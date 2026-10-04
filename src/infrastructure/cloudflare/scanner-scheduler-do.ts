@@ -1,29 +1,19 @@
 import { DurableObject } from "cloudflare:workers";
 import type { DurableObjectStorage } from "@cloudflare/workers-types";
-import {
-  ScannerRuntime,
-  validateInterval,
-} from "../../application/scanner-runtime.js";
+import { ScannerRuntime } from "../../application/scanner-runtime.js";
 import { QvaPayP2PClient } from "../qvapay/qvapay-p2p-client.js";
 import { CloudflareScannerScheduler } from "./scanner-scheduler.js";
-
-const CONFIG_KEY = "scanner-config";
-
-export interface ScannerSchedulerConfig {
-  readonly coin: string;
-  readonly intervalSeconds: number;
-}
+import {
+  normalizeScannerSchedulerConfig,
+  type ScannerSchedulerConfig,
+  type SchedulerState,
+} from "./scanner-scheduler-config.js";
 
 export interface ScannerSchedulerEnvironment {
   readonly QVAPAY_API_BASE_URL: string;
 }
 
-export interface SchedulerState {
-  readonly configured: boolean;
-  readonly coin: string | null;
-  readonly intervalSeconds: number | null;
-  readonly nextAlarmAt: number | null;
-}
+const CONFIG_KEY = "scanner-config";
 
 export class ScannerSchedulerDurableObject extends DurableObject<ScannerSchedulerEnvironment> {
   private readonly storage: DurableObjectStorage;
@@ -93,30 +83,7 @@ export class ScannerSchedulerDurableObject extends DurableObject<ScannerSchedule
   }
 }
 
-export function normalizeScannerSchedulerConfig(
-  config: ScannerSchedulerConfig,
-): ScannerSchedulerConfig {
-  const coin = config.coin.trim();
-  if (!coin) {
-    throw new Error("Scanner coin must not be empty");
-  }
-
-  validateInterval(config.intervalSeconds);
-
-  return {
-    coin,
-    intervalSeconds: config.intervalSeconds,
-  };
-}
-
-export function createScannerSchedulerState(
-  config: ScannerSchedulerConfig | undefined,
-  alarm: number | null,
-): SchedulerState {
-  return {
-    configured: config !== undefined,
-    coin: config?.coin ?? null,
-    intervalSeconds: config?.intervalSeconds ?? null,
-    nextAlarmAt: alarm,
-  };
-}
+export type {
+  ScannerSchedulerConfig,
+  SchedulerState,
+} from "./scanner-scheduler-config.js";
