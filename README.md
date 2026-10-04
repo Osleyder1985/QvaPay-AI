@@ -39,4 +39,4 @@ El primer alcance documentado comprende el escaneo automático del mercado P2P, 
 
 ## Verificación y certificación
 
-La política transversal del proyecto está definida en [Verification and Certification Policy](docs/quality/verification-and-certification-policy.md). Su aplicación es obligatoria para requisitos, diseño, implementación, pruebas, integraciones, infraestructura, documentación y releases.
+La política transversal del proyecto está definida en [Política de verificación y certificación](docs/quality/verification-and-certification-policy.md). Su aplicación es obligatoria para requisitos, diseño, implementación, pruebas, integraciones, infraestructura, documentación y releases.
