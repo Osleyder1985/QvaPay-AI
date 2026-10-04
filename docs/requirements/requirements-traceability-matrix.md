@@ -2,7 +2,7 @@
 
 ## Propósito
 
-Esta matriz establece la trazabilidad entre los requisitos del sistema y su futura implementación y verificación.
+Esta matriz establece la trazabilidad entre requisitos, responsabilidades de software, diseño, implementación, pruebas, evidencia de verificación y certificación.
 
 | Requirement ID | Requirement | Source | Software Requirement | Design / Component | Test | Verification Evidence | Status |
 |---|---|---|---|---|---|---|---|
@@ -25,16 +25,19 @@ Esta matriz establece la trazabilidad entre los requisitos del sistema y su futu
 
 ## Estados
 
-- **Defined:** requisito aprobado a nivel de definición inicial.
+- **Defined:** requisito definido y trazable.
+- **Designed:** existe diseño identificable.
 - **Implemented:** existe implementación identificable.
 - **Tested:** existe prueba ejecutada.
-- **Verified:** existe evidencia suficiente de verificación.
+- **Verified:** existe evidencia satisfactoria de verificación.
+- **Certified:** se completó la verificación requerida y la evidencia quedó registrada.
+- **Failed / Rejected:** existe incumplimiento o rechazo.
+- **Blocked:** la verificación está impedida por una dependencia externa.
 - **TBD:** información todavía no definida o verificada.
 
 ## Regla de trazabilidad
 
 Un requisito no se considerará completamente cerrado hasta disponer, cuando corresponda, de su relación con implementación, prueba y evidencia de verificación.
-
 
 ## Trazabilidad de ingestión event-driven
 
@@ -56,7 +59,7 @@ Un requisito no se considerará completamente cerrado hasta disponer, cuando cor
 | SYS-QR-006 | `src/domain/offer.ts` | `tests/domain/offer.test.ts` | Implemented |
 | SYS-QR-007 | Dominio sin dependencias externas | Tests unitarios del dominio | Implemented |
 
-La ejecución de CI determina posteriormente los estados Tested y Verified. Esta PR no certifica el cumplimiento funcional completo.
+La ejecución de CI determina posteriormente los estados Tested y Verified. La existencia de implementación y pruebas no certifica por sí sola el cumplimiento funcional completo.
 
 ## Implementación del adaptador QvaPay P2P
 
@@ -70,3 +73,7 @@ La ejecución de CI determina posteriormente los estados Tested y Verified. Esta
 | SYS-INT-009 | Cliente exclusivamente GET /p2p | Tests de cliente | Implemented/Tested |
 | SYS-INT-010 | `observedAt` generado en frontera de aplicación | `qvapay-p2p-client.test.ts` | Implemented |
 | SYS-INT-012 | Validación estricta del contrato externo | `qvapay-p2p-contract.test.ts` | Implemented/Tested |
+
+## Regla transversal de certificación
+
+Merge, CI exitoso o deployment exitoso no equivalen a certificación. Un requisito no podrá marcarse como **Certified** sin evidencia objetiva y trazable de cumplimiento conforme a [Verification and Certification Policy](../quality/verification-and-certification-policy.md).
