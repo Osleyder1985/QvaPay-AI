@@ -25,7 +25,8 @@ export interface SchedulerState {
   readonly nextAlarmAt: number | null;
 }
 
-export class ScannerSchedulerDurableObject\n  extends DurableObject<ScannerSchedulerEnvironment> {
+export class ScannerSchedulerDurableObject
+  extends DurableObject<ScannerSchedulerEnvironment> {
   private readonly storage: DurableObjectStorage;
 
   constructor(
