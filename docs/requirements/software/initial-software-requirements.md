@@ -85,3 +85,15 @@ Trazabilidad: SYS-QR-006, SYS-QR-008, SYS-QR-010.
 El software deberá ejecutar reconciliaciones mediante `GET /p2p` para recuperar pérdidas de eventos y divergencias del estado interno.
 
 Trazabilidad: SYS-QR-009.
+
+### SWR-IR-006 — Provider Request Policy
+
+La frontera QvaPay deberá encapsular paginación, límites, timeouts, clasificación de errores y backoff de las solicitudes de reconciliación.
+
+Trazabilidad: SYS-QR-005.
+
+### SWR-DR-002 — Decimal Value Preservation
+
+Los valores económicos recibidos del proveedor deberán conservar precisión decimal suficiente para su uso posterior.
+
+Trazabilidad: SYS-QR-006.
