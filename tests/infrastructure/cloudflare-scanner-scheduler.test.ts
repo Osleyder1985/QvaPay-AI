@@ -2,13 +2,13 @@ import { describe, expect, it, vi } from "vitest";
 import { CloudflareScannerScheduler } from "../../src/infrastructure/cloudflare/scanner-scheduler.js";
 import {
   createScannerSchedulerState,
+  normalizeScannerSchedulerConfig,
   type ScannerSchedulerConfig,
 } from "../../src/infrastructure/cloudflare/scanner-scheduler-do.js";
 
 function createStorage() {
   return {
     setAlarm: vi.fn().mockResolvedValue(undefined),
-    getAlarm: vi.fn().mockResolvedValue(null),
   };
 }
 
@@ -21,6 +21,38 @@ describe("CloudflareScannerScheduler", () => {
     await scheduler.scheduleNext(runAt);
 
     expect(storage.setAlarm).toHaveBeenCalledWith(runAt.getTime());
+  });
+});
+
+describe("normalizeScannerSchedulerConfig", () => {
+  it("trims the coin and preserves a valid interval", () => {
+    expect(
+      normalizeScannerSchedulerConfig({
+        coin: " QUSD ",
+        intervalSeconds: 10,
+      }),
+    ).toEqual({
+      coin: "QUSD",
+      intervalSeconds: 10,
+    });
+  });
+
+  it("rejects an empty coin", () => {
+    expect(() =>
+      normalizeScannerSchedulerConfig({
+        coin: " ",
+        intervalSeconds: 10,
+      }),
+    ).toThrow("must not be empty");
+  });
+
+  it("rejects an interval outside the runtime bounds", () => {
+    expect(() =>
+      normalizeScannerSchedulerConfig({
+        coin: "QUSD",
+        intervalSeconds: 301,
+      }),
+    ).toThrow("between 5 and 300");
   });
 });
 
