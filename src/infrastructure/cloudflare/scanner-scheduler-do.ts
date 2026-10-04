@@ -39,14 +39,13 @@ export class ScannerSchedulerDurableObject extends DurableObject<ScannerSchedule
     const config =
       await this.storage.get<ScannerSchedulerConfig>("scanner-config");
     const alarm = await this.storage.getAlarm();
-    const execution =
-      (await this.storage.get<ScannerRuntimeExecutionState>(
-        SCANNER_EXECUTION_STATE_KEY,
-      )) ?? {
-        lastStartedAt: null,
-        lastCompletedAt: null,
-        lastError: null,
-      };
+    const execution = (await this.storage.get<ScannerRuntimeExecutionState>(
+      SCANNER_EXECUTION_STATE_KEY,
+    )) ?? {
+      lastStartedAt: null,
+      lastCompletedAt: null,
+      lastError: null,
+    };
 
     return {
       configured: config !== undefined,
