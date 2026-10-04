@@ -25,8 +25,7 @@ export interface SchedulerState {
   readonly nextAlarmAt: number | null;
 }
 
-export class ScannerSchedulerDurableObject
-  extends DurableObject<ScannerSchedulerEnvironment> {
+export class ScannerSchedulerDurableObject extends DurableObject<ScannerSchedulerEnvironment> {
   private readonly storage: DurableObjectStorage;
 
   constructor(ctx: DurableObjectState, env: ScannerSchedulerEnvironment) {
@@ -38,9 +37,7 @@ export class ScannerSchedulerDurableObject
     config: ScannerSchedulerConfig,
   ): Promise<SchedulerState> {
     const normalized = normalizeScannerSchedulerConfig(config);
-    const previous = await this.storage.get<ScannerSchedulerConfig>(
-      CONFIG_KEY,
-    );
+    const previous = await this.storage.get<ScannerSchedulerConfig>(CONFIG_KEY);
     const currentAlarm = await this.storage.getAlarm();
     const configurationChanged =
       previous?.coin !== normalized.coin ||
