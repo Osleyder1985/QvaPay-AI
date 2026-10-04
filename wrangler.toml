@@ -1,0 +1,17 @@
+name = "qvapay-ai-runtime"
+main = "src/infrastructure/cloudflare/worker.ts"
+compatibility_date = "2026-10-04"
+
+[vars]
+QVAPAY_API_BASE_URL = "https://api.qvapay.com"
+SCANNER_COIN = "QUSD"
+SCANNER_INTERVAL_SECONDS = "10"
+
+[durable_objects]
+bindings = [
+  { name = "SCANNER_SCHEDULER", class_name = "ScannerSchedulerDurableObject" }
+]
+
+[exports.ScannerSchedulerDurableObject]
+type = "durable-object"
+storage = "sqlite"

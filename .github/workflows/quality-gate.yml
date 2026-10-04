@@ -132,7 +132,6 @@ jobs:
           set -euo pipefail
           git status --short
 
-
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -146,6 +145,9 @@ jobs:
 
       - name: Lint
         run: npm run lint
+
+      - name: Validate Cloudflare deployment bundle
+        run: npx wrangler deploy --dry-run
 
       - name: Format check
         run: npm run format:check

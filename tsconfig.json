@@ -13,7 +13,8 @@
     "isolatedModules": true,
     "verbatimModuleSyntax": true,
     "skipLibCheck": true,
-    "outDir": "dist"
+    "outDir": "dist",
+    "types": ["node", "@cloudflare/workers-types"]
   },
   "include": ["src", "tests", "vitest.config.ts"]
 }
