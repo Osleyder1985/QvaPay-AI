@@ -30,9 +30,8 @@ export class ScannerSchedulerDurableObject extends DurableObject<ScannerSchedule
   }
 
   async getState(): Promise<SchedulerState> {
-    const config = await this.storage.get<ScannerSchedulerConfig>(
-      "scanner-config",
-    );
+    const config =
+      await this.storage.get<ScannerSchedulerConfig>("scanner-config");
     const alarm = await this.storage.getAlarm();
 
     return {
@@ -44,9 +43,8 @@ export class ScannerSchedulerDurableObject extends DurableObject<ScannerSchedule
   }
 
   override async alarm(): Promise<void> {
-    const config = await this.storage.get<ScannerSchedulerConfig>(
-      "scanner-config",
-    );
+    const config =
+      await this.storage.get<ScannerSchedulerConfig>("scanner-config");
     if (!config) {
       return;
     }
