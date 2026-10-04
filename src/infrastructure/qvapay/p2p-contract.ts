@@ -43,22 +43,25 @@ function parseOffer(value: unknown): QvaPayP2POfferDto {
     throw new QvaPayContractError("Invalid QvaPay P2P offer type");
   }
 
-  const offer: QvaPayP2POfferDto = {
+  const reservedAmount = optionalDecimal(value.reserved_amount, "reserved_amount");
+  const orderMin = optionalDecimal(value.order_min, "order_min");
+  const orderMax = optionalDecimal(value.order_max, "order_max");
+  const createdAt = optionalTimestamp(value.created_at, "created_at");
+  const updatedAt = optionalTimestamp(value.updated_at, "updated_at");
+
+  return {
     uuid,
     type,
     coin,
     amount,
     receive,
     available_amount: availableAmount,
+    ...(reservedAmount === undefined ? {} : { reserved_amount: reservedAmount }),
+    ...(orderMin === undefined ? {} : { order_min: orderMin }),
+    ...(orderMax === undefined ? {} : { order_max: orderMax }),
+    ...(createdAt === undefined ? {} : { created_at: createdAt }),
+    ...(updatedAt === undefined ? {} : { updated_at: updatedAt }),
   };
-
-  addOptionalDecimal(offer, value.reserved_amount, "reserved_amount");
-  addOptionalDecimal(offer, value.order_min, "order_min");
-  addOptionalDecimal(offer, value.order_max, "order_max");
-  addOptionalTimestamp(offer, value.created_at, "created_at");
-  addOptionalTimestamp(offer, value.updated_at, "updated_at");
-
-  return offer;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -84,37 +87,12 @@ function optionalDecimal(value: unknown, field: string): string | undefined {
   return decimalString(value, field);
 }
 
-function addOptionalDecimal(
-  offer: QvaPayP2POfferDto,
-  value: unknown,
-  field: string,
-): void {
-  const parsed = optionalDecimal(value, field);
-  if (parsed !== undefined) {
-    if (field === "reserved_amount") offer.reserved_amount = parsed;
-    if (field === "order_min") offer.order_min = parsed;
-    if (field === "order_max") offer.order_max = parsed;
-  }
-}
-
 function optionalTimestamp(value: unknown, field: string): string | undefined {
   if (value === undefined || value === null) return undefined;
   if (typeof value !== "string" || Number.isNaN(Date.parse(value))) {
     throw new QvaPayContractError(`Invalid QvaPay timestamp: ${field}`);
   }
   return value;
-}
-
-function addOptionalTimestamp(
-  offer: QvaPayP2POfferDto,
-  value: unknown,
-  field: string,
-): void {
-  const parsed = optionalTimestamp(value, field);
-  if (parsed !== undefined) {
-    if (field === "created_at") offer.created_at = parsed;
-    if (field === "updated_at") offer.updated_at = parsed;
-  }
 }
 
 function positiveInteger(value: unknown, field: string): number {
