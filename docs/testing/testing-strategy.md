@@ -18,16 +18,7 @@ Todo pull request deberá pasar el workflow de GitHub Actions definido en `.gith
 
 En la fase documental, el gate comprueba la presencia e integridad estructural mínima de la documentación y los enlaces internos.
 
-Cuando exista código ejecutable, el gate deberá incorporar:
-
-- compilación;
-- lint;
-- format check;
-- pruebas unitarias;
-- pruebas de integración;
-- pruebas de contrato;
-- pruebas E2E aplicables;
-- controles de seguridad automatizados.
+En el estado actual, el Quality Gate incorpora compilación, lint, format check, pruebas unitarias y controles documentales. Las pruebas de integración, contrato, E2E y los controles de seguridad adicionales todavía deben incorporarse al workflow cuando existan los componentes correspondientes. No se considerará que esos niveles están cubiertos por CI hasta que exista un check ejecutable y evidencia de su ejecución.
 
 ## Criterio de integración
 
