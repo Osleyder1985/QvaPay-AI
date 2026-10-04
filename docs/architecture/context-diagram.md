@@ -1,4 +1,4 @@
-# Context Diagram
+# Diagrama de contexto
 
 ```mermaid
 flowchart LR
