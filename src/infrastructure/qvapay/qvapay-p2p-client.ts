@@ -51,6 +51,8 @@ export class QvaPayP2PClient {
       url.searchParams.set("coin", coin);
       url.searchParams.set("page", String(page));
       url.searchParams.set("take", String(this.take));
+      url.searchParams.set("orderBy", "updated_at");
+      url.searchParams.set("orderType", "desc");
 
       const response = await this.fetcher(url, { method: "GET" });
       if (response.status === 429) {
