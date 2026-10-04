@@ -23,9 +23,8 @@ export async function ensureScannerScheduled(
   now = Date.now(),
 ): Promise<SchedulerState> {
   const normalized = normalizeScannerSchedulerConfig(config);
-  const previous = await storage.get<ScannerSchedulerConfig>(
-    SCANNER_CONFIG_KEY,
-  );
+  const previous =
+    await storage.get<ScannerSchedulerConfig>(SCANNER_CONFIG_KEY);
   const currentAlarm = await storage.getAlarm();
   const configurationChanged =
     previous?.coin !== normalized.coin ||
