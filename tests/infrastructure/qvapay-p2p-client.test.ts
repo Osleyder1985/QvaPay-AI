@@ -55,9 +55,11 @@ describe("QvaPay P2P client", () => {
       "sell-one",
     ]);
     expect(fetcher).toHaveBeenCalledTimes(3);
-    expect(
-      fetcher.mock.calls.map(([url]) => url.searchParams.get("type")),
-    ).toEqual(["buy", "buy", "sell"]);
+    expect(fetcher.mock.calls.map(([url]) => url.searchParams.get("type"))).toEqual([
+      "buy",
+      "buy",
+      "sell",
+    ]);
   });
 
   it("uses Retry-After and retries a 429 response", async () => {
