@@ -146,6 +146,9 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      - name: Validate Cloudflare deployment bundle
+        run: npx wrangler deploy --dry-run
+
       - name: Format check
         run: npm run format:check
 
