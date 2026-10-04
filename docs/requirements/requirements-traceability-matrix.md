@@ -29,6 +29,9 @@ Esta matriz establece la trazabilidad entre los requisitos del sistema y su futu
 - **Implemented:** existe implementación identificable.
 - **Tested:** existe prueba ejecutada.
 - **Verified:** existe evidencia suficiente de verificación.
+- **Certified:** se completó la verificación requerida y la evidencia quedó registrada.
+- **Failed / Rejected:** la evidencia demuestra incumplimiento o el elemento fue rechazado.
+- **Blocked:** la verificación requerida no puede ejecutarse por una dependencia o condición externa.
 - **TBD:** información todavía no definida o verificada.
 
 ## Regla de trazabilidad
@@ -40,11 +43,11 @@ Un requisito no se considerará completamente cerrado hasta disponer, cuando cor
 
 | Requirement ID | Software Requirement | Architecture / Component | Planned Test |
 |---|---|---|---|
-| SYS-QR-008 | SWR-IR-002 | Event Ingestion Boundary | CT-QVA-003 |
-| SYS-QR-009 | SWR-IR-003 | Reconciliation | CT-QVA-009 |
-| SYS-QR-010 | SWR-IR-002 / SWR-SR-001 | Webhook Boundary / Secret Store | CT-QVA-004, CT-QVA-005 |
-| SYS-QR-005 | SWR-IR-004 | QvaPay Adapter | CT-QVA-011, CT-QVA-013 |
-| SYS-QR-006 | SWR-IR-001 / SWR-IR-002 | Integration Boundary | CT-QVA-001, CT-QVA-002, CT-QVA-007 |
+| SYS-QR-008 | SWR-IR-004 | Event Ingestion Boundary | TBD |
+| SYS-QR-009 | SWR-IR-005 | Reconciliation | TBD |
+| SYS-QR-010 | SWR-IR-004 / SWR-SR-001 | Webhook Boundary / Secret Store | TBD |
+| SYS-QR-005 | SWR-IR-006 | QvaPay Adapter | TBD |
+| SYS-QR-006 | SWR-IR-003 / SWR-IR-004 | Integration Boundary | TBD |
 
 ## Trazabilidad de la implementación inicial
 
@@ -56,17 +59,17 @@ Un requisito no se considerará completamente cerrado hasta disponer, cuando cor
 | SYS-QR-006 | `src/domain/offer.ts` | `tests/domain/offer.test.ts` | Implemented |
 | SYS-QR-007 | Dominio sin dependencias externas | Tests unitarios del dominio | Implemented |
 
-La ejecución de CI determina posteriormente los estados Tested y Verified. Esta PR no certifica el cumplimiento funcional completo.
+La ejecución de pruebas puede llevar un elemento a Tested; Verified requiere evidencia suficiente frente a los criterios aplicables. Certified requiere cumplir además las reglas de la política de verificación y certificación. Los estados de nivel sistema permanecen sin elevarse por una implementación parcial de componentes.
 
 ## Implementación del adaptador QvaPay P2P
 
 | Requirement | Implementation | Test | Status |
 |---|---|---|---|
-| SYS-INT-001 | `src/infrastructure/qvapay/qvapay-p2p-client.ts` | `tests/infrastructure/qvapay-p2p-client.test.ts` | Implemented/Tested |
-| SYS-INT-002 | `src/infrastructure/qvapay/p2p-contract.ts` + mapper | `tests/infrastructure/qvapay-p2p-contract.test.ts` | Implemented/Tested |
-| SYS-INT-003 | Paginación `page`/ `last_page` | `qvapay-p2p-client.test.ts` | Implemented/Tested |
-| SYS-INT-006 | Clasificación explícita de HTTP 429 | `qvapay-p2p-client.test.ts` | Implemented/Tested |
-| SYS-INT-008 | Decimales preservados como strings | `qvapay-p2p-contract.test.ts` | Implemented/Tested |
-| SYS-INT-009 | Cliente exclusivamente GET /p2p | Tests de cliente | Implemented/Tested |
+| SYS-INT-001 | `src/infrastructure/qvapay/qvapay-p2p-client.ts` | `tests/infrastructure/qvapay-p2p-client.test.ts` | Tested |
+| SYS-INT-002 | `src/infrastructure/qvapay/p2p-contract.ts` + mapper | `tests/infrastructure/qvapay-p2p-contract.test.ts` | Tested |
+| SYS-INT-003 | Paginación `page`/ `last_page` | `qvapay-p2p-client.test.ts` | Tested |
+| SYS-INT-006 | Clasificación explícita de HTTP 429 | `qvapay-p2p-client.test.ts` | Tested |
+| SYS-INT-008 | Decimales preservados como strings | `qvapay-p2p-contract.test.ts` | Tested |
+| SYS-INT-009 | Cliente exclusivamente GET /p2p | Tests de cliente | Tested |
 | SYS-INT-010 | `observedAt` generado en frontera de aplicación | `qvapay-p2p-client.test.ts` | Implemented |
-| SYS-INT-012 | Validación estricta del contrato externo | `qvapay-p2p-contract.test.ts` | Implemented/Tested |
+| SYS-INT-012 | Validación estricta del contrato externo | `qvapay-p2p-contract.test.ts` | Tested |
