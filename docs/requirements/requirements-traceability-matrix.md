@@ -57,3 +57,16 @@ Un requisito no se considerará completamente cerrado hasta disponer, cuando cor
 | SYS-QR-007 | Dominio sin dependencias externas | Tests unitarios del dominio | Implemented |
 
 La ejecución de CI determina posteriormente los estados Tested y Verified. Esta PR no certifica el cumplimiento funcional completo.
+
+## Implementación del adaptador QvaPay P2P
+
+| Requirement | Implementation | Test | Status |
+|---|---|---|---|
+| SYS-INT-001 | `src/infrastructure/qvapay/qvapay-p2p-client.ts` | `tests/infrastructure/qvapay-p2p-client.test.ts` | Implemented/Tested |
+| SYS-INT-002 | `src/infrastructure/qvapay/p2p-contract.ts` + mapper | `tests/infrastructure/qvapay-p2p-contract.test.ts` | Implemented/Tested |
+| SYS-INT-003 | Paginación `page`/ `last_page` | `qvapay-p2p-client.test.ts` | Implemented/Tested |
+| SYS-INT-006 | Clasificación explícita de HTTP 429 | `qvapay-p2p-client.test.ts` | Implemented/Tested |
+| SYS-INT-008 | Decimales preservados como strings | `qvapay-p2p-contract.test.ts` | Implemented/Tested |
+| SYS-INT-009 | Cliente exclusivamente GET /p2p | Tests de cliente | Implemented/Tested |
+| SYS-INT-010 | `observedAt` generado en frontera de aplicación | `qvapay-p2p-client.test.ts` | Implemented |
+| SYS-INT-012 | Validación estricta del contrato externo | `qvapay-p2p-contract.test.ts` | Implemented/Tested |
