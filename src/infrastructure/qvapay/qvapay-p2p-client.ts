@@ -51,6 +51,9 @@ export interface QvaPayP2PClientOptions {
 
 const OFFER_TYPES = ["buy", "sell"] as const;
 
+const defaultSleep = (milliseconds: number) =>
+  new Promise((resolve) => setTimeout(resolve, milliseconds));
+
 export class QvaPayP2PClient {
   private readonly fetcher: typeof fetch;
   private readonly take: number;
@@ -61,10 +64,7 @@ export class QvaPayP2PClient {
     this.fetcher = options.fetcher ?? fetch;
     this.take = options.take ?? 100;
     this.maxRetries = options.maxRetries ?? 3;
-    this.sleep =
-      options.sleep ??
-      ((milliseconds) =>
-        new Promise((resolve) => setTimeout(resolve, milliseconds)));
+    this.sleep = options.sleep ?? defaultSleep;
 
     if (!Number.isInteger(this.take) || this.take < 1 || this.take > 100) {
       throw new Error("QvaPay P2P take must be between 1 and 100");
@@ -171,6 +171,7 @@ export class QvaPayP2PClient {
               : response.status >= 400 && response.status < 500
                 ? "invalid-request"
                 : "contract";
+
           throw new QvaPayProviderError(
             response.status,
             `QvaPay P2P request failed with status ${response.status}`,
