@@ -22,3 +22,14 @@ Esta matriz establece la trazabilidad inicial entre los requisitos funcionales d
 ## Regla de trazabilidad
 
 Un requisito no se considerará completamente cerrado hasta disponer, cuando corresponda, de su relación con implementación, prueba y evidencia de verificación.
+
+
+## Trazabilidad de ingestión event-driven
+
+| Requirement ID | Software Requirement | Architecture / Component | Planned Test |
+|---|---|---|---|
+| SYS-QR-008 | SWR-IR-002 | Event Ingestion Boundary | CT-QVA-003 |
+| SYS-QR-009 | SWR-IR-003 | Reconciliation | CT-QVA-009 |
+| SYS-QR-010 | SWR-IR-002 / SWR-SR-001 | Webhook Boundary / Secret Store | CT-QVA-004, CT-QVA-005 |
+| SYS-QR-005 | SWR-IR-004 | QvaPay Adapter | CT-QVA-011, CT-QVA-013 |
+| SYS-QR-006 | SWR-IR-001 / SWR-IR-002 | Integration Boundary | CT-QVA-001, CT-QVA-002, CT-QVA-007 |
