@@ -28,25 +28,16 @@ const page = (
   total: last_page,
 });
 
+const responseFor = (body: unknown, status = 200) =>
+  new Response(JSON.stringify(body), { status });
+
 describe("QvaPay P2P client", () => {
   it("fetches every page independently for BUY and SELL", async () => {
     const fetcher = vi
       .fn()
-      .mockResolvedValueOnce(
-        new Response(JSON.stringify(page(1, 2, "buy-one", "buy")), {
-          status: 200,
-        }),
-      )
-      .mockResolvedValueOnce(
-        new Response(JSON.stringify(page(2, 2, "buy-two", "buy")), {
-          status: 200,
-        }),
-      )
-      .mockResolvedValueOnce(
-        new Response(JSON.stringify(page(1, 1, "sell-one", "sell")), {
-          status: 200,
-        }),
-      );
+      .mockResolvedValueOnce(responseFor(page(1, 2, "buy-one", "buy")))
+      .mockResolvedValueOnce(responseFor(page(2, 2, "buy-two", "buy")))
+      .mockResolvedValueOnce(responseFor(page(1, 1, "sell-one", "sell")));
 
     const client = new QvaPayP2PClient({
       baseUrl: "https://api.qvapay.com",
@@ -78,11 +69,7 @@ describe("QvaPay P2P client", () => {
           headers: { "retry-after": "7" },
         }),
       )
-      .mockResolvedValue(
-        new Response(JSON.stringify(page(1, 1, "buy-one", "buy")), {
-          status: 200,
-        }),
-      );
+      .mockResolvedValue(responseFor(page(1, 1, "buy-one", "buy")));
     const sleep = vi.fn().mockResolvedValue(undefined);
 
     const client = new QvaPayP2PClient({
@@ -123,6 +110,7 @@ describe("QvaPay P2P client", () => {
         .fn()
         .mockResolvedValue(new Response("unauthorized", { status: 401 })),
     });
+
     await expect(authClient.fetchOffers("BANK_CUP")).rejects.toMatchObject({
       name: QvaPayProviderError.name,
       status: 401,
@@ -137,6 +125,7 @@ describe("QvaPay P2P client", () => {
       sleep: vi.fn().mockResolvedValue(undefined),
       maxRetries: 0,
     });
+
     await expect(
       transientClient.fetchOffers("BANK_CUP"),
     ).rejects.toMatchObject({
