@@ -10,18 +10,18 @@ Esta matriz establece la trazabilidad entre los requisitos del sistema y su futu
 | SYS-FR-002 | Ejecución continua 24/7 sin usuarios conectados | Issue #1 | SWR-FR-002 | Durable Object / Alarm | TBD | TBD | Defined |
 | SYS-FR-003 | Ofertas SELL por moneda y tasa ascendente | Issue #1 | SWR-FR-003 | Market / Offer | tests/domain/market.test.ts | CI Quality Gate | Implemented |
 | SYS-FR-004 | Ofertas BUY por moneda y tasa ascendente | Issue #1 | SWR-FR-004 | Market / Offer | tests/domain/market.test.ts | CI Quality Gate | Implemented |
-| SYS-INT-001 | Consulta del mercado P2P mediante GET /p2p | Issue #10 / QvaPay API | SWR-IR-001 | QvaPay Adapter | CT-QVA-001 | TBD | Defined |
-| SYS-INT-002 | Separación independiente por type y coin | Issue #10 / QvaPay API | SWR-FR-003 / SWR-FR-004 | Market / Offer | CT-QVA-002 | TBD | Defined |
-| SYS-INT-003 | Procesamiento completo de paginación | Issue #10 / QvaPay API | SWR-IR-002 | QvaPay Adapter | CT-QVA-003 | TBD | Defined |
+| SYS-INT-001 | Consulta del mercado P2P mediante GET /p2p | Issue #10 / QvaPay API | SWR-IR-001 | QvaPay Adapter | CT-QVA-001 | CI Quality Gate | Tested |
+| SYS-INT-002 | Separación independiente por type y coin | Issue #10 / QvaPay API | SWR-FR-003 / SWR-FR-004 | QvaPay Adapter / Market / Offer | CT-QVA-002 | CI Quality Gate | Tested |
+| SYS-INT-003 | Procesamiento completo de paginación | Issue #10 / QvaPay API | SWR-IR-002 | QvaPay Adapter | CT-QVA-003 | CI Quality Gate | Tested |
 | SYS-INT-004 | Credenciales exclusivamente en servidor | Issue #10 / Security Baseline | SWR-SR-001 | Infrastructure / Secrets | SEC-QVA-001 | TBD | Defined |
-| SYS-INT-005 | Validación de respuestas externas | Issue #10 | SWR-IR-003 | Schema Validator / Mapper | CT-QVA-004 | TBD | Defined |
-| SYS-INT-006 | Backoff controlado ante 429 | Issue #10 / QvaPay API | SWR-QR-001 | Retry Policy | CT-QVA-005 | TBD | Defined |
-| SYS-INT-007 | Clasificación de errores del proveedor | Issue #10 | SWR-IR-002 | Error Classification | CT-QVA-006 | TBD | Defined |
-| SYS-INT-008 | Preservación de precisión decimal | Issue #10 / QvaPay API | SWR-DR-002 | Decimal Value Objects | CT-QVA-007 | TBD | Defined |
-| SYS-INT-009 | Integración inicial de solo lectura | Issue #10 | SWR-IR-001 | Read-only Adapter | CT-QVA-008 | TBD | Defined |
-| SYS-INT-010 | Timestamp propio de observación | Issue #10 | SWR-DR-001 | MarketSnapshot | CT-QVA-009 | TBD | Defined |
+| SYS-INT-005 | Validación de respuestas externas | Issue #10 | SWR-IR-003 | Schema Validator / Mapper | CT-QVA-004 | CI Quality Gate | Tested |
+| SYS-INT-006 | Backoff controlado ante 429 | Issue #10 / QvaPay API | SWR-QR-001 | Retry Policy | CT-QVA-005 | CI Quality Gate | Tested |
+| SYS-INT-007 | Clasificación de errores del proveedor | Issue #10 | SWR-IR-002 | Error Classification | CT-QVA-006 | CI Quality Gate | Tested |
+| SYS-INT-008 | Preservación de precisión decimal | Issue #10 / QvaPay API | SWR-DR-002 | Decimal Value Objects | CT-QVA-007 | CI Quality Gate | Tested |
+| SYS-INT-009 | Integración inicial de solo lectura | Issue #10 | SWR-IR-001 | Read-only Adapter | CT-QVA-008 | CI Quality Gate | Tested |
+| SYS-INT-010 | Timestamp propio de observación | Issue #10 | SWR-DR-001 | QvaPay Adapter / MarketSnapshot | CT-QVA-009 | CI Quality Gate | Tested |
 | SYS-INT-011 | Compatibilidad con caché del proveedor | Issue #10 / QvaPay API | SWR-FR-001 | Scanner Scheduling | CT-QVA-010 | TBD | Defined |
-| SYS-INT-012 | Evolución segura del contrato | Issue #10 | SWR-IR-003 | Contract Validation | CT-QVA-011 | TBD | Defined |
+| SYS-INT-012 | Evolución segura del contrato | Issue #10 | SWR-IR-003 | Contract Validation | CT-QVA-011 | CI Quality Gate | Tested |
 
 ## Estados
 
@@ -71,5 +71,5 @@ La ejecución de pruebas puede llevar un elemento a Tested; Verified requiere ev
 | SYS-INT-006 | Clasificación explícita de HTTP 429 | `qvapay-p2p-client.test.ts` | Tested |
 | SYS-INT-008 | Decimales preservados como strings | `qvapay-p2p-contract.test.ts` | Tested |
 | SYS-INT-009 | Cliente exclusivamente GET /p2p | Tests de cliente | Tested |
-| SYS-INT-010 | `observedAt` generado en frontera de aplicación | `qvapay-p2p-client.test.ts` | Implemented |
+| SYS-INT-010 | `observedAt` generado en la frontera del adaptador QvaPay | `qvapay-p2p-client.test.ts` | Tested |
 | SYS-INT-012 | Validación estricta del contrato externo | `qvapay-p2p-contract.test.ts` | Tested |
