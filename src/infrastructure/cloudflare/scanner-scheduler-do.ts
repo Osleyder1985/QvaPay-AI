@@ -29,10 +29,7 @@ export class ScannerSchedulerDurableObject
   extends DurableObject<ScannerSchedulerEnvironment> {
   private readonly storage: DurableObjectStorage;
 
-  constructor(
-    ctx: DurableObjectState,
-    env: ScannerSchedulerEnvironment,
-  ) {
+  constructor(ctx: DurableObjectState, env: ScannerSchedulerEnvironment) {
     super(ctx, env);
     this.storage = ctx.storage;
   }
