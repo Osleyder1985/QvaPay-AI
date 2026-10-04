@@ -5,7 +5,7 @@ export async function scanMarket(
   provider: MarketProvider,
   coin: string,
 ): Promise<ReturnType<typeof createMarket>> {
-  const offers = await provider.fetchOffers();
+  const offers = await provider.fetchOffers(coin);
   return createMarket(
     coin,
     offers.filter((offer) => offer.market === coin),
