@@ -55,9 +55,7 @@ export class QvaPayP2PClient {
   private readonly fetcher: typeof fetch;
   private readonly take: number;
   private readonly maxRetries: number;
-  private readonly sleep: (
-    milliseconds: number,
-  ) => Promise<void>;
+  private readonly sleep: (milliseconds: number) => Promise<void>;
 
   constructor(private readonly options: QvaPayP2PClientOptions) {
     this.fetcher = options.fetcher ?? fetch;
@@ -65,8 +63,7 @@ export class QvaPayP2PClient {
     this.maxRetries = options.maxRetries ?? 3;
     this.sleep =
       options.sleep ??
-      ((milliseconds) =>
-        new Promise((resolve) => setTimeout(resolve, milliseconds)));
+      ((milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds)));
 
     if (!Number.isInteger(this.take) || this.take < 1 || this.take > 100) {
       throw new Error("QvaPay P2P take must be between 1 and 100");
@@ -149,9 +146,7 @@ export class QvaPayP2PClient {
           const retryAfterSeconds = this.parseRetryAfter(
             response.headers.get("retry-after"),
           );
-          await this.sleep(
-            (retryAfterSeconds ?? 2 ** attempt) * 1000,
-          );
+          await this.sleep((retryAfterSeconds ?? 2 ** attempt) * 1000);
           continue;
         }
 
