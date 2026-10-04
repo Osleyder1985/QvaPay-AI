@@ -1,38 +1,42 @@
-# Testing Strategy
+# Estrategia de Pruebas
 
 ## Objetivo
 
-Verificar que QvaPay-AI satisface los requisitos y que los cambios no rompen contratos.
+Verificar que QvaPay-AI cumple sus requisitos funcionales, de calidad, integración, seguridad y operación mediante una estrategia progresiva y trazable.
 
 ## Niveles
 
-### Unit Tests
+- **Unitarias:** reglas de dominio y casos deterministas.
+- **Integración:** persistencia D1, runtime del scanner y adaptadores.
+- **Contrato:** compatibilidad con la API y feed P2P de QvaPay.
+- **E2E:** configuración → ingestión/reconciliación → persistencia → API → UI.
+- **Seguridad:** autenticación del webhook, secretos, validación de entrada, deduplicación y manejo seguro de errores.
 
-Reglas puras del dominio: separación BUY/SELL, agrupamiento, ordenación, validación de ofertas y configuración del intervalo.
+## Quality gate CI
 
-### Integration Tests
+Todo pull request deberá pasar el workflow de GitHub Actions definido en `.github/workflows/quality-gate.yml`.
 
-Persistencia D1, scanner runtime e integración entre Application e Infrastructure.
+En la fase documental, el gate comprueba la presencia e integridad estructural mínima de la documentación y los enlaces internos.
 
-### Contract Tests
+Cuando exista código ejecutable, el gate deberá incorporar:
 
-Contrato externo de QvaPay: endpoint, autenticación, estructura, tipos, campos obligatorios y errores.
+- compilación;
+- lint;
+- format check;
+- pruebas unitarias;
+- pruebas de integración;
+- pruebas de contrato;
+- pruebas E2E aplicables;
+- controles de seguridad automatizados.
 
-### End-to-End Tests
+## Criterio de integración
 
-Flujo completo:
+Un pull request no deberá integrarse si un check obligatorio falla o si existe una evidencia de trazabilidad requerida que no esté disponible.
 
-```
-Configuración → Escaneo → Persistencia → API → UI
-```
+## Evidencia
 
-## Trazabilidad
+Cada prueba significativa deberá poder relacionarse con uno o más requisitos mediante la matriz de trazabilidad. Los resultados del CI constituyen evidencia de verificación automatizada; no sustituyen evidencia operativa de producción cuando esta sea requerida.
 
-| Requirement | Test |
-|---|---|
-| SYS-FR-001 | TEST-SYS-FR-001 |
-| SYS-FR-002 | TEST-SYS-FR-002 |
-| SYS-FR-003 | TEST-SYS-FR-003 |
-| SYS-FR-004 | TEST-SYS-FR-004 |
+## Dependencias externas
 
-Un Pull Request no deberá considerarse listo si falla compilación, lint, formato, pruebas, contratos obligatorios o trazabilidad.
+Las pruebas que requieran QvaPay real, feed de pago o credenciales deberán estar separadas de las verificaciones deterministas del CI base. Los secretos nunca se almacenarán en el repositorio.
