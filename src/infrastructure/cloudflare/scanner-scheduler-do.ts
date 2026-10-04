@@ -66,7 +66,7 @@ export class ScannerSchedulerDurableObject extends DurableObject<ScannerSchedule
     };
   }
 
-  async alarm(): Promise<void> {
+  override async alarm(): Promise<void> {
     const config = await this.storage.get<ScannerSchedulerConfig>(CONFIG_KEY);
     if (!config) {
       return;
