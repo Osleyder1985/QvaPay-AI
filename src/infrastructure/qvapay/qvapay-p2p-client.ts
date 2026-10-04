@@ -63,7 +63,8 @@ export class QvaPayP2PClient {
     this.maxRetries = options.maxRetries ?? 3;
     this.sleep =
       options.sleep ??
-      ((milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds)));
+      ((milliseconds) =>
+        new Promise((resolve) => setTimeout(resolve, milliseconds)));
 
     if (!Number.isInteger(this.take) || this.take < 1 || this.take > 100) {
       throw new Error("QvaPay P2P take must be between 1 and 100");
