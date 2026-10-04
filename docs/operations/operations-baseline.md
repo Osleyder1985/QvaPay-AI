@@ -1,4 +1,4 @@
-# Operations Baseline
+# Línea base operativa
 
 ## Ciclo
 
