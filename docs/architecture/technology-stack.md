@@ -1,4 +1,4 @@
-# Technology Stack
+# Pila tecnológica
 
 ## Estado
 
