@@ -1,4 +1,4 @@
-# Verification and Certification Policy
+# Política de verificación y certificación
 
 ## Propósito
 
@@ -25,7 +25,7 @@ La ausencia de evidencia impide la certificación.
 | **Failed / Rejected** | La evidencia demuestra incumplimiento o el elemento fue rechazado. |
 | **Blocked** | La verificación requerida no puede ejecutarse por una dependencia o condición externa; no implica conformidad. |
 
-Los estados no son equivalentes.
+Los nombres de los estados se mantienen en inglés porque son identificadores del ciclo de vida del proyecto.
 
 En particular:
 
