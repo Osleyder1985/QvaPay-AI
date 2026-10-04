@@ -141,3 +141,9 @@ La reconciliación deberá:
 Contrato documentado a partir de la documentación oficial de QvaPay consultada el 2026-10-04.
 
 Las capacidades de producción deberán validarse posteriormente mediante pruebas de contrato y una suscripción de feed habilitada.
+
+## Decisión para QvaPay-AI sobre Cloudflare
+
+Para la arquitectura de producción en Cloudflare, el **webhook es el canal primario** y `GET /p2p` es la reconciliación obligatoria. El stream SSE queda como canal opcional/no crítico.
+
+No se debe asumir que un Durable Object puede mantener indefinidamente una conexión SSE outbound mediante `fetch()`. La documentación de Cloudflare indica que los fetch outbound normales no mantienen un Durable Object vivo por el mero hecho de que el cuerpo de respuesta esté en streaming. Por ello, el stream no será una dependencia de disponibilidad del scanner.
