@@ -1,5 +1,8 @@
 import { describe, expect, it, vi } from "vitest";
-import {\n  ScannerRuntime,\n  validateInterval,\n} from "../../src/application/scanner-runtime.js";
+import {
+  ScannerRuntime,
+  validateInterval,
+} from "../../src/application/scanner-runtime.js";
 import type { MarketProvider } from "../../src/application/ports/market-provider.js";
 import type { ScannerScheduler } from "../../src/application/ports/scanner-scheduler.js";
 
@@ -71,7 +74,9 @@ describe("ScannerRuntime", () => {
     const blocked = new Promise<void>((resolve) => {
       release = resolve;
     });
-    vi.mocked(provider.fetchOffers).mockReturnValueOnce(\n      blocked.then(() => []),\n    );
+    vi.mocked(provider.fetchOffers).mockReturnValueOnce(
+      blocked.then(() => []),
+    );
 
     const runtime = new ScannerRuntime(provider, {
       coin: "QUSD",
@@ -90,7 +95,9 @@ describe("ScannerRuntime", () => {
 
   it("records failures without scheduling another run", async () => {
     const { provider, scheduler } = createHarness();
-    vi.mocked(provider.fetchOffers).mockRejectedValueOnce(\n      new Error("provider unavailable"),\n    );
+    vi.mocked(provider.fetchOffers).mockRejectedValueOnce(
+      new Error("provider unavailable"),
+    );
 
     const runtime = new ScannerRuntime(provider, {
       coin: "QUSD",
