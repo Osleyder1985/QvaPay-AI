@@ -27,6 +27,7 @@ La documentación explicativa se mantiene en español. Los nombres técnicos de 
 4. Los requisitos deben tener identificadores estables.
 5. Los requisitos deben poder trazarse hasta diseño, implementación y verificación.
 6. Las capacidades de QvaPay que no hayan sido verificadas se marcarán como TBD y no se asumirán como hechos.
+7. Ningún elemento se considerará terminado o certificado sin evidencia objetiva conforme a la política de verificación y certificación.
 
 ## Primer alcance funcional
 
@@ -35,3 +36,7 @@ El primer alcance documentado comprende el escaneo automático del mercado P2P, 
 ## Referencia
 
 - Issue #1: Establish initial P2P market scanner requirements documentation
+
+## Verificación y certificación
+
+La política transversal del proyecto está definida en [Verification and Certification Policy](docs/quality/verification-and-certification-policy.md). Su aplicación es obligatoria para requisitos, diseño, implementación, pruebas, integraciones, infraestructura, documentación y releases.
