@@ -123,6 +123,9 @@ jobs:
               sys.exit(1)
           PY
 
+      - name: Check documentation language convention
+        run: node scripts/check-documentation-language.mjs
+
       - name: Check repository status
         shell: bash
         run: |
