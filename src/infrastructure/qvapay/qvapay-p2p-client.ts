@@ -41,7 +41,10 @@ export class QvaPayP2PClient {
     }
   }
 
-  async fetchOffers(coin: string, observedAt = new Date().toISOString()): Promise<readonly Offer[]> {
+  async fetchOffers(
+    coin: string,
+    observedAt = new Date().toISOString(),
+  ): Promise<readonly Offer[]> {
     const offers: Offer[] = [];
     let page = 1;
     let lastPage = 1;
@@ -57,7 +60,8 @@ export class QvaPayP2PClient {
       const response = await this.fetcher(url, { method: "GET" });
       if (response.status === 429) {
         const retryAfter = response.headers.get("retry-after");
-        const retryAfterSeconds = retryAfter === null ? undefined : Number(retryAfter);
+        const retryAfterSeconds =
+          retryAfter === null ? undefined : Number(retryAfter);
         throw new QvaPayRateLimitError(
           Number.isFinite(retryAfterSeconds) ? retryAfterSeconds : undefined,
         );
@@ -75,10 +79,15 @@ export class QvaPayP2PClient {
       lastPage = parsed.last_page;
 
       if (parsed.current_page !== page) {
-        throw new QvaPayProviderError(502, "QvaPay P2P returned an unexpected page");
+        throw new QvaPayProviderError(
+          502,
+          "QvaPay P2P returned an unexpected page",
+        );
       }
 
-      offers.push(...parsed.data.map((offer) => mapQvaPayOffer(offer, observedAt)));
+      offers.push(
+        ...parsed.data.map((offer) => mapQvaPayOffer(offer, observedAt)),
+      );
       page += 1;
     } while (page <= lastPage);
 
