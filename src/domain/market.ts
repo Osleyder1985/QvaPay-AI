@@ -30,5 +30,5 @@ export function offersBySide(
 ): readonly Offer[] {
   return market.offers
     .filter((offer) => offer.side === side)
-    .toSorted((left, right) => compareDecimalStrings(left.rate, right.rate));
+    .sort((left, right) => compareDecimalStrings(left.rate, right.rate));
 }
