@@ -51,21 +51,27 @@ describe("ScannerRuntime", () => {
   it("rejects an invalid interval", () => {
     const { provider, scheduler } = createHarness();
 
-    expect(() => new ScannerRuntime(provider, {
-      coin: "QUSD",
-      intervalSeconds: 4,
-      scheduler,
-    })).toThrow("between 5 and 300");
+    expect(
+      () =>
+        new ScannerRuntime(provider, {
+          coin: "QUSD",
+          intervalSeconds: 4,
+          scheduler,
+        }),
+    ).toThrow("between 5 and 300");
   });
 
   it("rejects an empty coin", () => {
     const { provider, scheduler } = createHarness();
 
-    expect(() => new ScannerRuntime(provider, {
-      coin: " ",
-      intervalSeconds: 10,
-      scheduler,
-    })).toThrow("must not be empty");
+    expect(
+      () =>
+        new ScannerRuntime(provider, {
+          coin: " ",
+          intervalSeconds: 10,
+          scheduler,
+        }),
+    ).toThrow("must not be empty");
   });
 
   it("prevents overlapping executions", async () => {
@@ -74,9 +80,7 @@ describe("ScannerRuntime", () => {
     const blocked = new Promise<void>((resolve) => {
       release = resolve;
     });
-    vi.mocked(provider.fetchOffers).mockReturnValueOnce(
-      blocked.then(() => []),
-    );
+    vi.mocked(provider.fetchOffers).mockReturnValueOnce(blocked.then(() => []));
 
     const runtime = new ScannerRuntime(provider, {
       coin: "QUSD",
