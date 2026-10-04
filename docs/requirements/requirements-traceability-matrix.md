@@ -13,10 +13,14 @@ Esta matriz establece la trazabilidad entre requisitos, responsabilidades de sof
 
 ## Estados
 
-- **Defined:** requisito aprobado a nivel de definición inicial.
+- **Defined:** requisito definido y trazable.
+- **Designed:** existe diseño identificable.
 - **Implemented:** existe implementación identificable.
 - **Tested:** existe prueba ejecutada.
-- **Verified:** existe evidencia suficiente de verificación.
+- **Verified:** existe evidencia satisfactoria de verificación.
+- **Certified:** se completó la verificación requerida y la evidencia quedó registrada.
+- **Failed / Rejected:** existe incumplimiento o rechazo.
+- **Blocked:** la verificación está impedida por una dependencia externa.
 - **TBD:** información todavía no definida o verificada.
 
 ## Regla de trazabilidad
