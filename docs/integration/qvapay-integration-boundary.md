@@ -1,4 +1,4 @@
-# QvaPay Integration Boundary
+# Frontera de integración con QvaPay
 
 ## Objetivo
 
