@@ -4,8 +4,8 @@ import {
   SCANNER_EXECUTION_STATE_KEY,
   type ScannerRuntimeExecutionState,
   type ScannerSchedulerPersistentStorage,
-} from "../../src/infrastructure/cloudflare/scanner-scheduler-do-logic.js";
-import type { MarketProvider } from "../../src/application/ports/market-provider.js";
+} from "../../../src/infrastructure/cloudflare/scanner-scheduler-do-logic.js";
+import type { MarketProvider } from "../../../src/application/ports/market-provider.js";
 
 class FakeStorage implements ScannerSchedulerPersistentStorage {
   private readonly values = new Map<string, unknown>();
@@ -57,7 +57,6 @@ describe("executeScannerAlarm", () => {
       lastError: null,
     });
     expect(state?.lastCompletedAt).toEqual(expect.any(String));
-    expect(storage).toBeDefined();
   });
 
   it("persists the error and schedules the next cycle after failure", async () => {
