@@ -123,9 +123,7 @@ describe("QvaPay P2P client", () => {
         .fn()
         .mockResolvedValue(new Response("unauthorized", { status: 401 })),
     });
-    await expect(
-      authClient.fetchOffers("BANK_CUP"),
-    ).rejects.toMatchObject({
+    await expect(authClient.fetchOffers("BANK_CUP")).rejects.toMatchObject({
       name: QvaPayProviderError.name,
       status: 401,
       category: "authentication",
@@ -133,7 +131,9 @@ describe("QvaPay P2P client", () => {
 
     const transientClient = new QvaPayP2PClient({
       baseUrl: "https://api.qvapay.com",
-      fetcher: vi.fn().mockResolvedValue(new Response("server error", { status: 503 })),
+      fetcher: vi
+        .fn()
+        .mockResolvedValue(new Response("server error", { status: 503 })),
       sleep: vi.fn().mockResolvedValue(undefined),
       maxRetries: 0,
     });
