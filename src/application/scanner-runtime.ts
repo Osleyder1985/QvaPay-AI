@@ -1,0 +1,102 @@
+import type { Market } from "../domain/market.js";
+import type { MarketProvider } from "./ports/market-provider.js";
+import type { ScannerScheduler } from "./ports/scanner-scheduler.js";
+import { scanMarket } from "./use-cases/scan-market.js";
+
+export interface ScannerRuntimeOptions {
+  readonly coin: string;
+  readonly intervalSeconds: number;
+  readonly scheduler: ScannerScheduler;
+}
+
+export interface ScannerRuntimeState {
+  readonly status: "idle" | "running" | "failed";
+  readonly lastStartedAt: string | null;
+  readonly lastCompletedAt: string | null;
+  readonly lastError: string | null;
+  readonly nextRunAt: string | null;
+}
+
+const MIN_INTERVAL_SECONDS = 5;
+const MAX_INTERVAL_SECONDS = 300;
+
+export class ScannerRuntime {
+  private running = false;
+  private state: ScannerRuntimeState = {
+    status: "idle",
+    lastStartedAt: null,
+    lastCompletedAt: null,
+    lastError: null,
+    nextRunAt: null,
+  };
+
+  constructor(
+    private readonly provider: MarketProvider,
+    private readonly options: ScannerRuntimeOptions,
+    private readonly clock: () => Date = () => new Date(),
+  ) {
+    validateInterval(options.intervalSeconds);
+    if (!options.coin.trim()) {
+      throw new Error("Scanner coin must not be empty");
+    }
+  }
+
+  getState(): ScannerRuntimeState {
+    return { ...this.state };
+  }
+
+  async run(): Promise<Market | null> {
+    if (this.running) {
+      return null;
+    }
+
+    this.running = true;
+    const startedAt = this.clock();
+    this.state = {
+      ...this.state,
+      status: "running",
+      lastStartedAt: startedAt.toISOString(),
+      lastError: null,
+    };
+
+    try {
+      const market = await scanMarket(this.provider, this.options.coin);
+      const nextRunAt = new Date(
+        startedAt.getTime() + this.options.intervalSeconds * 1000,
+      );
+      this.state = {
+        ...this.state,
+        status: "idle",
+        lastCompletedAt: this.clock().toISOString(),
+        nextRunAt: nextRunAt.toISOString(),
+      };
+      await this.options.scheduler.scheduleNext(nextRunAt);
+      return market;
+    } catch (error) {
+      this.state = {
+        ...this.state,
+        status: "failed",
+        lastError: error instanceof Error ? error.message : String(error),
+      };
+      throw error;
+    } finally {
+      this.running = false;
+    }
+  }
+}
+
+export function validateInterval(intervalSeconds: number): void {
+  if (
+    !Number.isInteger(intervalSeconds) ||
+    intervalSeconds < MIN_INTERVAL_SECONDS ||
+    intervalSeconds > MAX_INTERVAL_SECONDS
+  ) {
+    throw new Error(
+      "Scanner interval must be an integer between " +
+        MIN_INTERVAL_SECONDS +
+        " and " +
+        MAX_INTERVAL_SECONDS +
+        " seconds",
+    );
+  }
+}
