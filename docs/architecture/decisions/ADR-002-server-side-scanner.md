@@ -1,8 +1,8 @@
-# ADR-002: Server-Side Continuous Scanner
+# ADR-002: Escáner continuo del lado servidor
 
 ## Estado
 
-Accepted as initial baseline.
+Aceptado como línea base inicial.
 
 ## Contexto
 
