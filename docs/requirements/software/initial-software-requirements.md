@@ -1,0 +1,51 @@
+# Initial Software Requirements
+
+## Propósito
+
+Traducir los requisitos de sistema iniciales a responsabilidades de software sin inventar detalles de la API externa.
+
+### SWR-FR-001 — Scan Market Use Case
+
+El software deberá proporcionar un caso de uso que ejecute un escaneo del mercado y produzca un snapshot normalizado.
+
+Trazabilidad: SYS-FR-001.
+
+### SWR-FR-002 — Continuous Scanner Runtime
+
+El software deberá proporcionar un runtime server-side capaz de ejecutar el caso de uso de escaneo sin depender de una sesión de usuario.
+
+Trazabilidad: SYS-FR-002.
+
+### SWR-FR-003 — SELL Book Processing
+
+El software deberá clasificar, agrupar por mercado/moneda y ordenar ascendentemente por tasa las ofertas SELL.
+
+Trazabilidad: SYS-FR-003.
+
+### SWR-FR-004 — BUY Book Processing
+
+El software deberá clasificar, agrupar por mercado/moneda y ordenar ascendentemente por tasa las ofertas BUY.
+
+Trazabilidad: SYS-FR-004.
+
+### SWR-IR-001 — External Provider Adapter
+
+La integración con QvaPay deberá implementarse mediante una frontera de infraestructura que traduzca el contrato externo a modelos internos.
+
+Trazabilidad: SYS-FR-001, SYS-QR-006.
+
+### SWR-DR-001 — Market Snapshot Persistence
+
+El software deberá persistir snapshots con referencia temporal y estado de procesamiento.
+
+Trazabilidad: SYS-FR-002, SYS-QR-004, SYS-QR-005.
+
+### SWR-SR-001 — Secret Isolation
+
+El software no deberá exponer credenciales de proveedores externos al cliente web.
+
+Trazabilidad: SYS-QR-006 y baseline de seguridad.
+
+## Estado
+
+Definidos como baseline inicial. Los detalles de API, esquema físico y límites cuantitativos permanecen TBD.
