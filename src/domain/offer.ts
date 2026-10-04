@@ -1,0 +1,71 @@
+export type OfferSide = "BUY" | "SELL";
+
+export interface Offer {
+  readonly id: string;
+  readonly market: string;
+  readonly side: OfferSide;
+  readonly rate: string;
+  readonly amount: string;
+  readonly availableAmount: string;
+  readonly sourceTimestamp: string;
+  readonly observedAt: string;
+}
+
+export function compareDecimalStrings(left: string, right: string): number {
+  const a = normalizeDecimal(left);
+  const b = normalizeDecimal(right);
+
+  if (a.sign !== b.sign) {
+    return a.sign > b.sign ? 1 : -1;
+  }
+
+  const integerComparison = compareUnsignedIntegers(a.integer, b.integer);
+  if (integerComparison !== 0) {
+    return a.sign === 1 ? integerComparison : -integerComparison;
+  }
+
+  const fractionLength = Math.max(a.fraction.length, b.fraction.length);
+  const leftFraction = a.fraction.padEnd(fractionLength, "0");
+  const rightFraction = b.fraction.padEnd(fractionLength, "0");
+
+  if (leftFraction === rightFraction) {
+    return 0;
+  }
+
+  const fractionComparison = leftFraction > rightFraction ? 1 : -1;
+  return a.sign === 1 ? fractionComparison : -fractionComparison;
+}
+
+function normalizeDecimal(value: string): {
+  sign: -1 | 1;
+  integer: string;
+  fraction: string;
+} {
+  if (!/^-?\d+(?:\.\d+)?$/.test(value)) {
+    throw new Error("Invalid decimal value");
+  }
+
+  const negative = value.startsWith("-");
+  const unsigned = negative ? value.slice(1) : value;
+  const parts = unsigned.split(".");
+  const integer = (parts[0] ?? "0").replace(/^0+(?=\d)/, "");
+  const fraction = parts[1] ?? "";
+
+  return {
+    sign: negative ? -1 : 1,
+    integer,
+    fraction,
+  };
+}
+
+function compareUnsignedIntegers(left: string, right: string): number {
+  if (left.length !== right.length) {
+    return left.length > right.length ? 1 : -1;
+  }
+
+  if (left === right) {
+    return 0;
+  }
+
+  return left > right ? 1 : -1;
+}
