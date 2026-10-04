@@ -4,7 +4,7 @@ import {
   createScannerSchedulerState,
   normalizeScannerSchedulerConfig,
   type ScannerSchedulerConfig,
-} from "../../src/infrastructure/cloudflare/scanner-scheduler-do.js";
+} from "../../src/infrastructure/cloudflare/scanner-scheduler-config.js";
 
 function createStorage() {
   return {
