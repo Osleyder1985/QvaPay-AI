@@ -2,56 +2,101 @@
 
 ## Estado
 
-Accepted as initial architectural direction.
+Accepted as initial architectural direction, condicionada a las restricciones del runtime de producción.
 
 ## Contexto
 
-El listado P2P `GET /p2p` de QvaPay está cacheado y el proveedor documenta que consultar más rápido que la caché no garantiza datos más frescos. QvaPay ofrece además un feed del mercado P2P mediante webhook y stream SSE. El webhook dispone de cola y reintentos; el stream es en vivo y no acumula eventos durante una desconexión.
+QvaPay ofrece un feed P2P mediante webhook y stream SSE. El webhook proporciona entrega firmada con cola y reintentos. El stream proporciona eventos en vivo, pero no acumula eventos durante una desconexión y QvaPay indica que la conexión puede cortarse periódicamente.
 
-Para QvaPay-AI, cuyo objetivo es observar el mercado de forma continua, un modelo basado exclusivamente en polling introduce consultas repetitivas y no ofrece la mejor latencia de detección.
+QvaPay también expone `GET /p2p`, que se utilizará para reconciliación.
+
+Cloudflare Durable Objects no debe utilizarse bajo la premisa de que un `fetch()` outbound SSE mantiene indefinidamente el objeto activo. Cloudflare documenta que los fetch outbound normales no mantienen el Durable Object vivo por el mero hecho de tener un cuerpo de respuesta en streaming. Los Durable Object Alarms tienen además un límite de 15 minutos por invocación.
 
 ## Decisión
 
-QvaPay-AI adoptará una estrategia **event-driven con reconciliación**:
+Para producción sobre Cloudflare:
 
-1. **Webhook P2P** como canal durable de eventos cuando esté habilitado.
-2. **Stream SSE** como canal de baja latencia para reacción inmediata cuando resulte operativo.
-3. **GET /p2p** como mecanismo de reconciliación y recuperación de estado, no como mecanismo primario de detección.
-4. Todos los canales convergerán en el mismo pipeline interno de validación, normalización, deduplicación y persistencia.
-5. El estado persistido en D1 será la representación interna observable del mercado; ningún canal externo será tratado como fuente de verdad permanente sin validación.
-6. El sistema deberá tolerar eventos duplicados, pérdida temporal del stream, errores del proveedor y expiración de la suscripción.
+1. **Webhook P2P es el canal primario de ingestión de eventos.**
+2. **GET /p2p es el mecanismo obligatorio de reconciliación y recuperación.**
+3. **Stream SSE es opcional y no crítico.** Puede utilizarse únicamente cuando exista un runtime adecuado para mantener la conexión outbound y gestionar sus reconexiones sin convertirla en una dependencia de disponibilidad.
+4. Webhook y reconciliación convergen en el mismo pipeline de validación, deduplicación, normalización y persistencia.
+5. Durable Object + Alarm gestiona la programación de reconciliaciones y el estado operativo del scanner.
+6. No se introduce infraestructura externa permanente únicamente para mantener el stream mientras webhook + reconciliación cubran el objetivo de disponibilidad.
 
-## Razones
+## Flujo
 
-- El webhook ofrece cola y reintentos documentados por QvaPay.
-- El stream evita exponer un endpoint público y permite reaccionar en vivo.
-- La reconciliación con `GET /p2p` permite recuperar divergencias producidas por pérdida de eventos o indisponibilidad temporal.
-- La separación de canales evita acoplar el dominio a una única modalidad de transporte.
+```
+                    QvaPay P2P
+                        |
+                +-------+--------+
+                |                |
+                v                v
+        Webhook primario    Stream opcional
+                |                |
+                |          (no crítico)
+                |                |
+                +-------+--------+
+                        v
+             Event Ingestion Boundary
+                        |
+              Validate / Deduplicate
+                        |
+                    Normalize
+                        |
+                        v
+                 Market State D1
+                        ^
+                        |
+                 Reconciliation
+                   GET /p2p
+                        ^
+                        |
+              Durable Object Alarm
+```
+
+## Reconciliación
+
+La reconciliación deberá ejecutarse con un intervalo configurable y validado. Su propósito es detectar y corregir:
+
+- eventos perdidos;
+- desconexiones;
+- divergencias;
+- ofertas que cambiaron mientras el canal de eventos estaba indisponible;
+- expiración o fallo del feed.
+
+El intervalo de configuración representa por tanto la **frecuencia máxima de reconciliación**, no la frecuencia primaria de detección.
+
+## Idempotencia
+
+Los eventos deberán procesarse de forma idempotente. La deduplicación utilizará la identidad documentada por QvaPay y el identificador de la oferta/evento disponible en el payload.
+
+## Seguridad
+
+- Credenciales y secretos únicamente server-side.
+- Webhook autenticado antes de procesar el payload.
+- Payload externo validado antes de entrar al dominio.
+- Ningún secreto o firma completa en logs.
+- Esta arquitectura no autoriza operaciones financieras automáticas.
 
 ## Consecuencias
 
 ### Positivas
 
-- Menor dependencia del polling frecuente.
-- Menor presión sobre los límites de consultas del proveedor.
-- Menor latencia potencial para detectar cambios.
-- Recuperación explícita ante pérdida de eventos.
-- Un único pipeline interno para múltiples fuentes de ingestión.
+- Cloudflare no depende de una conexión SSE outbound permanente.
+- El webhook aprovecha la cola y los reintentos de QvaPay.
+- La reconciliación permite recuperación determinista.
+- El scanner permanece independiente del navegador.
+- Stream puede añadirse posteriormente como acelerador sin convertirse en dependencia crítica.
 
 ### Negativas
 
-- Mayor complejidad operacional que un polling simple.
-- Se requiere deduplicación e idempotencia.
-- Se requiere reconciliación periódica.
-- El feed es una capacidad de pago de QvaPay y debe gestionarse su ciclo de suscripción.
-
-## Límites de esta decisión
-
-Esta decisión **no autoriza** creación, edición, aplicación, cancelación ni ejecución automática de ofertas P2P.
-
-La semántica exacta del intervalo configurable del scanner deberá redefinirse como frecuencia de reconciliación si la implementación confirma el modelo event-driven.
+- La actualización puede tener latencia adicional si depende de webhook + reconciliación.
+- Se requiere implementación cuidadosa de idempotencia y reconciliación.
+- El feed P2P es una capacidad de pago de QvaPay.
 
 ## Referencias
 
 - Issue #12: Define event-driven P2P market ingestion strategy.
-- Contrato oficial QvaPay P2P feed: webhook y stream.
+- Contrato: `docs/integration/qvapay-p2p-feed-contract.md`.
+- QvaPay P2P webhooks y stream.
+- Cloudflare Workers Limits y Durable Objects Lifecycle.
