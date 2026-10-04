@@ -1,5 +1,5 @@
-import type { Offer } from "../../domain/offer.js";
+import type { Offer, OfferSide } from "../../domain/offer.js";
 
 export interface MarketProvider {
-  fetchOffers(coin: string): Promise<readonly Offer[]>;
+  fetchOffers(coin: string, side: OfferSide): Promise<readonly Offer[]>;
 }
