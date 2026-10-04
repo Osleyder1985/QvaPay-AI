@@ -18,11 +18,14 @@ export default {
   ): Promise<Response> {
     const url = new URL(request.url);
 
-    if (url.pathname !== "/internal/scanner/start") {
+    if (
+      url.pathname !== "/internal/scanner/start" &&
+      url.pathname !== "/internal/scanner/state"
+    ) {
       return new Response("Not found", { status: 404 });
     }
 
-    if (request.method !== "POST") {
+    if (request.method !== "POST" && request.method !== "GET") {
       return new Response("Method not allowed", { status: 405 });
     }
 
@@ -31,8 +34,21 @@ export default {
       return new Response("Unauthorized", { status: 401 });
     }
 
-    const intervalSeconds = Number(env.SCANNER_INTERVAL_SECONDS);
     const stub = env.SCANNER_SCHEDULER.getByName(OBJECT_NAME);
+
+    if (url.pathname === "/internal/scanner/state") {
+      if (request.method !== "GET") {
+        return new Response("Method not allowed", { status: 405 });
+      }
+
+      return Response.json(await stub.getState());
+    }
+
+    if (request.method !== "POST") {
+      return new Response("Method not allowed", { status: 405 });
+    }
+
+    const intervalSeconds = Number(env.SCANNER_INTERVAL_SECONDS);
     const state = await stub.ensureScheduled({
       coin: env.SCANNER_COIN,
       intervalSeconds,
