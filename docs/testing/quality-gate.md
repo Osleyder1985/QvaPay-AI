@@ -1,4 +1,4 @@
-# Repository Quality Gate
+# Quality Gate del repositorio
 
 ## Propósito
 
@@ -29,7 +29,7 @@ Cuando exista implementación ejecutable, el quality gate deberá ampliarse para
 
 Un cambio no se considera listo para integración si el quality gate obligatorio falla.
 
-## Relación con la estrategia de testing
+## Relación con la estrategia de pruebas
 
 Este CI implementa la primera capa automatizada de la estrategia definida en `docs/testing/testing-strategy.md`. No sustituye las pruebas de comportamiento; establece el mecanismo de enforcement para que las verificaciones posteriores puedan convertirse en gates obligatorios.
 

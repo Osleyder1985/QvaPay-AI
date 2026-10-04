@@ -1,4 +1,4 @@
-# Initial Quality Requirements
+# Requisitos iniciales de calidad
 
 ## SYS-QR-001 — Disponibilidad del scanner
 

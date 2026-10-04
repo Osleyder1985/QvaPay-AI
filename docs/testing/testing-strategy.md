@@ -12,7 +12,7 @@ Verificar que QvaPay-AI cumple sus requisitos funcionales, de calidad, integraci
 - **E2E:** configuración → ingestión/reconciliación → persistencia → API → UI.
 - **Seguridad:** autenticación del webhook, secretos, validación de entrada, deduplicación y manejo seguro de errores.
 
-## Quality gate CI
+## Quality gate de CI
 
 Todo pull request deberá pasar el workflow de GitHub Actions definido en `.github/workflows/quality-gate.yml`.
 

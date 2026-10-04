@@ -1,8 +1,8 @@
-# ADR-001: Modular Monolith Architecture
+# ADR-001: Arquitectura de monolito modular
 
 ## Estado
 
-Accepted as initial baseline.
+Aceptado como línea base inicial.
 
 ## Contexto
 

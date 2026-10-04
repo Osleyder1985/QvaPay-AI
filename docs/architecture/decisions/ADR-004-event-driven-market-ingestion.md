@@ -1,8 +1,8 @@
-# ADR-004: Event-Driven Market Ingestion
+# ADR-004: Ingestión de mercado orientada a eventos
 
 ## Estado
 
-Accepted as initial architectural direction, condicionada a las restricciones del runtime de producción.
+Aceptado como dirección arquitectónica inicial, condicionada a las restricciones del runtime de producción.
 
 ## Contexto
 

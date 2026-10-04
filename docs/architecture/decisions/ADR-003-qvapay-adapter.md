@@ -1,8 +1,8 @@
-# ADR-003: QvaPay Adapter Boundary
+# ADR-003: Frontera del adaptador QvaPay
 
 ## Estado
 
-Accepted as initial baseline.
+Aceptado como línea base inicial.
 
 ## Contexto
 

@@ -1,4 +1,4 @@
-# Project Structure
+# Estructura del proyecto
 
 ## Objetivo
 
@@ -35,8 +35,8 @@ QvaPay-AI/
 
 ## Reglas
 
-- Los nombres de carpetas y archivos son English technical names.
-- La documentación explicativa es española.
+- Los nombres de carpetas y archivos son nombres técnicos en inglés.
+- La documentación explicativa está en español.
 - Domain no depende de Infrastructure.
 - Tests se organizan por nivel.
 - La documentación arquitectónica no debe duplicarse en múltiples ubicaciones.

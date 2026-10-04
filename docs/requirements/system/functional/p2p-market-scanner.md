@@ -1,4 +1,4 @@
-# P2P Market Scanner — System Functional Requirements
+# Escáner de mercado P2P — Requisitos funcionales del sistema
 
 ## Propósito
 
@@ -78,11 +78,11 @@ TBD.
 
 ---
 
-## Scope boundary
+## Límite de alcance
 
 Estos requisitos describen observación y presentación del mercado. No autorizan por sí mismos la creación, modificación, cancelación o ejecución automática de órdenes.
 
-## Open questions
+## Preguntas abiertas
 
 - **TBD:** API/endpoint oficial que proporcionará las ofertas P2P.
 - **TBD:** definición exacta de moneda, mercado y par según el contrato de QvaPay.
