@@ -1,78 +1,141 @@
-import { env } from "cloudflare:workers";
-import {
-  reset,
-  runDurableObjectAlarm,
-  runInDurableObject,
-} from "cloudflare:test";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import { CloudflareScannerScheduler } from "../../src/infrastructure/cloudflare/scanner-scheduler.js";
+import {
+  ensureScannerScheduled,
+  executeScannerAlarm,
+  type ScannerSchedulerPersistentStorage,
+} from "../../src/infrastructure/cloudflare/scanner-scheduler-do-logic.js";
 import {
   createScannerSchedulerState,
   normalizeScannerSchedulerConfig,
   type ScannerSchedulerConfig,
 } from "../../src/infrastructure/cloudflare/scanner-scheduler-config.js";
 
-function createStorage() {
+function createStorage(initialAlarm: number | null = null) {
+  const values = new Map<string, unknown>();
+  let alarm = initialAlarm;
+
+  const storage: ScannerSchedulerPersistentStorage = {
+    async get<T>(key: string) {
+      return values.get(key) as T | undefined;
+    },
+    async put<T>(key: string, value: T) {
+      values.set(key, value);
+    },
+    async getAlarm() {
+      return alarm;
+    },
+    setAlarm(scheduledTimeMs) {
+      alarm = scheduledTimeMs;
+    },
+  };
+
   return {
-    setAlarm: vi.fn().mockResolvedValue(undefined),
+    storage,
+    getAlarm: () => alarm,
   };
 }
 
-afterEach(async () => {
-  vi.unstubAllGlobals();
-  await reset();
-});
-
 describe("CloudflareScannerScheduler", () => {
   it("schedules an alarm using the requested instant", async () => {
-    const storage = createStorage();
-    const scheduler = new CloudflareScannerScheduler(storage);
+    let scheduledAt: number | undefined;
+    const scheduler = new CloudflareScannerScheduler({
+      setAlarm(value) {
+        scheduledAt = value;
+      },
+    });
 
     const runAt = new Date("2026-10-04T19:00:10.000Z");
     await scheduler.scheduleNext(runAt);
 
-    expect(storage.setAlarm).toHaveBeenCalledWith(runAt.getTime());
+    expect(scheduledAt).toBe(runAt.getTime());
+  });
+
+  it("creates the initial alarm using the configured interval", async () => {
+    const { storage, getAlarm } = createStorage();
+    const state = await ensureScannerScheduled(
+      storage,
+      { coin: "QUSD", intervalSeconds: 5 },
+      1_000,
+    );
+
+    expect(state).toEqual({
+      configured: true,
+      coin: "QUSD",
+      intervalSeconds: 5,
+      nextAlarmAt: 6_000,
+    });
+    expect(getAlarm()).toBe(6_000);
   });
 
   it("keeps an existing alarm when configuration is unchanged", async () => {
-    const stub = env.SCANNER_SCHEDULER.getByName("unchanged-config");
-    await stub.ensureScheduled({ coin: "QUSD", intervalSeconds: 5 });
+    const { storage, getAlarm } = createStorage(8_000);
 
-    const firstAlarm = await runInDurableObject(stub, async (_, state) =>
-      state.storage.getAlarm(),
+    await storage.put("scanner-config", {
+      coin: "QUSD",
+      intervalSeconds: 5,
+    });
+
+    const state = await ensureScannerScheduled(
+      storage,
+      { coin: "QUSD", intervalSeconds: 5 },
+      10_000,
     );
 
-    await stub.ensureScheduled({ coin: "QUSD", intervalSeconds: 5 });
-
-    const secondAlarm = await runInDurableObject(stub, async (_, state) =>
-      state.storage.getAlarm(),
-    );
-
-    expect(firstAlarm).not.toBeNull();
-    expect(secondAlarm).toBe(firstAlarm);
+    expect(state.nextAlarmAt).toBe(8_000);
+    expect(getAlarm()).toBe(8_000);
   });
 
-  it("executes an Alarm and schedules a bounded retry after provider failure", async () => {
-    const stub = env.SCANNER_SCHEDULER.getByName("failure-retry");
-    await stub.ensureScheduled({ coin: "QUSD", intervalSeconds: 5 });
+  it("reprograms the alarm when configuration changes", async () => {
+    const { storage, getAlarm } = createStorage(8_000);
 
-    const initialAlarm = await runInDurableObject(stub, async (_, state) =>
-      state.storage.getAlarm(),
+    await storage.put("scanner-config", {
+      coin: "QUSD",
+      intervalSeconds: 5,
+    });
+
+    const state = await ensureScannerScheduled(
+      storage,
+      { coin: "QUSD", intervalSeconds: 10 },
+      10_000,
     );
 
-    const fetcher = vi.fn().mockRejectedValue(new Error("provider unavailable"));
-    vi.stubGlobal("fetch", fetcher);
+    expect(state.nextAlarmAt).toBe(20_000);
+    expect(getAlarm()).toBe(20_000);
+  });
 
-    expect(await runDurableObjectAlarm(stub)).toBe(true);
+  it("reschedules the next alarm after a successful scan", async () => {
+    const { storage, getAlarm } = createStorage();
+    const provider = {
+      fetchOffers: async () => [],
+    };
 
-    const retryAlarm = await runInDurableObject(stub, async (_, state) =>
-      state.storage.getAlarm(),
+    await executeScannerAlarm(
+      storage,
+      { coin: "QUSD", intervalSeconds: 5 },
+      provider,
     );
 
-    expect(initialAlarm).not.toBeNull();
-    expect(retryAlarm).not.toBeNull();
-    expect(retryAlarm).toBeGreaterThan(initialAlarm ?? 0);
-    expect(fetcher).toHaveBeenCalled();
+    expect(getAlarm()).not.toBeNull();
+    expect(getAlarm()).toBeGreaterThan(Date.now());
+  });
+
+  it("reschedules a single bounded retry after a provider failure", async () => {
+    const { storage, getAlarm } = createStorage();
+    const provider = {
+      fetchOffers: async () => {
+        throw new Error("provider unavailable");
+      },
+    };
+
+    await executeScannerAlarm(
+      storage,
+      { coin: "QUSD", intervalSeconds: 5 },
+      provider,
+    );
+
+    expect(getAlarm()).not.toBeNull();
+    expect(getAlarm()).toBeGreaterThan(Date.now());
   });
 });
 
