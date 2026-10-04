@@ -126,13 +126,13 @@ describe("QvaPay P2P client", () => {
       maxRetries: 0,
     });
 
-    await expect(
-      transientClient.fetchOffers("BANK_CUP"),
-    ).rejects.toMatchObject({
-      name: QvaPayProviderError.name,
-      status: 503,
-      category: "transient",
-    });
+    await expect(transientClient.fetchOffers("BANK_CUP")).rejects.toMatchObject(
+      {
+        name: QvaPayProviderError.name,
+        status: 503,
+        category: "transient",
+      },
+    );
   });
 
   it("classifies exhausted transport failures as transient", async () => {
