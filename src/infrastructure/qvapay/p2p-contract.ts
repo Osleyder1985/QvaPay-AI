@@ -37,13 +37,19 @@ function parseOffer(value: unknown): QvaPayP2POfferDto {
   const coin = stringField(value.coin, "coin");
   const amount = decimalString(value.amount, "amount");
   const receive = decimalString(value.receive, "receive");
-  const availableAmount = decimalString(value.available_amount, "available_amount");
+  const availableAmount = decimalString(
+    value.available_amount,
+    "available_amount",
+  );
 
   if (type !== "buy" && type !== "sell") {
     throw new QvaPayContractError("Invalid QvaPay P2P offer type");
   }
 
-  const reservedAmount = optionalDecimal(value.reserved_amount, "reserved_amount");
+  const reservedAmount = optionalDecimal(
+    value.reserved_amount,
+    "reserved_amount",
+  );
   const orderMin = optionalDecimal(value.order_min, "order_min");
   const orderMax = optionalDecimal(value.order_max, "order_max");
   const createdAt = optionalTimestamp(value.created_at, "created_at");
@@ -56,7 +62,9 @@ function parseOffer(value: unknown): QvaPayP2POfferDto {
     amount,
     receive,
     available_amount: availableAmount,
-    ...(reservedAmount === undefined ? {} : { reserved_amount: reservedAmount }),
+    ...(reservedAmount === undefined
+      ? {}
+      : { reserved_amount: reservedAmount }),
     ...(orderMin === undefined ? {} : { order_min: orderMin }),
     ...(orderMax === undefined ? {} : { order_max: orderMax }),
     ...(createdAt === undefined ? {} : { created_at: createdAt }),
