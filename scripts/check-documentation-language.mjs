@@ -1,1 +1,66 @@
-import fs from "node:fs";\nimport path from "node:path";\n\nconst root = process.cwd();\nconst markdownFiles = [];\n\nfunction walk(directory) {\n  for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {\n    if (entry.name === ".git" || entry.name === "node_modules") continue;\n    const fullPath = path.join(directory, entry.name);\n    if (entry.isDirectory()) walk(fullPath);\n    else if (entry.isFile() && entry.name.endsWith(".md")) markdownFiles.push(fullPath);\n  }\n}\n\nwalk(root);\n\nconst suspiciousPatterns = [\n  /^The\s+/i,\n  /^This\s+/i,\n  /^These\s+/i,\n  /^Those\s+/i,\n  /^Accepted as\s+/i,\n  /^Establish\s+/i,\n  /^Define\s+/i,\n  /^Defines\s+/i,\n  /^The system\s+/i,\n  /^The software\s+/i,\n  /^The adapter\s+/i,\n  /^The repository\s+/i,\n  /^The documentation\s+/i,\n  /^No\s+(?:secret|credential|external|element|change|document|requirement)/i,\n];\n\nconst failures = [];\n\nfor (const file of markdownFiles) {\n  const relative = path.relative(root, file).replaceAll(path.sep, "/");\n  const lines = fs.readFileSync(file, "utf8").split(/\r?\n/);\n  let inFence = false;\n\n  for (let index = 0; index < lines.length; index += 1) {\n    const line = lines[index];\n    if (line.trimStart().startsWith("```")) {\n      inFence = !inFence;\n      continue;\n    }\n    if (inFence) continue;\n\n    const trimmed = line.trim();\n    if (!trimmed || trimmed.startsWith("#") || trimmed.startsWith("|")) continue;\n\n    const candidate = trimmed.replace(/^[-*+]\s+/, "");\n    if (suspiciousPatterns.some((pattern) => pattern.test(candidate))) {\n      failures.push(`${relative}:${index + 1}: ${trimmed}`);\n    }\n  }\n}\n\nif (failures.length > 0) {\n  console.error("Potential English explanatory prose detected:");\n  console.error(failures.join("\n"));\n  process.exit(1);\n}\n\nconsole.log(`Language convention check passed for ${markdownFiles.length} Markdown files.`);\n
+import fs from "node:fs";
+import path from "node:path";
+
+const root = process.cwd();
+const markdownFiles = [];
+
+function walk(directory) {
+  for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
+    if (entry.name === ".git" || entry.name === "node_modules") continue;
+    const fullPath = path.join(directory, entry.name);
+    if (entry.isDirectory()) walk(fullPath);
+    else if (entry.isFile() && entry.name.endsWith(".md")) markdownFiles.push(fullPath);
+  }
+}
+
+walk(root);
+
+const suspiciousPatterns = [
+  /^The\s+/i,
+  /^This\s+/i,
+  /^These\s+/i,
+  /^Those\s+/i,
+  /^Accepted as\s+/i,
+  /^Establish\s+/i,
+  /^Define\s+/i,
+  /^Defines\s+/i,
+  /^The system\s+/i,
+  /^The software\s+/i,
+  /^The adapter\s+/i,
+  /^The repository\s+/i,
+  /^The documentation\s+/i,
+  /^No\s+(?:secret|credential|external|element|change|document|requirement)/i,
+];
+
+const failures = [];
+
+for (const file of markdownFiles) {
+  const relative = path.relative(root, file).replaceAll(path.sep, "/");
+  const lines = fs.readFileSync(file, "utf8").split(/\r?\n/);
+  let inFence = false;
+
+  for (let index = 0; index < lines.length; index += 1) {
+    const line = lines[index];
+    if (line.trimStart().startsWith("```")) {
+      inFence = !inFence;
+      continue;
+    }
+    if (inFence) continue;
+
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith("#") || trimmed.startsWith("|")) continue;
+
+    const candidate = trimmed.replace(/^[-*+]\s+/, "");
+    if (suspiciousPatterns.some((pattern) => pattern.test(candidate))) {
+      failures.push(relative + ":" + (index + 1) + ": " + trimmed);
+    }
+  }
+}
+
+if (failures.length > 0) {
+  console.error("Potential English explanatory prose detected:");
+  console.error(failures.join("\n"));
+  process.exit(1);
+}
+
+console.log("Language convention check passed for " + markdownFiles.length + " Markdown files.");
