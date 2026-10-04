@@ -64,11 +64,9 @@ describe("QvaPay P2P client", () => {
       "sell-one",
     ]);
     expect(fetcher).toHaveBeenCalledTimes(3);
-    expect(fetcher.mock.calls.map(([url]) => url.searchParams.get("type"))).toEqual([
-      "buy",
-      "buy",
-      "sell",
-    ]);
+    expect(
+      fetcher.mock.calls.map(([url]) => url.searchParams.get("type")),
+    ).toEqual(["buy", "buy", "sell"]);
   });
 
   it("uses Retry-After and retries a 429 response", async () => {
@@ -121,9 +119,13 @@ describe("QvaPay P2P client", () => {
   it("classifies 401 and 5xx responses separately", async () => {
     const authClient = new QvaPayP2PClient({
       baseUrl: "https://api.qvapay.com",
-      fetcher: vi.fn().mockResolvedValue(new Response("unauthorized", { status: 401 })),
+      fetcher: vi
+        .fn()
+        .mockResolvedValue(new Response("unauthorized", { status: 401 })),
     });
-    await expect(authClient.fetchOffers("BANK_CUP")).rejects.toMatchObject({
+    await expect(
+      authClient.fetchOffers("BANK_CUP"),
+    ).rejects.toMatchObject({
       name: QvaPayProviderError.name,
       status: 401,
       category: "authentication",
@@ -135,7 +137,9 @@ describe("QvaPay P2P client", () => {
       sleep: vi.fn().mockResolvedValue(undefined),
       maxRetries: 0,
     });
-    await expect(transientClient.fetchOffers("BANK_CUP")).rejects.toMatchObject({
+    await expect(
+      transientClient.fetchOffers("BANK_CUP"),
+    ).rejects.toMatchObject({
       name: QvaPayProviderError.name,
       status: 503,
       category: "transient",
