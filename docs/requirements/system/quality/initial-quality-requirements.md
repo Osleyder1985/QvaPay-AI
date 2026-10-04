@@ -31,3 +31,21 @@ Las reglas de dominio deberán poder probarse sin depender de servicios externos
 ## Estado
 
 Definidos como requisitos iniciales. Los objetivos cuantitativos de disponibilidad, latencia, recuperación y retención quedan TBD.
+
+## Requisitos adicionales de ingestión
+
+### SYS-QR-008 — Idempotencia de eventos
+
+La ingestión deberá tolerar entregas duplicadas sin duplicar ni corromper el estado de una oferta.
+
+### SYS-QR-009 — Recuperación de divergencias
+
+El sistema deberá disponer de reconciliación mediante `GET /p2p` para recuperar divergencias producidas por pérdida de eventos, desconexiones o errores temporales.
+
+### SYS-QR-010 — Seguridad del feed
+
+Las credenciales de aplicación y el secreto del feed deberán permanecer server-side. Los webhooks deberán validar autenticidad antes de procesar el contenido.
+
+### Aclaración de SYS-QR-002
+
+El intervalo configurable se considera inicialmente la **frecuencia de reconciliación**, no necesariamente la frecuencia primaria de detección de cambios, porque la ingestión puede ser event-driven.
