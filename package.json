@@ -8,7 +8,8 @@
     "test": "vitest run",
     "lint": "eslint .",
     "format:check": "prettier --check \"src/**/*.ts\" \"tests/**/*.ts\" \"*.json\" \"*.js\" \"*.ts\"",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "check:docs-language": "node scripts/check-documentation-language.mjs"
   },
   "devDependencies": {
     "@types/node": "^22.15.0",
