@@ -2,7 +2,7 @@
 
 ## Propósito
 
-Esta matriz establece la trazabilidad inicial entre los requisitos funcionales del sistema y su futura implementación y verificación.
+Esta matriz establece la trazabilidad entre requisitos, responsabilidades de software, diseño, implementación, pruebas, evidencia de verificación y certificación.
 
 | Requirement ID | Requirement | Source | Software Requirement | Design / Component | Test | Verification Evidence | Status |
 |---|---|---|---|---|---|---|---|
@@ -22,3 +22,7 @@ Esta matriz establece la trazabilidad inicial entre los requisitos funcionales d
 ## Regla de trazabilidad
 
 Un requisito no se considerará completamente cerrado hasta disponer, cuando corresponda, de su relación con implementación, prueba y evidencia de verificación.
+
+## Regla transversal de certificación
+
+Merge, CI exitoso o deployment exitoso no equivalen a certificación. Un requisito no podrá marcarse como **Certified** sin evidencia objetiva y trazable de cumplimiento conforme a [Verification and Certification Policy](../quality/verification-and-certification-policy.md).
