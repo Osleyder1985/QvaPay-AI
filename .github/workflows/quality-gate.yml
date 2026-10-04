@@ -150,12 +150,7 @@ jobs:
         run: npx wrangler deploy --dry-run
 
       - name: Format check
-        run: |
-          npm run format:check || {
-            npx prettier --write src/infrastructure/cloudflare/scanner-scheduler-do.ts tests/infrastructure/cloudflare/scanner-scheduler-do-logic.test.ts
-            git diff -- src/infrastructure/cloudflare/scanner-scheduler-do.ts tests/infrastructure/cloudflare/scanner-scheduler-do-logic.test.ts
-            exit 1
-          }
+        run: npm run format:check
 
       - name: Unit tests
         run: npm test
