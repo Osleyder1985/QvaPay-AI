@@ -40,6 +40,30 @@ El software deberá persistir snapshots con referencia temporal y estado de proc
 
 Trazabilidad: SYS-FR-002, SYS-QR-004, SYS-QR-005.
 
+### SWR-IR-002 — Provider Request Policy
+
+El adaptador deberá encapsular paginación, límites de frecuencia, timeouts y clasificación de errores del proveedor.
+
+Trazabilidad: SYS-INT-003, SYS-INT-006, SYS-INT-007, SYS-INT-011.
+
+### SWR-IR-003 — External Contract Validation
+
+El adaptador deberá validar las respuestas externas antes de mapearlas a modelos internos.
+
+Trazabilidad: SYS-INT-005, SYS-INT-012.
+
+### SWR-DR-002 — Decimal Value Preservation
+
+El software deberá representar cantidades y tasas con una estrategia numérica que preserve la precisión requerida por el contrato P2P.
+
+Trazabilidad: SYS-INT-008.
+
+### SWR-QR-001 — Controlled Retry
+
+El software deberá aplicar una política de reintento limitada y con backoff para fallos transitorios y rate limiting.
+
+Trazabilidad: SYS-INT-006, SYS-INT-007.
+
 ### SWR-SR-001 — Secret Isolation
 
 El software no deberá exponer credenciales de proveedores externos al cliente web.
