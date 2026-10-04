@@ -15,7 +15,21 @@ export interface ScannerSchedulerPersistentStorage {
   setAlarm(scheduledTimeMs: number): void | Promise<void>;
 }
 
+export interface ScannerRuntimeExecutionState {
+  readonly lastStartedAt: string | null;
+  readonly lastCompletedAt: string | null;
+  readonly lastError: string | null;
+}
+
 export const SCANNER_CONFIG_KEY = "scanner-config";
+export const SCANNER_EXECUTION_STATE_KEY = "scanner-execution-state";
+
+export const createInitialScannerRuntimeExecutionState =
+  (): ScannerRuntimeExecutionState => ({
+    lastStartedAt: null,
+    lastCompletedAt: null,
+    lastError: null,
+  });
 
 export async function ensureScannerScheduled(
   storage: ScannerSchedulerPersistentStorage,
@@ -44,8 +58,20 @@ export async function executeScannerAlarm(
   storage: ScannerSchedulerPersistentStorage,
   config: ScannerSchedulerConfig,
   provider: MarketProvider,
+  now = Date.now(),
 ): Promise<void> {
   const scheduler = new CloudflareScannerScheduler(storage);
+  const previousState =
+    (await storage.get<ScannerRuntimeExecutionState>(
+      SCANNER_EXECUTION_STATE_KEY,
+    )) ?? createInitialScannerRuntimeExecutionState();
+
+  await storage.put(SCANNER_EXECUTION_STATE_KEY, {
+    ...previousState,
+    lastStartedAt: new Date(now).toISOString(),
+    lastError: null,
+  });
+
   const runtime = new ScannerRuntime(provider, {
     coin: config.coin,
     intervalSeconds: config.intervalSeconds,
@@ -54,8 +80,19 @@ export async function executeScannerAlarm(
 
   try {
     await runtime.run();
+    await storage.put(SCANNER_EXECUTION_STATE_KEY, {
+      lastStartedAt: new Date(now).toISOString(),
+      lastCompletedAt: new Date(Date.now()).toISOString(),
+      lastError: null,
+    });
   } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
     console.error("Scanner alarm execution failed", error);
+    await storage.put(SCANNER_EXECUTION_STATE_KEY, {
+      lastStartedAt: new Date(now).toISOString(),
+      lastCompletedAt: previousState.lastCompletedAt,
+      lastError: message,
+    });
     await scheduler.scheduleNext(
       new Date(Date.now() + config.intervalSeconds * 1000),
     );
