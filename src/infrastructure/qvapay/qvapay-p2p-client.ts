@@ -51,8 +51,9 @@ export interface QvaPayP2PClientOptions {
 
 const OFFER_TYPES = ["buy", "sell"] as const;
 
-const defaultSleep = (milliseconds: number) =>
-  new Promise((resolve) => setTimeout(resolve, milliseconds));
+const defaultSleep = async (milliseconds: number): Promise<void> => {
+  await new Promise<void>((resolve) => setTimeout(resolve, milliseconds));
+};
 
 export class QvaPayP2PClient {
   private readonly fetcher: typeof fetch;
