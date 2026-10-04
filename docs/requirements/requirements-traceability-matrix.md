@@ -29,6 +29,10 @@ Esta matriz establece la trazabilidad entre los requisitos del sistema y su futu
 - **Implemented:** existe implementación identificable.
 - **Tested:** existe prueba ejecutada.
 - **Verified:** existe evidencia suficiente de verificación.
+- **Verified:** existe evidencia suficiente de verificación.
+- **Certified:** se completó la verificación requerida y la evidencia quedó registrada.
+- **Failed / Rejected:** la evidencia demuestra incumplimiento o el elemento fue rechazado.
+- **Blocked:** la verificación requerida no puede ejecutarse por una dependencia o condición externa.
 - **TBD:** información todavía no definida o verificada.
 
 ## Regla de trazabilidad
@@ -56,7 +60,7 @@ Un requisito no se considerará completamente cerrado hasta disponer, cuando cor
 | SYS-QR-006 | `src/domain/offer.ts` | `tests/domain/offer.test.ts` | Implemented |
 | SYS-QR-007 | Dominio sin dependencias externas | Tests unitarios del dominio | Implemented |
 
-La ejecución de CI determina posteriormente los estados Tested y Verified. Esta PR no certifica el cumplimiento funcional completo.
+La ejecución de pruebas puede llevar un elemento a Tested; Verified requiere evidencia suficiente frente a los criterios aplicables. Certified requiere cumplir además las reglas de la política de verificación y certificación. Los estados de nivel sistema permanecen sin elevarse por una implementación parcial de componentes.
 
 ## Implementación del adaptador QvaPay P2P
 
