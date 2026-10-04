@@ -22,10 +22,24 @@ El runtime depende únicamente de:
 
 No contiene dependencias de Cloudflare ni acceso directo a persistencia.
 
-## Cloudflare
+## Implementación Cloudflare
 
-La implementación futura podrá adaptar `ScannerScheduler` a Cloudflare Durable Object/Alarm. Esa integración todavía no forma parte de esta unidad y requiere verificación independiente de sus semánticas operativas.
+La implementación concreta de `ScannerScheduler` se encuentra en:
+
+- `src/infrastructure/cloudflare/scanner-scheduler.ts`;
+- `src/infrastructure/cloudflare/scanner-scheduler-do.ts`;
+- `src/infrastructure/cloudflare/worker.ts`.
+
+El Durable Object utiliza Cloudflare Alarm para despertar el proceso server-side y vuelve a programar el siguiente ciclo mediante el puerto de aplicación.
+
+## Persistencia y recuperación
+
+La configuración mínima de ejecución se almacena en el Durable Object. Esto permite reconstruir el scheduler después de evicción o reinicio.
+
+El estado funcional y los snapshots de mercado todavía no tienen persistencia D1.
 
 ## Estado
 
-Esta unidad implementa la coordinación del runtime y sus pruebas unitarias. No demuestra todavía ejecución 24/7 en producción, persistencia D1, recuperación ante reinicios ni disponibilidad operacional.
+El runtime y el scheduler Cloudflare tienen implementación y pruebas automatizadas.
+
+Esto todavía no demuestra ejecución 24/7 en producción. La verificación operacional requiere despliegue, activación del scheduler y evidencia runtime reproducible.
