@@ -38,8 +38,7 @@ export class ScannerSchedulerDurableObject
     config: ScannerSchedulerConfig,
   ): Promise<SchedulerState> {
     const normalized = normalizeScannerSchedulerConfig(config);
-    const previous =
-      await this.storage.get<ScannerSchedulerConfig>(CONFIG_KEY);
+    const previous = await this.storage.get<ScannerSchedulerConfig>(CONFIG_KEY);
     const currentAlarm = await this.storage.getAlarm();
     const configurationChanged =
       previous?.coin !== normalized.coin ||
@@ -48,9 +47,7 @@ export class ScannerSchedulerDurableObject
     await this.storage.put(CONFIG_KEY, normalized);
 
     if (currentAlarm === null || configurationChanged) {
-      const nextRunAt = new Date(
-        Date.now() + normalized.intervalSeconds * 1000,
-      );
+      const nextRunAt = new Date(Date.now() + normalized.intervalSeconds * 1000);
       await this.storage.setAlarm(nextRunAt.getTime());
     }
 
@@ -89,9 +86,7 @@ export class ScannerSchedulerDurableObject
       await runtime.run();
     } catch (error) {
       console.error("Scanner alarm execution failed", error);
-      const retryAt = new Date(
-        Date.now() + config.intervalSeconds * 1000,
-      );
+      const retryAt = new Date(Date.now() + config.intervalSeconds * 1000);
       await scheduler.scheduleNext(retryAt);
     }
   }
