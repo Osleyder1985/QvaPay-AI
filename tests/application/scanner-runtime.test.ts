@@ -25,15 +25,11 @@ describe("ScannerRuntime", () => {
   it("runs a scan and schedules the next execution", async () => {
     const { provider, scheduler } = createHarness();
     const now = new Date("2026-10-04T18:00:00.000Z");
-    const runtime = new ScannerRuntime(
-      provider,
-      {
-        coin: "QUSD",
-        intervalSeconds: 10,
-        scheduler,
-      },
-      () => now,
-    );
+    const runtime = new ScannerRuntime(provider, {
+      coin: "QUSD",
+      intervalSeconds: 10,
+      scheduler,
+    });
 
     const result = await runtime.run();
 
