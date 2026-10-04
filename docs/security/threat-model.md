@@ -1,4 +1,4 @@
-# Initial Threat Model
+# Modelo inicial de amenazas
 
 ## Activos
 
@@ -10,14 +10,14 @@
 
 ## Amenazas iniciales
 
-| Threat | Impacto | Control inicial |
+| Amenaza | Impacto | Control inicial |
 |---|---|---|
-| Exposición de credenciales | Alto | Secret management |
-| Respuesta externa manipulada o inválida | Alto | Schema validation |
-| Configuración no autorizada | Medio/Alto | Authentication and authorization |
-| Denegación por proveedor | Alto | Timeout, retry policy y circuit protection |
-| Datos BUY/SELL mezclados | Alto | Domain invariants y tests |
-| Logs con secretos | Alto | Log sanitization |
+| Exposición de credenciales | Alto | Gestión de secretos |
+| Respuesta externa manipulada o inválida | Alto | Validación de esquema |
+| Configuración no autorizada | Medio/Alto | Autenticación y autorización |
+| Denegación por proveedor | Alto | Timeout, política de reintentos y protección de circuito |
+| Datos BUY/SELL mezclados | Alto | Invariantes de dominio y pruebas |
+| Logs con secretos | Alto | Sanitización de logs |
 | Duplicación por reintentos | Medio | Idempotencia |
 
 ## Principio
