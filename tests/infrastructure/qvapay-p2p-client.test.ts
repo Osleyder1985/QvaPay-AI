@@ -171,6 +171,6 @@ describe("QvaPay P2P client", () => {
       QvaPayTransientError,
     );
     expect(fetcher).toHaveBeenCalledTimes(1);
-    expect(fetcher.mock.calls[0][1]?.signal?.aborted).toBe(true);
+    expect(fetcher.mock.calls[0]?.[1]?.signal?.aborted).toBe(true);
   });
 });
