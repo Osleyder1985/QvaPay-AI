@@ -69,7 +69,8 @@ describe("QvaPay P2P client", () => {
           headers: { "retry-after": "7" },
         }),
       )
-      .mockResolvedValue(responseFor(page(1, 1, "buy-one", "buy")));
+      .mockResolvedValueOnce(responseFor(page(1, 1, "buy-one", "buy")))
+      .mockResolvedValueOnce(responseFor(page(1, 1, "sell-one", "sell")));
     const sleep = vi.fn().mockResolvedValue(undefined);
 
     const client = new QvaPayP2PClient({
@@ -126,13 +127,13 @@ describe("QvaPay P2P client", () => {
       maxRetries: 0,
     });
 
-    await expect(transientClient.fetchOffers("BANK_CUP")).rejects.toMatchObject(
-      {
-        name: QvaPayProviderError.name,
-        status: 503,
-        category: "transient",
-      },
-    );
+    await expect(
+      transientClient.fetchOffers("BANK_CUP"),
+    ).rejects.toMatchObject({
+      name: QvaPayProviderError.name,
+      status: 503,
+      category: "transient",
+    });
   });
 
   it("classifies exhausted transport failures as transient", async () => {
