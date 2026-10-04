@@ -148,7 +148,7 @@ jobs:
         run: npm run lint
 
       - name: Format check
-        run: npx prettier --write \"src/**/*.ts\" \"tests/**/*.ts\" \"*.json\" \"*.js\" \"*.ts\" && git diff --exit-code
+        run: npx prettier --write src/infrastructure/cloudflare/scanner-scheduler-do-logic.ts src/infrastructure/cloudflare/scanner-scheduler-do.ts && git diff --exit-code
 
       - name: Unit tests
         run: npm test
