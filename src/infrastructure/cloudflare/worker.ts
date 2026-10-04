@@ -1,7 +1,4 @@
-import type {
-  DurableObjectNamespace,
-  ExecutionContext,
-} from "@cloudflare/workers-types";
+import type { DurableObjectNamespace } from "@cloudflare/workers-types";
 import { ScannerSchedulerDurableObject } from "./scanner-scheduler-do.js";
 
 export interface ScannerWorkerEnvironment {
@@ -18,7 +15,6 @@ export default {
   async fetch(
     request: Request,
     env: ScannerWorkerEnvironment,
-    _ctx: ExecutionContext,
   ): Promise<Response> {
     const url = new URL(request.url);
 
