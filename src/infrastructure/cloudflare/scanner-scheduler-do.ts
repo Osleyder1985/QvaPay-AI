@@ -4,6 +4,8 @@ import { QvaPayP2PClient } from "../qvapay/qvapay-p2p-client.js";
 import {
   ensureScannerScheduled,
   executeScannerAlarm,
+  SCANNER_EXECUTION_STATE_KEY,
+  type ScannerRuntimeExecutionState,
   type ScannerSchedulerPersistentStorage,
 } from "./scanner-scheduler-do-logic.js";
 import {
@@ -13,6 +15,10 @@ import {
 
 export interface ScannerSchedulerEnvironment {
   readonly QVAPAY_API_BASE_URL: string;
+}
+
+export interface ScannerSchedulerRuntimeState extends SchedulerState {
+  readonly execution: ScannerRuntimeExecutionState;
 }
 
 export class ScannerSchedulerDurableObject extends DurableObject<ScannerSchedulerEnvironment> {
@@ -29,16 +35,25 @@ export class ScannerSchedulerDurableObject extends DurableObject<ScannerSchedule
     return ensureScannerScheduled(this.storage, config);
   }
 
-  async getState(): Promise<SchedulerState> {
+  async getState(): Promise<ScannerSchedulerRuntimeState> {
     const config =
       await this.storage.get<ScannerSchedulerConfig>("scanner-config");
     const alarm = await this.storage.getAlarm();
+    const execution =
+      (await this.storage.get<ScannerRuntimeExecutionState>(
+        SCANNER_EXECUTION_STATE_KEY,
+      )) ?? {
+        lastStartedAt: null,
+        lastCompletedAt: null,
+        lastError: null,
+      };
 
     return {
       configured: config !== undefined,
       coin: config?.coin ?? null,
       intervalSeconds: config?.intervalSeconds ?? null,
       nextAlarmAt: alarm,
+      execution,
     };
   }
 
