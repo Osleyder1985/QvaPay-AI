@@ -1,6 +1,5 @@
 import { DurableObject } from "cloudflare:workers";
 import type { DurableObjectStorage } from "@cloudflare/workers-types";
-import type { Market } from "../../domain/market.js";
 import { ScannerRuntime, validateInterval } from "../../application/scanner-runtime.js";
 import { QvaPayP2PClient } from "../qvapay/qvapay-p2p-client.js";
 import { CloudflareScannerScheduler } from "./scanner-scheduler.js";
@@ -35,12 +34,20 @@ export class ScannerSchedulerDurableObject extends DurableObject<ScannerSchedule
   }
 
   async ensureScheduled(config: ScannerSchedulerConfig): Promise<SchedulerState> {
-    const normalized = normalizeConfig(config);
+    const normalized = normalizeScannerSchedulerConfig(config);
+    const previous =
+      await this.storage.get<ScannerSchedulerConfig>(CONFIG_KEY);
+    const currentAlarm = await this.storage.getAlarm();
+    const configurationChanged =
+      previous?.coin !== normalized.coin ||
+      previous?.intervalSeconds !== normalized.intervalSeconds;
+
     await this.storage.put(CONFIG_KEY, normalized);
 
-    const currentAlarm = await this.storage.getAlarm();
-    if (currentAlarm === null) {
-      const nextRunAt = new Date(Date.now() + normalized.intervalSeconds * 1000);
+    if (currentAlarm === null || configurationChanged) {
+      const nextRunAt = new Date(
+        Date.now() + normalized.intervalSeconds * 1000,
+      );
       await this.storage.setAlarm(nextRunAt.getTime());
     }
 
@@ -87,7 +94,9 @@ export class ScannerSchedulerDurableObject extends DurableObject<ScannerSchedule
   }
 }
 
-function normalizeConfig(config: ScannerSchedulerConfig): ScannerSchedulerConfig {
+export function normalizeScannerSchedulerConfig(
+  config: ScannerSchedulerConfig,
+): ScannerSchedulerConfig {
   const coin = config.coin.trim();
   if (!coin) {
     throw new Error("Scanner coin must not be empty");
@@ -112,5 +121,3 @@ export function createScannerSchedulerState(
     nextAlarmAt: alarm,
   };
 }
-
-export type ScannerExecutionResult = Market | null;
