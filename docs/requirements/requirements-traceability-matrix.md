@@ -6,8 +6,8 @@ Esta matriz establece la trazabilidad entre los requisitos del sistema, su imple
 
 | Requirement ID | Requirement | Source | Software Requirement | Design / Component | Test | Verification Evidence | Status |
 |---|---|---|---|---|---|---|---|
-| SYS-FR-001 | Escaneo automático con intervalo configurable | Issue #1 | SWR-FR-001 | Scanner Scheduler | TBD | TBD | Defined |
-| SYS-FR-002 | Ejecución continua 24/7 sin usuarios conectados | Issue #1 | SWR-FR-002 | Durable Object / Alarm | TBD | TBD | Defined |
+| SYS-FR-001 | Escaneo automático con intervalo configurable | Issue #1 / Issue #32 | SWR-FR-001 | Scanner Runtime / Scanner Scheduler | tests/application/scanner-runtime.test.ts | CI Quality Gate | Tested |
+| SYS-FR-002 | Ejecución continua 24/7 sin usuarios conectados | Issue #1 / Issue #32 | SWR-FR-002 | Scanner Runtime / Durable Object / Alarm | TBD | TBD | Defined |
 | SYS-FR-003 | Ofertas SELL por moneda y tasa ascendente | Issue #1 | SWR-FR-003 | Market / Offer | tests/domain/market.test.ts | CI Quality Gate | Implemented |
 | SYS-FR-004 | Ofertas BUY por moneda y tasa ascendente | Issue #1 | SWR-FR-004 | Market / Offer | tests/domain/market.test.ts | CI Quality Gate | Implemented |
 | SYS-INT-001 | Consulta del mercado P2P mediante GET /p2p | Issue #10 / QvaPay API | SWR-IR-001 | QvaPay Adapter | tests/infrastructure/qvapay-p2p-client.test.ts | CI Quality Gate | Tested |
