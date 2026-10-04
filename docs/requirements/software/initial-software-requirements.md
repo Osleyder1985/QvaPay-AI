@@ -1,4 +1,4 @@
-# Initial Software Requirements
+# Requisitos iniciales de software
 
 ## Propósito
 
