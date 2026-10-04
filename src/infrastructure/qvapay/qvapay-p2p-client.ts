@@ -43,6 +43,7 @@ export interface QvaPayP2PClientOptions {
   readonly fetcher?: typeof fetch;
   readonly take?: number;
   readonly maxRetries?: number;
+  readonly timeoutMs?: number;
   readonly sleep?: (milliseconds: number) => Promise<void>;
 }
 
@@ -55,12 +56,14 @@ export class QvaPayP2PClient {
   private readonly fetcher: typeof fetch;
   private readonly take: number;
   private readonly maxRetries: number;
+  private readonly timeoutMs: number;
   private readonly sleep: (milliseconds: number) => Promise<void>;
 
   constructor(private readonly options: QvaPayP2PClientOptions) {
     this.fetcher = options.fetcher ?? fetch;
     this.take = options.take ?? 100;
     this.maxRetries = options.maxRetries ?? 3;
+    this.timeoutMs = options.timeoutMs ?? 10_000;
     this.sleep = options.sleep ?? defaultSleep;
 
     if (!Number.isInteger(this.take) || this.take < 1 || this.take > 100) {
@@ -69,6 +72,10 @@ export class QvaPayP2PClient {
 
     if (!Number.isInteger(this.maxRetries) || this.maxRetries < 0) {
       throw new Error("QvaPay P2P maxRetries must be a non-negative integer");
+    }
+
+    if (!Number.isInteger(this.timeoutMs) || this.timeoutMs <= 0) {
+      throw new Error("QvaPay P2P timeoutMs must be a positive integer");
     }
   }
 
@@ -132,51 +139,61 @@ export class QvaPayP2PClient {
         url.searchParams.set("orderBy", "updated_at");
         url.searchParams.set("orderType", "desc");
 
-        const response = await this.fetcher(url, { method: "GET" });
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), this.timeoutMs);
 
-        if (response.status === 429) {
-          if (attempt >= this.maxRetries) {
-            throw new QvaPayRateLimitError(
-              this.parseRetryAfter(response.headers.get("retry-after")),
+        try {
+          const response = await this.fetcher(url, {
+            method: "GET",
+            signal: controller.signal,
+          });
+
+          if (response.status === 429) {
+            if (attempt >= this.maxRetries) {
+              throw new QvaPayRateLimitError(
+                this.parseRetryAfter(response.headers.get("retry-after")),
+              );
+            }
+
+            const retryAfterSeconds = this.parseRetryAfter(
+              response.headers.get("retry-after"),
             );
+            await this.sleep((retryAfterSeconds ?? 2 ** attempt) * 1000);
+            continue;
           }
 
-          const retryAfterSeconds = this.parseRetryAfter(
-            response.headers.get("retry-after"),
-          );
-          await this.sleep((retryAfterSeconds ?? 2 ** attempt) * 1000);
-          continue;
-        }
+          if (response.status >= 500) {
+            if (attempt >= this.maxRetries) {
+              throw new QvaPayProviderError(
+                response.status,
+                `QvaPay P2P request failed with status ${response.status}`,
+                "transient",
+              );
+            }
 
-        if (response.status >= 500) {
-          if (attempt >= this.maxRetries) {
+            await this.sleep(2 ** attempt * 1000);
+            continue;
+          }
+
+          if (!response.ok) {
+            const category =
+              response.status === 401
+                ? "authentication"
+                : response.status >= 400 && response.status < 500
+                  ? "invalid-request"
+                  : "contract";
+
             throw new QvaPayProviderError(
               response.status,
               `QvaPay P2P request failed with status ${response.status}`,
-              "transient",
+              category,
             );
           }
 
-          await this.sleep(2 ** attempt * 1000);
-          continue;
+          return response;
+        } finally {
+          clearTimeout(timeout);
         }
-
-        if (!response.ok) {
-          const category =
-            response.status === 401
-              ? "authentication"
-              : response.status >= 400 && response.status < 500
-                ? "invalid-request"
-                : "contract";
-
-          throw new QvaPayProviderError(
-            response.status,
-            `QvaPay P2P request failed with status ${response.status}`,
-            category,
-          );
-        }
-
-        return response;
       } catch (error) {
         if (
           error instanceof QvaPayRateLimitError ||
