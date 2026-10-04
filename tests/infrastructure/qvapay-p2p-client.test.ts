@@ -37,9 +37,7 @@ describe("QvaPay P2P client", () => {
     await client.fetchOffers("BANK_CUP", "SELL");
 
     expect(fetcher).toHaveBeenCalledWith(
-      expect.objectContaining({
-        search: expect.any(Function),
-      }),
+      expect.any(URL),
       { method: "GET" },
     );
     const requestedUrl = String(fetcher.mock.calls[0]?.[0]);
