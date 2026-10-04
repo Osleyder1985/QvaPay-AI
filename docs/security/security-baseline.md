@@ -1,4 +1,4 @@
-# Security Baseline
+# Línea base de seguridad
 
 ## Principios
 
@@ -22,7 +22,7 @@ La API deberá validar entradas y autenticar las operaciones que modifiquen conf
 
 Las respuestas de QvaPay se consideran datos no confiables hasta ser validadas.
 
-## Logging
+## Registro de eventos
 
 No registrar tokens, credenciales, cookies ni información sensible.
 
