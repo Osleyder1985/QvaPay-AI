@@ -17,7 +17,7 @@ Este directorio contiene la línea base arquitectónica de QvaPay-AI.
 
 QvaPay-AI se define inicialmente como un monolito modular con principios de arquitectura hexagonal/Clean Architecture, desplegado sobre Cloudflare.
 
-Componentes principales:
+Componentes principales de la arquitectura objetivo:
 
 - Frontend web.
 - HTTP API.
@@ -31,4 +31,4 @@ Componentes principales:
 
 ## Estado
 
-Propuesto. La arquitectura deberá validarse contra las capacidades reales de la API de QvaPay antes de considerar cerradas las decisiones de integración.
+Arquitectura objetivo/propuesta. Los componentes realmente implementados se identifican en `implementation-state.md`. La arquitectura deberá validarse contra las capacidades reales de la API de QvaPay antes de considerar cerradas las decisiones de integración.
