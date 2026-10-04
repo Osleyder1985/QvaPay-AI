@@ -51,25 +51,38 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          python3 - <<'PY'
+          import pathlib
+          import sys
 
-          files="$(find . -type f -name '*.md' -not -path './.git/*' -print)"
-          test -n "$files"
+          root = pathlib.Path(".")
+          files = sorted(root.rglob("*.md"))
+          files = [p for p in files if ".git" not in p.parts]
 
-          while IFS= read -r file; do
-            test -s "$file" || {
-              echo "Empty Markdown file: $file"
-              exit 1
-            }
+          if not files:
+              print("No Markdown files found")
+              sys.exit(1)
 
-            first_line="$(head -n 1 "$file")"
-            case "$first_line" in
-              #*) ;;
-              *)
-                echo "Markdown document must start with a heading: $file"
-                exit 1
-                ;;
-            esac
-          done <<< "$files"
+          failures = []
+          for path in files:
+              text = path.read_text(encoding="utf-8")
+              if not text.strip():
+                  failures.append(f"Empty Markdown file: {path}")
+                  continue
+
+              first_nonempty = next(
+                  (line.strip() for line in text.splitlines() if line.strip()),
+                  "",
+              )
+              if not first_nonempty.startswith("#"):
+                  failures.append(
+                      f"Markdown document must start with a heading: {path}"
+                  )
+
+          if failures:
+              print("\n".join(failures))
+              sys.exit(1)
+          PY
 
       - name: Validate internal Markdown targets
         shell: bash
