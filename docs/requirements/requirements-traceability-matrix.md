@@ -46,7 +46,7 @@ Un requisito no se considerará completamente cerrado hasta disponer, cuando cor
 | SYS-QR-008 | SWR-IR-004 | Event Ingestion Boundary | TBD |
 | SYS-QR-009 | SWR-IR-005 | Reconciliation | TBD |
 | SYS-QR-010 | SWR-IR-004 / SWR-SR-001 | Webhook Boundary / Secret Store | TBD |
-| SYS-QR-005 | SWR-IR-006 | QvaPay Adapter | TBD |
+| SYS-QR-005 | SWR-IR-002 | QvaPay Adapter | TBD |
 | SYS-QR-006 | SWR-IR-003 / SWR-IR-004 | Integration Boundary | TBD |
 
 ## Trazabilidad de la implementación inicial

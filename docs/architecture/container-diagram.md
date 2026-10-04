@@ -1,5 +1,7 @@
 # Diagrama de contenedores
 
+> **Estado documental:** contenedores objetivo/propuestos. Los elementos sin implementación en `src/` no deben interpretarse como componentes operativos actuales.
+
 ```mermaid
 flowchart TB
     Browser[Web Browser]

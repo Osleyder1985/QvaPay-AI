@@ -1,5 +1,7 @@
 # Diagrama de contexto
 
+> **Estado documental:** contexto objetivo del sistema; no representa una certificación de componentes implementados.
+
 ```mermaid
 flowchart LR
     User[Usuario]
@@ -14,7 +16,7 @@ flowchart LR
     QAI -->|Ejecución y persistencia| CF
 ```
 
-## Frontera del sistema
+## Frontera objetivo del sistema
 
 QvaPay-AI es responsable de ejecutar el escaneo, validar y normalizar datos, separar BUY/SELL, agrupar por mercado/moneda, ordenar por tasa, persistir snapshots y exponer información al frontend.
 

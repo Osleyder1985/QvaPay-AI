@@ -1,5 +1,7 @@
 # Diagrama de componentes
 
+> **Estado documental:** componentes objetivo/propuestos. La implementación actual se determina exclusivamente por el código existente y la matriz de trazabilidad.
+
 ```mermaid
 flowchart LR
     subgraph Interfaces
