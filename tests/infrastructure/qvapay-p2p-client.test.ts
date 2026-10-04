@@ -1,3 +1,4 @@
+
 import { describe, expect, it, vi } from "vitest";
 import {
   QvaPayP2PClient,
@@ -147,5 +148,29 @@ describe("QvaPay P2P client", () => {
     await expect(client.fetchOffers("BANK_CUP")).rejects.toBeInstanceOf(
       QvaPayTransientError,
     );
+  });
+
+  it("times out stalled provider requests", async () => {
+    const fetcher = vi.fn().mockImplementation(
+      (_url: URL, init?: RequestInit) =>
+        new Promise<Response>((_, reject) => {
+          init?.signal?.addEventListener("abort", () =>
+            reject(new DOMException("The operation was aborted", "AbortError")),
+          );
+        }),
+    );
+
+    const client = new QvaPayP2PClient({
+      baseUrl: "https://api.qvapay.com",
+      fetcher,
+      timeoutMs: 1,
+      maxRetries: 0,
+    });
+
+    await expect(client.fetchOffers("BANK_CUP")).rejects.toBeInstanceOf(
+      QvaPayTransientError,
+    );
+    expect(fetcher).toHaveBeenCalledTimes(1);
+    expect(fetcher.mock.calls[0][1]?.signal?.aborted).toBe(true);
   });
 });
