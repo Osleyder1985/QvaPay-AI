@@ -1,10 +1,12 @@
 import { DurableObject } from "cloudflare:workers";
 import type { DurableObjectStorage } from "@cloudflare/workers-types";
-import { ScannerRuntime } from "../../application/scanner-runtime.js";
 import { QvaPayP2PClient } from "../qvapay/qvapay-p2p-client.js";
-import { CloudflareScannerScheduler } from "./scanner-scheduler.js";
 import {
-  normalizeScannerSchedulerConfig,
+  ensureScannerScheduled,
+  executeScannerAlarm,
+  type ScannerSchedulerPersistentStorage,
+} from "./scanner-scheduler-do-logic.js";
+import {
   type ScannerSchedulerConfig,
   type SchedulerState,
 } from "./scanner-scheduler-config.js";
@@ -12,8 +14,6 @@ import {
 export interface ScannerSchedulerEnvironment {
   readonly QVAPAY_API_BASE_URL: string;
 }
-
-const CONFIG_KEY = "scanner-config";
 
 export class ScannerSchedulerDurableObject extends DurableObject<ScannerSchedulerEnvironment> {
   private readonly storage: DurableObjectStorage;
@@ -26,27 +26,13 @@ export class ScannerSchedulerDurableObject extends DurableObject<ScannerSchedule
   async ensureScheduled(
     config: ScannerSchedulerConfig,
   ): Promise<SchedulerState> {
-    const normalized = normalizeScannerSchedulerConfig(config);
-    const previous = await this.storage.get<ScannerSchedulerConfig>(CONFIG_KEY);
-    const currentAlarm = await this.storage.getAlarm();
-    const configurationChanged =
-      previous?.coin !== normalized.coin ||
-      previous?.intervalSeconds !== normalized.intervalSeconds;
-
-    await this.storage.put(CONFIG_KEY, normalized);
-
-    if (currentAlarm === null || configurationChanged) {
-      const nextRunAt = new Date(
-        Date.now() + normalized.intervalSeconds * 1000,
-      );
-      await this.storage.setAlarm(nextRunAt.getTime());
-    }
-
-    return this.getState();
+    return ensureScannerScheduled(this.storage, config);
   }
 
   async getState(): Promise<SchedulerState> {
-    const config = await this.storage.get<ScannerSchedulerConfig>(CONFIG_KEY);
+    const config = await this.storage.get<ScannerSchedulerConfig>(
+      "scanner-config",
+    );
     const alarm = await this.storage.getAlarm();
 
     return {
@@ -58,7 +44,9 @@ export class ScannerSchedulerDurableObject extends DurableObject<ScannerSchedule
   }
 
   override async alarm(): Promise<void> {
-    const config = await this.storage.get<ScannerSchedulerConfig>(CONFIG_KEY);
+    const config = await this.storage.get<ScannerSchedulerConfig>(
+      "scanner-config",
+    );
     if (!config) {
       return;
     }
@@ -66,20 +54,12 @@ export class ScannerSchedulerDurableObject extends DurableObject<ScannerSchedule
     const provider = new QvaPayP2PClient({
       baseUrl: this.env.QVAPAY_API_BASE_URL,
     });
-    const scheduler = new CloudflareScannerScheduler(this.storage);
-    const runtime = new ScannerRuntime(provider, {
-      coin: config.coin,
-      intervalSeconds: config.intervalSeconds,
-      scheduler,
-    });
 
-    try {
-      await runtime.run();
-    } catch (error) {
-      console.error("Scanner alarm execution failed", error);
-      const retryAt = new Date(Date.now() + config.intervalSeconds * 1000);
-      await scheduler.scheduleNext(retryAt);
-    }
+    await executeScannerAlarm(
+      this.storage satisfies ScannerSchedulerPersistentStorage,
+      config,
+      provider,
+    );
   }
 }
 
