@@ -47,7 +47,9 @@ export class ScannerSchedulerDurableObject
     await this.storage.put(CONFIG_KEY, normalized);
 
     if (currentAlarm === null || configurationChanged) {
-      const nextRunAt = new Date(Date.now() + normalized.intervalSeconds * 1000);
+      const nextRunAt = new Date(
+        Date.now() + normalized.intervalSeconds * 1000,
+      );
       await this.storage.setAlarm(nextRunAt.getTime());
     }
 
