@@ -47,10 +47,9 @@ describe("executeScannerAlarm", () => {
       Date.parse("2026-10-04T12:00:00.000Z"),
     );
 
-    const state =
-      await storage.get<ScannerRuntimeExecutionState>(
-        SCANNER_EXECUTION_STATE_KEY,
-      );
+    const state = await storage.get<ScannerRuntimeExecutionState>(
+      SCANNER_EXECUTION_STATE_KEY,
+    );
 
     expect(state).toMatchObject({
       lastStartedAt: "2026-10-04T12:00:00.000Z",
@@ -74,10 +73,9 @@ describe("executeScannerAlarm", () => {
       Date.parse("2026-10-04T12:00:00.000Z"),
     );
 
-    const state =
-      await storage.get<ScannerRuntimeExecutionState>(
-        SCANNER_EXECUTION_STATE_KEY,
-      );
+    const state = await storage.get<ScannerRuntimeExecutionState>(
+      SCANNER_EXECUTION_STATE_KEY,
+    );
 
     expect(state).toMatchObject({
       lastStartedAt: "2026-10-04T12:00:00.000Z",
