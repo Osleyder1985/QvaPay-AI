@@ -1,4 +1,4 @@
-# QvaPay P2P Market Feed Contract
+# Contrato del feed de mercado P2P de QvaPay
 
 ## Propósito
 
@@ -34,7 +34,7 @@ QvaPay documenta:
 
 Para mantener una copia del libro de ofertas, la documentación de QvaPay identifica `created` y `reopened` como eventos de entrada y `applied` y `cancelled` como eventos que retiran una oferta. `paid` y `completed` son relevantes principalmente para análisis de operaciones realizadas.
 
-## Payload normalizado externo
+## Payload externo normalizado
 
 Cada evento incluye:
 
@@ -142,7 +142,7 @@ Contrato documentado a partir de la documentación oficial de QvaPay consultada 
 
 Las capacidades de producción deberán validarse posteriormente mediante pruebas de contrato y una suscripción de feed habilitada.
 
-## Decisión para QvaPay-AI sobre Cloudflare
+## Decisión de QvaPay-AI para Cloudflare
 
 Para la arquitectura de producción en Cloudflare, el **webhook es el canal primario** y `GET /p2p` es la reconciliación obligatoria. El stream SSE queda como canal opcional/no crítico.
 
