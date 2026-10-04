@@ -1,6 +1,9 @@
 import { DurableObject } from "cloudflare:workers";
 import type { DurableObjectStorage } from "@cloudflare/workers-types";
-import { ScannerRuntime, validateInterval } from "../../application/scanner-runtime.js";
+import {
+  ScannerRuntime,
+  validateInterval,
+} from "../../application/scanner-runtime.js";
 import { QvaPayP2PClient } from "../qvapay/qvapay-p2p-client.js";
 import { CloudflareScannerScheduler } from "./scanner-scheduler.js";
 
@@ -33,7 +36,9 @@ export class ScannerSchedulerDurableObject extends DurableObject<ScannerSchedule
     this.storage = ctx.storage;
   }
 
-  async ensureScheduled(config: ScannerSchedulerConfig): Promise<SchedulerState> {
+  async ensureScheduled(
+    config: ScannerSchedulerConfig,
+  ): Promise<SchedulerState> {
     const normalized = normalizeScannerSchedulerConfig(config);
     const previous =
       await this.storage.get<ScannerSchedulerConfig>(CONFIG_KEY);
