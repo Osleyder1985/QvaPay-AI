@@ -49,3 +49,27 @@ Trazabilidad: SYS-QR-006 y baseline de seguridad.
 ## Estado
 
 Definidos como baseline inicial. Los detalles de API, esquema físico y límites cuantitativos permanecen TBD.
+
+### SWR-IR-002 — Market Event Ingestion
+
+El software deberá aceptar eventos del feed P2P mediante webhook y/o stream, validarlos y convertirlos a actualizaciones internas del estado de mercado.
+
+Trazabilidad: SYS-QR-006, SYS-QR-008, SYS-QR-010.
+
+### SWR-IR-003 — Market Reconciliation
+
+El software deberá ejecutar reconciliaciones mediante `GET /p2p` para recuperar pérdidas de eventos y divergencias del estado interno.
+
+Trazabilidad: SYS-QR-009.
+
+### SWR-IR-004 — Provider Request Policy
+
+La frontera QvaPay deberá encapsular paginación, límites, timeouts, clasificación de errores y backoff de las solicitudes de reconciliación.
+
+Trazabilidad: SYS-QR-005.
+
+### SWR-DR-002 — Decimal Value Preservation
+
+Los valores económicos recibidos del proveedor deberán conservar precisión decimal suficiente para su uso posterior.
+
+Trazabilidad: SYS-QR-006.

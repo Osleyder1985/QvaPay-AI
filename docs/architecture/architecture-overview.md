@@ -60,3 +60,35 @@ BUY y SELL nunca se deben mezclar durante clasificación ni presentación.
 ## Dependencias
 
 Las dependencias externas principales son QvaPay, Cloudflare y GitHub. Las capacidades exactas de QvaPay quedan sujetas a validación mediante documentación y pruebas de contrato.
+
+## Event-driven market ingestion
+
+La ingestión de producción seguirá una estrategia event-driven con reconciliación. El **webhook P2P será el canal primario**; el stream SSE será opcional y no crítico. Ambos pueden converger en la misma frontera de validación, deduplicación, normalización y persistencia.
+
+```
+QvaPay P2P
+   |------------------|
+   v                  v
+Webhook primario   Stream opcional
+   |                  |
+   +--------+---------+
+            v
+   Event Ingestion Boundary
+            |
+   Validate / Deduplicate
+            |
+         Normalize
+            |
+            v
+      Market State (D1)
+            ^
+            |
+   GET /p2p Reconciliation
+            ^
+            |
+   Durable Object Alarm
+```
+
+El navegador no mantiene vivo el scanner. Durable Object + Alarm programa reconciliaciones server-side. El sistema no depende de mantener una conexión SSE outbound permanente en Cloudflare.
+
+La definición detallada se encuentra en ADR-004 y en el contrato documentado del feed P2P.
