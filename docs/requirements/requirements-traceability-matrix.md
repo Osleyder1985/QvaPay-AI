@@ -8,8 +8,8 @@ Esta matriz establece la trazabilidad entre los requisitos del sistema y su futu
 |---|---|---|---|---|---|---|---|
 | SYS-FR-001 | Escaneo automático con intervalo configurable | Issue #1 | SWR-FR-001 | Scanner Scheduler | TBD | TBD | Defined |
 | SYS-FR-002 | Ejecución continua 24/7 sin usuarios conectados | Issue #1 | SWR-FR-002 | Durable Object / Alarm | TBD | TBD | Defined |
-| SYS-FR-003 | Ofertas SELL por moneda y tasa ascendente | Issue #1 | SWR-FR-003 | Market / Offer | TBD | TBD | Defined |
-| SYS-FR-004 | Ofertas BUY por moneda y tasa ascendente | Issue #1 | SWR-FR-004 | Market / Offer | TBD | TBD | Defined |
+| SYS-FR-003 | Ofertas SELL por moneda y tasa ascendente | Issue #1 | SWR-FR-003 | Market / Offer | tests/domain/market.test.ts | CI Quality Gate | Implemented |
+| SYS-FR-004 | Ofertas BUY por moneda y tasa ascendente | Issue #1 | SWR-FR-004 | Market / Offer | tests/domain/market.test.ts | CI Quality Gate | Implemented |
 | SYS-INT-001 | Consulta del mercado P2P mediante GET /p2p | Issue #10 / QvaPay API | SWR-IR-001 | QvaPay Adapter | CT-QVA-001 | TBD | Defined |
 | SYS-INT-002 | Separación independiente por type y coin | Issue #10 / QvaPay API | SWR-FR-003 / SWR-FR-004 | Market / Offer | CT-QVA-002 | TBD | Defined |
 | SYS-INT-003 | Procesamiento completo de paginación | Issue #10 / QvaPay API | SWR-IR-002 | QvaPay Adapter | CT-QVA-003 | TBD | Defined |
@@ -45,3 +45,15 @@ Un requisito no se considerará completamente cerrado hasta disponer, cuando cor
 | SYS-QR-010 | SWR-IR-002 / SWR-SR-001 | Webhook Boundary / Secret Store | CT-QVA-004, CT-QVA-005 |
 | SYS-QR-005 | SWR-IR-004 | QvaPay Adapter | CT-QVA-011, CT-QVA-013 |
 | SYS-QR-006 | SWR-IR-001 / SWR-IR-002 | Integration Boundary | CT-QVA-001, CT-QVA-002, CT-QVA-007 |
+
+## Trazabilidad de la implementación inicial
+
+| Requirement | Implementation | Test | Current Status |
+|---|---|---|---|
+| SYS-FR-003 | `src/domain/market.ts` + `src/domain/offer.ts` | `tests/domain/market.test.ts` | Implemented |
+| SYS-FR-004 | `src/domain/market.ts` + `src/domain/offer.ts` | `tests/domain/market.test.ts` | Implemented |
+| SYS-QR-003 | `src/domain/market.ts` | `tests/domain/market.test.ts` | Implemented |
+| SYS-QR-006 | `src/domain/offer.ts` | `tests/domain/offer.test.ts` | Implemented |
+| SYS-QR-007 | Dominio sin dependencias externas | Tests unitarios del dominio | Implemented |
+
+La ejecución de CI determina posteriormente los estados Tested y Verified. Esta PR no certifica el cumplimiento funcional completo.
