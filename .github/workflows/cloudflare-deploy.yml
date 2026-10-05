@@ -63,29 +63,35 @@ jobs:
             "$WORKER_URL/internal/scanner/start")"
           printf '%s\n' "$START_RESPONSE"
 
-          printf 'Waiting for Durable Object Alarm...\n'
-          sleep 20
+          for attempt in $(seq 1 18); do
+            STATE_RESPONSE="$(curl --fail-with-body --silent --show-error \
+              --request GET \
+              --header "Authorization: Bearer $SCANNER_BOOTSTRAP_TOKEN" \
+              --header "Accept: application/json" \
+              "$WORKER_URL/internal/scanner/state")"
+            printf 'Runtime state attempt %s/18:\n%s\n' "$attempt" "$STATE_RESPONSE"
 
-          STATE_RESPONSE="$(curl --fail-with-body --silent --show-error \
-            --request GET \
-            --header "Authorization: Bearer $SCANNER_BOOTSTRAP_TOKEN" \
-            --header "Accept: application/json" \
-            "$WORKER_URL/internal/scanner/state")"
-          printf '%s\n' "$STATE_RESPONSE"
+            if node -e '
+              const state = JSON.parse(process.argv[1]);
+              const execution = state.execution;
+              const successful =
+                state.configured === true &&
+                state.coin === "QUSD" &&
+                state.intervalSeconds === 10 &&
+                execution?.lastStartedAt != null &&
+                execution?.lastCompletedAt != null &&
+                execution.lastCompletedAt >= execution.lastStartedAt &&
+                execution.lastError == null &&
+                state.nextAlarmAt != null;
+              process.exit(successful ? 0 : 1);
+            ' "$STATE_RESPONSE"; then
+              exit 0
+            fi
 
-          node -e '
-            const state = JSON.parse(process.argv[1]);
-            const execution = state.execution;
-            if (
-              state.configured !== true ||
-              state.coin !== "QUSD" ||
-              state.intervalSeconds !== 10 ||
-              execution?.lastStartedAt == null ||
-              execution?.lastCompletedAt == null ||
-              execution.lastCompletedAt < execution.lastStartedAt ||
-              state.nextAlarmAt == null
-            ) {
-              console.error("Production scanner runtime verification failed");
-              process.exit(1);
-            }
-          ' "$STATE_RESPONSE"
+            if [ "$attempt" -lt 18 ]; then
+              sleep 5
+            fi
+          done
+
+          echo "Production scanner runtime verification failed after 90 seconds"
+          exit 1
