@@ -39,7 +39,14 @@ Wrangler define:
 - `SCANNER_INTERVAL_SECONDS`;
 - binding `SCANNER_SCHEDULER`.
 
-El valor de intervalo debe ser entero entre 5 y 300 segundos.
+El intervalo debe ser entero entre 5 y 300 segundos.
+
+El adaptador P2P requiere además dos secretos de infraestructura:
+
+- `QVAPAY_APP_ID`;
+- `QVAPAY_APP_SECRET`.
+
+Estas credenciales se envían exclusivamente desde el Durable Object mediante los headers `app-id` y `app-secret`. Nunca se exponen al navegador, al repositorio, a la respuesta del scanner ni a los logs.
 
 El endpoint de inicialización del Worker es deliberadamente interno:
 
@@ -47,7 +54,7 @@ El endpoint de inicialización del Worker es deliberadamente interno:
 
 y requiere `Authorization: Bearer <SCANNER_BOOTSTRAP_TOKEN>`.
 
-El token debe configurarse como secreto de Cloudflare y nunca almacenarse en el repositorio.
+El token de bootstrap y las credenciales de QvaPay deben configurarse como secretos de Cloudflare y nunca almacenarse en el repositorio.
 
 ## Límites
 
@@ -63,3 +70,5 @@ Esta unidad todavía no implementa:
 ## Estado de evidencia
 
 La implementación y las pruebas automatizadas no equivalen a verificación de producción. La operación 24/7 requiere posteriormente despliegue, activación del scheduler y evidencia runtime reproducible.
+
+La evidencia actual demostró que Durable Object Alarm se activa y se reprograma, pero la ejecución de mercado no puede considerarse satisfactoria hasta que las credenciales de aplicación de QvaPay estén configuradas y una lectura P2P real complete sin error.
