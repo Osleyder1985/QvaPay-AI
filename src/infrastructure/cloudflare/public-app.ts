@@ -253,7 +253,7 @@ let state=null;
 const esc=value=>String(value??"—").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const fmtNumber=value=>Number.isFinite(Number(value))?Number(value).toLocaleString(undefined,{maximumFractionDigits:8}):"—";
 const fmtTime=value=>value?new Date(value).toLocaleTimeString():"—";
-const table=(offers,side)=>offers.length?\`<table><thead><tr><th>Created</th><th>User</th><th>QUSD</th><th>Ratio CUP/QUSD</th><th>CUP</th></tr></thead><tbody>\${offers.map((o,i)=>\`<tr><td>\${fmtTime(o.createdAt)}</td><td>\${esc(o.creatorUsername||"—")}</td><td>\${esc(o.amount)}</td><td class="ratecell \${side==="BUY"?"buyrate":"sellrate"}">\${i===0?"★ ":""}\${esc(o.rate)}</td><td>\${esc(o.fiatAmount)}</td></tr>\`).join("")}</tbody></table>\`:'<div class="empty">No compatible offers in the latest snapshot.</div>';
+const table=(offers,side)=>offers.length?\`<table><thead><tr><th>Created</th><th>User</th><th>${side==="BUY"?"QUSD a comprar":"QUSD a vender"}</th><th>Ratio CUP/QUSD</th><th>${side==="BUY"?"CUP a pagar":"CUP a recibir"}</th></tr></thead><tbody>\${offers.map((o,i)=>\`<tr><td>\${fmtTime(o.createdAt)}</td><td>\${esc(o.creatorUsername||"—")}</td><td>\${esc(o.amount)}</td><td class="ratecell \${side==="BUY"?"buyrate":"sellrate"}">\${i===0?"★ ":""}\${esc(o.rate)}</td><td>\${esc(o.fiatAmount)}</td></tr>\`).join("")}</tbody></table>\`:'<div class="empty">No compatible offers in the latest snapshot.</div>';
 function render(){
  if(!state)return;
  $("coin").textContent=state.coin||"—";
