@@ -27,6 +27,51 @@ describe("QvaPay P2P contract", () => {
     expect(page.data[0]?.type).toBe("sell");
   });
 
+  it("accepts serialized pagination integers from QvaPay", () => {
+    const page = parseP2PPage({
+      data: [
+        {
+          uuid: "abc",
+          type: "buy",
+          coin: "QUSD",
+          amount: "100",
+          receive: "100000",
+          available_amount: "100",
+        },
+      ],
+      current_page: "1",
+      last_page: "3",
+      per_page: "100",
+      total: "201",
+    });
+
+    expect(page.current_page).toBe(1);
+    expect(page.last_page).toBe(3);
+    expect(page.per_page).toBe(100);
+    expect(page.total).toBe(201);
+  });
+
+  it("rejects non-integer pagination values", () => {
+    expect(() =>
+      parseP2PPage({
+        data: [
+          {
+            uuid: "abc",
+            type: "sell",
+            coin: "BANK_CUP",
+            amount: "100",
+            receive: "105000",
+            available_amount: "90",
+          },
+        ],
+        current_page: "1.5",
+        last_page: 1,
+        per_page: 100,
+        total: 1,
+      }),
+    ).toThrow(QvaPayContractError);
+  });
+
   it("rejects numeric decimals instead of silently coercing them", () => {
     expect(() =>
       parseP2PPage({
