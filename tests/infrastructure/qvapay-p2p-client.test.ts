@@ -249,14 +249,19 @@ describe("QvaPay P2P client", () => {
 
 describe("QvaPay P2P apply", () => {
   it("applies an offer with app credentials", async () => {
-    const fetcher = async (input: RequestInfo | URL, init?: RequestInit) => {
+    const fetcher = async (
+      input: RequestInfo | URL,
+      init?: RequestInit,
+    ) => {
       expect(String(input)).toBe(
         "https://api.qvapay.com/p2p/offer-123/apply",
       );
       expect(init?.method).toBe("POST");
       expect(new Headers(init?.headers).get("app-id")).toBe("app-id");
       expect(new Headers(init?.headers).get("app-secret")).toBe("app-secret");
-      return new Response(JSON.stringify({ message: "Aplicado a la oferta" }), {
+      return new Response(
+        JSON.stringify({ message: "Aplicado a la oferta" }),
+        {
         status: 201,
         headers: { "content-type": "application/json" },
       });
