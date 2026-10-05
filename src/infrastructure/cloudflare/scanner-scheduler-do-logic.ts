@@ -46,7 +46,7 @@ export async function ensureScannerScheduled(
 
   await storage.put(SCANNER_CONFIG_KEY, normalized);
 
-  if (currentAlarm === null || configurationChanged) {
+  if (currentAlarm === null || currentAlarm <= now || configurationChanged) {
     await storage.setAlarm(now + normalized.intervalSeconds * 1000);
   }
 
