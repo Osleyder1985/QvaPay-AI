@@ -1,4 +1,4 @@
-import type { QvaPayP2PPageDto, QvaPayP2POfferDto } from "./p2p-types.js";
+import type {\n  QvaPayP2PPageDto,\n  QvaPayP2POfferDto,\n  QvaPayP2POfferStatus,\n} from "./p2p-types.js";
 
 export class QvaPayContractError extends Error {
   constructor(message: string) {
@@ -63,7 +63,7 @@ function parseOffer(value: unknown): QvaPayP2POfferDto {
     coin,
     amount,
     receive,
-    available_amount: availableAmount,
+    available_amount: availableAmount,\n    status,
     ...(reservedAmount === undefined
       ? {}
       : { reserved_amount: reservedAmount }),
