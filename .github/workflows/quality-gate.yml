@@ -150,7 +150,12 @@ jobs:
         run: npx wrangler deploy --dry-run
 
       - name: Format check
-        run: npm run format:check
+        run: |
+          npm run format:check || {
+            npx prettier --write src/infrastructure/qvapay/p2p-contract.ts
+            git diff -- src/infrastructure/qvapay/p2p-contract.ts
+            exit 1
+          }
 
       - name: Unit tests
         run: npm test
