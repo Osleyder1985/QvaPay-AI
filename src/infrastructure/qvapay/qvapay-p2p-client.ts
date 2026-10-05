@@ -13,7 +13,10 @@ export class QvaPayRateLimitError extends Error {
 }
 
 export type QvaPayProviderErrorCategory =
-  "invalid-request" | "authentication" | "transient" | "contract";
+  | "invalid-request"
+  | "authentication"
+  | "transient"
+  | "contract";
 
 export class QvaPayProviderError extends Error {
   readonly status: number;
@@ -40,6 +43,8 @@ export class QvaPayTransientError extends Error {
 
 export interface QvaPayP2PClientOptions {
   readonly baseUrl: string;
+  readonly appId: string;
+  readonly appSecret: string;
   readonly fetcher?: typeof fetch;
   readonly take?: number;
   readonly maxRetries?: number;
@@ -65,6 +70,10 @@ export class QvaPayP2PClient {
     this.maxRetries = options.maxRetries ?? 3;
     this.timeoutMs = options.timeoutMs ?? 10_000;
     this.sleep = options.sleep ?? defaultSleep;
+
+    if (!options.appId || !options.appSecret) {
+      throw new Error("QvaPay P2P application credentials are required");
+    }
 
     if (!Number.isInteger(this.take) || this.take < 1 || this.take > 100) {
       throw new Error("QvaPay P2P take must be between 1 and 100");
@@ -145,6 +154,10 @@ export class QvaPayP2PClient {
         try {
           const response = await this.fetcher(url, {
             method: "GET",
+            headers: {
+              "app-id": this.options.appId,
+              "app-secret": this.options.appSecret,
+            },
             signal: controller.signal,
           });
 
