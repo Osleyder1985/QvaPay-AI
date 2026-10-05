@@ -7,7 +7,7 @@ function calculateRate(amount: string, receive: string): string {
   if (!Number.isFinite(qUsdAmount) || qUsdAmount <= 0 || !Number.isFinite(fiatAmount)) {
     throw new Error("Invalid QvaPay P2P amounts for rate calculation");
   }
-  return (fiatAmount / qUsdAmount).toFixed(8).replace(/0+$/, "").replace(/\\.$/, "");
+  return (fiatAmount / qUsdAmount).toFixed(8).replace(/0+$/, "").replace(/\.$/, "");
 }
 
 export function mapQvaPayOffer(
