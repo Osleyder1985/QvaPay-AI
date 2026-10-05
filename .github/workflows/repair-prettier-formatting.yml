@@ -1,0 +1,44 @@
+name: Repair Prettier Formatting
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    name: Repair repository formatting
+    runs-on: windows-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Apply Prettier
+        run: npx prettier --write "src/**/*.ts" "tests/**/*.ts" "*.json" "*.js" "*.ts"
+
+      - name: Commit formatting repairs
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git diff --quiet; then
+            echo "Repository is already formatted."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src tests "*.json" "*.js" "*.ts"
+          git commit -m "chore: repair repository formatting"
+          git push origin HEAD:main
