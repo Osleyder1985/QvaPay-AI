@@ -107,4 +107,4 @@ Los mensajes de error del proveedor no deben ser el único mecanismo para clasif
 - Credenciales de aplicación: https://www.qvapay.com/docs/p2p/app-credentials
 - Introducción API: https://www.qvapay.com/docs
 
-Fecha de verificación: 2026-10-04.
+Fecha de verificación: 2026-10-05.
