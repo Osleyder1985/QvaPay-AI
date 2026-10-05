@@ -41,7 +41,10 @@ describe("QvaPay P2P client", () => {
     const originalFetch = globalThis.fetch;
     const calls: URL[] = [];
 
-    globalThis.fetch = function (\n      this: typeof globalThis,\n      input: RequestInfo | URL,\n    ) {
+    globalThis.fetch = function (
+      this: typeof globalThis,
+      input: RequestInfo | URL,
+    ) {
       if (this !== globalThis) {
         throw new TypeError("incorrect this reference");
       }
@@ -70,7 +73,6 @@ describe("QvaPay P2P client", () => {
       globalThis.fetch = originalFetch;
     }
   });
-
 
   it("authenticates every market request with application credentials", async () => {
     const fetcher = vi
