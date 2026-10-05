@@ -68,7 +68,8 @@ function addPositiveDecimals(values: readonly string[]): string {
   for (let index = maxIntegerLength - 1; index >= 0; index -= 1) {
     let digit = carry;
     for (const value of normalized) {
-      digit += Number(value.integer[value.integer.length - maxIntegerLength + index] ?? "0");
+      const position = index - (maxIntegerLength - value.integer.length);
+      digit += Number(position >= 0 ? value.integer[position] : "0");
     }
     integer = String(digit % 10) + integer;
     carry = Math.floor(digit / 10);
