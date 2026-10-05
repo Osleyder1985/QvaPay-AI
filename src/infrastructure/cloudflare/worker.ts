@@ -45,7 +45,8 @@ export default {
         coin: state.coin,
         intervalSeconds: state.intervalSeconds,
         nextAlarmAt: state.nextAlarmAt,
-        running: state.execution.lastStartedAt !== null &&
+        running:
+          state.execution.lastStartedAt !== null &&
           (state.execution.lastCompletedAt === null ||
             state.execution.lastStartedAt > state.execution.lastCompletedAt),
         lastStartedAt: state.execution.lastStartedAt,
