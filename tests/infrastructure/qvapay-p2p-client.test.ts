@@ -169,7 +169,7 @@ describe("QvaPay P2P client", () => {
     );
   });
 
-  it("classifies exhausted transport failures as transient", async () => {
+  it("classifies exhausted transport failures with safe operation context", async () => {
     const client = new QvaPayP2PClient({
       baseUrl: "https://api.qvapay.com",
       ...credentials,
@@ -178,9 +178,10 @@ describe("QvaPay P2P client", () => {
       maxRetries: 0,
     });
 
-    await expect(client.fetchOffers("BANK_CUP")).rejects.toBeInstanceOf(
-      QvaPayTransientError,
-    );
+    await expect(client.fetchOffers("BANK_CUP")).rejects.toMatchObject({
+      name: QvaPayTransientError.name,
+      message: "QvaPay P2P buy page 1 transport error: Error: timeout",
+    });
   });
 
   it("times out stalled provider requests", async () => {
@@ -201,9 +202,11 @@ describe("QvaPay P2P client", () => {
       maxRetries: 0,
     });
 
-    await expect(client.fetchOffers("BANK_CUP")).rejects.toBeInstanceOf(
-      QvaPayTransientError,
-    );
+    await expect(client.fetchOffers("BANK_CUP")).rejects.toMatchObject({
+      name: QvaPayTransientError.name,
+      message:
+        "QvaPay P2P buy page 1 transport error: AbortError: The operation was aborted",
+    });
     expect(fetcher).toHaveBeenCalledTimes(1);
     expect(fetcher.mock.calls[0]?.[1]?.signal?.aborted).toBe(true);
   });
