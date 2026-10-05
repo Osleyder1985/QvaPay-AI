@@ -4,7 +4,11 @@ import type { QvaPayP2POfferDto } from "./p2p-types.js";
 function calculateRate(amount: string, receive: string): string {
   const qUsdAmount = Number(amount);
   const fiatAmount = Number(receive);
-  if (\n    !Number.isFinite(qUsdAmount) ||\n    qUsdAmount <= 0 ||\n    !Number.isFinite(fiatAmount)\n  ) {
+  if (
+    !Number.isFinite(qUsdAmount) ||
+    qUsdAmount <= 0 ||
+    !Number.isFinite(fiatAmount)
+  ) {
     throw new Error("Invalid QvaPay P2P amounts for rate calculation");
   }
   return (fiatAmount / qUsdAmount).toFixed(8).replace(/0+$/, "").replace(/\.$/, "");
