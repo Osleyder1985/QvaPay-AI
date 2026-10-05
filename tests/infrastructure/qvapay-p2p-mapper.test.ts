@@ -56,3 +56,25 @@ describe("QvaPay P2P mapper", () => {
     expect(large.rate).toBe("255");
   });
 });
+
+
+describe("QvaPay P2P mapper VIP metadata", () => {
+  it("preserves offer VIP restriction and creator VIP status", () => {
+    const offer = mapQvaPayOffer(
+      {
+        uuid: "vip-offer",
+        type: "sell",
+        coin: "BANK_CUP",
+        amount: "500",
+        receive: "505000",
+        available_amount: "500",
+        only_vip: true,
+        User: { username: "vip-seller", vip: true },
+      },
+      "2026-10-05T17:00:00.000Z",
+    );
+
+    expect(offer.onlyVip).toBe(true);
+    expect(offer.creatorVip).toBe(true);
+  });
+});
