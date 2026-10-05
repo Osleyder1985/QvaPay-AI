@@ -90,18 +90,18 @@ Estos requisitos describen observación y presentación del mercado. No autoriza
 - **TBD:** política de recuperación ante errores del proveedor.
 
 
-## P2P offer interaction requirements
+## Requisitos de interacción con ofertas P2P
 
-The market dashboard shall:
+El panel de mercado debe:
 
-- display QUSD quantities and fiat amounts with comma-separated thousands and exactly two decimal places, without changing stored numeric precision;
-- display the offer creation date and time, not only the time of day;
-- identify offers restricted to VIP users with an explicit VIP indicator;
-- display **Vender** for a BUY offer because the user becomes the QUSD seller;
-- display **Comprar** for a SELL offer because the user becomes the QUSD buyer;
-- require explicit confirmation before applying to an offer;
-- require a server-side operation credential before the application can reach the QvaPay P2P apply endpoint;
-- show a clear taken/processing state after a successful application;
-- provide visual transitions for market updates, row hover states, action feedback, and state changes without requiring a full page reload.
+- mostrar las cantidades de QUSD y los importes fiat con separador de miles mediante coma y exactamente dos decimales, sin modificar la precisión numérica almacenada;
+- mostrar la fecha y hora de creación de la oferta, no solamente la hora del día;
+- identificar mediante un indicador explícito las ofertas restringidas a usuarios VIP;
+- mostrar **Vender** para una oferta BUY porque el usuario pasa a ser el vendedor de QUSD;
+- mostrar **Comprar** para una oferta SELL porque el usuario pasa a ser el comprador de QUSD;
+- exigir una confirmación explícita antes de aplicar a una oferta;
+- exigir una credencial de operación del lado del servidor antes de permitir que la aplicación alcance el endpoint de aplicación P2P de QvaPay;
+- mostrar claramente el estado de tomada/procesando después de una aplicación exitosa;
+- proporcionar transiciones visuales para las actualizaciones del mercado, el estado al pasar sobre una fila, la respuesta de las acciones y los cambios de estado, sin exigir una recarga completa de la página.
 
-The server-side application action shall never expose QvaPay app credentials to the browser.
+La acción de aplicación del lado del servidor nunca debe exponer al navegador las credenciales de la aplicación de QvaPay.
