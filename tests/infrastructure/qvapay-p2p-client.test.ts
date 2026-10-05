@@ -41,7 +41,7 @@ describe("QvaPay P2P client", () => {
     const originalFetch = globalThis.fetch;
     const calls: URL[] = [];
 
-    globalThis.fetch = function (this: typeof globalThis, input: RequestInfo | URL) {
+    globalThis.fetch = function (\n      this: typeof globalThis,\n      input: RequestInfo | URL,\n    ) {
       if (this !== globalThis) {
         throw new TypeError("incorrect this reference");
       }
