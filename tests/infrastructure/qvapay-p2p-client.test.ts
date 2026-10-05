@@ -31,7 +31,35 @@ const page = (
 const responseFor = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status });
 
+const credentials = {
+  appId: "test-app-id",
+  appSecret: "test-app-secret",
+};
+
 describe("QvaPay P2P client", () => {
+  it("authenticates every market request with application credentials", async () => {
+    const fetcher = vi
+      .fn()
+      .mockResolvedValueOnce(responseFor(page(1, 1, "buy-one", "buy")))
+      .mockResolvedValueOnce(responseFor(page(1, 1, "sell-one", "sell")));
+
+    const client = new QvaPayP2PClient({
+      baseUrl: "https://api.qvapay.com",
+      ...credentials,
+      fetcher,
+    });
+
+    await client.fetchOffers("BANK_CUP");
+
+    expect(fetcher.mock.calls).toHaveLength(2);
+    for (const [, init] of fetcher.mock.calls) {
+      expect(init?.headers).toEqual({
+        "app-id": credentials.appId,
+        "app-secret": credentials.appSecret,
+      });
+    }
+  });
+
   it("fetches every page independently for BUY and SELL", async () => {
     const fetcher = vi
       .fn()
@@ -41,6 +69,7 @@ describe("QvaPay P2P client", () => {
 
     const client = new QvaPayP2PClient({
       baseUrl: "https://api.qvapay.com",
+      ...credentials,
       fetcher,
       take: 1,
     });
@@ -75,6 +104,7 @@ describe("QvaPay P2P client", () => {
 
     const client = new QvaPayP2PClient({
       baseUrl: "https://api.qvapay.com",
+      ...credentials,
       fetcher,
       sleep,
     });
@@ -93,6 +123,7 @@ describe("QvaPay P2P client", () => {
 
     const client = new QvaPayP2PClient({
       baseUrl: "https://api.qvapay.com",
+      ...credentials,
       fetcher,
       sleep: vi.fn().mockResolvedValue(undefined),
       maxRetries: 1,
@@ -107,6 +138,7 @@ describe("QvaPay P2P client", () => {
   it("classifies 401 and 5xx responses separately", async () => {
     const authClient = new QvaPayP2PClient({
       baseUrl: "https://api.qvapay.com",
+      ...credentials,
       fetcher: vi
         .fn()
         .mockResolvedValue(new Response("unauthorized", { status: 401 })),
@@ -120,6 +152,7 @@ describe("QvaPay P2P client", () => {
 
     const transientClient = new QvaPayP2PClient({
       baseUrl: "https://api.qvapay.com",
+      ...credentials,
       fetcher: vi
         .fn()
         .mockResolvedValue(new Response("server error", { status: 503 })),
@@ -139,6 +172,7 @@ describe("QvaPay P2P client", () => {
   it("classifies exhausted transport failures as transient", async () => {
     const client = new QvaPayP2PClient({
       baseUrl: "https://api.qvapay.com",
+      ...credentials,
       fetcher: vi.fn().mockRejectedValue(new Error("timeout")),
       sleep: vi.fn().mockResolvedValue(undefined),
       maxRetries: 0,
@@ -153,14 +187,15 @@ describe("QvaPay P2P client", () => {
     const fetcher = vi.fn().mockImplementation(
       (_url: URL, init?: RequestInit) =>
         new Promise<Response>((_, reject) => {
-          init?.signal?.addEventListener("abort", () =>
-            reject(new DOMException("The operation was aborted", "AbortError")),
-          );
+          init?.signal?.addEventListener("abort", () => {
+            reject(new DOMException("The operation was aborted", "AbortError"));
+          });
         }),
     );
 
     const client = new QvaPayP2PClient({
       baseUrl: "https://api.qvapay.com",
+      ...credentials,
       fetcher,
       timeoutMs: 1,
       maxRetries: 0,

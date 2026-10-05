@@ -15,6 +15,8 @@ import {
 
 export interface ScannerSchedulerEnvironment {
   readonly QVAPAY_API_BASE_URL: string;
+  readonly QVAPAY_APP_ID: string;
+  readonly QVAPAY_APP_SECRET: string;
 }
 
 export interface ScannerSchedulerRuntimeState extends SchedulerState {
@@ -65,6 +67,8 @@ export class ScannerSchedulerDurableObject extends DurableObject<ScannerSchedule
 
     const provider = new QvaPayP2PClient({
       baseUrl: this.env.QVAPAY_API_BASE_URL,
+      appId: this.env.QVAPAY_APP_ID,
+      appSecret: this.env.QVAPAY_APP_SECRET,
     });
 
     await executeScannerAlarm(
