@@ -8,4 +8,5 @@ interface Env {
   SCANNER_COIN: string;
   SCANNER_INTERVAL_SECONDS: string;
   SCANNER_BOOTSTRAP_TOKEN: string;
+  P2P_ACTION_TOKEN?: string;
 }
