@@ -74,15 +74,29 @@ function parseOffer(value: unknown): QvaPayP2POfferDto {
   };
 }
 
-function optionalUser(value: unknown): { username?: string; name?: string } | undefined {
+function optionalUser(
+  value: unknown,
+): { username?: string; name?: string } | undefined {
   if (value === undefined || value === null) return undefined;
   if (!isRecord(value)) {
     throw new QvaPayContractError("Invalid QvaPay P2P user");
   }
-  const username = value.username === undefined ? undefined : stringField(value.username, "User.username");
-  const name = value.name === undefined ? undefined : stringField(value.name, "User.name");
+
+  const username =
+    value.username === undefined
+      ? undefined
+      : stringField(value.username, "User.username");
+  const name =
+    value.name === undefined
+      ? undefined
+      : stringField(value.name, "User.name");
+
   if (username === undefined && name === undefined) return undefined;
-  return { ...(username === undefined ? {} : { username }), ...(name === undefined ? {} : { name }) };
+
+  return {
+    ...(username === undefined ? {} : { username }),
+    ...(name === undefined ? {} : { name }),
+  };
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -108,7 +122,10 @@ function optionalDecimal(value: unknown, field: string): string | undefined {
   return decimalString(value, field);
 }
 
-function optionalTimestamp(value: unknown, field: string): string | undefined {
+function optionalTimestamp(
+  value: unknown,
+  field: string,
+): string | undefined {
   if (value === undefined || value === null) return undefined;
   if (typeof value !== "string" || Number.isNaN(Date.parse(value))) {
     throw new QvaPayContractError(`Invalid QvaPay timestamp: ${field}`);
@@ -144,14 +161,10 @@ function nonNegativeInteger(value: unknown, field: string): number {
 
 function providerInteger(value: unknown, field: string): number {
   if (typeof value === "number") {
-    if (Number.isSafeInteger(value)) {
-      return value;
-    }
+    if (Number.isSafeInteger(value)) return value;
   } else if (typeof value === "string" && /^\d+$/.test(value)) {
     const parsed = Number(value);
-    if (Number.isSafeInteger(parsed)) {
-      return parsed;
-    }
+    if (Number.isSafeInteger(parsed)) return parsed;
   }
 
   throw new QvaPayContractError(`Invalid QvaPay integer: ${field}`);
