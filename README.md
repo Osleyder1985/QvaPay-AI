@@ -6,11 +6,11 @@ QvaPay-AI es el sistema orientado al análisis automatizado del mercado P2P de Q
 
 **[Open QvaPay-AI in production](https://qvapay-ai-runtime.osleyder-gonzalez1985.workers.dev)**
 
-Production application: https://qvapay-ai-runtime.osleyder-gonzalez1985.workers.dev
+La URL de producción sirve directamente la interfaz web pública del sistema. La interfaz es de solo lectura y muestra el estado del scanner server-side.
 
 ## Estado del repositorio
 
-El repositorio se encuentra en evolución incremental. Ya existe implementación verificable del dominio, del caso de uso de escaneo y del adaptador QvaPay P2P; las capacidades restantes continúan en diseño o planificación.
+El repositorio se encuentra en evolución incremental. Ya existe implementación verificable del dominio, del caso de uso de escaneo, del adaptador QvaPay P2P y de la interfaz web pública de producción; las capacidades restantes continúan en diseño o planificación.
 
 ## Requisitos
 
@@ -46,3 +46,4 @@ La verificación y certificación se rigen por una política explícita de evide
 ## Referencia
 
 - Issue #1: Establish initial P2P market scanner requirements documentation
+- Issue #61: Serve public production web application
