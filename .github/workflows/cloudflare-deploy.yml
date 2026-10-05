@@ -83,18 +83,22 @@ jobs:
             "$WORKER_URL/api/scanner/status")"
           printf 'Public scanner status:\n%s\n' "$STATUS_RESPONSE"
 
-          node -e '
-            const state = JSON.parse(process.argv[1]);
-            const valid =
-              typeof state.configured === "boolean" &&
-              Array.isArray(state.buyOffers) &&
-              Array.isArray(state.sellOffers) &&
-              state.metrics &&
-              typeof state.metrics.totalOffers === "number" &&
-              Object.prototype.hasOwnProperty.call(state.metrics, "bestBuyRate") &&
-              Object.prototype.hasOwnProperty.call(state.metrics, "bestSellRate");
-            process.exit(valid ? 0 : 1);
-          ' "$STATUS_RESPONSE"
+          printf '%s' "$STATUS_RESPONSE" | node -e '
+            let input = "";
+            process.stdin.on("data", (chunk) => { input += chunk; });
+            process.stdin.on("end", () => {
+              const state = JSON.parse(input);
+              const valid =
+                typeof state.configured === "boolean" &&
+                Array.isArray(state.buyOffers) &&
+                Array.isArray(state.sellOffers) &&
+                state.metrics &&
+                typeof state.metrics.totalOffers === "number" &&
+                Object.prototype.hasOwnProperty.call(state.metrics, "bestBuyRate") &&
+                Object.prototype.hasOwnProperty.call(state.metrics, "bestSellRate");
+              process.exit(valid ? 0 : 1);
+            });
+          '
 
           echo "Verifying public dashboard HTML..."
           DASHBOARD_HTML="$(curl --fail-with-body --silent --show-error "$WORKER_URL/")"
@@ -150,20 +154,24 @@ jobs:
 
             printf 'Runtime state attempt %s/18:\n%s\n' "$attempt" "$STATE_RESPONSE"
 
-            if node -e '
-              const state = JSON.parse(process.argv[1]);
-              const execution = state.execution;
-              const successful =
-                state.configured === true &&
-                state.coin === "BANK_CUP" &&
-                state.intervalSeconds === 10 &&
-                execution?.lastStartedAt != null &&
-                execution?.lastCompletedAt != null &&
-                execution.lastCompletedAt >= execution.lastStartedAt &&
-                execution.lastError == null &&
-                state.nextAlarmAt != null;
-              process.exit(successful ? 0 : 1);
-            ' "$STATE_RESPONSE"; then
+            if printf '%s' "$STATE_RESPONSE" | node -e '
+              let input = "";
+              process.stdin.on("data", (chunk) => { input += chunk; });
+              process.stdin.on("end", () => {
+                const state = JSON.parse(input);
+                const execution = state.execution;
+                const successful =
+                  state.configured === true &&
+                  state.coin === "BANK_CUP" &&
+                  state.intervalSeconds === 10 &&
+                  execution?.lastStartedAt != null &&
+                  execution?.lastCompletedAt != null &&
+                  execution.lastCompletedAt >= execution.lastStartedAt &&
+                  execution.lastError == null &&
+                  state.nextAlarmAt != null;
+                process.exit(successful ? 0 : 1);
+              });
+            '; then
               exit 0
             fi
 
