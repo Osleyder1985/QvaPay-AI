@@ -1,4 +1,8 @@
-import type {\n  QvaPayP2PPageDto,\n  QvaPayP2POfferDto,\n  QvaPayP2POfferStatus,\n} from "./p2p-types.js";
+import type {
+  QvaPayP2PPageDto,
+  QvaPayP2POfferDto,
+  QvaPayP2POfferStatus,
+} from "./p2p-types.js";
 
 export class QvaPayContractError extends Error {
   constructor(message: string) {
@@ -55,6 +59,7 @@ function parseOffer(value: unknown): QvaPayP2POfferDto {
   const createdAt = optionalTimestamp(value.created_at, "created_at");
   const updatedAt = optionalTimestamp(value.updated_at, "updated_at");
   const onlyVip = optionalBoolean(value.only_vip, "only_vip");
+  const status = optionalStatus(value.status);
   const user = optionalUser(value.User);
 
   return {
@@ -63,7 +68,8 @@ function parseOffer(value: unknown): QvaPayP2POfferDto {
     coin,
     amount,
     receive,
-    available_amount: availableAmount,\n    status,
+    available_amount: availableAmount,
+    status,
     ...(reservedAmount === undefined
       ? {}
       : { reserved_amount: reservedAmount }),
@@ -74,6 +80,26 @@ function parseOffer(value: unknown): QvaPayP2POfferDto {
     ...(onlyVip === undefined ? {} : { only_vip: onlyVip }),
     ...(user === undefined ? {} : { User: user }),
   };
+}
+
+function optionalStatus(value: unknown): QvaPayP2POfferStatus {
+  if (value === undefined || value === null) return "open";
+  if (typeof value !== "string") {
+    throw new QvaPayContractError("Invalid QvaPay P2P status");
+  }
+
+  const allowed: readonly QvaPayP2POfferStatus[] = [
+    "open",
+    "revision",
+    "processing",
+    "paid",
+    "completed",
+    "cancelled",
+  ];
+  if (!allowed.includes(value as QvaPayP2POfferStatus)) {
+    throw new QvaPayContractError("Invalid QvaPay P2P status");
+  }
+  return value as QvaPayP2POfferStatus;
 }
 
 function optionalUser(
