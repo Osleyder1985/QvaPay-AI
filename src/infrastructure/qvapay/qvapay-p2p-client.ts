@@ -13,10 +13,7 @@ export class QvaPayRateLimitError extends Error {
 }
 
 export type QvaPayProviderErrorCategory =
-  | "invalid-request"
-  | "authentication"
-  | "transient"
-  | "contract";
+  "invalid-request" | "authentication" | "transient" | "contract";
 
 export class QvaPayProviderError extends Error {
   readonly status: number;
