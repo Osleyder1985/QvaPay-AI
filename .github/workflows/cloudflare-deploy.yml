@@ -37,10 +37,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
       - name: Deploy Worker
         env:
@@ -57,4 +56,8 @@ jobs:
           set -euo pipefail
           SCANNER_BOOTSTRAP_TOKEN="$(node -e "console.log(require('crypto').randomBytes(32).toString('hex'))")"
           printf '%s' "$SCANNER_BOOTSTRAP_TOKEN" | npx wrangler secret put SCANNER_BOOTSTRAP_TOKEN
-          curl --fail-with-body --silent --show-error             --request POST             --header "Authorization: Bearer $SCANNER_BOOTSTRAP_TOKEN"             --header "Accept: application/json"             "$WORKER_URL/internal/scanner/start"
+          curl --fail-with-body --silent --show-error \
+            --request POST \
+            --header "Authorization: Bearer $SCANNER_BOOTSTRAP_TOKEN" \
+            --header "Accept: application/json" \
+            "$WORKER_URL/internal/scanner/start"
