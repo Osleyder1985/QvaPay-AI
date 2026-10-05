@@ -155,7 +155,7 @@ jobs:
               const execution = state.execution;
               const successful =
                 state.configured === true &&
-                state.coin === "QUSD" &&
+                state.coin === "BANK_CUP" &&
                 state.intervalSeconds === 10 &&
                 execution?.lastStartedAt != null &&
                 execution?.lastCompletedAt != null &&
