@@ -39,15 +39,22 @@ export default {
 
     const applyMatch = url.pathname.match(/^\/api\/p2p\/([^/]+)\/apply$/);
     if (applyMatch) {
-      if (request.method !== "POST") return new Response("Method not allowed", { status: 405 });
+      if (request.method !== "POST") {
+        return new Response("Method not allowed", { status: 405 });
+      }
 
       const actionToken = env.P2P_ACTION_TOKEN;
-      if (!actionToken || request.headers.get("x-p2p-action-token") !== actionToken) {
+      if (
+        !actionToken ||
+        request.headers.get("x-p2p-action-token") !== actionToken
+      ) {
         return new Response("Unauthorized", { status: 401 });
       }
 
       const uuid = decodeURIComponent(applyMatch[1] ?? "");
-      if (!uuid || uuid.length > 100) return new Response("Invalid offer id", { status: 400 });
+      if (!uuid || uuid.length > 100) {
+        return new Response("Invalid offer id", { status: 400 });
+      }
 
       const provider = new QvaPayP2PClient({
         baseUrl: env.QVAPAY_API_BASE_URL,
@@ -67,7 +74,12 @@ export default {
             : 502;
         return Response.json(
           { error: error instanceof Error ? error.message : String(error) },
-          { status: Number.isInteger(status) && status >= 400 && status < 600 ? status : 502 },
+          {
+            status:
+              Number.isInteger(status) && status >= 400 && status < 600
+                ? status
+                : 502,
+          },
         );
       }
     }
