@@ -54,6 +54,7 @@ function parseOffer(value: unknown): QvaPayP2POfferDto {
   const orderMax = optionalDecimal(value.order_max, "order_max");
   const createdAt = optionalTimestamp(value.created_at, "created_at");
   const updatedAt = optionalTimestamp(value.updated_at, "updated_at");
+  const user = optionalUser(value.User);
 
   return {
     uuid,
@@ -69,6 +70,7 @@ function parseOffer(value: unknown): QvaPayP2POfferDto {
     ...(orderMax === undefined ? {} : { order_max: orderMax }),
     ...(createdAt === undefined ? {} : { created_at: createdAt }),
     ...(updatedAt === undefined ? {} : { updated_at: updatedAt }),
+    ...(user === undefined ? {} : { User: user }),
   };
 }
 
