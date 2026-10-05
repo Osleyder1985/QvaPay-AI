@@ -293,7 +293,8 @@ function tick(){
   $("countdown").innerHTML=state.lastError?'RETRYING <small>server</small>':'— <small>scheduled scan</small>';
   return;
  }
- const seconds=Math.ceil((state.nextAlarmAt-(state.serverNowAt+(Date.now()-state.serverNowAt)))/1000);
+ const clockOffset=state.serverNowAt-Date.now();
+ const seconds=Math.ceil((state.nextAlarmAt-(Date.now()+clockOffset))/1000);
  if(seconds<0){
   $("countdown").innerHTML='DUE <small>server</small>';
   return;
