@@ -78,11 +78,30 @@ jobs:
           printf '%s\n' "$START_RESPONSE"
 
           for attempt in $(seq 1 18); do
-            STATE_RESPONSE="$(curl --fail-with-body --silent --show-error \
-              --request GET \
-              --header "Authorization: Bearer $SCANNER_BOOTSTRAP_TOKEN" \
-              --header "Accept: application/json" \
-              "$WORKER_URL/internal/scanner/state")"
+            STATE_RESPONSE=""
+            for state_attempt in $(seq 1 3); do
+              if STATE_RESPONSE="$(curl --fail-with-body --silent --show-error \
+                --request GET \
+                --header "Authorization: Bearer $SCANNER_BOOTSTRAP_TOKEN" \
+                --header "Accept: application/json" \
+                "$WORKER_URL/internal/scanner/state")"; then
+                break
+              fi
+
+              if [ "$state_attempt" -lt 3 ]; then
+                sleep 2
+              fi
+            done
+
+            if [ -z "$STATE_RESPONSE" ]; then
+              echo "Scanner state endpoint not ready on verification attempt $attempt/18"
+              if [ "$attempt" -lt 18 ]; then
+                sleep 3
+                continue
+              fi
+              exit 1
+            fi
+
             printf 'Runtime state attempt %s/18:\n%s\n' "$attempt" "$STATE_RESPONSE"
 
             if node -e '
