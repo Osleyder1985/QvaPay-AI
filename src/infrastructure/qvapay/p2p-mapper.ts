@@ -11,7 +11,11 @@ function calculateRate(amount: string, receive: string): string {
   ) {
     throw new Error("Invalid QvaPay P2P amounts for rate calculation");
   }
-  return (fiatAmount / qUsdAmount).toFixed(8).replace(/0+$/, "").replace(/\.$/, "");
+
+  return (fiatAmount / qUsdAmount)
+    .toFixed(8)
+    .replace(/0+$/, "")
+    .replace(/\.$/, "");
 }
 
 export function mapQvaPayOffer(
@@ -19,6 +23,7 @@ export function mapQvaPayOffer(
   observedAt: string,
 ): Offer {
   const side = dto.type === "buy" ? "BUY" : "SELL";
+
   return {
     id: dto.uuid,
     market: dto.coin,
