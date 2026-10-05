@@ -107,7 +107,6 @@ describe("QvaPay P2P contract", () => {
   });
 });
 
-
 describe("QvaPay P2P offer status", () => {
   it("defaults public offers to open when the provider omits status", () => {
     const page = parseP2PPage({
