@@ -280,7 +280,23 @@ async function applyOffer(uuid,side,button){
     alert("No se pudo tomar la oferta: "+(error instanceof Error?error.message:String(error)));
   }
 }
-const table=(offers,side)=>offers.length?`<table><thead><tr><th>Created</th><th>User</th><th>${side==="BUY"?"QUSD a vender":"QUSD a comprar"}</th><th>Ratio CUP/QUSD</th><th>${side==="BUY"?"CUP a recibir":"CUP a pagar"}</th><th>VIP</th><th>Acción</th></tr></thead><tbody>${offers.map((o,i)=>{const action=side==="BUY"?"Vender":"Comprar";return `<tr><td>${fmtDateTime(o.createdAt)}</td><td>${esc(o.creatorUsername||"—")}${o.creatorVip?" 👑":""}</td><td>${fmtCoin(o.amount)}</td><td class="ratecell ${side==="BUY"?"buyrate":"sellrate"}">${i===0?"★ ":""}${esc(fmtRate(o.rate))}</td><td>${fmtCoin(o.fiatAmount)}</td><td>${o.onlyVip?'<span class="vipbadge">👑 VIP</span>':"No"}</td><td>${taken.has(o.id)?'<span class="reserved">🔒 Tomada</span>':`<button class="action" onclick="applyOffer('${esc(o.id)}','${side}',this)">${action}</button>`}</td></tr>`}).join("")}</tbody></table>`:'<div class="empty">No compatible offers in the latest snapshot.</div>';
+const taken=new Set();
+async function applyOffer(uuid,side,button){
+  const action=side==="BUY"?"Vender":"Comprar";
+  if(!confirm("¿Confirmas "+action+" QUSD en esta oferta? Esta acción la toma realmente en QvaPay.")) return;
+  const token=prompt("Introduce tu clave de operación P2P:");
+  if(!token) return;
+  button.disabled=true; button.textContent="Tomando…";
+  try{
+    const r=await fetch("/api/p2p/"+encodeURIComponent(uuid)+"/apply",{method:"POST",headers:{"x-p2p-action-token":token,"accept":"application/json"}});
+    if(!r.ok) throw new Error((await r.text())||("HTTP "+r.status));
+    taken.add(uuid); render(); alert("Oferta tomada correctamente. QvaPay la ha pasado a procesamiento.");
+  }catch(error){
+    button.disabled=false; button.textContent=action;
+    alert("No se pudo tomar la oferta: "+(error instanceof Error?error.message:String(error)));
+  }
+}
+const table=(offers,side)=>offers.length?\`<table><thead><tr><th>Created</th><th>User</th><th>\${side==="BUY"?"QUSD a vender":"QUSD a comprar"}</th><th>Ratio CUP/QUSD</th><th>\${side==="BUY"?"CUP a recibir":"CUP a pagar"}</th><th>VIP</th><th>Acción</th></tr></thead><tbody>\${offers.map((o,i)=>{const action=side==="BUY"?"Vender":"Comprar";return '<tr><td>'+fmtDateTime(o.createdAt)+'</td><td>'+esc(o.creatorUsername||"—")+(o.creatorVip?" 👑":"")+'</td><td>'+fmtCoin(o.amount)+'</td><td class="ratecell '+(side==="BUY"?"buyrate":"sellrate")+'">'+(i===0?"★ ":"")+esc(fmtRate(o.rate))+'</td><td>'+fmtCoin(o.fiatAmount)+'</td><td>'+(o.onlyVip?'<span class="vipbadge">👑 VIP</span>':"No")+'</td><td>'+(taken.has(o.id)?'<span class="reserved">🔒 Tomada</span>':'<button class="action" onclick="applyOffer(\\\''+esc(o.id)+'\\\',\\\''+side+'\\\',this)">'+action+'</button>')+'</td></tr>'}).join("")}</tbody></table>\`:'<div class="empty">No compatible offers in the latest snapshot.</div>';
 function render(){
  if(!state)return;
  $("coin").textContent=state.coin||"—";
