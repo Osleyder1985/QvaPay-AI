@@ -32,7 +32,9 @@ export interface PublicScannerState {
   readonly coin: string | null;
   readonly intervalSeconds: number | null;
   readonly nextAlarmAt: number | null;
+  readonly serverNowAt: number;
   readonly running: boolean;
+  readonly snapshotStatus: "UNAVAILABLE" | "EMPTY" | "AVAILABLE";
   readonly lastStartedAt: string | null;
   readonly lastCompletedAt: string | null;
   readonly lastError: string | null;
@@ -168,11 +170,19 @@ export function toPublicScannerState(
     state.market,
     state.execution.lastCompletedAt,
   );
+  const snapshotStatus =
+    state.market === null
+      ? "UNAVAILABLE"
+      : state.market.offers.length === 0
+        ? "EMPTY"
+        : "AVAILABLE";
+
   return {
     configured: state.configured,
     coin: state.coin,
     intervalSeconds: state.intervalSeconds,
     nextAlarmAt: state.nextAlarmAt,
+    serverNowAt: Date.now(),
     running:
       state.execution.lastStartedAt !== null &&
       (state.execution.lastCompletedAt === null ||
@@ -180,6 +190,7 @@ export function toPublicScannerState(
     lastStartedAt: state.execution.lastStartedAt,
     lastCompletedAt: state.execution.lastCompletedAt,
     lastError: state.execution.lastError,
+    snapshotStatus,
     ...marketView,
   };
 }
@@ -250,7 +261,7 @@ function render(){
  $("offers").textContent=state.metrics.totalOffers;
  $("spread").textContent=state.metrics.spread===null?"—":state.metrics.spread+" ("+state.metrics.spreadPercent.toFixed(3)+"%)";
  const quality=state.metrics.snapshotAt?Math.max(0,Date.now()-new Date(state.metrics.snapshotAt).getTime()):Infinity;
- $("quality").textContent=quality<state.intervalSeconds*2000?"FRESH":"STALE";
+ $("quality").textContent=state.snapshotStatus==="UNAVAILABLE"?"WAITING":quality<state.intervalSeconds*2000?"FRESH":"STALE";
  $("bestBuy").textContent=state.metrics.bestBuyRate||"—";
  $("bestSell").textContent=state.metrics.bestSellRate||"—";
  $("buyCount").textContent=state.metrics.buyOffers+" offers";
@@ -263,7 +274,7 @@ function render(){
  const healthy=state.configured&&!state.lastError;
  $("live").className="live "+(healthy?"":"bad");
  $("liveText").textContent=healthy?"LIVE":"DEGRADED";
- $("health").textContent=state.lastError?"Scanner error: "+state.lastError:(state.running?"Scanner executing live market scan":"Server scanner healthy");
+ $("health").textContent=state.lastError?"Scanner error: "+state.lastError:(state.running?"Scanner executing live market scan":state.snapshotStatus==="UNAVAILABLE"?"Waiting for first completed server scan":state.snapshotStatus==="EMPTY"?"Server scan completed: no compatible offers":"Server scanner healthy");
  $("healthIcon").textContent=state.lastError?"⚠":"●";
 }
 async function refresh(){
@@ -276,8 +287,17 @@ async function refresh(){
  }
 }
 function tick(){
- if(!state||!state.nextAlarmAt){$("countdown").textContent="—";return}
- const seconds=Math.max(0,Math.ceil((state.nextAlarmAt-Date.now())/1000));
+ if(!state){$("countdown").textContent="—";return}
+ if(state.running){$("countdown").innerHTML='SCANNING <small>server</small>';return}
+ if(!state.nextAlarmAt){
+  $("countdown").innerHTML=state.lastError?'RETRYING <small>server</small>':'— <small>scheduled scan</small>';
+  return;
+ }
+ const seconds=Math.ceil((state.nextAlarmAt-(state.serverNowAt+(Date.now()-state.serverNowAt)))/1000);
+ if(seconds<0){
+  $("countdown").innerHTML='DUE <small>server</small>';
+  return;
+ }
  $("countdown").innerHTML=seconds+' <small>seconds</small>';
 }
 refresh(); tick(); setInterval(refresh,10000); setInterval(tick,1000);
