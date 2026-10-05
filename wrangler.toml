@@ -1,6 +1,7 @@
 name = "qvapay-ai-runtime"
 main = "src/infrastructure/cloudflare/worker.ts"
 compatibility_date = "2026-10-04"
+workers_dev = true
 
 [vars]
 QVAPAY_API_BASE_URL = "https://api.qvapay.com"
