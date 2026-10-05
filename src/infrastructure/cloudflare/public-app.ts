@@ -184,7 +184,8 @@ export function toPublicScannerState(
   };
 }
 
-// prettier-ignore\nconst HTML = `<!doctype html>
+// prettier-ignore
+const HTML = `<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
