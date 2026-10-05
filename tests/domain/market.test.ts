@@ -14,6 +14,7 @@ const offer = (
   rate,
   amount: "100",
   availableAmount: "100",
+    status: "open",
   sourceTimestamp: "2026-10-04T00:00:00.000Z",
   observedAt: "2026-10-04T00:00:00.000Z",
 });
