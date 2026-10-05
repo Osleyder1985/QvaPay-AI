@@ -104,15 +104,32 @@ function optionalTimestamp(value: unknown, field: string): string | undefined {
 }
 
 function positiveInteger(value: unknown, field: string): number {
-  if (typeof value !== "number" || !Number.isInteger(value) || value < 1) {
+  const parsed = providerInteger(value, field);
+  if (parsed < 1) {
     throw new QvaPayContractError(`Invalid QvaPay integer: ${field}`);
   }
-  return value;
+  return parsed;
 }
 
 function nonNegativeInteger(value: unknown, field: string): number {
-  if (typeof value !== "number" || !Number.isInteger(value) || value < 0) {
+  const parsed = providerInteger(value, field);
+  if (parsed < 0) {
     throw new QvaPayContractError(`Invalid QvaPay integer: ${field}`);
   }
-  return value;
+  return parsed;
+}
+
+function providerInteger(value: unknown, field: string): number {
+  if (typeof value === "number") {
+    if (Number.isSafeInteger(value)) {
+      return value;
+    }
+  } else if (typeof value === "string" && /^\d+$/.test(value)) {
+    const parsed = Number(value);
+    if (Number.isSafeInteger(parsed)) {
+      return parsed;
+    }
+  }
+
+  throw new QvaPayContractError(`Invalid QvaPay integer: ${field}`);
 }
