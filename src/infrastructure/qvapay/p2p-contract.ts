@@ -15,7 +15,7 @@ export function parseP2PPage(payload: unknown): QvaPayP2PPageDto {
   const page = {
     data: payload.data.map(parseOffer),
     current_page: positiveInteger(payload.current_page, "current_page"),
-    last_page: positiveInteger(payload.last_page, "last_page"),
+    last_page: resolveLastPage(payload),
     per_page: positiveInteger(payload.per_page, "per_page"),
     total: nonNegativeInteger(payload.total, "total"),
   };
@@ -101,6 +101,16 @@ function optionalTimestamp(value: unknown, field: string): string | undefined {
     throw new QvaPayContractError(`Invalid QvaPay timestamp: ${field}`);
   }
   return value;
+}
+
+function resolveLastPage(payload: Record<string, unknown>): number {
+  if (payload.last_page !== undefined && payload.last_page !== null) {
+    return positiveInteger(payload.last_page, "last_page");
+  }
+
+  const total = nonNegativeInteger(payload.total, "total");
+  const perPage = positiveInteger(payload.per_page, "per_page");
+  return Math.max(1, Math.ceil(total / perPage));
 }
 
 function positiveInteger(value: unknown, field: string): number {
