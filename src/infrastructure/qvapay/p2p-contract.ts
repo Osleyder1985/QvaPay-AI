@@ -72,7 +72,18 @@ function parseOffer(value: unknown): QvaPayP2POfferDto {
   };
 }
 
-function optionalUser(value: unknown): { username?: string; name?: string } | undefined {\n  if (value === undefined || value === null) return undefined;\n  if (!isRecord(value)) {\n    throw new QvaPayContractError("Invalid QvaPay P2P user");\n  }\n  const username = value.username === undefined ? undefined : stringField(value.username, "User.username");\n  const name = value.name === undefined ? undefined : stringField(value.name, "User.name");\n  if (username === undefined && name === undefined) return undefined;\n  return { ...(username === undefined ? {} : { username }), ...(name === undefined ? {} : { name }) };\n}\n\nfunction isRecord(value: unknown): value is Record<string, unknown> {
+function optionalUser(value: unknown): { username?: string; name?: string } | undefined {
+  if (value === undefined || value === null) return undefined;
+  if (!isRecord(value)) {
+    throw new QvaPayContractError("Invalid QvaPay P2P user");
+  }
+  const username = value.username === undefined ? undefined : stringField(value.username, "User.username");
+  const name = value.name === undefined ? undefined : stringField(value.name, "User.name");
+  if (username === undefined && name === undefined) return undefined;
+  return { ...(username === undefined ? {} : { username }), ...(name === undefined ? {} : { name }) };
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
