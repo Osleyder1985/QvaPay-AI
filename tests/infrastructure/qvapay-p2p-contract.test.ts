@@ -15,6 +15,7 @@ describe("QvaPay P2P contract", () => {
           amount: "100.00",
           receive: "105000.50",
           available_amount: "90.00",
+          status: "processing",
         },
       ],
       current_page: 1,
@@ -25,6 +26,7 @@ describe("QvaPay P2P contract", () => {
 
     expect(page.data[0]?.receive).toBe("105000.50");
     expect(page.data[0]?.type).toBe("sell");
+    expect(page.data[0]?.status).toBe("processing");
   });
 
   it("accepts serialized pagination integers from QvaPay", () => {
@@ -94,6 +96,52 @@ describe("QvaPay P2P contract", () => {
             amount: 100,
             receive: "105000",
             available_amount: "90",
+          },
+        ],
+        current_page: 1,
+        last_page: 1,
+        per_page: 100,
+        total: 1,
+      }),
+    ).toThrow(QvaPayContractError);
+  });
+});
+
+
+describe("QvaPay P2P offer status", () => {
+  it("defaults public offers to open when the provider omits status", () => {
+    const page = parseP2PPage({
+      data: [
+        {
+          uuid: "open-offer",
+          type: "sell",
+          coin: "BANK_CUP",
+          amount: "100",
+          receive: "25000",
+          available_amount: "100",
+        },
+      ],
+      current_page: 1,
+      last_page: 1,
+      per_page: 100,
+      total: 1,
+    });
+
+    expect(page.data[0]?.status).toBe("open");
+  });
+
+  it("rejects an unsupported provider status", () => {
+    expect(() =>
+      parseP2PPage({
+        data: [
+          {
+            uuid: "bad-status",
+            type: "sell",
+            coin: "BANK_CUP",
+            amount: "100",
+            receive: "25000",
+            available_amount: "100",
+            status: "expired",
           },
         ],
         current_page: 1,
