@@ -8,7 +8,7 @@ import type { ScannerSchedulerRuntimeState } from "../../src/infrastructure/clou
 
 const marketState: ScannerSchedulerRuntimeState = {
   configured: true,
-  coin: "QUSD",
+  coin: "BANK_CUP",
   intervalSeconds: 10,
   nextAlarmAt: Date.now() + 10_000,
   execution: {
@@ -20,47 +20,59 @@ const marketState: ScannerSchedulerRuntimeState = {
     lastSellCount: 2,
   },
   market: {
-    coin: "QUSD",
+    coin: "BANK_CUP",
     offers: [
       {
         id: "buy-low",
-        market: "QUSD",
+        market: "BANK_CUP",
         side: "BUY",
         rate: "999",
         amount: "10",
         availableAmount: "5",
         sourceTimestamp: "2026-10-05T15:59:00.000Z",
         observedAt: "2026-10-05T16:00:01.000Z",
+        createdAt: "2026-10-05T15:49:00.000Z",
+        creatorUsername: "buyer-low",
+        fiatAmount: "9990",
       },
       {
         id: "buy-best",
-        market: "QUSD",
+        market: "BANK_CUP",
         side: "BUY",
         rate: "1000",
-        amount: "20",
+        amount: "10",
         availableAmount: "7",
         sourceTimestamp: "2026-10-05T15:59:30.000Z",
         observedAt: "2026-10-05T16:00:01.000Z",
+        createdAt: "2026-10-05T15:50:00.000Z",
+        creatorUsername: "buyer123",
+        fiatAmount: "10000",
       },
       {
         id: "sell-best",
-        market: "QUSD",
+        market: "BANK_CUP",
         side: "SELL",
         rate: "1001",
         amount: "15",
         availableAmount: "8",
         sourceTimestamp: "2026-10-05T15:59:20.000Z",
         observedAt: "2026-10-05T16:00:01.000Z",
+        createdAt: "2026-10-05T15:50:20.000Z",
+        creatorUsername: "seller-best",
+        fiatAmount: "15015",
       },
       {
         id: "sell-high",
-        market: "QUSD",
+        market: "BANK_CUP",
         side: "SELL",
         rate: "1002",
         amount: "30",
         availableAmount: "9",
         sourceTimestamp: "2026-10-05T15:59:10.000Z",
         observedAt: "2026-10-05T16:00:01.000Z",
+        createdAt: "2026-10-05T15:50:10.000Z",
+        creatorUsername: "seller-high",
+        fiatAmount: "30060",
       },
     ],
   },
@@ -105,7 +117,7 @@ describe("public production dashboard", () => {
   it("marks an empty persisted market explicitly", () => {
     const state = toPublicScannerState({
       ...marketState,
-      market: { coin: "QUSD", offers: [] },
+      market: { coin: "BANK_CUP", offers: [] },
     });
 
     expect(state.snapshotStatus).toBe("EMPTY");
