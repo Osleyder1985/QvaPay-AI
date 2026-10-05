@@ -1,6 +1,7 @@
 export interface QvaPayP2PUserDto {
   readonly username?: string;
   readonly name?: string;
+  readonly vip?: boolean;
 }
 
 export interface QvaPayP2POfferDto {
@@ -15,6 +16,7 @@ export interface QvaPayP2POfferDto {
   readonly order_max?: string;
   readonly created_at?: string;
   readonly updated_at?: string;
+  readonly only_vip?: boolean;
   readonly User?: QvaPayP2PUserDto;
 }
 
