@@ -11,6 +11,9 @@ export interface PublicMarketOffer {
   readonly rate: string;
   readonly amount: string;
   readonly availableAmount: string;
+  readonly createdAt: string;
+  readonly creatorUsername: string | null;
+  readonly fiatAmount: string;
   readonly observedAt: string;
 }
 
@@ -91,6 +94,9 @@ function toPublicOffer(offer: Offer): PublicMarketOffer {
     rate: offer.rate,
     amount: offer.amount,
     availableAmount: offer.availableAmount,
+    createdAt: offer.createdAt ?? offer.sourceTimestamp,
+    creatorUsername: offer.creatorUsername ?? null,
+    fiatAmount: offer.fiatAmount ?? offer.rate,
     observedAt: offer.observedAt,
   };
 }
