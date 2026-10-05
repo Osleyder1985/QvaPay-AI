@@ -54,6 +54,14 @@ const OFFER_TYPES = ["buy", "sell"] as const;
 const defaultSleep = (milliseconds: number) =>
   new Promise<void>((resolve) => setTimeout(resolve, milliseconds));
 
+function describeTransportError(error: unknown): string {
+  if (error instanceof Error) {
+    return `${error.name}: ${error.message}`;
+  }
+
+  return String(error);
+}
+
 export class QvaPayP2PClient {
   private readonly fetcher: typeof fetch;
   private readonly take: number;
@@ -214,7 +222,7 @@ export class QvaPayP2PClient {
 
         if (attempt >= this.maxRetries) {
           throw new QvaPayTransientError(
-            "QvaPay P2P request failed due to a transient transport error",
+            `QvaPay P2P ${type} page ${page} transport error: ${describeTransportError(error)}`,
             { cause: error },
           );
         }
