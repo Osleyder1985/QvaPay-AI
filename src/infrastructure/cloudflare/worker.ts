@@ -3,6 +3,7 @@ import { ScannerSchedulerDurableObject } from "./scanner-scheduler-do.js";
 import {
   createPublicAppResponse,
   createPublicScannerStateResponse,
+  toPublicScannerState,
 } from "./public-app.js";
 
 export interface ScannerWorkerEnvironment {
@@ -39,19 +40,9 @@ export default {
         return new Response("Method not allowed", { status: 405 });
       }
 
-      const state = await stub.getState();
-      return createPublicScannerStateResponse({
-        configured: state.configured,
-        coin: state.coin,
-        intervalSeconds: state.intervalSeconds,
-        nextAlarmAt: state.nextAlarmAt,
-        running:
-          state.execution.lastStartedAt !== null &&
-          (state.execution.lastCompletedAt === null ||
-            state.execution.lastStartedAt > state.execution.lastCompletedAt),
-        lastStartedAt: state.execution.lastStartedAt,
-        lastCompletedAt: state.execution.lastCompletedAt,
-      });
+      return createPublicScannerStateResponse(
+        toPublicScannerState(await stub.getState()),
+      );
     }
 
     if (
