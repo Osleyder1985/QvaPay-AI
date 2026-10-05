@@ -1,4 +1,4 @@
-export interface QvaPayP2POfferDto {
+export interface QvaPayP2PUserDto {\n  readonly username?: string;\n  readonly name?: string;\n}\n\nexport interface QvaPayP2POfferDto {
   readonly uuid: string;
   readonly type: "buy" | "sell";
   readonly coin: string;
