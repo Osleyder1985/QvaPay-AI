@@ -235,7 +235,7 @@ let state=null;
 const esc=value=>String(value??"—").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const fmtNumber=value=>Number.isFinite(Number(value))?Number(value).toLocaleString(undefined,{maximumFractionDigits:8}):"—";
 const fmtTime=value=>value?new Date(value).toLocaleTimeString():"—";
-const table=(offers,side)=>offers.length?`<table><thead><tr><th>Rate</th><th>Available</th><th>Amount</th><th>Observed</th></tr></thead><tbody>\${offers.map((o,i)=>`<tr><td class="ratecell \${side==="BUY"?"buyrate":"sellrate"}">\${i===0?"★ ":""}\${esc(o.rate)}</td><td>\${esc(o.availableAmount)}</td><td>\${esc(o.amount)}</td><td>\${fmtTime(o.observedAt)}</td></tr>`).join("")}</tbody></table>`:'<div class="empty">No compatible offers in the latest snapshot.</div>';
+const table=(offers,side)=>offers.length?\`<table><thead><tr><th>Rate</th><th>Available</th><th>Amount</th><th>Observed</th></tr></thead><tbody>\${offers.map((o,i)=>\`<tr><td class="ratecell \${side==="BUY"?"buyrate":"sellrate"}">\${i===0?"★ ":""}\${esc(o.rate)}</td><td>\${esc(o.availableAmount)}</td><td>\${esc(o.amount)}</td><td>\${fmtTime(o.observedAt)}</td></tr>\`).join("")}</tbody></table>\`:'<div class="empty">No compatible offers in the latest snapshot.</div>';
 function render(){
  if(!state)return;
  $("coin").textContent=state.coin||"—";
