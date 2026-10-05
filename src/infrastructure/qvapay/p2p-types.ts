@@ -1,4 +1,4 @@
-export interface QvaPayP2PUserDto {
+export type QvaPayP2POfferStatus =\n  | "open"\n  | "revision"\n  | "processing"\n  | "paid"\n  | "completed"\n  | "cancelled";\n\nexport interface QvaPayP2PUserDto {
   readonly username?: string;
   readonly name?: string;
   readonly vip?: boolean;
@@ -10,7 +10,7 @@ export interface QvaPayP2POfferDto {
   readonly coin: string;
   readonly amount: string;
   readonly receive: string;
-  readonly available_amount: string;
+  readonly available_amount: string;\n  readonly status?: QvaPayP2POfferStatus;
   readonly reserved_amount?: string;
   readonly order_min?: string;
   readonly order_max?: string;
