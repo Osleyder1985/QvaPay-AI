@@ -69,7 +69,7 @@ describe("CloudflareScannerScheduler", () => {
   });
 
   it("keeps an existing alarm when configuration is unchanged", async () => {
-    const { storage, getAlarm } = createStorage(8_000);
+    const { storage, getAlarm } = createStorage(18_000);
 
     await storage.put("scanner-config", {
       coin: "QUSD",
@@ -82,8 +82,8 @@ describe("CloudflareScannerScheduler", () => {
       10_000,
     );
 
-    expect(state.nextAlarmAt).toBe(8_000);
-    expect(getAlarm()).toBe(8_000);
+    expect(state.nextAlarmAt).toBe(18_000);
+    expect(getAlarm()).toBe(18_000);
   });
 
   it("reprograms the alarm when configuration changes", async () => {

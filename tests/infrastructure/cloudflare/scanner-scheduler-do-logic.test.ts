@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  ensureScannerScheduled,
   executeScannerAlarm,
   SCANNER_EXECUTION_STATE_KEY,
   type ScannerRuntimeExecutionState,
@@ -32,6 +33,21 @@ const config = {
   coin: "QUSD",
   intervalSeconds: 10,
 };
+
+describe("ensureScannerScheduled", () => {
+  it("reschedules when the persisted alarm is stale", async () => {
+    const storage = new FakeStorage();
+    const now = Date.parse("2026-10-05T06:00:00.000Z");
+    await storage.setAlarm(now - 60_000);
+
+    await storage.put("scanner-config", config);
+
+    const state = await ensureScannerScheduled(storage, config, now);
+
+    expect(state.nextAlarmAt).toBe(now + 10_000);
+    expect(await storage.getAlarm()).toBe(now + 10_000);
+  });
+});
 
 describe("executeScannerAlarm", () => {
   it("persists started and completed execution timestamps", async () => {
