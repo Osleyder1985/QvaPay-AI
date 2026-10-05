@@ -19,10 +19,13 @@ export function mapQvaPayOffer(
     id: dto.uuid,
     market: dto.coin,
     side,
-    rate: dto.receive,
+    rate: calculateRate(dto.amount, dto.receive),
     amount: dto.amount,
     availableAmount: dto.available_amount,
     sourceTimestamp: dto.updated_at ?? dto.created_at ?? observedAt,
     observedAt,
+    createdAt: dto.created_at ?? dto.updated_at ?? observedAt,
+    creatorUsername: dto.User?.username ?? null,
+    fiatAmount: dto.receive,
   };
 }
