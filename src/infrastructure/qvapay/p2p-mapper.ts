@@ -1,5 +1,14 @@
 import type { Offer } from "../../domain/offer.js";
-import type { QvaPayP2POfferDto } from "./p2p-types.js";\n\nfunction calculateRate(amount: string, receive: string): string {\n  const qUsdAmount = Number(amount);\n  const fiatAmount = Number(receive);\n  if (!Number.isFinite(qUsdAmount) || qUsdAmount <= 0 || !Number.isFinite(fiatAmount)) {\n    throw new Error("Invalid QvaPay P2P amounts for rate calculation");\n  }\n  return (fiatAmount / qUsdAmount).toFixed(8).replace(/0+$/, "").replace(/\\.$/, "");\n}
+import type { QvaPayP2POfferDto } from "./p2p-types.js";
+
+function calculateRate(amount: string, receive: string): string {
+  const qUsdAmount = Number(amount);
+  const fiatAmount = Number(receive);
+  if (!Number.isFinite(qUsdAmount) || qUsdAmount <= 0 || !Number.isFinite(fiatAmount)) {
+    throw new Error("Invalid QvaPay P2P amounts for rate calculation");
+  }
+  return (fiatAmount / qUsdAmount).toFixed(8).replace(/0+$/, "").replace(/\\.$/, "");
+}
 
 export function mapQvaPayOffer(
   dto: QvaPayP2POfferDto,
