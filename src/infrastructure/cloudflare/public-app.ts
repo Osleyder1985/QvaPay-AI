@@ -129,7 +129,10 @@ function buildMarketView(market: Market | null, completedAt: string | null) {
   const bestSellNumber = bestSell === null ? null : Number(bestSell);
   const spread =
     bestBuyNumber !== null && bestSellNumber !== null
-      ? (bestSellNumber - bestBuyNumber).toFixed(8).replace(/0+$/, "").replace(/\.$/, "")
+      ? (bestSellNumber - bestBuyNumber)
+          .toFixed(8)
+          .replace(/0+$/, "")
+          .replace(/\.$/, "")
       : null;
   const spreadPercent =
     bestBuyNumber !== null &&
@@ -161,7 +164,10 @@ function buildMarketView(market: Market | null, completedAt: string | null) {
 export function toPublicScannerState(
   state: ScannerSchedulerRuntimeState,
 ): PublicScannerState {
-  const marketView = buildMarketView(state.market, state.execution.lastCompletedAt);
+  const marketView = buildMarketView(
+    state.market,
+    state.execution.lastCompletedAt,
+  );
   return {
     configured: state.configured,
     coin: state.coin,
