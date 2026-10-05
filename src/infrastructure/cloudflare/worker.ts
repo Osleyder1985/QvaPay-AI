@@ -1,5 +1,6 @@
 import type { DurableObjectNamespace } from "@cloudflare/workers-types";
 import { ScannerSchedulerDurableObject } from "./scanner-scheduler-do.js";
+import { QvaPayP2PClient } from "../qvapay/qvapay-p2p-client.js";
 import {
   createPublicAppResponse,
   createPublicScannerStateResponse,
