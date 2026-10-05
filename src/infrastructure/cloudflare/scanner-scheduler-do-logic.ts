@@ -1,5 +1,6 @@
 import type { MarketProvider } from "../../application/ports/market-provider.js";
 import { ScannerRuntime } from "../../application/scanner-runtime.js";
+import type { Market } from "../../domain/market.js";
 import { CloudflareScannerScheduler } from "./scanner-scheduler.js";
 import {
   createScannerSchedulerState,
@@ -19,16 +20,23 @@ export interface ScannerRuntimeExecutionState {
   readonly lastStartedAt: string | null;
   readonly lastCompletedAt: string | null;
   readonly lastError: string | null;
+  readonly lastOfferCount: number;
+  readonly lastBuyCount: number;
+  readonly lastSellCount: number;
 }
 
 export const SCANNER_CONFIG_KEY = "scanner-config";
 export const SCANNER_EXECUTION_STATE_KEY = "scanner-execution-state";
+export const SCANNER_MARKET_SNAPSHOT_KEY = "scanner-market-snapshot";
 
 export const createInitialScannerRuntimeExecutionState =
   (): ScannerRuntimeExecutionState => ({
     lastStartedAt: null,
     lastCompletedAt: null,
     lastError: null,
+    lastOfferCount: 0,
+    lastBuyCount: 0,
+    lastSellCount: 0,
   });
 
 export async function ensureScannerScheduled(
@@ -79,18 +87,36 @@ export async function executeScannerAlarm(
   });
 
   try {
-    await runtime.run();
-    await storage.put(SCANNER_EXECUTION_STATE_KEY, {
-      lastStartedAt: new Date(now).toISOString(),
-      lastCompletedAt: new Date(Date.now()).toISOString(),
-      lastError: null,
-    });
+    const market = await runtime.run();
+    if (!market) {
+      throw new Error("Scanner returned no market snapshot");
+    }
+
+    const buyCount = market.offers.filter(
+      (offer) => offer.side === "BUY",
+    ).length;
+    const sellCount = market.offers.filter(
+      (offer) => offer.side === "SELL",
+    ).length;
+
+    await storage.put<Market>(SCANNER_MARKET_SNAPSHOT_KEY, market);
+    await storage.put<ScannerRuntimeExecutionState>(
+      SCANNER_EXECUTION_STATE_KEY,
+      {
+        lastStartedAt: new Date(now).toISOString(),
+        lastCompletedAt: new Date().toISOString(),
+        lastError: null,
+        lastOfferCount: market.offers.length,
+        lastBuyCount: buyCount,
+        lastSellCount: sellCount,
+      },
+    );
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     console.error("Scanner alarm execution failed", error);
     await storage.put(SCANNER_EXECUTION_STATE_KEY, {
+      ...previousState,
       lastStartedAt: new Date(now).toISOString(),
-      lastCompletedAt: previousState.lastCompletedAt,
       lastError: message,
     });
     await scheduler.scheduleNext(

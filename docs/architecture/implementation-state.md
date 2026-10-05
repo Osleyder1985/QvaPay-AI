@@ -19,7 +19,7 @@ Este documento identifica exclusivamente los componentes que tienen implementaci
 | Cliente QvaPay P2P | `src/infrastructure/qvapay/qvapay-p2p-client.ts` | Implemented |
 | Cloudflare scheduler adapter | `src/infrastructure/cloudflare/scanner-scheduler.ts` | Tested |
 | Cloudflare Durable Object + Alarm | `src/infrastructure/cloudflare/scanner-scheduler-do.ts` | Implemented |
-| Public web application | `src/infrastructure/cloudflare/public-app.ts`, `worker.ts` | Tested |
+| Public web application | `src/infrastructure/cloudflare/public-app.ts`, `worker.ts` | Tested |\n| Live market dashboard | `src/infrastructure/cloudflare/public-app.ts` | Tested |\n| Persisted market snapshot | `src/infrastructure/cloudflare/scanner-scheduler-do-logic.ts` | Tested |\n| Ranked BUY/SELL market view | `src/infrastructure/cloudflare/public-app.ts` | Tested |
 | Public scanner status | `GET /api/scanner/status` | Tested |
 | Worker control boundary | `src/infrastructure/cloudflare/worker.ts` | Implemented |
 | Wrangler deployment configuration | `wrangler.toml` | Implemented |
@@ -27,7 +27,7 @@ Este documento identifica exclusivamente los componentes que tienen implementaci
 | Pruebas del adaptador QvaPay | `tests/infrastructure/*` | Tested |
 | Pruebas del scheduler Cloudflare | `tests/infrastructure/cloudflare-scanner-scheduler.test.ts` | Tested |
 
-## No implementado todavía
+## Criterios de observabilidad del dashboard\n\nEl dashboard utiliza métricas operativas alineadas con conceptos de calidad y seguridad habituales en ISO 9001 e ISO/IEC 25010, sin afirmar certificación ISO del producto. La interfaz muestra disponibilidad del runtime, frescura del snapshot, integridad de la identidad de mercado, trazabilidad temporal mediante `observedAt`/`lastCompletedAt`, estado de error, conteo de ofertas, liquidez disponible, mejor BUY, mejor SELL y spread. La separación por moneda evita mezclar mercados.\n\nLas métricas son de observabilidad y análisis; no constituyen por sí mismas una decisión financiera ni una orden de mercado.\n\n## No implementado todavía
 
 Los siguientes elementos aparecen en la arquitectura objetivo, pero no tienen implementación identificable en el repositorio actual:
 

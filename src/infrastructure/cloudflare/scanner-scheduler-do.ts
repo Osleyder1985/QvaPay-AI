@@ -1,10 +1,12 @@
 import { DurableObject } from "cloudflare:workers";
 import type { DurableObjectStorage } from "@cloudflare/workers-types";
+import type { Market } from "../../domain/market.js";
 import { QvaPayP2PClient } from "../qvapay/qvapay-p2p-client.js";
 import {
   ensureScannerScheduled,
   executeScannerAlarm,
   SCANNER_EXECUTION_STATE_KEY,
+  SCANNER_MARKET_SNAPSHOT_KEY,
   type ScannerRuntimeExecutionState,
   type ScannerSchedulerPersistentStorage,
 } from "./scanner-scheduler-do-logic.js";
@@ -21,6 +23,7 @@ export interface ScannerSchedulerEnvironment {
 
 export interface ScannerSchedulerRuntimeState extends SchedulerState {
   readonly execution: ScannerRuntimeExecutionState;
+  readonly market: Market | null;
 }
 
 export class ScannerSchedulerDurableObject extends DurableObject<ScannerSchedulerEnvironment> {
@@ -41,13 +44,19 @@ export class ScannerSchedulerDurableObject extends DurableObject<ScannerSchedule
     const config =
       await this.storage.get<ScannerSchedulerConfig>("scanner-config");
     const alarm = await this.storage.getAlarm();
-    const execution = (await this.storage.get<ScannerRuntimeExecutionState>(
-      SCANNER_EXECUTION_STATE_KEY,
-    )) ?? {
-      lastStartedAt: null,
-      lastCompletedAt: null,
-      lastError: null,
-    };
+    const execution =
+      (await this.storage.get<ScannerRuntimeExecutionState>(
+        SCANNER_EXECUTION_STATE_KEY,
+      )) ?? {
+        lastStartedAt: null,
+        lastCompletedAt: null,
+        lastError: null,
+        lastOfferCount: 0,
+        lastBuyCount: 0,
+        lastSellCount: 0,
+      };
+    const market =
+      (await this.storage.get<Market>(SCANNER_MARKET_SNAPSHOT_KEY)) ?? null;
 
     return {
       configured: config !== undefined,
@@ -55,6 +64,7 @@ export class ScannerSchedulerDurableObject extends DurableObject<ScannerSchedule
       intervalSeconds: config?.intervalSeconds ?? null,
       nextAlarmAt: alarm,
       execution,
+      market,
     };
   }
 

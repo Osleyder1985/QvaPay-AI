@@ -83,6 +83,25 @@ jobs:
             "$WORKER_URL/api/scanner/status")"
           printf 'Public scanner status:\n%s\n' "$STATUS_RESPONSE"
 
+          node -e '
+            const state = JSON.parse(process.argv[1]);
+            const valid =
+              typeof state.configured === "boolean" &&
+              Array.isArray(state.buyOffers) &&
+              Array.isArray(state.sellOffers) &&
+              state.metrics &&
+              typeof state.metrics.totalOffers === "number" &&
+              Object.prototype.hasOwnProperty.call(state.metrics, "bestBuyRate") &&
+              Object.prototype.hasOwnProperty.call(state.metrics, "bestSellRate");
+            process.exit(valid ? 0 : 1);
+          ' "$STATUS_RESPONSE"
+
+          echo "Verifying public dashboard HTML..."
+          DASHBOARD_HTML="$(curl --fail-with-body --silent --show-error "$WORKER_URL/")"
+          printf '%s' "$DASHBOARD_HTML" | grep -q 'BEST BUY'
+          printf '%s' "$DASHBOARD_HTML" | grep -q 'BEST SELL'
+          printf '%s' "$DASHBOARD_HTML" | grep -q 'Auto-refresh'
+
           START_RESPONSE=""
           for attempt in $(seq 1 7); do
             if START_RESPONSE="$(curl --fail-with-body --silent --show-error \
