@@ -1,3 +1,8 @@
+export interface QvaPayP2PUserDto {
+  readonly username?: string;
+  readonly name?: string;
+}
+
 export interface QvaPayP2POfferDto {
   readonly uuid: string;
   readonly type: "buy" | "sell";
@@ -10,6 +15,7 @@ export interface QvaPayP2POfferDto {
   readonly order_max?: string;
   readonly created_at?: string;
   readonly updated_at?: string;
+  readonly User?: QvaPayP2PUserDto;
 }
 
 export interface QvaPayP2PPageDto {

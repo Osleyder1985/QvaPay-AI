@@ -54,6 +54,7 @@ function parseOffer(value: unknown): QvaPayP2POfferDto {
   const orderMax = optionalDecimal(value.order_max, "order_max");
   const createdAt = optionalTimestamp(value.created_at, "created_at");
   const updatedAt = optionalTimestamp(value.updated_at, "updated_at");
+  const user = optionalUser(value.User);
 
   return {
     uuid,
@@ -69,6 +70,30 @@ function parseOffer(value: unknown): QvaPayP2POfferDto {
     ...(orderMax === undefined ? {} : { order_max: orderMax }),
     ...(createdAt === undefined ? {} : { created_at: createdAt }),
     ...(updatedAt === undefined ? {} : { updated_at: updatedAt }),
+    ...(user === undefined ? {} : { User: user }),
+  };
+}
+
+function optionalUser(
+  value: unknown,
+): { username?: string; name?: string } | undefined {
+  if (value === undefined || value === null) return undefined;
+  if (!isRecord(value)) {
+    throw new QvaPayContractError("Invalid QvaPay P2P user");
+  }
+
+  const username =
+    value.username === undefined
+      ? undefined
+      : stringField(value.username, "User.username");
+  const name =
+    value.name === undefined ? undefined : stringField(value.name, "User.name");
+
+  if (username === undefined && name === undefined) return undefined;
+
+  return {
+    ...(username === undefined ? {} : { username }),
+    ...(name === undefined ? {} : { name }),
   };
 }
 
@@ -131,14 +156,10 @@ function nonNegativeInteger(value: unknown, field: string): number {
 
 function providerInteger(value: unknown, field: string): number {
   if (typeof value === "number") {
-    if (Number.isSafeInteger(value)) {
-      return value;
-    }
+    if (Number.isSafeInteger(value)) return value;
   } else if (typeof value === "string" && /^\d+$/.test(value)) {
     const parsed = Number(value);
-    if (Number.isSafeInteger(parsed)) {
-      return parsed;
-    }
+    if (Number.isSafeInteger(parsed)) return parsed;
   }
 
   throw new QvaPayContractError(`Invalid QvaPay integer: ${field}`);
