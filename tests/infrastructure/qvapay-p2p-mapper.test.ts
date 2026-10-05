@@ -57,7 +57,6 @@ describe("QvaPay P2P mapper", () => {
   });
 });
 
-
 describe("QvaPay P2P mapper VIP metadata", () => {
   it("preserves offer VIP restriction and creator VIP status", () => {
     const offer = mapQvaPayOffer(
