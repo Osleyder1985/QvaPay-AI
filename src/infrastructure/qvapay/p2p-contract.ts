@@ -124,7 +124,7 @@ function providerInteger(value: unknown, field: string): number {
     if (Number.isSafeInteger(value)) {
       return value;
     }
-  } else if (typeof value === "string" && /^\\d+$/.test(value)) {
+  } else if (typeof value === "string" && /^\d+$/.test(value)) {
     const parsed = Number(value);
     if (Number.isSafeInteger(parsed)) {
       return parsed;
