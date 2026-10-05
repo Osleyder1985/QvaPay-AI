@@ -9,6 +9,9 @@ export interface Offer {
   readonly availableAmount: string;
   readonly sourceTimestamp: string;
   readonly observedAt: string;
+  readonly createdAt?: string;
+  readonly creatorUsername?: string | null;
+  readonly fiatAmount?: string;
 }
 
 export function compareDecimalStrings(left: string, right: string): number {
