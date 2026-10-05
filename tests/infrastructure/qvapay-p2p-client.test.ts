@@ -52,9 +52,7 @@ describe("QvaPay P2P client", () => {
       const url = input instanceof URL ? input : new URL(String(input));
       calls.push(url);
       const type = url.searchParams.get("type") as "buy" | "sell";
-      return Promise.resolve(
-        responseFor(page(1, 1, `${type}-one`, type)),
-      );
+      return Promise.resolve(responseFor(page(1, 1, `${type}-one`, type)));
     };
 
     try {
