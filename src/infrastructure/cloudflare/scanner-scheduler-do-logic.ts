@@ -92,7 +92,9 @@ export async function executeScannerAlarm(
       throw new Error("Scanner returned no market snapshot");
     }
 
-    const buyCount = market.offers.filter((offer) => offer.side === "BUY").length;
+    const buyCount = market.offers.filter(
+      (offer) => offer.side === "BUY",
+    ).length;
     const sellCount = market.offers.filter(
       (offer) => offer.side === "SELL",
     ).length;
