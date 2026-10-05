@@ -11,7 +11,7 @@ permissions:
 jobs:
   repair:
     name: Repair repository formatting
-    runs-on: macos-latest
+    runs-on: windows-latest
     steps:
       - name: Checkout main
         uses: actions/checkout@v4
