@@ -122,10 +122,7 @@ function optionalDecimal(value: unknown, field: string): string | undefined {
   return decimalString(value, field);
 }
 
-function optionalTimestamp(
-  value: unknown,
-  field: string,
-): string | undefined {
+function optionalTimestamp(value: unknown, field: string): string | undefined {
   if (value === undefined || value === null) return undefined;
   if (typeof value !== "string" || Number.isNaN(Date.parse(value))) {
     throw new QvaPayContractError(`Invalid QvaPay timestamp: ${field}`);
