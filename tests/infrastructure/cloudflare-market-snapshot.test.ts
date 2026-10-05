@@ -19,7 +19,7 @@ class MemoryStorage implements ScannerSchedulerPersistentStorage {
     this.values.set(key, value);
   }
 
-  getAlarm(): number | null {
+  async getAlarm(): Promise<number | null> {
     return this.alarm;
   }
 
