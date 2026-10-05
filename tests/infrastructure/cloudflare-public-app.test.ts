@@ -95,6 +95,30 @@ describe("public production dashboard", () => {
     expect(state.metrics.totalAvailableAmount).toBe("29");
     expect(state.buyOffers[0]?.rate).toBe("1000");
     expect(state.sellOffers[0]?.rate).toBe("1001");
+    expect(state.snapshotStatus).toBe("AVAILABLE");
+    expect(state.serverNowAt).toEqual(expect.any(Number));
+  });
+
+  it("marks an empty persisted market explicitly", () => {
+    const state = toPublicScannerState({
+      ...marketState,
+      market: { coin: "QUSD", offers: [] },
+    });
+
+    expect(state.snapshotStatus).toBe("EMPTY");
+    expect(state.metrics.totalOffers).toBe(0);
+    expect(state.buyOffers).toEqual([]);
+    expect(state.sellOffers).toEqual([]);
+  });
+
+  it("marks the pre-scan state as unavailable", () => {
+    const state = toPublicScannerState({
+      ...marketState,
+      market: null,
+    });
+
+    expect(state.snapshotStatus).toBe("UNAVAILABLE");
+    expect(state.metrics.snapshotAt).toBeNull();
   });
 
   it("returns a sanitized public JSON contract", async () => {

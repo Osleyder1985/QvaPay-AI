@@ -61,13 +61,14 @@ export class ScannerRuntime {
 
     try {
       const market = await scanMarket(this.provider, this.options.coin);
+      const completedAt = this.clock();
       const nextRunAt = new Date(
-        startedAt.getTime() + this.options.intervalSeconds * 1000,
+        completedAt.getTime() + this.options.intervalSeconds * 1000,
       );
       this.state = {
         ...this.state,
         status: "idle",
-        lastCompletedAt: this.clock().toISOString(),
+        lastCompletedAt: completedAt.toISOString(),
         nextRunAt: nextRunAt.toISOString(),
       };
       await this.options.scheduler.scheduleNext(nextRunAt);

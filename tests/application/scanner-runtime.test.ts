@@ -22,9 +22,14 @@ function createHarness() {
 }
 
 describe("ScannerRuntime", () => {
-  it("runs a scan and schedules the next execution", async () => {
+  it("runs a scan and schedules the next execution after completion", async () => {
     const { provider, scheduler } = createHarness();
-    const now = new Date("2026-10-04T18:00:00.000Z");
+    const startedAt = new Date("2026-10-04T18:00:00.000Z");
+    const completedAt = new Date("2026-10-04T18:02:30.000Z");
+    const clock = vi
+      .fn<() => Date>()
+      .mockReturnValueOnce(startedAt)
+      .mockReturnValueOnce(completedAt);
     const runtime = new ScannerRuntime(
       provider,
       {
@@ -32,19 +37,20 @@ describe("ScannerRuntime", () => {
         intervalSeconds: 10,
         scheduler,
       },
-      () => now,
+      clock,
     );
 
     const result = await runtime.run();
 
     expect(result).toEqual(market);
     expect(scheduler.scheduleNext).toHaveBeenCalledWith(
-      new Date("2026-10-04T18:00:10.000Z"),
+      new Date("2026-10-04T18:02:40.000Z"),
     );
     expect(runtime.getState()).toMatchObject({
       status: "idle",
-      lastStartedAt: now.toISOString(),
-      nextRunAt: "2026-10-04T18:00:10.000Z",
+      lastStartedAt: startedAt.toISOString(),
+      lastCompletedAt: completedAt.toISOString(),
+      nextRunAt: "2026-10-04T18:02:40.000Z",
     });
   });
 
