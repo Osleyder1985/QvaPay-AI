@@ -37,6 +37,41 @@ const credentials = {
 };
 
 describe("QvaPay P2P client", () => {
+  it("binds the default fetcher to the global scope", async () => {
+    const originalFetch = globalThis.fetch;
+    const calls: URL[] = [];
+
+    globalThis.fetch = function (
+      this: typeof globalThis,
+      input: RequestInfo | URL,
+    ) {
+      if (this !== globalThis) {
+        throw new TypeError("incorrect this reference");
+      }
+
+      const url = input instanceof URL ? input : new URL(String(input));
+      calls.push(url);
+      const type = url.searchParams.get("type") as "buy" | "sell";
+      return Promise.resolve(responseFor(page(1, 1, `${type}-one`, type)));
+    };
+
+    try {
+      const client = new QvaPayP2PClient({
+        baseUrl: "https://api.qvapay.com",
+        ...credentials,
+      });
+
+      await client.fetchOffers("BANK_CUP");
+
+      expect(calls.map((url) => url.searchParams.get("type"))).toEqual([
+        "buy",
+        "sell",
+      ]);
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
+  });
+
   it("authenticates every market request with application credentials", async () => {
     const fetcher = vi
       .fn()

@@ -70,7 +70,7 @@ export class QvaPayP2PClient {
   private readonly sleep: (milliseconds: number) => Promise<void>;
 
   constructor(private readonly options: QvaPayP2PClientOptions) {
-    this.fetcher = options.fetcher ?? fetch;
+    this.fetcher = options.fetcher ?? globalThis.fetch.bind(globalThis);
     this.take = options.take ?? 100;
     this.maxRetries = options.maxRetries ?? 3;
     this.timeoutMs = options.timeoutMs ?? 10_000;
