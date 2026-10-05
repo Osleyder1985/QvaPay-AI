@@ -56,11 +56,25 @@ jobs:
           printf '%s' "$SCANNER_BOOTSTRAP_TOKEN" | npx wrangler secret put SCANNER_BOOTSTRAP_TOKEN
           npx wrangler deploy
 
-          START_RESPONSE="$(curl --fail-with-body --silent --show-error \
-            --request POST \
-            --header "Authorization: Bearer $SCANNER_BOOTSTRAP_TOKEN" \
-            --header "Accept: application/json" \
-            "$WORKER_URL/internal/scanner/start")"
+          START_RESPONSE=""
+          for attempt in $(seq 1 7); do
+            if START_RESPONSE="$(curl --fail-with-body --silent --show-error \
+              --request POST \
+              --header "Authorization: Bearer $SCANNER_BOOTSTRAP_TOKEN" \
+              --header "Accept: application/json" \
+              "$WORKER_URL/internal/scanner/start")"; then
+              break
+            fi
+
+            if [ "$attempt" -lt 7 ]; then
+              sleep 5
+            fi
+          done
+
+          if [ -z "$START_RESPONSE" ]; then
+            echo "Production scanner bootstrap failed after 30 seconds"
+            exit 1
+          fi
           printf '%s\n' "$START_RESPONSE"
 
           for attempt in $(seq 1 18); do
