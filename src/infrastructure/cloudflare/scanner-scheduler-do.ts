@@ -10,9 +10,9 @@ import {
   type ScannerRuntimeExecutionState,
   type ScannerSchedulerPersistentStorage,
 } from "./scanner-scheduler-do-logic.js";
-import type {
-  ScannerSchedulerConfig,
-  SchedulerState,
+import {
+  type ScannerSchedulerConfig,
+  type SchedulerState,
 } from "./scanner-scheduler-config.js";
 
 export interface ScannerSchedulerEnvironment {
