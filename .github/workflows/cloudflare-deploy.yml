@@ -41,7 +41,7 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Set bootstrap secret and deploy Worker
+      - name: Deploy Worker and verify scanner runtime
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -56,8 +56,36 @@ jobs:
           printf '%s' "$SCANNER_BOOTSTRAP_TOKEN" | npx wrangler secret put SCANNER_BOOTSTRAP_TOKEN
           npx wrangler deploy
 
-          curl --fail-with-body --silent --show-error \
+          START_RESPONSE="$(curl --fail-with-body --silent --show-error \
             --request POST \
             --header "Authorization: Bearer $SCANNER_BOOTSTRAP_TOKEN" \
             --header "Accept: application/json" \
-            "$WORKER_URL/internal/scanner/start"
+            "$WORKER_URL/internal/scanner/start")"
+          printf '%s\n' "$START_RESPONSE"
+
+          printf 'Waiting for Durable Object Alarm...\n'
+          sleep 20
+
+          STATE_RESPONSE="$(curl --fail-with-body --silent --show-error \
+            --request GET \
+            --header "Authorization: Bearer $SCANNER_BOOTSTRAP_TOKEN" \
+            --header "Accept: application/json" \
+            "$WORKER_URL/internal/scanner/state")"
+          printf '%s\n' "$STATE_RESPONSE"
+
+          node -e '
+            const state = JSON.parse(process.argv[1]);
+            const execution = state.execution;
+            if (
+              state.configured !== true ||
+              state.coin !== "QUSD" ||
+              state.intervalSeconds !== 10 ||
+              execution?.lastStartedAt == null ||
+              execution?.lastCompletedAt == null ||
+              execution.lastCompletedAt < execution.lastStartedAt ||
+              state.nextAlarmAt == null
+            ) {
+              console.error("Production scanner runtime verification failed");
+              process.exit(1);
+            }
+          ' "$STATE_RESPONSE"
