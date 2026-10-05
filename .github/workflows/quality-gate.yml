@@ -150,12 +150,7 @@ jobs:
         run: npx wrangler deploy --dry-run
 
       - name: Format check
-        shell: bash
-        run: |
-          set -euo pipefail
-          npx prettier --write src/infrastructure/qvapay/qvapay-p2p-client.ts
-          git diff --no-ext-diff --no-color -- src/infrastructure/qvapay/qvapay-p2p-client.ts
-          npx prettier --check "src/**/*.ts" "tests/**/*.ts" "*.json" "*.js" "*.ts"
+        run: npm run format:check
 
       - name: Unit tests
         run: npm test
