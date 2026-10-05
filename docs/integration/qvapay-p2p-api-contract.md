@@ -31,7 +31,7 @@ Para `best_rate`, QvaPay exige `type` y `coin`.
 
 La respuesta pública del mercado contiene, entre otros:
 
-Los campos de paginación deben interpretarse como enteros; el proveedor puede serializarlos como números o como cadenas decimales sin parte fraccionaria. El adaptador normaliza ambos formatos a enteros seguros y rechaza valores no enteros.
+Los campos de paginación deben interpretarse como enteros; el proveedor puede serializarlos como números o como cadenas decimales sin parte fraccionaria. El adaptador normaliza ambos formatos a enteros seguros y rechaza valores no enteros. Si `last_page` no está presente, el adaptador lo deriva de `total` y `per_page`.
 
 - `uuid`
 - `type`
@@ -107,4 +107,4 @@ Los mensajes de error del proveedor no deben ser el único mecanismo para clasif
 - Credenciales de aplicación: https://www.qvapay.com/docs/p2p/app-credentials
 - Introducción API: https://www.qvapay.com/docs
 
-Fecha de verificación: 2026-10-04.
+Fecha de verificación: 2026-10-05.

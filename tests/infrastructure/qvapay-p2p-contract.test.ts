@@ -72,6 +72,17 @@ describe("QvaPay P2P contract", () => {
     ).toThrow(QvaPayContractError);
   });
 
+  it("derives last_page when the provider omits it", () => {
+    const page = parseP2PPage({
+      data: [],
+      current_page: 2,
+      per_page: 20,
+      total: 41,
+    });
+
+    expect(page.last_page).toBe(3);
+  });
+
   it("rejects numeric decimals instead of silently coercing them", () => {
     expect(() =>
       parseP2PPage({
