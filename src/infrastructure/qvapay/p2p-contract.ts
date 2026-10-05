@@ -87,9 +87,7 @@ function optionalUser(
       ? undefined
       : stringField(value.username, "User.username");
   const name =
-    value.name === undefined
-      ? undefined
-      : stringField(value.name, "User.name");
+    value.name === undefined ? undefined : stringField(value.name, "User.name");
 
   if (username === undefined && name === undefined) return undefined;
 
