@@ -46,6 +46,8 @@ La implementación de Durable Object + Alarm establece la frontera de ejecución
 
 La configuración del scheduler se persiste en el almacenamiento del Durable Object para sobrevivir a evicciones o reinicios. Esto no sustituye la futura persistencia funcional de snapshots en D1.
 
+La implementación de la interfaz pública y su verificación automatizada se realizan bajo el Issue #61 y el Pull Request #62.
+
 ## Regla
 
 La presencia de un componente en un diagrama de arquitectura objetivo no constituye evidencia de implementación, prueba, verificación ni certificación.
