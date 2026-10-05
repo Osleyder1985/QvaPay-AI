@@ -88,3 +88,20 @@ Estos requisitos describen observación y presentación del mercado. No autoriza
 - **TBD:** definición exacta de moneda, mercado y par según el contrato de QvaPay.
 - **TBD:** límites mínimo y máximo permitidos para el intervalo configurable.
 - **TBD:** política de recuperación ante errores del proveedor.
+
+
+## P2P offer interaction requirements
+
+The market dashboard shall:
+
+- display QUSD quantities and fiat amounts with comma-separated thousands and exactly two decimal places, without changing stored numeric precision;
+- display the offer creation date and time, not only the time of day;
+- identify offers restricted to VIP users with an explicit VIP indicator;
+- display **Vender** for a BUY offer because the user becomes the QUSD seller;
+- display **Comprar** for a SELL offer because the user becomes the QUSD buyer;
+- require explicit confirmation before applying to an offer;
+- require a server-side operation credential before the application can reach the QvaPay P2P apply endpoint;
+- show a clear taken/processing state after a successful application;
+- provide visual transitions for market updates, row hover states, action feedback, and state changes without requiring a full page reload.
+
+The server-side application action shall never expose QvaPay app credentials to the browser.
