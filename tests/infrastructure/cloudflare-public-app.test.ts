@@ -96,7 +96,7 @@ describe("public production dashboard", () => {
     expect(state.buyOffers[0]?.rate).toBe("1000");
     expect(state.sellOffers[0]?.rate).toBe("1001");
     expect(state.snapshotStatus).toBe("AVAILABLE");
-    expect(state.serverNowAt).toEqual(expect.any(Number));
+    expect(state.serverNowAt).toEqual(expect.any(Number));\n    expect(state.buyOffers[0]?.creatorUsername).toBe("buyer123");\n    expect(state.buyOffers[0]?.createdAt).toBe("2026-10-05T15:50:00.000Z");\n    expect(state.buyOffers[0]?.fiatAmount).toBe("10000");
   });
 
   it("marks an empty persisted market explicitly", () => {
@@ -131,6 +131,6 @@ describe("public production dashboard", () => {
     expect(response.headers.get("cache-control")).toBe("no-store");
     expect(body).not.toContain("SCANNER_BOOTSTRAP_TOKEN");
     expect(body).not.toContain("app-secret");
-    expect(body).toContain('"bestBuyRate":"1000"');
+    expect(body).toContain('"bestBuyRate":"1000"');\n    expect(body).toContain('"createdAt"');\n    expect(body).toContain('"creatorUsername"');
   });
 });
