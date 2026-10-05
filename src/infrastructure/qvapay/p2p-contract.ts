@@ -54,6 +54,7 @@ function parseOffer(value: unknown): QvaPayP2POfferDto {
   const orderMax = optionalDecimal(value.order_max, "order_max");
   const createdAt = optionalTimestamp(value.created_at, "created_at");
   const updatedAt = optionalTimestamp(value.updated_at, "updated_at");
+  const onlyVip = optionalBoolean(value.only_vip, "only_vip");
   const user = optionalUser(value.User);
 
   return {
@@ -70,6 +71,7 @@ function parseOffer(value: unknown): QvaPayP2POfferDto {
     ...(orderMax === undefined ? {} : { order_max: orderMax }),
     ...(createdAt === undefined ? {} : { created_at: createdAt }),
     ...(updatedAt === undefined ? {} : { updated_at: updatedAt }),
+    ...(onlyVip === undefined ? {} : { only_vip: onlyVip }),
     ...(user === undefined ? {} : { User: user }),
   };
 }
@@ -88,13 +90,28 @@ function optionalUser(
       : stringField(value.username, "User.username");
   const name =
     value.name === undefined ? undefined : stringField(value.name, "User.name");
+  const vip =
+    value.vip === undefined ? undefined : booleanField(value.vip, "User.vip");
 
   if (username === undefined && name === undefined) return undefined;
 
   return {
     ...(username === undefined ? {} : { username }),
     ...(name === undefined ? {} : { name }),
+    ...(vip === undefined ? {} : { vip }),
   };
+}
+
+function booleanField(value: unknown, field: string): boolean {
+  if (typeof value !== "boolean") {
+    throw new QvaPayContractError(`Invalid QvaPay field: ${field}`);
+  }
+  return value;
+}
+
+function optionalBoolean(value: unknown, field: string): boolean | undefined {
+  if (value === undefined || value === null) return undefined;
+  return booleanField(value, field);
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
