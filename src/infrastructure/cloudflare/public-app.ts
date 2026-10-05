@@ -232,8 +232,8 @@ main{max-width:1440px;margin:auto;padding:22px clamp(14px,3vw,38px) 40px}.top{di
 </div>
 <div class="panel best"><div class="eyebrow">🏆 Best market opportunities</div>
 <div class="bestgrid">
-<div class="quote buy"><div class="side">🟢 BEST BUY</div><div class="rate" id="bestBuy">—</div><div class="small">Highest observed BUY rate</div></div>
-<div class="quote sell"><div class="side">🔴 BEST SELL</div><div class="rate" id="bestSell">—</div><div class="small">Lowest observed SELL rate</div></div>
+<div class="quote buy"><div class="side">🟢 BEST BUY</div><div class="rate" id="bestBuy">—</div><div class="small" id="bestBuyDetail">Highest CUP received per QUSD</div></div>
+<div class="quote sell"><div class="side">🔴 BEST SELL</div><div class="rate" id="bestSell">—</div><div class="small" id="bestSellDetail">Lowest CUP paid per QUSD</div></div>
 </div>
 <div style="margin-top:15px"><div class="eyebrow">⏱️ Next server scan</div><div class="countdown" id="countdown">— <small>seconds</small></div></div>
 </div>
@@ -253,7 +253,7 @@ let state=null;
 const esc=value=>String(value??"—").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const fmtNumber=value=>Number.isFinite(Number(value))?Number(value).toLocaleString(undefined,{maximumFractionDigits:8}):"—";
 const fmtTime=value=>value?new Date(value).toLocaleTimeString():"—";
-const table=(offers,side)=>offers.length?\`<table><thead><tr><th>Rate</th><th>Available</th><th>Amount</th><th>Observed</th></tr></thead><tbody>\${offers.map((o,i)=>\`<tr><td class="ratecell \${side==="BUY"?"buyrate":"sellrate"}">\${i===0?"★ ":""}\${esc(o.rate)}</td><td>\${esc(o.availableAmount)}</td><td>\${esc(o.amount)}</td><td>\${fmtTime(o.observedAt)}</td></tr>\`).join("")}</tbody></table>\`:'<div class="empty">No compatible offers in the latest snapshot.</div>';
+const table=(offers,side)=>offers.length?\`<table><thead><tr><th>Created</th><th>User</th><th>QUSD</th><th>Ratio CUP/QUSD</th><th>CUP</th></tr></thead><tbody>\${offers.map((o,i)=>\`<tr><td>\${fmtTime(o.createdAt)}</td><td>\${esc(o.creatorUsername||"—")}</td><td>\${esc(o.amount)}</td><td class="ratecell \${side==="BUY"?"buyrate":"sellrate"}">\${i===0?"★ ":""}\${esc(o.rate)}</td><td>\${esc(o.fiatAmount)}</td></tr>\`).join("")}</tbody></table>\`:'<div class="empty">No compatible offers in the latest snapshot.</div>';
 function render(){
  if(!state)return;
  $("coin").textContent=state.coin||"—";
@@ -301,7 +301,7 @@ function tick(){
  }
  $("countdown").innerHTML=seconds+' <small>seconds</small>';
 }
-refresh(); tick(); setInterval(refresh,10000); setInterval(tick,1000);
+refresh(); tick(); setInterval(refresh,1000); setInterval(tick,1000);
 </script>
 </body>
 </html>`;
