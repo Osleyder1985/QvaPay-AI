@@ -4,6 +4,8 @@ import { ScannerSchedulerDurableObject } from "./scanner-scheduler-do.js";
 export interface ScannerWorkerEnvironment {
   readonly SCANNER_SCHEDULER: DurableObjectNamespace<ScannerSchedulerDurableObject>;
   readonly QVAPAY_API_BASE_URL: string;
+  readonly QVAPAY_APP_ID: string;
+  readonly QVAPAY_APP_SECRET: string;
   readonly SCANNER_COIN: string;
   readonly SCANNER_INTERVAL_SECONDS: string;
   readonly SCANNER_BOOTSTRAP_TOKEN: string;
