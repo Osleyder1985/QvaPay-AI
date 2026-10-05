@@ -41,7 +41,7 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Deploy Worker and start scanner
+      - name: Set bootstrap secret and deploy Worker
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -53,11 +53,8 @@ jobs:
           SCANNER_BOOTSTRAP_TOKEN="$(node -e "console.log(require('crypto').randomBytes(32).toString('hex'))")"
           echo "::add-mask::$SCANNER_BOOTSTRAP_TOKEN"
 
-          SECRETS_FILE="$(mktemp)"
-          trap 'rm -f "$SECRETS_FILE"' EXIT
-
-          printf '{"SCANNER_BOOTSTRAP_TOKEN":"%s"}' "$SCANNER_BOOTSTRAP_TOKEN" > "$SECRETS_FILE"
-          npx wrangler deploy --secrets-file "$SECRETS_FILE"
+          printf '%s' "$SCANNER_BOOTSTRAP_TOKEN" | npx wrangler secret put SCANNER_BOOTSTRAP_TOKEN
+          npx wrangler deploy
 
           curl --fail-with-body --silent --show-error \
             --request POST \
