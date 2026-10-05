@@ -11,6 +11,8 @@ export interface Offer {
   readonly observedAt: string;
   readonly createdAt?: string;
   readonly creatorUsername?: string | null;
+  readonly creatorVip?: boolean;
+  readonly onlyVip?: boolean;
   readonly fiatAmount?: string;
 }
 

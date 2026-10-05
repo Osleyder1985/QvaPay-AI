@@ -93,6 +93,34 @@ export class QvaPayP2PClient {
     }
   }
 
+  async applyOffer(uuid: string): Promise<unknown> {
+    const response = await this.fetcher(
+      new URL(`/p2p/${encodeURIComponent(uuid)}/apply`, this.options.baseUrl),
+      {
+        method: "POST",
+        headers: {
+          "app-id": this.options.appId,
+          "app-secret": this.options.appSecret,
+        },
+      },
+    );
+
+    if (!response.ok) {
+      const body = await response.text();
+      throw new QvaPayProviderError(
+        response.status,
+        body || `QvaPay P2P apply failed with status ${response.status}`,
+        response.status === 401
+          ? "authentication"
+          : response.status >= 400 && response.status < 500
+            ? "invalid-request"
+            : "transient",
+      );
+    }
+
+    return response.json();
+  }
+
   async fetchOffers(
     coin: string,
     observedAt = new Date().toISOString(),

@@ -246,3 +246,29 @@ describe("QvaPay P2P client", () => {
     expect(fetcher.mock.calls[0]?.[1]?.signal?.aborted).toBe(true);
   });
 });
+
+describe("QvaPay P2P apply", () => {
+  it("applies an offer with app credentials", async () => {
+    const fetcher = async (input: RequestInfo | URL, init?: RequestInit) => {
+      expect(String(input)).toBe("https://api.qvapay.com/p2p/offer-123/apply");
+      expect(init?.method).toBe("POST");
+      expect(new Headers(init?.headers).get("app-id")).toBe("app-id");
+      expect(new Headers(init?.headers).get("app-secret")).toBe("app-secret");
+      return new Response(JSON.stringify({ message: "Aplicado a la oferta" }), {
+        status: 201,
+        headers: { "content-type": "application/json" },
+      });
+    };
+
+    const client = new QvaPayP2PClient({
+      baseUrl: "https://api.qvapay.com",
+      appId: "app-id",
+      appSecret: "app-secret",
+      fetcher,
+    });
+
+    await expect(client.applyOffer("offer-123")).resolves.toEqual({
+      message: "Aplicado a la oferta",
+    });
+  });
+});

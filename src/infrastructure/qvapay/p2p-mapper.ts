@@ -35,6 +35,8 @@ export function mapQvaPayOffer(
     observedAt,
     createdAt: dto.created_at ?? dto.updated_at ?? observedAt,
     creatorUsername: dto.User?.username ?? null,
+    creatorVip: dto.User?.vip ?? false,
+    onlyVip: dto.only_vip ?? false,
     fiatAmount: dto.receive,
   };
 }

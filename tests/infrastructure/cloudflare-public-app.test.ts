@@ -46,6 +46,8 @@ const marketState: ScannerSchedulerRuntimeState = {
         observedAt: "2026-10-05T16:00:01.000Z",
         createdAt: "2026-10-05T15:50:00.000Z",
         creatorUsername: "buyer123",
+        creatorVip: true,
+        onlyVip: true,
         fiatAmount: "10000",
       },
       {
@@ -59,6 +61,8 @@ const marketState: ScannerSchedulerRuntimeState = {
         observedAt: "2026-10-05T16:00:01.000Z",
         createdAt: "2026-10-05T15:50:20.000Z",
         creatorUsername: "seller-best",
+        creatorVip: false,
+        onlyVip: false,
         fiatAmount: "15015",
       },
       {
@@ -112,6 +116,8 @@ describe("public production dashboard", () => {
     expect(state.buyOffers[0]?.creatorUsername).toBe("buyer123");
     expect(state.buyOffers[0]?.createdAt).toBe("2026-10-05T15:50:00.000Z");
     expect(state.buyOffers[0]?.fiatAmount).toBe("10000");
+    expect(state.buyOffers[0]?.onlyVip).toBe(true);
+    expect(state.buyOffers[0]?.creatorVip).toBe(true);
     expect(state.sellOffers[0]?.creatorUsername).toBe("seller-best");
     expect(state.sellOffers[0]?.createdAt).toBe("2026-10-05T15:50:20.000Z");
     expect(state.sellOffers[0]?.fiatAmount).toBe("15015");

@@ -13,6 +13,8 @@ export interface PublicMarketOffer {
   readonly availableAmount: string;
   readonly createdAt: string;
   readonly creatorUsername: string | null;
+  readonly creatorVip: boolean;
+  readonly onlyVip: boolean;
   readonly fiatAmount: string;
   readonly observedAt: string;
 }
@@ -96,6 +98,8 @@ function toPublicOffer(offer: Offer): PublicMarketOffer {
     availableAmount: offer.availableAmount,
     createdAt: offer.createdAt ?? offer.sourceTimestamp,
     creatorUsername: offer.creatorUsername ?? null,
+    creatorVip: offer.creatorVip ?? false,
+    onlyVip: offer.onlyVip ?? false,
     fiatAmount: offer.fiatAmount ?? offer.rate,
     observedAt: offer.observedAt,
   };
@@ -214,7 +218,7 @@ const HTML = `<!doctype html>
 *{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(circle at 15% 0,#16233f 0,transparent 35%),radial-gradient(circle at 90% 10%,#211a3e 0,transparent 32%),var(--bg);color:var(--text)}
 main{max-width:1440px;margin:auto;padding:22px clamp(14px,3vw,38px) 40px}.top{display:flex;justify-content:space-between;gap:18px;align-items:center;flex-wrap:wrap}.brand{display:flex;gap:14px;align-items:center}.logo{width:50px;height:50px;border-radius:16px;display:grid;place-items:center;background:linear-gradient(135deg,#6f8cff,#9b6dff);font-size:26px;box-shadow:var(--shadow)}h1{font-size:clamp(22px,3vw,32px);margin:0}.subtitle{margin:3px 0 0;color:var(--muted);font-size:13px}.live{display:flex;align-items:center;gap:9px;padding:10px 14px;border:1px solid var(--line);border-radius:999px;background:#0b1220}.dot{width:9px;height:9px;border-radius:50%;background:var(--good);box-shadow:0 0 14px var(--good)}.live.bad .dot{background:var(--bad);box-shadow:0 0 14px var(--bad)}
 .hero{margin-top:22px;display:grid;grid-template-columns:1.5fr 1fr;gap:16px}.panel{background:linear-gradient(145deg,rgba(17,26,45,.94),rgba(10,16,29,.94));border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow)}.overview{padding:24px}.eyebrow{color:var(--muted);font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase}.coin{font-size:42px;font-weight:800;margin:5px 0}.health{display:flex;gap:9px;align-items:center;color:var(--good)}.countdown{font-variant-numeric:tabular-nums;font-size:44px;font-weight:800;color:var(--accent)}.countdown small{font-size:13px;color:var(--muted);font-weight:500}.metrics{margin-top:16px;display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.metric{padding:15px;border-radius:14px;background:rgba(6,11,22,.65);border:1px solid #1e2a44}.metric b{display:block;font-size:18px;margin-top:5px}.metric span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}.best{padding:22px}.bestgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:13px}.quote{padding:18px;border-radius:16px;background:#0a1220;border:1px solid var(--line)}.quote.buy{border-color:rgba(71,215,160,.35)}.quote.sell{border-color:rgba(255,120,144,.35)}.side{font-size:12px;font-weight:800;letter-spacing:.08em}.buy .side{color:var(--buy)}.sell .side{color:var(--sell)}.rate{font-size:25px;font-weight:800;margin:8px 0}.small{font-size:12px;color:var(--muted)}
-.tables{margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:16px}.tablepanel{overflow:hidden}.tablehead{display:flex;justify-content:space-between;align-items:center;padding:17px 19px;border-bottom:1px solid var(--line)}.tablehead h2{font-size:17px;margin:0}.badge{font-size:11px;color:var(--muted);padding:5px 8px;border:1px solid var(--line);border-radius:999px}table{width:100%;border-collapse:collapse}th,td{text-align:right;padding:12px 16px;border-bottom:1px solid rgba(36,49,77,.55);font-variant-numeric:tabular-nums}th:first-child,td:first-child{text-align:left}th{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}td{font-size:13px}.ratecell{font-weight:750}.buyrate{color:var(--buy)}.sellrate{color:var(--sell)}tr:last-child td{border-bottom:0}.empty{padding:35px;text-align:center;color:var(--muted)}
+.tables{margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:16px}.tablepanel{overflow:hidden}.tablehead{display:flex;justify-content:space-between;align-items:center;padding:17px 19px;border-bottom:1px solid var(--line)}.tablehead h2{font-size:17px;margin:0}.badge{font-size:11px;color:var(--muted);padding:5px 8px;border:1px solid var(--line);border-radius:999px}table{width:100%;border-collapse:collapse}th,td{text-align:right;padding:12px 16px;border-bottom:1px solid rgba(36,49,77,.55);font-variant-numeric:tabular-nums;transition:background .2s,transform .2s}tbody tr:hover td{background:rgba(124,156,255,.07);transform:translateY(-1px)}th:first-child,td:first-child{text-align:left}th{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}td{font-size:13px}.vipbadge{display:inline-flex;align-items:center;gap:4px;padding:4px 7px;border-radius:999px;background:rgba(244,201,93,.12);color:var(--warn);font-size:10px;font-weight:800}.action{border:0;border-radius:9px;padding:8px 11px;font:inherit;font-size:11px;font-weight:800;cursor:pointer;transition:transform .15s,filter .15s;background:linear-gradient(135deg,#6f8cff,#9b6dff);color:white}.action:hover{transform:translateY(-2px);filter:brightness(1.08)}.action:disabled{opacity:.55;cursor:wait;transform:none}.reserved{display:inline-flex;padding:6px 8px;border-radius:8px;background:rgba(85,227,154,.12);color:var(--good);font-size:10px;font-weight:800}.ratecell{font-weight:750}.buyrate{color:var(--buy)}.sellrate{color:var(--sell)}tr:last-child td{border-bottom:0}.empty{padding:35px;text-align:center;color:var(--muted)}
 .footer{margin-top:17px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;color:var(--muted);font-size:11px}.iso{display:flex;gap:12px;flex-wrap:wrap}.tag{padding:5px 8px;border:1px solid #1d2942;border-radius:7px}
 @media(max-width:900px){.hero,.tables{grid-template-columns:1fr}.metrics{grid-template-columns:repeat(2,1fr)}}@media(max-width:520px){main{padding:15px 10px 30px}.overview{padding:18px}.coin{font-size:34px}.countdown{font-size:34px}.metrics{grid-template-columns:1fr 1fr}.bestgrid{grid-template-columns:1fr}th,td{padding:10px 8px;font-size:11px}}
 </style>
@@ -257,9 +261,42 @@ main{max-width:1440px;margin:auto;padding:22px clamp(14px,3vw,38px) 40px}.top{di
 const $=id=>document.getElementById(id);
 let state=null;
 const esc=value=>String(value??"—").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const fmtNumber=value=>Number.isFinite(Number(value))?Number(value).toLocaleString(undefined,{maximumFractionDigits:8}):"—";
-const fmtTime=value=>value?new Date(value).toLocaleTimeString():"—";
-const table=(offers,side)=>offers.length?\`<table><thead><tr><th>Created</th><th>User</th><th>\${side==="BUY"?"QUSD a comprar":"QUSD a vender"}</th><th>Ratio CUP/QUSD</th><th>\${side==="BUY"?"CUP a pagar":"CUP a recibir"}</th></tr></thead><tbody>\${offers.map((o,i)=>\`<tr><td>\${fmtTime(o.createdAt)}</td><td>\${esc(o.creatorUsername||"—")}</td><td>\${esc(o.amount)}</td><td class="ratecell \${side==="BUY"?"buyrate":"sellrate"}">\${i===0?"★ ":""}\${esc(o.rate)}</td><td>\${esc(o.fiatAmount)}</td></tr>\`).join("")}</tbody></table>\`:'<div class="empty">No compatible offers in the latest snapshot.</div>';
+const fmtCoin=value=>Number.isFinite(Number(value))?Number(value).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"—";
+const fmtRate=value=>Number.isFinite(Number(value))?Number(value).toLocaleString("en-US",{maximumFractionDigits:8}):"—";
+const fmtDateTime=value=>value?new Date(value).toLocaleString():"—";
+const taken=new Set();
+async function applyOffer(uuid,side,button){
+  const action=side==="BUY"?"Vender":"Comprar";
+  if(!confirm("¿Confirmas "+action+" QUSD en esta oferta? Esta acción la toma realmente en QvaPay.")) return;
+  const token=prompt("Introduce tu clave de operación P2P:");
+  if(!token) return;
+  button.disabled=true; button.textContent="Tomando…";
+  try{
+    const r=await fetch("/api/p2p/"+encodeURIComponent(uuid)+"/apply",{method:"POST",headers:{"x-p2p-action-token":token,"accept":"application/json"}});
+    if(!r.ok) throw new Error((await r.text())||("HTTP "+r.status));
+    taken.add(uuid); render(); alert("Oferta tomada correctamente. QvaPay la ha pasado a procesamiento.");
+  }catch(error){
+    button.disabled=false; button.textContent=action;
+    alert("No se pudo tomar la oferta: "+(error instanceof Error?error.message:String(error)));
+  }
+}
+const taken=new Set();
+async function applyOffer(uuid,side,button){
+  const action=side==="BUY"?"Vender":"Comprar";
+  if(!confirm("¿Confirmas "+action+" QUSD en esta oferta? Esta acción la toma realmente en QvaPay.")) return;
+  const token=prompt("Introduce tu clave de operación P2P:");
+  if(!token) return;
+  button.disabled=true; button.textContent="Tomando…";
+  try{
+    const r=await fetch("/api/p2p/"+encodeURIComponent(uuid)+"/apply",{method:"POST",headers:{"x-p2p-action-token":token,"accept":"application/json"}});
+    if(!r.ok) throw new Error((await r.text())||("HTTP "+r.status));
+    taken.add(uuid); render(); alert("Oferta tomada correctamente. QvaPay la ha pasado a procesamiento.");
+  }catch(error){
+    button.disabled=false; button.textContent=action;
+    alert("No se pudo tomar la oferta: "+(error instanceof Error?error.message:String(error)));
+  }
+}
+const table=(offers,side)=>offers.length?\`<table><thead><tr><th>Created</th><th>User</th><th>\${side==="BUY"?"QUSD a vender":"QUSD a comprar"}</th><th>Ratio CUP/QUSD</th><th>\${side==="BUY"?"CUP a recibir":"CUP a pagar"}</th><th>VIP</th><th>Acción</th></tr></thead><tbody>\${offers.map((o,i)=>{const action=side==="BUY"?"Vender":"Comprar";return '<tr><td>'+fmtDateTime(o.createdAt)+'</td><td>'+esc(o.creatorUsername||"—")+(o.creatorVip?" 👑":"")+'</td><td>'+fmtCoin(o.amount)+'</td><td class="ratecell '+(side==="BUY"?"buyrate":"sellrate")+'">'+(i===0?"★ ":"")+esc(fmtRate(o.rate))+'</td><td>'+fmtCoin(o.fiatAmount)+'</td><td>'+(o.onlyVip?'<span class="vipbadge">👑 VIP</span>':"No")+'</td><td>'+(taken.has(o.id)?'<span class="reserved">🔒 Tomada</span>':'<button class="action" onclick="applyOffer(\\\''+esc(o.id)+'\\\',\\\''+side+'\\\',this)">'+action+'</button>')+'</td></tr>'}).join("")}</tbody></table>\`:'<div class="empty">No compatible offers in the latest snapshot.</div>';
 function render(){
  if(!state)return;
  $("coin").textContent=state.coin||"—";
@@ -274,9 +311,9 @@ function render(){
  $("sellCount").textContent=state.metrics.sellOffers+" offers";
  $("buyTable").innerHTML=table(state.buyOffers,"BUY");
  $("sellTable").innerHTML=table(state.sellOffers,"SELL");
- $("snapshot").textContent=fmtTime(state.metrics.snapshotAt);
+ $("snapshot").textContent=fmtDateTime(state.metrics.snapshotAt);
  $("intervalLabel").textContent=state.intervalSeconds??10;
- $("updated").textContent=fmtTime(state.lastCompletedAt);
+ $("updated").textContent=fmtDateTime(state.lastCompletedAt);
  const healthy=state.configured&&!state.lastError;
  $("live").className="live "+(healthy?"":"bad");
  $("liveText").textContent=healthy?"LIVE":"DEGRADED";
