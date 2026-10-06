@@ -3,7 +3,7 @@ import type { DurableObjectNamespace, D1Database } from "@cloudflare/workers-typ
 // prettier-ignore
 import { ScannerSchedulerDurableObject } from "./scanner-scheduler-do.js";
 // prettier-ignore
-import { authenticate, createUser, ensureSecuritySchema, getSession, listUsers, logout, requireRole, setUserActive, changeUserPassword, type AppRole } from "./auth-rbac.js";
+import { authenticate, createUser, deleteUserByUsername, ensureSecuritySchema, getSession, listUsers, logout, requireRole, setUserActive, changeUserPassword, type AppRole } from "./auth-rbac.js";
 // prettier-ignore
 import { QvaPayAccountClient } from "../qvapay/qvapay-account-client.js";
 // prettier-ignore
@@ -64,6 +64,38 @@ export default {
       } catch (error) {
         return jsonError(error instanceof Error ? error.message : "No fue posible iniciar sesión.", 400);
       }
+    }
+
+    if (url.pathname === "/internal/auth/smoke-user") {
+      const authorization = request.headers.get("authorization");
+      if (authorization !== `Bearer ${env.SCANNER_BOOTSTRAP_TOKEN}`) return new Response("Unauthorized", { status: 401 });
+      const input = await body(request);
+      const username = typeof input.username === "string" ? input.username.trim() : "";
+      if (!/^ci-smoke-[a-zA-Z0-9-]{3,64}$/.test(username)) return jsonError("Smoke username inválido.", 400);
+
+      if (request.method === "POST") {
+        const password = typeof input.password === "string" ? input.password : "";
+        try {
+          const user = await createUser(env.DB, username, password, "ADMINISTRATION");
+          await env.DB.prepare(
+            "INSERT INTO security_audit_log (id, occurred_at, actor_user_id, actor_username, event_type, outcome, target_user_id, target_username, metadata_json) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+          ).bind(crypto.randomUUID(), new Date().toISOString(), null, null, "smoke_user_created", "SUCCESS", user.id, user.username, JSON.stringify({ purpose: "production_auth_smoke" })).run();
+          return Response.json({ user }, { headers: { "cache-control": "no-store" } });
+        } catch (error) {
+          return jsonError(error instanceof Error ? error.message : "No se pudo crear la cuenta de smoke.", 400);
+        }
+      }
+
+      if (request.method === "DELETE") {
+        try {
+          await deleteUserByUsername(env.DB, username);
+          return new Response(null, { status: 204, headers: { "cache-control": "no-store" } });
+        } catch (error) {
+          return jsonError(error instanceof Error ? error.message : "No se pudo eliminar la cuenta de smoke.", 400);
+        }
+      }
+
+      return new Response("Method not allowed", { status: 405 });
     }
 
     if (url.pathname === "/api/auth/logout") {
