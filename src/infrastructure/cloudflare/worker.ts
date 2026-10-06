@@ -118,6 +118,8 @@ export default {
       }
       const userMatch = url.pathname.match(/^\/api\/admin\/users\/([^/]+)\/(enable|disable|password)$/);
       if (userMatch) {
+        const userId = userMatch[1];
+        if (!userId) return jsonError("Usuario no encontrado.", 404);
         const input = await body(request);
         try {
           const session = access;
