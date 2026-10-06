@@ -74,7 +74,9 @@ describe("QvaPayAccountClient", () => {
     expect(snapshot.identityProvenance.endpoint).toBe("/user");
     expect(snapshot.identityProvenance.status).toBe("verified");
     expect(snapshot.ownOffersTotal).toBe(12);
-    expect(snapshot.ownOffersProvenance.endpoint).toBe("/p2p?my=1&take=1&page=1");
+    expect(snapshot.ownOffersProvenance.endpoint).toBe(
+      "/p2p?my=1&take=1&page=1",
+    );
     expect(snapshot.ownOffersProvenance.status).toBe("verified");
     expect(snapshot.integrationStatus).toBe("verified");
 
