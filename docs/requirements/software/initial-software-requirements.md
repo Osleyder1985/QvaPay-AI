@@ -1,87 +1,81 @@
 # Requisitos iniciales de software
 
-## Propósito
+## SWR-FR-001 — Scan Market Use Case
 
-Traducir los requisitos de sistema iniciales a responsabilidades de software sin inventar detalles de la API externa.
+El software ejecuta un escaneo y produce un mercado normalizado.
 
-### SWR-FR-001 — Scan Market Use Case
+**Trazabilidad:** SYS-FR-001.
 
-El software deberá proporcionar un caso de uso que ejecute un escaneo del mercado y produzca un snapshot normalizado.
+**Estado:** Tested.
 
-Trazabilidad: SYS-FR-001.
+## SWR-FR-002 — Continuous Scanner Runtime
 
-### SWR-FR-002 — Continuous Scanner Runtime
+El runtime ejecuta el scanner sin depender de una sesión de usuario.
 
-El software deberá proporcionar un runtime server-side capaz de ejecutar el caso de uso de escaneo sin depender de una sesión de usuario.
+**Trazabilidad:** SYS-FR-002.
 
-Trazabilidad: SYS-FR-002.
+**Estado:** Tested.
 
-### SWR-FR-003 — SELL Book Processing
+## SWR-FR-003 — SELL Book Processing
 
-El software deberá clasificar, agrupar por mercado/moneda y ordenar ascendentemente por tasa las ofertas SELL.
+El software mantiene BUY y SELL separados y ordena SELL por tasa ascendente.
 
-Trazabilidad: SYS-FR-003.
+**Trazabilidad:** SYS-FR-003.
 
-### SWR-FR-004 — BUY Book Processing
+**Estado:** Tested.
 
-El software deberá clasificar, agrupar por mercado/moneda y ordenar ascendentemente por tasa las ofertas BUY.
+## SWR-FR-004 — BUY Book Processing
 
-Trazabilidad: SYS-FR-004.
+El software mantiene BUY y SELL separados y determina la mejor BUY mediante la mayor tasa.
 
-### SWR-IR-001 — External Provider Adapter
+**Trazabilidad:** SYS-FR-004.
 
-La integración con QvaPay deberá implementarse mediante una frontera de infraestructura que traduzca el contrato externo a modelos internos.
+**Estado:** Tested.
 
-Trazabilidad: SYS-FR-001, SYS-QR-006.
+## SWR-IR-001 — External Provider Adapter
 
-### SWR-DR-001 — Market Snapshot Persistence
+QvaPay se integra mediante `QvaPayP2PClient`.
 
-El software deberá persistir snapshots con referencia temporal y estado de procesamiento.
+**Estado:** Tested.
 
-Trazabilidad: SYS-FR-002, SYS-QR-004, SYS-QR-005.
+## SWR-IR-002 — Provider Request Policy
 
-### SWR-IR-002 — Provider Request Policy
+El adaptador gestiona paginación, timeout, rate limiting, backoff y errores.
 
-El adaptador deberá encapsular paginación, límites de frecuencia, timeouts y clasificación de errores del proveedor.
+**Estado:** Tested.
 
-Trazabilidad: SYS-INT-003, SYS-INT-006, SYS-INT-007, SYS-INT-011.
+## SWR-IR-003 — External Contract Validation
 
-### SWR-IR-003 — External Contract Validation
+El contrato externo se valida antes del mapeo.
 
-El adaptador deberá validar las respuestas externas antes de mapearlas a modelos internos.
+**Estado:** Tested.
 
-Trazabilidad: SYS-INT-005, SYS-INT-012.
+## SWR-DR-001 — Market Snapshot Persistence
 
-### SWR-DR-002 — Decimal Value Preservation
+El snapshot se conserva en el almacenamiento del Durable Object.
 
-El software deberá representar cantidades y tasas con una estrategia numérica que preserve la precisión requerida por el contrato P2P.
+**Estado:** Implemented / Tested.
 
-Trazabilidad: SYS-INT-008.
+D1 permanece futuro.
 
-### SWR-QR-001 — Controlled Retry
+## SWR-DR-002 — Decimal Value Preservation
 
-El software deberá aplicar una política de reintento limitada y con backoff para fallos transitorios y rate limiting.
+Los valores económicos externos se representan como strings.
 
-Trazabilidad: SYS-INT-006, SYS-INT-007.
+**Estado:** Tested.
 
-### SWR-SR-001 — Secret Isolation
+## SWR-QR-001 — Controlled Retry
 
-El software no deberá exponer credenciales de proveedores externos al cliente web.
+Los reintentos son limitados y utilizan backoff.
 
-Trazabilidad: SYS-QR-006 y baseline de seguridad.
+**Estado:** Tested.
 
-## Estado
+## SWR-SR-001 — Secret Isolation
 
-Definidos como baseline inicial. Los detalles de API, esquema físico y límites cuantitativos permanecen TBD.
+Las credenciales se mantienen server-side.
 
-### SWR-IR-004 — Market Event Ingestion
+**Estado:** Implemented.
 
-El software deberá aceptar eventos del feed P2P mediante webhook y/o stream, validarlos y convertirlos a actualizaciones internas del estado de mercado.
+## Capacidades futuras
 
-Trazabilidad: SYS-QR-006, SYS-QR-008, SYS-QR-010.
-
-### SWR-IR-005 — Market Reconciliation
-
-El software deberá ejecutar reconciliaciones mediante `GET /p2p` para recuperar pérdidas de eventos y divergencias del estado interno.
-
-Trazabilidad: SYS-QR-009.
+`SWR-IR-004` y `SWR-IR-005` relacionados con ingestión event-driven y reconciliación permanecen como requisitos futuros hasta que exista implementación y evidencia.
