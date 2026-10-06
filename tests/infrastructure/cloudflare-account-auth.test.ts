@@ -19,9 +19,9 @@ describe("Account Center session", () => {
     const request = new Request("https://example.com/api/account", {
       headers: { cookie: cookie!.split(";")[0]! },
     });
-    await expect(
-      isAuthenticated(request, "correct-secret"),
-    ).resolves.toBe(true);
+    await expect(isAuthenticated(request, "correct-secret")).resolves.toBe(
+      true,
+    );
   });
 
   it("rejects invalid credentials and tampered cookies", async () => {
@@ -37,9 +37,9 @@ describe("Account Center session", () => {
     const request = new Request("https://example.com/api/account", {
       headers: { cookie: tampered },
     });
-    await expect(
-      isAuthenticated(request, "correct-secret"),
-    ).resolves.toBe(false);
+    await expect(isAuthenticated(request, "correct-secret")).resolves.toBe(
+      false,
+    );
   });
 
   it("clears the session without exposing credentials", () => {
