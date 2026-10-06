@@ -28,6 +28,7 @@ async function body(request: Request): Promise<Record<string, unknown>> {
   return (await request.json().catch(() => null)) as Record<string, unknown> | null ?? {};
 }
 
+// prettier-ignore
 export default {
   async fetch(request: Request, env: ScannerWorkerEnvironment): Promise<Response> {
     const url = new URL(request.url);
