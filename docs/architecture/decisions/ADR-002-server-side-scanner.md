@@ -2,23 +2,29 @@
 
 ## Estado
 
-Aceptado como línea base inicial.
+Aceptado e implementado.
 
 ## Contexto
 
-SYS-FR-002 exige que el scanner opere 24/7 independientemente de la conexión de usuarios.
+El scanner debe continuar aunque ningún usuario tenga abierta la aplicación.
 
 ## Decisión
 
-El ciclo de escaneo se ejecutará server-side mediante Cloudflare Workers y un Durable Object con Alarm. El frontend consultará el estado y configurará el scanner mediante la API.
+El ciclo se ejecuta mediante Cloudflare Durable Object + Alarm. El navegador no mantiene vivo el scanner.
+
+## Configuración
+
+- moneda: `SCANNER_COIN`;
+- intervalo: `SCANNER_INTERVAL_SECONDS`;
+- rango permitido: 5–300 segundos.
 
 ## Consecuencias
 
-- cerrar el navegador no detiene el scanner;
-- el intervalo se gestiona centralmente;
-- el estado del proceso puede coordinarse;
-- se necesita idempotencia y recuperación ante fallos.
+- F5 no reinicia el scheduler;
+- cerrar el navegador no detiene el ciclo;
+- el estado puede consultarse mediante endpoints públicos/protegidos;
+- los errores se registran y el siguiente ciclo se programa.
 
-## Riesgos pendientes
+## Evidencia
 
-Validar disponibilidad, semántica y límites de las alarmas en el entorno de producción.
+La automatización de Cloudflare realiza bootstrap y verifica una ejecución real después del deployment.
