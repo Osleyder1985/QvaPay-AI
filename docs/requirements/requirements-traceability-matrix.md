@@ -32,15 +32,15 @@ La cadena de evidencia vigente es:
 
 `PR → merge → main commit → Repository Quality Gate → Cloudflare Deploy → production smoke`.
 
-Para el commit `bde3b567120d2671d3f8cb8136fab1675ef1136a`:
+Para el commit de `main` `bac8500cc579e4277852e74cc3a247bf00ed0cc1`:
 
 - Repository Quality Gate: **PASSED**.
 - Security Gate: **PASSED**.
-- Cloudflare Deploy #60: **PASSED**.
+- Cloudflare Deploy #67: **PASSED**.
 - Smoke de producción: dashboard HTTP 200, scanner operativo y snapshot no vacío.
 - El smoke confirmó BUY y SELL no vacíos, `totalOffers > 0`, `snapshotAt`, `bestBuyRate` y `bestSellRate`.
 
-## Estados
+## Estados formales
 
 - **Defined**
 - **Designed**
@@ -50,6 +50,8 @@ Para el commit `bde3b567120d2671d3f8cb8136fab1675ef1136a`:
 - **Certified**
 - **Failed / Rejected**
 - **Blocked**
+
+`TBD` no es un estado formal; cuando falta información o evidencia, el requisito debe permanecer en el estado formal que corresponda (`Defined`, `Designed`, `Implemented`, `Tested`, `Verified` o `Blocked`) y la ausencia de evidencia debe quedar descrita explícitamente.
 
 Estos estados no son intercambiables. Un deployment exitoso no implica certificación.
 
