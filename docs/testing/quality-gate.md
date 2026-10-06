@@ -2,37 +2,44 @@
 
 ## Propósito
 
-El repositorio utiliza GitHub Actions como quality gate mínimo para cambios integrados mediante pull request.
+El workflow `Repository Quality Gate` es el gate obligatorio de calidad para Pull Requests y cambios integrados en `main`.
 
-## Estado actual
+## Comprobaciones actuales
 
-Mientras el repositorio se encuentre en fase documental, el CI verifica:
+1. 📚 existencia de documentación requerida;
+2. 📝 estructura Markdown;
+3. 🔗 destinos internos de enlaces;
+4. 🇪🇸 convención de idioma documental;
+5. 🧩 TypeScript;
+6. 🔎 ESLint;
+7. ☁️ `wrangler deploy --dry-run`;
+8. ✨ Prettier;
+9. 🧪 Vitest.
 
-- existencia de la documentación normativa requerida;
-- estructura básica de los documentos Markdown;
-- destinos locales de enlaces Markdown;
-- ejecución limpia del workflow sobre pull requests y `main`.
+## Despliegue
 
-## Evolución prevista
+`Cloudflare Deploy` se activa mediante `workflow_run` solamente cuando `Repository Quality Gate` termina en `success` sobre `main`.
 
-Cuando exista implementación ejecutable, el quality gate deberá ampliarse para incluir, como mínimo:
+El deployment utiliza el `head_sha` que fue verificado por el Quality Gate.
 
-1. instalación reproducible de dependencias;
-2. compilación TypeScript;
-3. lint;
-4. format check;
-5. pruebas unitarias;
-6. pruebas de integración;
-7. pruebas de contrato QvaPay;
-8. pruebas E2E cuando exista UI ejecutable;
-9. validación de trazabilidad requisito → prueba → evidencia.
+## Smoke de producción
 
-Un cambio no se considera listo para integración si el quality gate obligatorio falla.
+Después de desplegar, el workflow verifica:
 
-## Relación con la estrategia de pruebas
+- HTTP 200 en la raíz;
+- JSON válido en `GET /api/scanner/status`;
+- dashboard con BUY/SELL;
+- mapeo de acciones;
+- fila de mejor oferta;
+- heartbeat dorado;
+- tipografía de tablas;
+- bootstrap del scanner;
+- ejecución completa;
+- ausencia de error;
+- `nextAlarmAt`.
 
-Este CI implementa la primera capa automatizada de la estrategia definida en `docs/testing/testing-strategy.md`. No sustituye las pruebas de comportamiento; establece el mecanismo de enforcement para que las verificaciones posteriores puedan convertirse en gates obligatorios.
+## Regla
 
-## Política
+Un fallo de Quality Gate bloquea el flujo de integración/deployment automático.
 
-El CI debe permanecer determinista, reproducible y sin secretos. Las pruebas que requieran credenciales reales o una suscripción de QvaPay deberán utilizar mecanismos explícitos de entorno protegido y no bloquearán el baseline documental por ausencia de secretos.
+Un deployment exitoso es evidencia de despliegue, no certificación automática del sistema.

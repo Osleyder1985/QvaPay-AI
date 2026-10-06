@@ -1,23 +1,25 @@
 # Diagrama de contexto
 
-> **Estado documental:** contexto objetivo del sistema; no representa una certificación de componentes implementados.
+## Estado
+
+Representa el sistema desplegado actualmente.
 
 ```mermaid
 flowchart LR
     User[Usuario]
     QAI[QvaPay-AI]
-    QVA[QvaPay P2P Market]
+    QVA[QvaPay P2P]
     GH[GitHub]
-    CF[Cloudflare Platform]
+    CF[Cloudflare]
 
-    User -->|Consulta configuración y mercado| QAI
-    QAI -->|Obtiene ofertas P2P| QVA
-    QAI -->|Repositorio, CI/CD y control de cambios| GH
-    QAI -->|Ejecución y persistencia| CF
+    User -->|Consulta mercado y estado| QAI
+    QAI -->|GET /p2p| QVA
+    QAI -->|CI/CD y control de cambios| GH
+    QAI -->|Ejecución server-side| CF
 ```
 
-## Frontera objetivo del sistema
+## Frontera
 
-QvaPay-AI es responsable de ejecutar el escaneo, validar y normalizar datos, separar BUY/SELL, agrupar por mercado/moneda, ordenar por tasa, persistir snapshots y exponer información al frontend.
+QvaPay-AI consulta, valida, normaliza, clasifica y presenta ofertas P2P. También dispone de una frontera protegida para aplicar a una oferta.
 
-QvaPay-AI no modifica ofertas externas bajo los requisitos funcionales iniciales.
+El sistema no debe ejecutar estrategias automáticas de arbitraje sin requisitos y controles específicos.

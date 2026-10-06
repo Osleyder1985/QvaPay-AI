@@ -6,18 +6,18 @@ Establecer el criterio obligatorio para determinar cuándo un elemento de QvaPay
 
 ## Regla maestra
 
-Nada se considerará completo, terminado, aprobado, operativo o certificado hasta disponer de evidencia objetiva, suficiente y reproducible frente a los requisitos y criterios de aceptación aplicables.
+Nada se considera completo, terminado, aprobado, operativo o certificado sin evidencia objetiva, suficiente y reproducible frente a los requisitos y criterios de aceptación aplicables.
 
-## Estados
+## Estados formales
 
-- **Defined:** requisito definido y aprobado para su evolución.
+- **Defined:** requisito definido.
 - **Designed:** existe diseño suficiente.
 - **Implemented:** existe implementación identificable.
-- **Tested:** existe una prueba ejecutada con resultado satisfactorio.
+- **Tested:** existe una prueba ejecutada satisfactoriamente.
 - **Verified:** existe evidencia suficiente frente a los criterios aplicables.
 - **Certified:** se completó la verificación requerida y la evidencia quedó registrada.
-- **Failed / Rejected:** la evidencia demuestra incumplimiento o el elemento fue rechazado.
-- **Blocked:** la verificación requerida no puede ejecutarse por una dependencia o condición externa.
+- **Failed / Rejected:** existe incumplimiento o rechazo.
+- **Blocked:** no puede ejecutarse la verificación requerida por una dependencia o condición externa.
 
 ## Distinciones obligatorias
 
@@ -30,16 +30,25 @@ Nada se considerará completo, terminado, aprobado, operativo o certificado hast
 
 ## Cadena de evidencia
 
-Requirement → Design → Implementation → Automated Tests → Integration / Contract Tests → Runtime Verification → Production Verification → Evidence → Certification.
+**Requirement → Design → Implementation → Automated Tests → Runtime Verification → Production Verification → Evidence → Certification**
 
-## Regla de cierre
+Cuando una etapa sea aplicable y no exista evidencia, el estado no puede elevarse artificialmente.
 
-Cuando la certificación sea aplicable, Done significa Certified. Un estado inferior debe conservarse explícitamente cuando falte evidencia.
+## Evidencia de producción
 
-## Trazabilidad
+Para el runtime Cloudflare se exige, cuando aplique:
 
-Cada estado deberá poder relacionarse con un requisito, implementación, prueba y evidencia verificable. La matriz de trazabilidad es el registro transversal de esta relación.
+1. Pull Request.
+2. Merge sobre `main`.
+3. Quality Gate exitoso.
+4. Deployment del mismo commit verificado.
+5. HTTP 200 del Worker.
+6. Estado público válido.
+7. Bootstrap autenticado.
+8. Ejecución real del scanner.
+9. Estado de ejecución sin error.
+10. Siguiente Alarm programado.
 
-## Auditoría
+## Alcance
 
-Esta política se aplica a requisitos, arquitectura, diseño, código, APIs, integraciones, datos, seguridad, documentación, infraestructura, CI/CD, despliegues, operaciones, migraciones y releases.
+La política aplica a requisitos, arquitectura, código, APIs, integraciones, datos, seguridad, documentación, infraestructura, CI/CD, deployments, operaciones y releases.

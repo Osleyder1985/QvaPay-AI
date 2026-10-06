@@ -1,53 +1,44 @@
 # Diagrama de componentes
 
-> **Estado documental:** componentes objetivo/propuestos. La implementación actual se determina exclusivamente por el código existente y la matriz de trazabilidad.
+## Estado
+
+Componentes alineados con la implementación actual.
 
 ```mermaid
 flowchart LR
-    subgraph Interfaces
-      HTTP[HTTP Controllers]
-      WEB[Web Components]
-    end
+    Worker[Cloudflare Worker]
+    Web[Public Web App]
+    Status[Public Scanner Status]
+    Apply[Protected P2P Apply]
+    Control[Protected Scanner Control]
+    DO[Durable Object]
+    Alarm[Alarm]
+    Runtime[Scanner Runtime]
+    Client[QvaPay P2P Client]
+    Contract[Contract Validation]
+    Mapper[QvaPay Mapper]
+    Domain[Market / Offer]
+    QVA[QvaPay API]
 
-    subgraph Application
-      Scan[Scan Market]
-      Snapshot[Get Latest Snapshot]
-      Config[Configure Scanner]
-    end
-
-    subgraph Domain
-      Market[Market]
-      Offer[Offer]
-      Side[Offer Side]
-    end
-
-    subgraph Infrastructure
-      QClient[QvaPay Client]
-      QMapper[QvaPay Mapper]
-      Repo[Market Snapshot Repository]
-      Scheduler[Scanner Scheduler]
-    end
-
-    HTTP --> Scan
-    HTTP --> Snapshot
-    HTTP --> Config
-    WEB --> HTTP
-    Scan --> Market
-    Scan --> Offer
-    Scan --> QClient
-    Scan --> Repo
-    QClient --> QMapper
-    Scheduler --> Scan
-    Repo --> DB[(D1)]
+    Worker --> Web
+    Worker --> Status
+    Worker --> Apply
+    Worker --> Control
+    Control --> DO
+    Apply --> Client
+    DO --> Alarm
+    Alarm --> Runtime
+    Runtime --> Client
+    Client --> Contract
+    Contract --> Mapper
+    Mapper --> Domain
+    Client --> QVA
 ```
 
 ## Regla de dependencias
 
-Las dependencias deben apuntar hacia el dominio:
-
-```
-Interfaces → Application → Domain
-Infrastructure → Application/Domain contracts
+```text
+Infrastructure → Application → Domain
 ```
 
-El dominio no debe importar APIs de Cloudflare, SDKs de QvaPay ni detalles de persistencia.
+El dominio no depende de Cloudflare ni de QvaPay.

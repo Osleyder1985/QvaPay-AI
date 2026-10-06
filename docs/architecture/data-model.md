@@ -1,37 +1,59 @@
 # Modelo de datos
 
-## Entidades iniciales
+## Market
 
-### Market
+Representa un mercado identificado por `coin`.
 
-Representa un mercado o par.
+Atributos actuales:
 
-Atributos conceptuales: marketId, baseCurrency, quoteCurrency, displayName.
+- `coin`;
+- `offers`.
 
-### Offer
+El dominio rechaza una oferta cuyo mercado no coincida con la identidad del mercado.
+
+## Offer
 
 Representa una oferta observada.
 
-Atributos conceptuales: offerId, marketId, currency, side, rate, amount, availableAmount, sourceTimestamp, observedAt.
+Atributos actuales:
 
-### OfferSide
+- `id`;
+- `market`;
+- `side`;
+- `rate`;
+- `amount`;
+- `availableAmount`;
+- `status`;
+- `sourceTimestamp`;
+- `observedAt`;
+- `createdAt`;
+- `creatorUsername`;
+- `creatorVip`;
+- `onlyVip`;
+- `fiatAmount`.
 
-Valores permitidos: BUY y SELL.
+## OfferSide
 
-### MarketSnapshot
+Valores:
 
-Representa el resultado de un escaneo.
+- `BUY`;
+- `SELL`.
 
-Atributos conceptuales: scanId, startedAt, completedAt, status, offersCount, errorCode, offers.
+## Estados
+
+`open`, `revision`, `processing`, `paid`, `completed`, `cancelled`.
 
 ## Reglas
 
-1. BUY y SELL se conservan como lados independientes.
-2. Una oferta pertenece a un mercado identificado.
-3. La ordenación de presentación no modifica el dato original.
-4. Cada snapshot conserva información temporal.
-5. Los datos externos conservan la referencia necesaria para auditoría.
+1. BUY y SELL son libros independientes.
+2. Las ofertas se asocian a una única identidad de mercado.
+3. Las tasas se comparan como decimales representados en texto.
+4. `observedAt` representa el momento de observación de QvaPay-AI.
+5. `createdAt` conserva el timestamp de creación proporcionado por QvaPay cuando existe.
+6. El dashboard calcula métricas sin modificar el dato fuente.
 
-## TBD
+## Persistencia actual
 
-El esquema físico de D1 se definirá después de validar el contrato real de QvaPay.
+El snapshot vive en el almacenamiento del Durable Object.
+
+D1 no forma parte todavía del modelo físico implementado.

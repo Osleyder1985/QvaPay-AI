@@ -2,73 +2,53 @@
 
 ## Propósito
 
-Este componente adapta el puerto de aplicación `ScannerScheduler` a Cloudflare Durable Objects y Alarms.
+Adaptar el puerto `ScannerScheduler` a Cloudflare Durable Objects y Alarms.
 
-## Flujo
+## Flujo actual
 
-`Worker control boundary → Durable Object → ScannerRuntime → QvaPayP2PClient → CloudflareScannerScheduler → Alarm`
+`Worker → Durable Object → Scanner Runtime → QvaPayP2PClient → Alarm`
 
-El Worker solamente inicializa o consulta el scheduler. La ejecución periódica ocurre dentro del Durable Object mediante `alarm()`, por lo que no depende de que exista un navegador conectado.
+El Worker crea o consulta el scheduler. El Durable Object ejecuta el ciclo mediante `alarm()`.
 
 ## Persistencia
 
-La configuración mínima del scanner se guarda en el almacenamiento del Durable Object:
+El Durable Object conserva:
 
 - `scanner-config`;
 - moneda;
-- intervalo en segundos.
+- intervalo;
+- estado de ejecución;
+- snapshot de mercado;
+- próxima alarma.
 
-Esto permite reconstruir la configuración después de una evicción o reinicio del Durable Object.
-
-D1 todavía no forma parte de esta unidad. La persistencia de snapshots de mercado y del estado funcional del scanner queda para una unidad posterior.
+La configuración se valida entre 5 y 300 segundos.
 
 ## Alarm
 
-Cada Durable Object puede tener un único Alarm activo. El scheduler solamente crea el siguiente Alarm cuando no existe uno.
+El scheduler mantiene una única alarma para el objeto. Después de cada ejecución solicita la siguiente programación.
 
-Después de una ejecución exitosa, `ScannerRuntime` solicita el siguiente Alarm.
+El ciclo se basa en la finalización real de la ejecución para evitar publicar una siguiente ejecución ya vencida cuando la consulta al proveedor tarda más de lo esperado.
 
-Si la consulta de mercado falla, el handler captura el error y programa el siguiente intento después del mismo intervalo. Esto evita depender exclusivamente de los reintentos automáticos limitados del servicio de Alarm.
+Ante un error se conserva el último snapshot válido, se registra `lastError` y se programa el siguiente ciclo.
 
-## Configuración
+## Secretos
 
-Wrangler define:
-
-- `QVAPAY_API_BASE_URL`;
-- `SCANNER_COIN`;
-- `SCANNER_INTERVAL_SECONDS`;
-- binding `SCANNER_SCHEDULER`.
-
-El intervalo debe ser entero entre 5 y 300 segundos.
-
-El adaptador P2P requiere además dos secretos de infraestructura:
+El runtime utiliza:
 
 - `QVAPAY_APP_ID`;
-- `QVAPAY_APP_SECRET`.
+- `QVAPAY_APP_SECRET`;
+- `SCANNER_BOOTSTRAP_TOKEN`;
+- `P2P_ACTION_TOKEN` para aplicar ofertas.
 
-Estas credenciales se envían exclusivamente desde el Durable Object mediante los headers `app-id` y `app-secret`. Nunca se exponen al navegador, al repositorio, a la respuesta del scanner ni a los logs.
+Los valores son secrets de Cloudflare y no forman parte del repositorio.
 
-El endpoint de inicialización del Worker es deliberadamente interno:
+## Endpoints
 
-`POST /internal/scanner/start`
+- `POST /internal/scanner/start`: inicialización protegida.
+- `GET /internal/scanner/state`: estado operativo protegido.
+- `GET /api/scanner/status`: estado público sanitizado.
+- `POST /api/p2p/:uuid/apply`: aplicación P2P protegida por token.
 
-y requiere `Authorization: Bearer <SCANNER_BOOTSTRAP_TOKEN>`.
+## Estado
 
-El token de bootstrap y las credenciales de QvaPay deben configurarse como secretos de Cloudflare y nunca almacenarse en el repositorio.
-
-## Límites
-
-Esta unidad todavía no implementa:
-
-- API pública del scanner;
-- UI;
-- snapshots D1;
-- arbitrage engine;
-- ejecución de órdenes;
-- certificación de operación 24/7 en producción.
-
-## Estado de evidencia
-
-La implementación y las pruebas automatizadas no equivalen a verificación de producción. La operación 24/7 requiere posteriormente despliegue, activación del scheduler y evidencia runtime reproducible.
-
-La evidencia actual demostró que Durable Object Alarm se activa y se reprograma, pero la ejecución de mercado no puede considerarse satisfactoria hasta que las credenciales de aplicación de QvaPay estén configuradas y una lectura P2P real complete sin error.
+El scheduler está implementado y probado. La evidencia de producción se obtiene mediante el workflow de Cloudflare Deploy.

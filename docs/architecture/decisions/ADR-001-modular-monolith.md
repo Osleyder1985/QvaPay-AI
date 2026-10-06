@@ -2,35 +2,27 @@
 
 ## Estado
 
-Aceptado como línea base inicial.
+Aceptado como línea base de la implementación actual.
 
 ## Contexto
 
-QvaPay-AI necesita scanner 24/7, integración externa, persistencia e interfaz web. Los requisitos actuales no justifican múltiples servicios desplegados de forma independiente.
+QvaPay-AI necesita integrar un scanner, un proveedor externo, un runtime continuo y una interfaz web sin introducir complejidad operacional innecesaria.
 
 ## Decisión
 
-Adoptar un monolito modular con principios de arquitectura hexagonal/Clean Architecture.
-
-Módulos conceptuales:
+Mantener un monolito modular con separación entre:
 
 - Domain;
 - Application;
-- Infrastructure;
-- Interfaces.
+- Infrastructure.
 
-## Consecuencias positivas
+La implementación actual se despliega como un único Cloudflare Worker con un Durable Object.
+
+## Consecuencias
 
 - menor complejidad operacional;
-- despliegue sencillo;
-- separación clara de responsabilidades;
-- facilidad para pruebas;
-- posibilidad de extraer módulos posteriormente.
+- límites claros entre dominio y proveedor;
+- pruebas deterministas;
+- posibilidad de separar módulos en el futuro.
 
-## Alternativas descartadas
-
-Microservices: sobrearquitectura para esta fase.
-
-Frontend-only scanner: incompatible con SYS-FR-002.
-
-Monolito sin separación interna: dificulta evolución, pruebas y aislamiento de la integración externa.
+Microservicios y componentes externos permanentes no son necesarios para el estado actual.
