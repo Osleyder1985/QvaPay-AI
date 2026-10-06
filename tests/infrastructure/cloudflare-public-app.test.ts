@@ -103,6 +103,10 @@ describe("public production dashboard", () => {
     expect(body).toContain("Dashboard operativo");
     expect(body).toContain("Auditoría y trazabilidad");
     expect(body).toContain("Cuenta");
+    expect(body).toContain("state.serverNowAt-Date.now()");
+    expect(body).toContain("setInterval(refresh,1000)");
+    expect(body).not.toContain("/internal/scanner/start");
+    expect(body).not.toContain("setAlarm(");
     expect(body).toContain("/api/account");
     expect(body).not.toContain("x-p2p-action-token");
     expect(body).not.toContain("P2P_ACTION_TOKEN");
