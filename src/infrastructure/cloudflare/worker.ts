@@ -24,7 +24,7 @@ export default {
   async fetch(
     request: Request,
     env: ScannerWorkerEnvironment,
-    ctx: ExecutionContext,
+    ctx: unknown,
   ): Promise<Response> {
     const url = new URL(request.url);
 
@@ -54,7 +54,7 @@ export default {
         return new Response("Method not allowed", { status: 405 });
       }
 
-      const accessContext = ctx as ExecutionContext & {
+      const accessContext = ctx as {
         access?: { getIdentity: () => Promise<unknown> };
       };
       if (!accessContext.access) {
