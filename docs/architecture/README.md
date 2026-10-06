@@ -1,34 +1,46 @@
 # Arquitectura
 
-Este directorio contiene la línea base arquitectónica de QvaPay-AI.
+## Propósito
+
+Este directorio contiene la arquitectura documentada de QvaPay-AI y distingue de forma explícita la implementación actual de las capacidades futuras.
+
+## Arquitectura implementada
+
+La implementación vigente es un monolito modular sobre Cloudflare:
+
+```text
+Cloudflare Worker
+      │
+      ├── Public Web Application
+      ├── Public Scanner Status
+      ├── Protected P2P Apply Boundary
+      └── Protected Scanner Control
+              │
+              ▼
+       Durable Object
+              │
+             Alarm
+              │
+              ▼
+       Scanner Runtime
+              │
+              ▼
+        QvaPay P2P Client
+```
 
 ## Principios
 
-1. Los requisitos gobiernan la arquitectura.
-2. El dominio no depende de infraestructura.
-3. La integración con QvaPay se aísla mediante adaptadores.
-4. El escáner se ejecuta server-side y no depende de usuarios conectados.
-5. BUY y SELL se procesan como libros independientes.
-6. La persistencia conserva snapshots verificables del mercado.
-7. Las decisiones técnicas relevantes se registran mediante ADR.
-8. No se introducen microservicios mientras los requisitos no los justifiquen.
-
-## Línea base
-
-QvaPay-AI se define inicialmente como un monolito modular con principios de arquitectura hexagonal/Clean Architecture, desplegado sobre Cloudflare.
-
-Componentes principales de la arquitectura objetivo:
-
-- Frontend web.
-- HTTP API.
-- Application layer.
-- Domain layer.
-- QvaPay adapter.
-- Persistence adapter.
-- Scanner runtime.
-- Durable Object con alarms.
-- Cloudflare D1.
+1. El dominio no depende de infraestructura.
+2. QvaPay se aísla mediante un adaptador.
+3. BUY y SELL son libros independientes.
+4. Cada mercado se identifica mediante `coin`.
+5. El scanner se ejecuta server-side.
+6. El navegador consume el estado público; no controla el ciclo del scanner.
+7. Los secretos permanecen en infraestructura.
+8. La arquitectura futura no se presenta como implementación actual.
 
 ## Estado
 
-Arquitectura objetivo/propuesta. Los componentes realmente implementados se identifican en `implementation-state.md`. La arquitectura deberá validarse contra las capacidades reales de la API de QvaPay antes de considerar cerradas las decisiones de integración.
+El Worker, Durable Object, Alarm, runtime, cliente QvaPay, dashboard público y estado persistido del scheduler están implementados y cubiertos por pruebas.
+
+D1, webhook, SSE, ingestión event-driven completa y arbitraje permanecen como arquitectura futura.
