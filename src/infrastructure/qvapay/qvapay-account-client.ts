@@ -9,6 +9,7 @@ export interface QvaPayAccountClientOptions {
   readonly baseUrl: string;
   readonly appId: string;
   readonly appSecret: string;
+  readonly userApiToken: string;
   readonly fetcher?: typeof fetch;
   readonly timeoutMs?: number;
 }
@@ -84,46 +85,46 @@ function parseApplication(payload: unknown): QvaPayApplicationIdentity | null {
   };
 }
 
-function parseUser(value: unknown): QvaPayAccountUser | null {
+function parseAuthenticatedUser(payload: unknown): QvaPayAccountUser | null {
+  const value = readPayload(payload);
   if (!isRecord(value)) return null;
+
   const uuid = optionalString(value, "uuid");
   const username = optionalString(value, "username");
   if (!uuid || !username) return null;
-  const counts = isRecord(value._count) ? value._count : null;
+
   return {
     uuid,
     username,
     name: optionalString(value, "name"),
+    lastname: optionalString(value, "lastname"),
     image: optionalString(value, "image"),
-    ratingAvg: optionalNumber(value, "rating_avg"),
+    ratingAvg: optionalNumber(value, "average_rating"),
     ratingCount: optionalNumber(value, "rating_count"),
     kyc: optionalBoolean(value, "kyc"),
     vip: optionalBoolean(value, "vip"),
     goldenCheck: optionalBoolean(value, "golden_check"),
     phoneVerified: optionalBoolean(value, "phone_verified"),
-    telegramVerified: optionalBoolean(value, "telegram_verified"),
-    completedAsOwner: counts ? optionalNumber(counts, "P2P") : null,
-    completedAsPeer: counts ? optionalNumber(counts, "P2P_Peer") : null,
+    telegramVerified: optionalString(value, "telegram") !== null,
+    p2pEnabled: optionalBoolean(value, "p2p_enabled"),
+    completedAsOwner: null,
+    completedAsPeer: null,
   };
 }
 
-function parseOwnOffers(payload: unknown): {
-  readonly identity: QvaPayAccountUser | null;
-  readonly total: number | null;
-} {
+function parseOwnOffers(payload: unknown): { readonly total: number | null } {
   const value = readPayload(payload);
-  if (!isRecord(value)) return { identity: null, total: null };
-  const data = Array.isArray(value.data) ? value.data : [];
-  const first = data.find(isRecord);
-  const identity = first ? parseUser(first.User) : null;
-  const total = optionalNumber(value, "total");
-  return { identity, total };
+  if (!isRecord(value)) return { total: null };
+  return {
+    total: optionalNumber(value, "total"),
+  };
 }
 
 async function request(
   options: QvaPayAccountClientOptions,
   path: string,
   init: RequestInit,
+  authentication: "app" | "user" = "app",
 ): Promise<{
   readonly status: number;
   readonly ok: boolean;
@@ -135,13 +136,20 @@ async function request(
     () => controller.abort(),
     options.timeoutMs ?? 10_000,
   );
+  const authHeaders =
+    authentication === "user"
+      ? { Authorization: `Bearer ${options.userApiToken}` }
+      : {
+          "app-id": options.appId,
+          "app-secret": options.appSecret,
+        };
+
   try {
     const response = await fetcher(new URL(path, options.baseUrl), {
       ...init,
       headers: {
         accept: "application/json",
-        "app-id": options.appId,
-        "app-secret": options.appSecret,
+        ...authHeaders,
         ...init.headers,
       },
       signal: controller.signal,
@@ -166,23 +174,28 @@ export class QvaPayAccountClient {
     if (!options.appId || !options.appSecret) {
       throw new Error("QvaPay application credentials are required");
     }
+    if (!options.userApiToken) {
+      throw new Error("QvaPay user API token is required");
+    }
   }
 
   async fetchAccount(): Promise<QvaPayAccountSnapshot> {
-    const [balance, info, ownOffers] = await Promise.all([
+    const [balance, info, user, ownOffers] = await Promise.all([
       request(this.options, "/v2/balance", { method: "POST" }),
       request(this.options, "/v2/info", { method: "POST" }),
+      request(this.options, "/user", { method: "GET" }, "user"),
       request(this.options, "/p2p?my=1&take=1&page=1", { method: "GET" }),
     ]);
 
     const balanceUsd = balance.ok ? parseBalance(balance.payload) : null;
     const application = info.ok ? parseApplication(info.payload) : null;
+    const identity = user.ok ? parseAuthenticatedUser(user.payload) : null;
     const own = ownOffers.ok
       ? parseOwnOffers(ownOffers.payload)
-      : { identity: null, total: null };
+      : { total: null };
     const integrationStatus = evaluateAccountIntegration({
       balanceOk: balanceUsd !== null,
-      identityOk: own.identity !== null,
+      identityOk: identity !== null,
       applicationOk: application !== null,
       p2pAccessible: ownOffers.ok,
     });
@@ -197,15 +210,16 @@ export class QvaPayAccountClient {
           : balance.ok
             ? null
             : `QvaPay balance request failed with HTTP ${balance.status}.`,
-      identity: own.identity,
-      identityHttpStatus: ownOffers.status,
-      identityOk: own.identity !== null,
+      identity,
+      identitySource: "/user",
+      identityHttpStatus: user.status,
+      identityOk: identity !== null,
       identityError:
-        ownOffers.ok && own.identity === null
-          ? "No valid account identity was present in the own-offers response."
-          : ownOffers.ok
+        user.ok && identity === null
+          ? "QvaPay returned an incompatible authenticated-user payload."
+          : user.ok
             ? null
-            : `QvaPay own-offers request failed with HTTP ${ownOffers.status}.`,
+            : `QvaPay authenticated-user request failed with HTTP ${user.status}.`,
       application,
       applicationHttpStatus: info.status,
       applicationOk: application !== null,

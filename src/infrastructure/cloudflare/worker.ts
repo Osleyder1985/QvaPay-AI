@@ -1,6 +1,5 @@
 import type { DurableObjectNamespace } from "@cloudflare/workers-types";
 import { ScannerSchedulerDurableObject } from "./scanner-scheduler-do.js";
-import { QvaPayP2PClient } from "../qvapay/qvapay-p2p-client.js";
 import { QvaPayAccountClient } from "../qvapay/qvapay-account-client.js";
 import {
   createPublicAppResponse,
@@ -13,10 +12,10 @@ export interface ScannerWorkerEnvironment {
   readonly QVAPAY_API_BASE_URL: string;
   readonly QVAPAY_APP_ID: string;
   readonly QVAPAY_APP_SECRET: string;
+  readonly QVAPAY_USER_API_TOKEN: string;
   readonly SCANNER_COIN: string;
   readonly SCANNER_INTERVAL_SECONDS: string;
   readonly SCANNER_BOOTSTRAP_TOKEN: string;
-  readonly P2P_ACTION_TOKEN?: string;
 }
 
 const OBJECT_NAME = "default";
@@ -25,6 +24,7 @@ export default {
   async fetch(
     request: Request,
     env: ScannerWorkerEnvironment,
+    ctx: ExecutionContext,
   ): Promise<Response> {
     const url = new URL(request.url);
 
@@ -40,49 +40,13 @@ export default {
 
     const applyMatch = url.pathname.match(/^\/api\/p2p\/([^/]+)\/apply$/);
     if (applyMatch) {
-      if (request.method !== "POST") {
-        return new Response("Method not allowed", { status: 405 });
-      }
-
-      const actionToken = env.P2P_ACTION_TOKEN;
-      if (
-        !actionToken ||
-        request.headers.get("x-p2p-action-token") !== actionToken
-      ) {
-        return new Response("Unauthorized", { status: 401 });
-      }
-
-      const uuid = decodeURIComponent(applyMatch[1] ?? "");
-      if (!uuid || uuid.length > 100) {
-        return new Response("Invalid offer id", { status: 400 });
-      }
-
-      const provider = new QvaPayP2PClient({
-        baseUrl: env.QVAPAY_API_BASE_URL,
-        appId: env.QVAPAY_APP_ID,
-        appSecret: env.QVAPAY_APP_SECRET,
-      });
-
-      try {
-        return Response.json(await provider.applyOffer(uuid), {
-          status: 201,
-          headers: { "cache-control": "no-store" },
-        });
-      } catch (error) {
-        const status =
-          error instanceof Error && "status" in error
-            ? Number((error as { status: number }).status)
-            : 502;
-        return Response.json(
-          { error: error instanceof Error ? error.message : String(error) },
-          {
-            status:
-              Number.isInteger(status) && status >= 400 && status < 600
-                ? status
-                : 502,
-          },
-        );
-      }
+      return Response.json(
+        {
+          error:
+            "Las operaciones P2P reales no están habilitadas desde el dashboard público.",
+        },
+        { status: 403, headers: { "cache-control": "no-store" } },
+      );
     }
 
     if (url.pathname === "/api/account") {
@@ -90,12 +54,14 @@ export default {
         return new Response("Method not allowed", { status: 405 });
       }
 
-      const actionToken = env.P2P_ACTION_TOKEN;
-      if (
-        !actionToken ||
-        request.headers.get("x-p2p-action-token") !== actionToken
-      ) {
-        return Response.json({ error: "Unauthorized" }, { status: 401 });
+      const accessContext = ctx as ExecutionContext & {
+        access?: { getIdentity: () => Promise<unknown> };
+      };
+      if (!accessContext.access) {
+        return Response.json(
+          { error: "Application authentication required." },
+          { status: 403 },
+        );
       }
 
       try {
@@ -103,9 +69,9 @@ export default {
           baseUrl: env.QVAPAY_API_BASE_URL,
           appId: env.QVAPAY_APP_ID,
           appSecret: env.QVAPAY_APP_SECRET,
+          userApiToken: env.QVAPAY_USER_API_TOKEN,
         });
         const account = await provider.fetchAccount();
-
         return Response.json(
           { account },
           {
@@ -128,6 +94,11 @@ export default {
       if (request.method !== "GET") {
         return new Response("Method not allowed", { status: 405 });
       }
+
+      await stub.ensureScheduled({
+        coin: env.SCANNER_COIN,
+        intervalSeconds: Number(env.SCANNER_INTERVAL_SECONDS),
+      });
 
       return createPublicScannerStateResponse(
         toPublicScannerState(await stub.getState()),

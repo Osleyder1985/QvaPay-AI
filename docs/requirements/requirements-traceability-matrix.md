@@ -46,3 +46,12 @@ Estos estados no son intercambiables.
 ## Capacidades futuras
 
 Los requisitos de webhook, SSE, ingestión event-driven, D1 y arbitraje no deben marcarse como implementados hasta que exista código y pruebas correspondientes.
+
+
+## Security dashboard boundary update
+
+| Control | Issue | Implementation | Evidence |
+|---|---|---|---|
+| Browser never receives operational secrets | #98, #101 | Public dashboard no longer prompts or sends P2P action credentials | Security Gate + dashboard contract tests |
+| Account data requires authenticated application context | #100 | `/api/account` requires Cloudflare Access context | Worker authorization path + production smoke |
+| Server-side scanner must self-initialize | #102 | Public status initializes the Durable Object schedule | Runtime integration and production smoke |

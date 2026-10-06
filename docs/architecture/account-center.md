@@ -55,3 +55,8 @@ Los campos ausentes se muestran como no disponibles; nunca se inventan valores.
 ## Regla de evolución
 
 Cada nuevo campo de Cuenta debe identificar su fuente QvaPay, pasar por normalización, tener prueba cuando sea contractual y mantenerse fuera de cualquier secreto o payload upstream completo.
+
+
+## Security boundary
+
+Account identity and balance are protected data. The public browser never supplies an infrastructure token. The Account Center endpoint requires an authenticated application context; when that context is absent it returns `403` and the UI presents an authentication-required state. The QvaPay user API token remains server-side only.
