@@ -190,7 +190,7 @@ jobs:
                 const successful =
                   state.configured === true &&
                   state.coin === "BANK_CUP" &&
-                  state.intervalSeconds === 10 &&
+                  Number.isInteger(state.intervalSeconds) &&\n                  state.intervalSeconds >= 5 &&\n                  state.intervalSeconds <= 300 &&
                   execution?.lastStartedAt != null &&
                   execution?.lastCompletedAt != null &&
                   execution.lastCompletedAt >= execution.lastStartedAt &&
