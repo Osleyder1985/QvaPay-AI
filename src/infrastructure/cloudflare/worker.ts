@@ -3,7 +3,7 @@ import type { DurableObjectNamespace, D1Database } from "@cloudflare/workers-typ
 // prettier-ignore
 import { ScannerSchedulerDurableObject } from "./scanner-scheduler-do.js";
 // prettier-ignore
-import { authenticate, createUser, getSession, listUsers, logout, requireRole, setUserActive, changeUserPassword, type AppRole } from "./auth-rbac.js";
+import { authenticate, createUser, ensureSecuritySchema, getSession, listUsers, logout, requireRole, setUserActive, changeUserPassword, type AppRole } from "./auth-rbac.js";
 // prettier-ignore
 import { QvaPayAccountClient } from "../qvapay/qvapay-account-client.js";
 // prettier-ignore
@@ -43,6 +43,10 @@ export default {
   async fetch(request: Request, env: ScannerWorkerEnvironment): Promise<Response> {
     const url = new URL(request.url);
     const stub = env.SCANNER_SCHEDULER.getByName(OBJECT_NAME);
+
+    if (url.pathname === "/" || url.pathname.startsWith("/api/")) {
+      await ensureSecuritySchema(env.DB);
+    }
 
     if (url.pathname === "/api/auth/login") {
       if (request.method !== "POST") return new Response("Method not allowed", { status: 405 });
