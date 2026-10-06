@@ -24,7 +24,6 @@ export default {
   async fetch(
     request: Request,
     env: ScannerWorkerEnvironment,
-    ctx: unknown,
   ): Promise<Response> {
     const url = new URL(request.url);
 
@@ -54,15 +53,10 @@ export default {
         return new Response("Method not allowed", { status: 405 });
       }
 
-      const accessContext = ctx as {
-        access?: { getIdentity: () => Promise<unknown> };
-      };
-      if (!accessContext.access) {
-        return Response.json(
-          { error: "Application authentication required." },
-          { status: 403 },
-        );
-      }
+      return Response.json(
+        { error: "Application authentication required." },
+        { status: 403 },
+      );
 
       try {
         const provider = new QvaPayAccountClient({
