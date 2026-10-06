@@ -93,6 +93,7 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           ACCOUNT_AUTH_SECRET: ${{ secrets.ACCOUNT_AUTH_SECRET }}
           QVAPAY_USER_API_TOKEN: ${{ secrets.QVAPAY_USER_API_TOKEN }}
+          INITIAL_ADMIN_BOOTSTRAP_TOKEN: ${{ secrets.INITIAL_ADMIN_BOOTSTRAP_TOKEN }}
           WORKER_URL: https://qvapay-ai-runtime.osleyder-gonzalez1985.workers.dev
         shell: bash
         run: |
@@ -106,14 +107,14 @@ jobs:
             echo "Missing required GitHub Actions secret: QVAPAY_USER_API_TOKEN. Configure the QvaPay user API token before production identity smoke can run."
             exit 1
           fi
-
+          if [ -z "$INITIAL_ADMIN_BOOTSTRAP_TOKEN" ]; then
+            echo "Missing required GitHub Actions secret: INITIAL_ADMIN_BOOTSTRAP_TOKEN. Configure it before production initial Administration setup can run."
+            exit 1
+          fi
           SCANNER_BOOTSTRAP_TOKEN="$(node -e "console.log(require('crypto').randomBytes(32).toString('hex'))")"
           echo "::add-mask::$SCANNER_BOOTSTRAP_TOKEN"
 
           npx wrangler deploy
-
-          INITIAL_ADMIN_BOOTSTRAP_TOKEN="$(node -e 'const crypto=require("node:crypto"); process.stdout.write(crypto.randomBytes(32).toString("base64url"))')"
-          export INITIAL_ADMIN_BOOTSTRAP_TOKEN
 
           echo "Uploading required Worker secrets..."
           printf '%s' "$ACCOUNT_AUTH_SECRET" | npx wrangler secret put ACCOUNT_AUTH_SECRET
@@ -121,15 +122,7 @@ jobs:
           printf '%s' "$SCANNER_BOOTSTRAP_TOKEN" | npx wrangler secret put SCANNER_BOOTSTRAP_TOKEN
           printf '%s' "$INITIAL_ADMIN_BOOTSTRAP_TOKEN" | npx wrangler secret put INITIAL_ADMIN_BOOTSTRAP_TOKEN
 
-          {
-            echo "## Initial Administration setup"
-            echo ""
-            echo "Use the following one-time token at \`/setup\` to create the first Administration account:"
-            echo ""
-            echo "\`$INITIAL_ADMIN_BOOTSTRAP_TOKEN\`"
-            echo ""
-            echo "The token is invalidated automatically after the first application user is created."
-          } >> "$GITHUB_STEP_SUMMARY"
+
 
           echo "Verifying public application root..."
           ROOT_STATUS="000"
