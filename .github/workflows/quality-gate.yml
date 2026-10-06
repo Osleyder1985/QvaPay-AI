@@ -149,6 +149,12 @@ jobs:
       - name: Validate Cloudflare deployment bundle
         run: npx wrangler deploy --dry-run
 
+      - name: Prettier diagnostic
+        run: |
+          npx prettier --write src/infrastructure/qvapay/account-contract.ts
+          git diff -- src/infrastructure/qvapay/account-contract.ts
+          exit 1
+
       - name: Format check
         run: npm run format:check
 
