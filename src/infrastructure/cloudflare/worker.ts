@@ -1,6 +1,10 @@
 import type { DurableObjectNamespace } from "@cloudflare/workers-types";
 import { ScannerSchedulerDurableObject } from "./scanner-scheduler-do.js";
-import { createSessionCookie, clearSessionCookie, isAuthenticated } from "./account-auth.js";
+import {
+  createSessionCookie,
+  clearSessionCookie,
+  isAuthenticated,
+} from "./account-auth.js";
 import { QvaPayAccountClient } from "../qvapay/qvapay-account-client.js";
 import {
   createPublicAppResponse,
@@ -50,17 +54,49 @@ export default {
     }
 
     if (url.pathname === "/api/auth/login") {
-      if (request.method !== "POST") return new Response("Method not allowed", { status: 405 });
-      const body = (await request.json().catch(() => null)) as { password?: unknown } | null;
-      const password = typeof body?.password === "string" ? body.password : "";
-      const cookie = await createSessionCookie(password, env.ACCOUNT_AUTH_SECRET);
-      if (!cookie) return Response.json({ error: "Credenciales inválidas." }, { status: 401, headers: { "cache-control": "no-store" } });
-      return Response.json({ authenticated: true, expiresInSeconds: 28800 }, { headers: { "cache-control": "no-store", "set-cookie": cookie } });
+      if (request.method !== "POST") {
+        return new Response("Method not allowed", { status: 405 });
+      }
+      const body = (await request.json().catch(() => null)) as {
+        password?: unknown;
+      } | null;
+      const password =
+        typeof body?.password === "string" ? body.password : "";
+      const cookie = await createSessionCookie(
+        password,
+        env.ACCOUNT_AUTH_SECRET,
+      );
+      if (!cookie) {
+        return Response.json(
+          { error: "Credenciales inválidas." },
+          {
+            status: 401,
+            headers: { "cache-control": "no-store" },
+          },
+        );
+      }
+      return Response.json(
+        { authenticated: true, expiresInSeconds: 28800 },
+        {
+          headers: {
+            "cache-control": "no-store",
+            "set-cookie": cookie,
+          },
+        },
+      );
     }
 
     if (url.pathname === "/api/auth/logout") {
-      if (request.method !== "POST") return new Response("Method not allowed", { status: 405 });
-      return new Response(null, { status: 204, headers: { "cache-control": "no-store", "set-cookie": clearSessionCookie() } });
+      if (request.method !== "POST") {
+        return new Response("Method not allowed", { status: 405 });
+      }
+      return new Response(null, {
+        status: 204,
+        headers: {
+          "cache-control": "no-store",
+          "set-cookie": clearSessionCookie(),
+        },
+      });
     }
 
     if (url.pathname === "/api/account") {
@@ -82,7 +118,10 @@ export default {
         userApiToken: env.QVAPAY_USER_API_TOKEN,
       });
       const account = await client.fetchAccount();
-      return Response.json({ account }, { headers: { "cache-control": "no-store" } });
+      return Response.json(
+        { account },
+        { headers: { "cache-control": "no-store" } },
+      );
     }
 
     if (url.pathname === "/api/scanner/status") {
