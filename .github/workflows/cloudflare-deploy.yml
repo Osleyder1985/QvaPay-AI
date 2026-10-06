@@ -113,6 +113,8 @@ jobs:
             ['side==="SELL"?"Comprar":"Vender"', "SELL/BUY action mapping"],
             ['i===0?"best-offer":""', "best-offer row markup"],
             ["tr.best-offer td{animation:bestOfferHeartbeat", "best-offer heartbeat animation"],
+            ["tr.best-offer td{animation:bestOfferHeartbeat 1.8s ease-in-out infinite;background:rgba(255,215,70,.10)}", "strong golden best-offer base"],
+            ["14%{background:rgba(255,215,70,.24)}", "strong golden heartbeat peak"],
             ["@keyframes bestOfferHeartbeat", "best-offer heartbeat keyframes"],
             [".action-buy{background:linear-gradient(135deg,#16a765,#42e69a)", "green BUY action"],
             [".action-sell{background:linear-gradient(135deg,#d83d59,#ff7188)", "red SELL action"],
