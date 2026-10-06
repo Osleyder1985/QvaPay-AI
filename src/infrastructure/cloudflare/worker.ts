@@ -11,7 +11,7 @@ import { createLoginAppResponse } from "./login-app.js";
 // prettier-ignore
 import { bootstrapInitialAdmin } from "./initial-admin-setup.js";
 // prettier-ignore
-import { createInitialAdminSetupResponse } from "./initial-admin-setup-app.js";
+import { createInitialAdminSetupCompletedResponse, createInitialAdminSetupResponse } from "./initial-admin-setup-app.js";
 // prettier-ignore
 import { createPublicAppResponse, createPublicScannerStateResponse, toPublicScannerState } from "./public-app.js";
 
@@ -56,7 +56,7 @@ export default {
     if (url.pathname === "/setup") {
       if (request.method !== "GET") return new Response("Method not allowed", { status: 405 });
       const count = await env.DB.prepare("SELECT COUNT(*) AS count FROM app_users").first<{ count: number }>();
-      if (Number(count?.count ?? 0) !== 0) return Response.redirect(new URL("/", request.url), 303);
+      if (Number(count?.count ?? 0) !== 0) return createInitialAdminSetupCompletedResponse();
       return createInitialAdminSetupResponse();
     }
 
