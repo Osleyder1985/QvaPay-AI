@@ -17,11 +17,11 @@ El Worker utiliza:
 
 - `QVAPAY_APP_ID`;
 - `QVAPAY_APP_SECRET`;
-- `QVAPAY_USER_API_TOKEN` (API token with the minimum `read` permission required by the authenticated profile endpoint);
+- `QVAPAY_USER_API_TOKEN` (API Token QvaPay con el mínimo alcance `read` requerido para `GET /user`);
 - `SCANNER_BOOTSTRAP_TOKEN`;
 - `P2P_ACTION_TOKEN`.
 
-Ninguno debe almacenarse en archivos versionados.
+Ninguno debe almacenarse en archivos versionados, Issues, Pull Requests, logs ni navegador.
 
 ## Fronteras
 
@@ -31,38 +31,33 @@ Ninguno debe almacenarse en archivos versionados.
 
 ### Cuenta conectada
 
-La identidad del propietario se obtiene exclusivamente mediante `GET /user` con un API Token de QvaPay autenticado. Los participantes de P2P nunca son una fuente de identidad de cuenta.
+La identidad del propietario se obtiene exclusivamente mediante `GET /user` con el API Token QvaPay server-side. Los participantes de P2P nunca son fuente de identidad.
 
-### Aplicación P2P
+El endpoint público `GET /api/account` devuelve `403` mientras no exista una sesión de usuario autenticada independiente. No solicita ni acepta el token de infraestructura desde el navegador.
 
-`/api/p2p/:uuid/apply` requiere `x-p2p-action-token`.
+### Operaciones P2P
+
+`/api/p2p/:uuid/apply` permanece bloqueado para el dashboard público. La ejecución de operaciones reales requiere una frontera de operación autenticada independiente de los secretos server-side.
 
 ### Dashboard
 
-`GET /api/scanner/status` expone únicamente estado sanitizado y no secretos.
+`GET /api/scanner/status` expone únicamente estado sanitizado y datos de mercado persistidos.
 
 ## Proveedor
 
-La respuesta QvaPay se considera no confiable hasta pasar validación de contrato.
+La respuesta QvaPay se considera no confiable hasta pasar validación contractual. Los valores incompatibles o ausentes se representan como no disponibles.
 
 ## Logs
 
 No registrar:
 
 - app secret;
+- user API token;
 - bootstrap token;
 - action token;
 - firmas completas;
 - cookies sensibles.
 
-## Alcance
+## Alineación
 
-La línea base debe ampliarse antes de introducir autenticación de usuarios, permisos administrativos, automatización financiera o estrategias de arbitraje.
-
-## 2026-10-06 límite de seguridad del dashboard público
-
-El dashboard público es de solo lectura para las operaciones P2P que cambian estado. El código del navegador no debe solicitar, almacenar, pedir mediante formularios ni transmitir secretos operacionales.
-
-La identidad de la cuenta y el balance son datos protegidos. El navegador público nunca proporciona un token de infraestructura. El endpoint del Centro de Cuenta requiere un contexto de aplicación autenticado; si ese límite no existe, devuelve `403` en lugar de exponer datos de la cuenta.
-
-Este límite sigue principios de ISO/IEC 27001/27002 sobre mínimo privilegio, separación de funciones y protección de información de autenticación; no constituye una declaración de certificación.
+Esta línea base aplica principios de mínimo privilegio, separación de funciones, protección de credenciales y fallo seguro coherentes con ISO/IEC 27001/27002. No constituye certificación.
