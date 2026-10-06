@@ -131,6 +131,10 @@ Estructura:
 - `docs/security/` — seguridad y amenazas.
 - `docs/testing/` — estrategia y Quality Gate.
 
+## 📐 Verificación y certificación
+
+La política transversal obligatoria está definida en [`docs/quality/verification-and-certification-policy.md`](docs/quality/verification-and-certification-policy.md). Define los estados formales, la cadena de evidencia y la regla de que **merge, CI green o deployment successful no equivalen a Certified**. La certificación requiere evidencia objetiva y reproducible frente a los criterios aplicables.
+
 ## 📐 Regla de trazabilidad
 
 `Requirement → Design → Implementation → Automated Tests → Runtime Verification → Production Verification → Evidence → Certification`
