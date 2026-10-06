@@ -17,15 +17,24 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-function optionalString(record: Record<string, unknown>, key: string): string | null {
+function optionalString(
+  record: Record<string, unknown>,
+  key: string,
+): string | null {
   return typeof record[key] === "string" ? record[key].trim() || null : null;
 }
 
-function optionalBoolean(record: Record<string, unknown>, key: string): boolean | null {
+function optionalBoolean(
+  record: Record<string, unknown>,
+  key: string,
+): boolean | null {
   return typeof record[key] === "boolean" ? record[key] : null;
 }
 
-function optionalNumber(record: Record<string, unknown>, key: string): number | null {
+function optionalNumber(
+  record: Record<string, unknown>,
+  key: string,
+): number | null {
   const value = record[key];
   return typeof value === "number" && Number.isFinite(value) ? value : null;
 }
@@ -45,7 +54,9 @@ function parseBalance(payload: unknown): number | null {
     : null;
 }
 
-function parseApplication(payload: unknown): QvaPayApplicationIdentity | null {
+function parseApplication(
+  payload: unknown,
+): QvaPayApplicationIdentity | null {
   const value = readPayload(payload);
   if (!isRecord(value)) return null;
   const uuid = optionalString(value, "uuid");
@@ -109,7 +120,11 @@ async function request(
   options: QvaPayAccountClientOptions,
   path: string,
   init: RequestInit,
-): Promise<{ readonly status: number; readonly ok: boolean; readonly payload: unknown }> {
+): Promise<{
+  readonly status: number;
+  readonly ok: boolean;
+  readonly payload: unknown;
+}> {
   const fetcher = options.fetcher ?? globalThis.fetch.bind(globalThis);
   const controller = new AbortController();
   const timeout = setTimeout(
