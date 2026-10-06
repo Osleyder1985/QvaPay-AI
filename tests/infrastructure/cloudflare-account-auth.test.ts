@@ -18,7 +18,7 @@ describe("Account Center session", () => {
   it("rejects invalid credentials and tampered cookies", async () => {
     await expect(createSessionCookie("wrong", "correct-secret")).resolves.toBeNull();
     const cookie = await createSessionCookie("correct-secret", "correct-secret");
-    const token = cookie!.split(";")[0];
+    const token = cookie!.split(";")[0]!;
     const tampered = token.replace(/\.[^.]+$/, ".tampered");
     const request = new Request("https://example.com/api/account", {
       headers: { cookie: tampered },
