@@ -34,7 +34,24 @@ La aplicación se sirve directamente desde Cloudflare Workers.
 
 ### 📈 Dashboard
 
+El dashboard central organiza la aplicación en cinco áreas: **Inicio**, **Mercado P2P**, **Operaciones**, **Controles** y **Auditoría**.
+
+- Resumen operativo del scanner server-side.
 - Mejor BUY y mejor SELL.
+- Spread y porcentaje de spread.
+- Liquidez disponible.
+- Cantidad de ofertas.
+- Estado del snapshot: `UNAVAILABLE`, `EMPTY` o `AVAILABLE`.
+- Cuenta regresiva hasta el siguiente Alarm.
+- Tablas BUY/SELL separadas.
+- Paneles visibles de seguridad, calidad, continuidad, exposición y trazabilidad.
+- Auditoría operacional basada en las marcas temporales reales del scanner.
+- Referencias de organización inspiradas en ISO 9001, ISO/IEC 27001 e ISO 22301, sin declarar certificación.
+- ⭐ Resaltado de la mejor oferta con heartbeat dorado.
+- 🟢 Acción **Comprar** para ofertas SELL.
+- 🔴 Acción **Vender** para ofertas BUY.
+- 👑 Indicadores VIP.
+- Animaciones de estado, hover, heartbeat y actividad del scanner.
 - Spread y porcentaje de spread.
 - Liquidez disponible.
 - Cantidad de ofertas.

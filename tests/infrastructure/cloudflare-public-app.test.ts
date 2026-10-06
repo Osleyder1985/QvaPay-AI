@@ -97,11 +97,15 @@ describe("public production dashboard", () => {
       "connect-src 'self'",
     );
     expect(body).toContain("QvaPay-AI");
-    expect(body).toContain("BEST BUY");
-    expect(body).toContain("BEST SELL");
+    expect(body).toContain("MEJOR BUY");
+    expect(body).toContain("MEJOR SELL");
     expect(body).toContain("10");
+    expect(body).toContain("Dashboard operativo");
+    expect(body).toContain("Auditoría y trazabilidad");
+    expect(body).toContain("ISO/IEC 27001");
     expect(body).not.toContain("QVAPAY_APP_SECRET");
     expect(body).not.toContain("SCANNER_BOOTSTRAP_TOKEN");
+    expect(body).not.toContain("Server-Side Monitoring");
   });
 
   it("ranks BUY descending and SELL ascending", () => {
