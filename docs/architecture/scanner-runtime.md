@@ -2,44 +2,45 @@
 
 ## Propósito
 
-El Scanner Runtime coordina una ejecución de `ScanMarket`, mantiene el estado mínimo de ejecución y solicita al scheduler la siguiente ejecución.
+Coordinar una ejecución de `ScanMarket`, conservar el estado mínimo y solicitar al scheduler el siguiente ciclo.
 
 ## Responsabilidades
 
-- validar la moneda configurada;
-- validar un intervalo entero entre 5 y 300 segundos;
-- impedir ejecuciones concurrentes del mismo runtime;
-- registrar inicio, finalización y error de la última ejecución;
-- calcular el siguiente instante de ejecución;
-- delegar la programación al puerto `ScannerScheduler`.
+- validar la moneda;
+- validar un intervalo entero de 5 a 300 segundos;
+- impedir ejecuciones concurrentes;
+- registrar inicio, finalización y error;
+- ejecutar el caso de uso de escaneo;
+- conservar el snapshot de mercado;
+- programar el siguiente ciclo.
 
 ## Fronteras
 
 El runtime depende únicamente de:
 
-- `MarketProvider` para obtener el mercado;
-- `ScannerScheduler` para programar la siguiente ejecución.
+- `MarketProvider`;
+- `ScannerScheduler`.
 
-No contiene dependencias de Cloudflare ni acceso directo a persistencia.
+No contiene lógica específica de Cloudflare ni credenciales del proveedor.
 
-## Implementación Cloudflare
+## Estado expuesto
 
-La implementación concreta de `ScannerScheduler` se encuentra en:
+El runtime conserva:
 
-- `src/infrastructure/cloudflare/scanner-scheduler.ts`;
-- `src/infrastructure/cloudflare/scanner-scheduler-do.ts`;
-- `src/infrastructure/cloudflare/worker.ts`.
+- `lastStartedAt`;
+- `lastCompletedAt`;
+- `lastError`;
+- `nextAlarmAt`;
+- snapshot de mercado.
 
-El Durable Object utiliza Cloudflare Alarm para despertar el proceso server-side y vuelve a programar el siguiente ciclo mediante el puerto de aplicación.
+## Semántica del dashboard
 
-## Persistencia y recuperación
+`UNAVAILABLE` significa que todavía no existe snapshot.
 
-La configuración mínima de ejecución se almacena en el Durable Object. Esto permite reconstruir el scheduler después de evicción o reinicio.
+`EMPTY` significa que existe un snapshot válido sin ofertas.
 
-El estado funcional y los snapshots de mercado todavía no tienen persistencia D1.
+`AVAILABLE` significa que existe un snapshot con ofertas.
 
-## Estado
+## Verificación
 
-El runtime y el scheduler Cloudflare tienen implementación y pruebas automatizadas.
-
-Esto todavía no demuestra ejecución 24/7 en producción. La verificación operacional requiere despliegue, activación del scheduler y evidencia runtime reproducible.
+Las pruebas automatizadas cubren el runtime y el scheduler. La operación real en producción se verifica posteriormente mediante el pipeline Cloudflare.
