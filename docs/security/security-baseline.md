@@ -3,33 +3,53 @@
 ## Principios
 
 - mínimo privilegio;
-- separación de secretos;
-- validación de entradas;
-- no exponer credenciales al navegador;
-- aislamiento de integraciones externas;
-- trazabilidad;
-- fallo seguro.
+- secretos exclusivamente server-side;
+- validación de entrada;
+- aislamiento del proveedor;
+- autenticación de fronteras sensibles;
+- no exposición de credenciales;
+- fallo seguro;
+- reintentos controlados.
 
-## Secretos
+## Secretos actuales
 
-Las credenciales de QvaPay y Cloudflare no deben almacenarse en código, documentación ni archivos versionados.
+El Worker utiliza:
 
-## API
+- `QVAPAY_APP_ID`;
+- `QVAPAY_APP_SECRET`;
+- `SCANNER_BOOTSTRAP_TOKEN`;
+- `P2P_ACTION_TOKEN`.
 
-La API deberá validar entradas y autenticar las operaciones que modifiquen configuración.
+Ninguno debe almacenarse en archivos versionados.
 
-## Integración externa
+## Fronteras
 
-Las respuestas de QvaPay se consideran datos no confiables hasta ser validadas.
+### Scanner
 
-## Registro de eventos
+`/internal/scanner/start` y `/internal/scanner/state` requieren Bearer token.
 
-No registrar tokens, credenciales, cookies ni información sensible.
+### Aplicación P2P
 
-## Disponibilidad
+`/api/p2p/:uuid/apply` requiere `x-p2p-action-token`.
 
-Los errores externos no deben producir ciclos de reintento descontrolados.
+### Dashboard
 
-## Evolución
+`GET /api/scanner/status` expone únicamente estado sanitizado y no secretos.
 
-La línea base deberá ampliarse cuando se incorporen autenticación de usuarios, alertas, operaciones financieras o ejecución de órdenes.
+## Proveedor
+
+La respuesta QvaPay se considera no confiable hasta pasar validación de contrato.
+
+## Logs
+
+No registrar:
+
+- app secret;
+- bootstrap token;
+- action token;
+- firmas completas;
+- cookies sensibles.
+
+## Alcance
+
+La línea base debe ampliarse antes de introducir autenticación de usuarios, permisos administrativos, automatización financiera o estrategias de arbitraje.
