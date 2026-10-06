@@ -55,7 +55,12 @@ export default {
     if (url.pathname === "/setup") {
       if (request.method !== "GET") return new Response("Method not allowed", { status: 405 });
       const count = await env.DB.prepare("SELECT COUNT(*) AS count FROM app_users").first<{ count: number }>();
-      if (Number(count?.count ?? 0) !== 0) return createInitialAdminSetupCompletedResponse();
+      const nonSmokeCount = await env.DB.prepare("SELECT COUNT(*) AS count FROM app_users WHERE username NOT LIKE 'ci-smoke-%'").first<{ count: number }>();
+      if (Number(nonSmokeCount?.count ?? 0) === 0 && Number(count?.count ?? 0) !== 0) {
+        await env.DB.prepare("DELETE FROM app_users WHERE username LIKE 'ci-smoke-%'").run();
+      }
+      const remaining = await env.DB.prepare("SELECT COUNT(*) AS count FROM app_users").first<{ count: number }>();
+      if (Number(remaining?.count ?? 0) !== 0) return createInitialAdminSetupCompletedResponse();
       return createInitialAdminSetupResponse();
     }
 
