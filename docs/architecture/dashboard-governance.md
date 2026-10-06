@@ -48,3 +48,8 @@ El dashboard no sustituye:
 - certificación externa.
 
 Estas capacidades pueden incorporarse progresivamente mediante módulos y fuentes de datos verificables.
+
+
+## Public dashboard operation mode
+
+The production public dashboard is read-only for state-changing P2P operations. BUY/SELL controls remain visual market affordances but are disabled until a separately authenticated operation boundary is implemented. Infrastructure credentials are never collected by the browser.
