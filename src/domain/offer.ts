@@ -1,7 +1,7 @@
 export type OfferSide = "BUY" | "SELL";
 
 export type OfferStatus =
-  | "open"
+  "open"
   | "revision"
   | "processing"
   | "paid"
