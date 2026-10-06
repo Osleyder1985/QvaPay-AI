@@ -90,10 +90,15 @@ jobs:
               const state = JSON.parse(input);
               const valid =
                 typeof state.configured === "boolean" &&
+                state.snapshotStatus === "AVAILABLE" &&
                 Array.isArray(state.buyOffers) &&
+                state.buyOffers.length > 0 &&
                 Array.isArray(state.sellOffers) &&
+                state.sellOffers.length > 0 &&
                 state.metrics &&
                 typeof state.metrics.totalOffers === "number" &&
+                state.metrics.totalOffers > 0 &&
+                state.metrics.snapshotAt != null &&
                 Object.prototype.hasOwnProperty.call(state.metrics, "bestBuyRate") &&
                 Object.prototype.hasOwnProperty.call(state.metrics, "bestSellRate");
               process.exit(valid ? 0 : 1);
