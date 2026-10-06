@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const createUserMock = vi.fn();
+const { createUserMock } = vi.hoisted(() => ({ createUserMock: vi.fn() }));
 
 vi.mock("../../src/infrastructure/cloudflare/auth-rbac.js", () => ({
   createUser: createUserMock,
