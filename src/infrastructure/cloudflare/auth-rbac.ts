@@ -36,14 +36,14 @@ function unb64(value: string): Uint8Array {
 function equalBytes(a: Uint8Array, b: Uint8Array): boolean {
   if (a.length !== b.length) return false;
   let result = 0;
-  for (let i = 0; i < a.length; i += 1) result |= a[i] ^ b[i];
+  for (let i = 0; i < a.length; i += 1) result |= (a[i] ?? 0) ^ (b[i] ?? 0);
   return result === 0;
 }
 
 async function derivePasswordHash(password: string, salt: Uint8Array, iterations = PBKDF2_ITERATIONS): Promise<Uint8Array> {
   const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(password), "PBKDF2", false, ["deriveBits"]);
   const bits = await crypto.subtle.deriveBits(
-    { name: "PBKDF2", salt, iterations, hash: "SHA-256" },
+    { name: "PBKDF2", salt: salt as unknown as BufferSource, iterations, hash: "SHA-256" },
     key,
     256,
   );
