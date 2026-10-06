@@ -123,12 +123,12 @@ export default {
           const session = access;
           if (userMatch[2] === "enable" || userMatch[2] === "disable") {
             if (request.method !== "POST") return new Response("Method not allowed", { status: 405 });
-            const user = await setUserActive(env.DB, session.user, userMatch[1], userMatch[2] === "enable");
+            const user = await setUserActive(env.DB, session.user, userId, userMatch[2] === "enable");
             return Response.json({ user }, { headers: { "cache-control": "no-store" } });
           }
           if (request.method !== "POST") return new Response("Method not allowed", { status: 405 });
           const password = typeof input.password === "string" ? input.password : "";
-          const user = await changeUserPassword(env.DB, session.user, userMatch[1], password);
+          const user = await changeUserPassword(env.DB, session.user, userId, password);
           return Response.json({ user }, { headers: { "cache-control": "no-store" } });
         } catch (error) {
           return jsonError(error instanceof Error ? error.message : "No se pudo actualizar el usuario.", 400);
