@@ -31,6 +31,7 @@ export function mapQvaPayOffer(
     rate: calculateRate(dto.amount, dto.receive),
     amount: dto.amount,
     availableAmount: dto.available_amount,
+    status: dto.status ?? "open",
     sourceTimestamp: dto.updated_at ?? dto.created_at ?? observedAt,
     observedAt,
     createdAt: dto.created_at ?? dto.updated_at ?? observedAt,

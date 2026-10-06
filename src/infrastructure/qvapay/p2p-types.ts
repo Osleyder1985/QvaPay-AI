@@ -1,3 +1,6 @@
+export type QvaPayP2POfferStatus =
+  "open" | "revision" | "processing" | "paid" | "completed" | "cancelled";
+
 export interface QvaPayP2PUserDto {
   readonly username?: string;
   readonly name?: string;
@@ -11,6 +14,7 @@ export interface QvaPayP2POfferDto {
   readonly amount: string;
   readonly receive: string;
   readonly available_amount: string;
+  readonly status?: QvaPayP2POfferStatus;
   readonly reserved_amount?: string;
   readonly order_min?: string;
   readonly order_max?: string;

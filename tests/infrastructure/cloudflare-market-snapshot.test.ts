@@ -41,6 +41,7 @@ describe("scanner market snapshot persistence", () => {
           rate: "1000",
           amount: "5",
           availableAmount: "5",
+          status: "open",
           sourceTimestamp: "2026-10-05T16:00:00.000Z",
           observedAt: "2026-10-05T16:00:00.000Z",
         },

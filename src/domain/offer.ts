@@ -1,5 +1,8 @@
 export type OfferSide = "BUY" | "SELL";
 
+export type OfferStatus =
+  "open" | "revision" | "processing" | "paid" | "completed" | "cancelled";
+
 export interface Offer {
   readonly id: string;
   readonly market: string;
@@ -7,6 +10,7 @@ export interface Offer {
   readonly rate: string;
   readonly amount: string;
   readonly availableAmount: string;
+  readonly status: OfferStatus;
   readonly sourceTimestamp: string;
   readonly observedAt: string;
   readonly createdAt?: string;
