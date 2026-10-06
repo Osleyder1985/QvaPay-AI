@@ -20,7 +20,7 @@ const offer = (
 });
 
 describe("market domain", () => {
-  it("keeps BUY and SELL books independent and sorts each by ascending rate", () => {
+  it("ranks BUY by highest rate and SELL by lowest rate", () => {
     const market = createMarket("BANK_CUP", [
       offer("sell-2", "SELL", "1200"),
       offer("buy-2", "BUY", "1150"),
@@ -33,8 +33,8 @@ describe("market domain", () => {
       "sell-2",
     ]);
     expect(offersBySide(market, "BUY").map((item) => item.id)).toEqual([
-      "buy-1",
       "buy-2",
+      "buy-1",
     ]);
   });
 
