@@ -20,11 +20,7 @@ async function hmac(secret: string, value: string): Promise<string> {
   );
   return bytesToBase64(
     new Uint8Array(
-      await crypto.subtle.sign(
-        "HMAC",
-        key,
-        new TextEncoder().encode(value),
-      ),
+      await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(value)),
     ),
   );
 }
