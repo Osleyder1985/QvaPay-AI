@@ -45,23 +45,29 @@ function equalBytes(a: Uint8Array, b: Uint8Array): boolean {
 }
 
 // prettier-ignore
-async function derivePasswordHash(password: string, salt: Uint8Array, iterations = PBKDF2_ITERATIONS): Promise<Uint8Array> {
-  return new Promise((resolve, reject) => {
-    pbkdf2(
-      Buffer.from(password, "utf8"),
-      Buffer.from(salt),
+async function derivePasswordHash(
+  password: string,
+  salt: Uint8Array,
+  iterations = PBKDF2_ITERATIONS,
+): Promise<Uint8Array> {
+  const key = await crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(password),
+    "PBKDF2",
+    false,
+    ["deriveBits"],
+  );
+  const bits = await crypto.subtle.deriveBits(
+    {
+      name: "PBKDF2",
+      salt,
       iterations,
-      32,
-      "sha256",
-      (error, derivedKey) => {
-        if (error) {
-          reject(error);
-          return;
-        }
-        resolve(new Uint8Array(derivedKey));
-      },
-    );
-  });
+      hash: "SHA-256",
+    },
+    key,
+    256,
+  );
+  return new Uint8Array(bits);
 }
 
 // prettier-ignore
