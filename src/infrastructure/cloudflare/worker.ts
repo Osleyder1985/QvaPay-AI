@@ -13,6 +13,7 @@ export interface ScannerWorkerEnvironment {
   readonly QVAPAY_API_BASE_URL: string;
   readonly QVAPAY_APP_ID: string;
   readonly QVAPAY_APP_SECRET: string;
+  readonly QVAPAY_USER_API_TOKEN: string;
   readonly SCANNER_COIN: string;
   readonly SCANNER_INTERVAL_SECONDS: string;
   readonly SCANNER_BOOTSTRAP_TOKEN: string;
@@ -103,6 +104,7 @@ export default {
           baseUrl: env.QVAPAY_API_BASE_URL,
           appId: env.QVAPAY_APP_ID,
           appSecret: env.QVAPAY_APP_SECRET,
+          userApiToken: env.QVAPAY_USER_API_TOKEN,
         });
         const account = await provider.fetchAccount();
 
