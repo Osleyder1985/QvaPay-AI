@@ -54,9 +54,7 @@ function parseBalance(payload: unknown): number | null {
     : null;
 }
 
-function parseApplication(
-  payload: unknown,
-): QvaPayApplicationIdentity | null {
+function parseApplication(payload: unknown): QvaPayApplicationIdentity | null {
   const value = readPayload(payload);
   if (!isRecord(value)) return null;
   const uuid = optionalString(value, "uuid");
