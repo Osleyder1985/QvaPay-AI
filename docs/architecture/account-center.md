@@ -1,8 +1,8 @@
-# Account Center
+# Centro de Cuenta
 
 ## Propósito
 
-El módulo **Cuenta** presenta la información de la cuenta propietaria asociada a las credenciales de la aplicación QvaPay.
+El módulo **Cuenta** presenta información separada y trazable de la cuenta propietaria asociada a las credenciales QvaPay configuradas en el servidor.
 
 ## Fuentes de verdad
 
@@ -10,52 +10,40 @@ El módulo **Cuenta** presenta la información de la cuenta propietaria asociada
 |---|---|
 | Balance | `POST /v2/balance` |
 | Aplicación | `POST /v2/info` |
-| Identidad P2P observada | `GET /p2p?my=1` |
+| Identidad autenticada | `GET /user` con API Token QvaPay de alcance mínimo `read` |
 | Ofertas propias | `GET /p2p?my=1` |
 
-La identidad se obtiene únicamente de una oferta perteneciente al conjunto `my=1`; no se infiere desde una contraparte pública.
+La identidad de la cuenta **no** se obtiene de una oferta P2P ni de su participante. Los participantes de P2P son datos de mercado.
+
+## Proveniencia y estados
+
+Cada fuente se conserva con su estado HTTP, resultado de normalización y marca temporal de lectura. Un valor ausente, incompatible o no disponible no se convierte en cero ni se presenta como verificado.
+
+Los estados de integración distinguen, según corresponda:
+
+- **verified**: las dependencias requeridas entregaron datos compatibles;
+- **degraded**: existe información válida pero una dependencia no está disponible;
+- **failed**: no puede validarse la integración requerida.
 
 ## Seguridad
 
-El endpoint `GET /api/account` requiere la clave de operación P2P mediante `x-p2p-action-token`. La interfaz solicita esa clave cuando el usuario abre Cuenta y la mantiene únicamente en memoria del navegador.
+El token de API de usuario de QvaPay permanece exclusivamente en el Worker. El `app-secret`, `QVAPAY_USER_API_TOKEN`, `SCANNER_BOOTSTRAP_TOKEN` y `P2P_ACTION_TOKEN` nunca se entregan al navegador.
 
-El `app-secret` nunca se entrega al cliente. Tampoco se devuelve el payload completo de QvaPay ni campos desconocidos potencialmente sensibles.
+El endpoint público `GET /api/account` permanece bloqueado mientras no exista un contexto de usuario autenticado independiente del secreto de infraestructura. En ese estado devuelve `403`; la interfaz debe mostrar que la cuenta protegida requiere autenticación, no solicitar secretos operacionales al usuario.
 
-## Estados
-
-- **verified**: balance, aplicación, identidad P2P y acceso a ofertas propias cumplen sus contratos.
-- **degraded**: existe información válida, pero falta una dependencia crítica.
-- **failed**: ninguna dependencia crítica permite validar la integración.
+La ruta `POST /api/p2p/:uuid/apply` también permanece bloqueada para el dashboard público hasta disponer de una frontera de operación autenticada independiente.
 
 ## Interfaz
 
-La sección Cuenta incluye:
-
-- balance QUSD;
-- usuario y nombre;
-- UUID;
-- rating y número de valoraciones;
-- KYC, VIP y Golden Check;
-- teléfono y Telegram verificados;
-- contadores P2P;
-- número de ofertas propias;
-- aplicación, UUID, estado, URL, callback y fechas;
-- estado de integración;
-- fecha de sincronización.
-
-Los campos ausentes se muestran como no disponibles; nunca se inventan valores.
+Cuando la ruta protegida esté disponible para una sesión autenticada, Cuenta podrá mostrar balance, identidad autenticada, estado de la aplicación, metadatos P2P propios y diagnóstico de integración. Los campos ausentes se muestran como no disponibles.
 
 ## Trazabilidad
 
-- Requisito: Issue #95.
-- Implementación: `src/infrastructure/qvapay/qvapay-account-client.ts` y `src/infrastructure/cloudflare/worker.ts`.
+- Requisito: Issue #95 y hallazgos #97/#100.
+- Implementación: `src/infrastructure/qvapay/qvapay-account-client.ts`, `src/infrastructure/qvapay/account-contract.ts` y `src/infrastructure/cloudflare/worker.ts`.
 - UI: `src/infrastructure/cloudflare/public-app.ts`.
-- Tests: `tests/infrastructure/qvapay-account-client.test.ts`.
+- Tests: `tests/infrastructure/qvapay-account-client.test.ts` y pruebas del contrato público.
 
 ## Regla de evolución
 
-Cada nuevo campo de Cuenta debe identificar su fuente QvaPay, pasar por normalización, tener prueba cuando sea contractual y mantenerse fuera de cualquier secreto o payload upstream completo.
-
-## Límite de seguridad
-
-La identidad y el balance de la cuenta son datos protegidos. El navegador público nunca proporciona un token de infraestructura. El endpoint del Centro de Cuenta requiere un contexto de aplicación autenticado; cuando ese contexto no existe devuelve `403` y la interfaz muestra un estado que exige autenticación. El token de API de usuario de QvaPay permanece exclusivamente en el servidor.
+Cada nuevo campo de Cuenta debe identificar su fuente QvaPay, pasar por normalización contractual, registrar su estado de lectura y tener prueba cuando sea contractual. Nunca se debe sustituir una fuente por datos de mercado ni exponer payloads upstream completos.
