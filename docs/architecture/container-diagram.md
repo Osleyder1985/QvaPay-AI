@@ -1,41 +1,40 @@
 # Diagrama de contenedores
 
-> **Estado documental:** contenedores objetivo/propuestos. Los elementos sin implementación en `src/` no deben interpretarse como componentes operativos actuales.
+## Estado
+
+Este diagrama representa la implementación vigente y separa explícitamente las capacidades futuras.
 
 ```mermaid
 flowchart TB
-    Browser[Web Browser]
-    Web[Web Interface]
-    API[HTTP API]
-    App[Application Layer]
-    Domain[Domain Layer]
-    Scanner[Scanner Runtime]
+    Browser[Navegador]
+    Worker[Cloudflare Worker]
+    Dashboard[Dashboard público]
+    API[API pública y fronteras protegidas]
+    DO[Durable Object]
+    Runtime[Scanner Runtime]
     QAdapter[QvaPay Adapter]
-    DBAdapter[Persistence Adapter]
-    DO[Durable Object + Alarm]
-    D1[(Cloudflare D1)]
-    QvaPay[QvaPay P2P API]
+    QVA[QvaPay P2P API]
+    Storage[Durable Object SQLite Storage]
 
-    Browser --> Web
-    Web --> API
-    API --> App
-    Scanner --> App
-    DO --> Scanner
-    App --> Domain
-    App --> QAdapter
-    App --> DBAdapter
-    QAdapter --> QvaPay
-    DBAdapter --> D1
+    Browser --> Dashboard
+    Dashboard --> API
+    API --> Worker
+    Worker --> DO
+    DO --> Runtime
+    Runtime --> QAdapter
+    QAdapter --> QVA
+    DO --> Storage
 ```
+
+## Componentes
 
 | Componente | Responsabilidad |
 |---|---|
-| Web Interface | Presentación y configuración |
-| HTTP API | Frontera de entrada/salida |
-| Application | Casos de uso |
-| Domain | Reglas del dominio |
-| Scanner Runtime | Ejecución del escaneo |
-| Durable Object | Coordinación y programación |
-| QvaPay Adapter | Integración externa |
-| Persistence Adapter | Acceso a persistencia |
-| D1 | Almacenamiento |
+| Dashboard público | Presentación y acciones protegidas |
+| Worker | Ruteo HTTP y fronteras de seguridad |
+| Durable Object | Estado, snapshot y programación |
+| Scanner Runtime | Coordinación del escaneo |
+| QvaPay Adapter | Contrato, autenticación, paginación y mapeo |
+| SQLite Storage | Persistencia del Durable Object |
+
+D1, webhook, SSE y Event Ingestion Boundary no forman parte del despliegue actual.
