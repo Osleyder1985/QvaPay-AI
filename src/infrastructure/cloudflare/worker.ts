@@ -1,6 +1,7 @@
 import type { DurableObjectNamespace } from "@cloudflare/workers-types";
 import { ScannerSchedulerDurableObject } from "./scanner-scheduler-do.js";
 import { QvaPayP2PClient } from "../qvapay/qvapay-p2p-client.js";
+import { QvaPayAccountClient } from "../qvapay/qvapay-account-client.js";
 import {
   createPublicAppResponse,
   createPublicScannerStateResponse,
@@ -80,6 +81,45 @@ export default {
                 ? status
                 : 502,
           },
+        );
+      }
+    }
+
+    if (url.pathname === "/api/account") {
+      if (request.method !== "GET") {
+        return new Response("Method not allowed", { status: 405 });
+      }
+
+      const actionToken = env.P2P_ACTION_TOKEN;
+      if (
+        !actionToken ||
+        request.headers.get("x-p2p-action-token") !== actionToken
+      ) {
+        return Response.json({ error: "Unauthorized" }, { status: 401 });
+      }
+
+      try {
+        const provider = new QvaPayAccountClient({
+          baseUrl: env.QVAPAY_API_BASE_URL,
+          appId: env.QVAPAY_APP_ID,
+          appSecret: env.QVAPAY_APP_SECRET,
+        });
+        const account = await provider.fetchAccount();
+
+        return Response.json(
+          { account },
+          {
+            headers: {
+              "cache-control": "no-store",
+              "x-content-type-options": "nosniff",
+            },
+          },
+        );
+      } catch (error) {
+        console.error("Account endpoint failed", error);
+        return Response.json(
+          { error: "No se pudo consultar la cuenta conectada." },
+          { status: 502 },
         );
       }
     }
