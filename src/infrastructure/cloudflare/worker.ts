@@ -38,7 +38,7 @@ export default {
 
     const stub = env.SCANNER_SCHEDULER.getByName(OBJECT_NAME);
 
-    const applyMatch = url.pathname.match(/^\\/api\\/p2p\\/([^/]+)\\/apply$/);
+    const applyMatch = url.pathname.match(/^\/api\/p2p\/([^/]+)\/apply$/);
     if (applyMatch) {
       return Response.json(
         {
