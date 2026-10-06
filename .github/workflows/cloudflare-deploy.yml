@@ -185,8 +185,20 @@ jobs:
           console.log(`Protected login HTML assertions passed (${required.length}).`);
           NODE
 
-          echo "Authenticating production smoke session as bootstrap Administration..."
-          LOGIN_RESPONSE="$(curl --fail-with-body --silent --show-error --cookie-jar /tmp/qvapay-cookie.txt --request POST --header "Content-Type: application/json" --header "Accept: application/json" --data "$(node -e 'process.stdout.write(JSON.stringify({username:"admin",password:process.env.ACCOUNT_AUTH_SECRET}))')" "$WORKER_URL/api/auth/login")"
+          SMOKE_USERNAME="ci-smoke-${GITHUB_RUN_ID}"
+          export SMOKE_USERNAME
+          echo "Creating ephemeral production Administration smoke account..."
+          curl --fail-with-body --silent --show-error \
+            --request POST \
+            --header "Authorization: Bearer $SCANNER_BOOTSTRAP_TOKEN" \
+            --header "Content-Type: application/json" \
+            --header "Accept: application/json" \
+            --data "$(node -e 'process.stdout.write(JSON.stringify({username:process.env.SMOKE_USERNAME,password:process.env.ACCOUNT_AUTH_SECRET}))')" \
+            "$WORKER_URL/internal/auth/smoke-user"
+          trap 'curl --silent --show-error --request DELETE --header "Authorization: Bearer $SCANNER_BOOTSTRAP_TOKEN" --header "Content-Type: application/json" --data "$(node -e 'process.stdout.write(JSON.stringify({username:process.env.SMOKE_USERNAME}))')" "$WORKER_URL/internal/auth/smoke-user" >/dev/null 2>&1 || true' EXIT
+
+          echo "Authenticating production smoke session as ephemeral Administration..."
+          LOGIN_RESPONSE="$(curl --fail-with-body --silent --show-error --cookie-jar /tmp/qvapay-cookie.txt --request POST --header "Content-Type: application/json" --header "Accept: application/json" --data "$(node -e 'process.stdout.write(JSON.stringify({username:process.env.SMOKE_USERNAME,password:process.env.ACCOUNT_AUTH_SECRET}))')" "$WORKER_URL/api/auth/login")"
           printf '%s\n' "$LOGIN_RESPONSE"
           printf '%s' "$LOGIN_RESPONSE" | node -e '
             let input = "";

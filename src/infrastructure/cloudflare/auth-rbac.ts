@@ -210,18 +210,6 @@ async function sessionForUser(request: Request, db: D1Database, secret: string):
 }
 
 // prettier-ignore
-export function canRecoverBootstrapAdmin(user: AppUser, username: string, password: string, secret: string): boolean {
-  return (
-    user.active &&
-    user.role === "ADMINISTRATION" &&
-    username.trim().toLowerCase() === "admin" &&
-    password.length >= 12 &&
-    password === secret &&
-    secret.length >= 12
-  );
-}
-
-// prettier-ignore
 export async function authenticate(
   request: Request,
   db: D1Database,
@@ -236,16 +224,6 @@ export async function authenticate(
       user = await createUser(db, username || "admin", password, "ADMINISTRATION");
       await writeAudit(db, "bootstrap_admin_created", "SUCCESS", user, user);
     }
-  }
-
-  if (user && canRecoverBootstrapAdmin(user, username, password, secret)) {
-    const verifier = await createPasswordVerifier(password);
-    const now = new Date().toISOString();
-    await db.prepare(
-      "UPDATE app_users SET password_salt = ?, password_hash = ?, password_iterations = ?, updated_at = ? WHERE id = ?",
-    ).bind(verifier.salt, verifier.hash, verifier.iterations, now, user.id).run();
-    user = { ...user, updatedAt: now };
-    await writeAudit(db, "bootstrap_admin_recovered", "SUCCESS", user, user);
   }
   if (!user) {
     await writeAudit(db, "login", "FAILURE", undefined, undefined, { username: username.trim() });
@@ -327,4 +305,24 @@ export async function changeUserPassword(db: D1Database, actor: AppUser, userId:
   const updated = { ...target, updatedAt: now };
   await writeAudit(db, "password_changed", "SUCCESS", actor, updated);
   return updated;
+}
+
+// prettier-ignore
+export async function deleteUserByUsername(
+  db: D1Database,
+  username: string,
+): Promise<void> {
+  const normalized = username.trim();
+  if (!/^ci-smoke-[a-zA-Z0-9-]{3,64}$/.test(normalized)) {
+    throw new Error(
+      "Solo se pueden eliminar cuentas de smoke con prefijo ci-smoke-.",
+    );
+  }
+  const user = await findUserByUsername(db, normalized);
+  if (!user) return;
+  await db
+    .prepare("DELETE FROM app_users WHERE id = ?")
+    .bind(user.id)
+    .run();
+  await writeAudit(db, "smoke_user_deleted", "SUCCESS", undefined, user);
 }

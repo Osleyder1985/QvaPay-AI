@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-import { canRecoverBootstrapAdmin } from "../../src/infrastructure/cloudflare/auth-rbac.js";
 import {
   clearSessionCookie,
   createSessionCookie,
@@ -49,58 +48,5 @@ describe("Account Center session", () => {
     expect(cookie).toContain("Max-Age=0");
     expect(cookie).toContain("HttpOnly");
     expect(cookie).not.toContain("correct-secret");
-  });
-
-  it("allows bootstrap recovery only for the active Administration admin account", () => {
-    const user = {
-      id: "admin-id",
-      username: "admin",
-      role: "ADMINISTRATION" as const,
-      active: true,
-      createdAt: "2026-10-06T00:00:00.000Z",
-      updatedAt: "2026-10-06T00:00:00.000Z",
-      lastLoginAt: null,
-    };
-
-    expect(
-      canRecoverBootstrapAdmin(
-        user,
-        "admin",
-        "strong-bootstrap-secret",
-        "strong-bootstrap-secret",
-      ),
-    ).toBe(true);
-    expect(
-      canRecoverBootstrapAdmin(
-        user,
-        "admin",
-        "wrong-secret",
-        "strong-bootstrap-secret",
-      ),
-    ).toBe(false);
-    expect(
-      canRecoverBootstrapAdmin(
-        { ...user, role: "AUDITOR" },
-        "admin",
-        "strong-bootstrap-secret",
-        "strong-bootstrap-secret",
-      ),
-    ).toBe(false);
-    expect(
-      canRecoverBootstrapAdmin(
-        { ...user, active: false },
-        "admin",
-        "strong-bootstrap-secret",
-        "strong-bootstrap-secret",
-      ),
-    ).toBe(false);
-    expect(
-      canRecoverBootstrapAdmin(
-        user,
-        "other",
-        "strong-bootstrap-secret",
-        "strong-bootstrap-secret",
-      ),
-    ).toBe(false);
   });
 });
