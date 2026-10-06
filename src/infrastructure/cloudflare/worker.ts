@@ -1,6 +1,5 @@
 import type { DurableObjectNamespace } from "@cloudflare/workers-types";
 import { ScannerSchedulerDurableObject } from "./scanner-scheduler-do.js";
-import { QvaPayAccountClient } from "../qvapay/qvapay-account-client.js";
 import {
   createPublicAppResponse,
   createPublicScannerStateResponse,
@@ -57,31 +56,6 @@ export default {
         { error: "Application authentication required." },
         { status: 403 },
       );
-
-      try {
-        const provider = new QvaPayAccountClient({
-          baseUrl: env.QVAPAY_API_BASE_URL,
-          appId: env.QVAPAY_APP_ID,
-          appSecret: env.QVAPAY_APP_SECRET,
-          userApiToken: env.QVAPAY_USER_API_TOKEN,
-        });
-        const account = await provider.fetchAccount();
-        return Response.json(
-          { account },
-          {
-            headers: {
-              "cache-control": "no-store",
-              "x-content-type-options": "nosniff",
-            },
-          },
-        );
-      } catch (error) {
-        console.error("Account endpoint failed", error);
-        return Response.json(
-          { error: "No se pudo consultar la cuenta conectada." },
-          { status: 502 },
-        );
-      }
     }
 
     if (url.pathname === "/api/scanner/status") {
