@@ -49,7 +49,6 @@ El dashboard no sustituye:
 
 Estas capacidades pueden incorporarse progresivamente mediante módulos y fuentes de datos verificables.
 
+## Modo operativo del dashboard público
 
-## Public dashboard operation mode
-
-The production public dashboard is read-only for state-changing P2P operations. BUY/SELL controls remain visual market affordances but are disabled until a separately authenticated operation boundary is implemented. Infrastructure credentials are never collected by the browser.
+El dashboard público de producción es de solo lectura para las operaciones P2P que cambian estado. Los controles BUY/SELL permanecen como elementos visuales del mercado, pero están deshabilitados hasta que exista un límite de operación autenticado de forma independiente. El navegador nunca recopila credenciales de infraestructura.
