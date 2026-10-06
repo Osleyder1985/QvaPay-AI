@@ -253,9 +253,14 @@ jobs:
                   nextAlarmAt > completedAt;
                 const firstCycleValid =
                   !process.env.FIRST_COMPLETED_AT && baseValid;
+                const nextAlarmWithinInterval =
+                  Number.isFinite(nextAlarmAt) &&
+                  Number.isInteger(state.intervalSeconds) &&
+                  nextAlarmAt - completedAt <= state.intervalSeconds * 1000;
                 const secondCycleValid =
                   Boolean(process.env.FIRST_COMPLETED_AT) &&
                   baseValid &&
+                  nextAlarmWithinInterval &&
                   completedAt > firstCompletedAt;
                 if (firstCycleValid || secondCycleValid) {
                   process.stdout.write(execution.lastCompletedAt);
