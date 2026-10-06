@@ -275,6 +275,7 @@ export class QvaPayAccountClient {
       applicationOk: application !== null,
       p2pAccessible: ownOffers.ok,
       ownOffersTotal: own.total,
+      ownOffersProvenance,
       integrationStatus,
       fetchedAt: new Date().toISOString(),
     };
