@@ -19,7 +19,7 @@ export interface AuthSession {
 
 const SESSION_COOKIE = "qvapay_ai_session";
 const SESSION_TTL_SECONDS = 60 * 60 * 8;
-const PBKDF2_ITERATIONS = 120_000;
+const PBKDF2_ITERATIONS = 100_000;
 const SALT_BYTES = 16;
 
 // prettier-ignore
