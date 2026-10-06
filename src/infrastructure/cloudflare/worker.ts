@@ -39,7 +39,9 @@ export default {
     const applyMatch = url.pathname.match(/^\/api\/p2p\/([^/]+)\/apply$/);
     if (applyMatch) {
       return Response.json(
-        {\n          error: "Las operaciones P2P reales requieren una sesión autenticada.",\n        },
+        {
+          error: "Las operaciones P2P reales requieren una sesión autenticada.",
+        },
         { status: 403, headers: { "cache-control": "no-store" } },
       );
     }
