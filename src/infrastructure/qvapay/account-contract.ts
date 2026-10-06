@@ -31,10 +31,7 @@ export interface QvaPayApplicationIdentity {
   readonly updatedAt: string | null;
 }
 
-export type QvaPayAccountIntegrationStatus =
-  | "verified"
-  | "degraded"
-  | "failed";
+export type QvaPayAccountIntegrationStatus = "verified" | "degraded" | "failed";
 
 export interface QvaPayAccountSnapshot {
   readonly balanceUsd: number | null;
