@@ -28,6 +28,18 @@ jobs:
       - name: Dependency vulnerability verification
         run: npm audit --audit-level=high
 
+      - name: TypeScript type check
+        run: npm run build
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Format verification
+        run: npm run format:check
+
+      - name: Documentation language verification
+        run: npm run check:docs-language
+
       - name: Secret exposure scan
         shell: bash
         run: |
