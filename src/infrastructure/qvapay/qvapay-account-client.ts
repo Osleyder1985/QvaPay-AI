@@ -1,9 +1,9 @@
 import {
   evaluateAccountIntegration,
   type QvaPayAccountSnapshot,
+  type QvaPayAccountSourceMetadata,
   type QvaPayAccountUser,
   type QvaPayApplicationIdentity,
-  type QvaPayAccountSourceMetadata,
 } from "./account-contract.js";
 
 export interface QvaPayAccountClientOptions {
@@ -165,7 +165,12 @@ async function request(
         payload = null;
       }
     }
-    return { status: response.status, ok: response.ok, payload, retrievedAt: new Date().toISOString() };
+    return {
+      status: response.status,
+      ok: response.ok,
+      payload,
+      retrievedAt: new Date().toISOString(),
+    };
   } finally {
     clearTimeout(timeout);
   }
@@ -199,7 +204,8 @@ export class QvaPayAccountClient {
       endpoint: "/v2/balance",
       retrievedAt: balance.retrievedAt,
       httpStatus: balance.status,
-      status: balanceUsd !== null ? "verified" : balance.ok ? "unavailable" : "failed",
+      status:
+        balanceUsd !== null ? "verified" : balance.ok ? "unavailable" : "failed",
       error:
         balance.ok && balanceUsd === null
           ? "QvaPay returned an incompatible balance payload."
@@ -211,7 +217,8 @@ export class QvaPayAccountClient {
       endpoint: "/user",
       retrievedAt: user.retrievedAt,
       httpStatus: user.status,
-      status: identity !== null ? "verified" : user.ok ? "unavailable" : "failed",
+      status:
+        identity !== null ? "verified" : user.ok ? "unavailable" : "failed",
       error:
         user.ok && identity === null
           ? "QvaPay returned an incompatible authenticated-user payload."
@@ -223,7 +230,8 @@ export class QvaPayAccountClient {
       endpoint: "/v2/info",
       retrievedAt: info.retrievedAt,
       httpStatus: info.status,
-      status: application !== null ? "verified" : info.ok ? "unavailable" : "failed",
+      status:
+        application !== null ? "verified" : info.ok ? "unavailable" : "failed",
       error:
         info.ok && application === null
           ? "QvaPay returned an incompatible application payload."
