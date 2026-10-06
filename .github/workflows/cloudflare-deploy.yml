@@ -3,7 +3,7 @@ name: Cloudflare Deploy
 on:
   workflow_run:
     workflows:
-      - Repository Quality Gate
+      - Security Gate
     types:
       - completed
     branches:
