@@ -1,10 +1,17 @@
+// prettier-ignore
 import type { DurableObjectNamespace, D1Database } from "@cloudflare/workers-types";
+// prettier-ignore
 import { ScannerSchedulerDurableObject } from "./scanner-scheduler-do.js";
+// prettier-ignore
 import { authenticate, createUser, getSession, listUsers, logout, requireRole, setUserActive, changeUserPassword, type AppRole } from "./auth-rbac.js";
+// prettier-ignore
 import { QvaPayAccountClient } from "../qvapay/qvapay-account-client.js";
+// prettier-ignore
 import { createLoginAppResponse } from "./login-app.js";
+// prettier-ignore
 import { createPublicAppResponse, createPublicScannerStateResponse, toPublicScannerState } from "./public-app.js";
 
+// prettier-ignore
 export interface ScannerWorkerEnvironment {
   readonly SCANNER_SCHEDULER: DurableObjectNamespace<ScannerSchedulerDurableObject>;
   readonly DB: D1Database;
@@ -18,12 +25,15 @@ export interface ScannerWorkerEnvironment {
   readonly ACCOUNT_AUTH_SECRET: string;
 }
 
+// prettier-ignore
 const OBJECT_NAME = "default";
 
+// prettier-ignore
 function jsonError(message: string, status: number): Response {
   return Response.json({ error: message }, { status, headers: { "cache-control": "no-store" } });
 }
 
+// prettier-ignore
 async function body(request: Request): Promise<Record<string, unknown>> {
   return (await request.json().catch(() => null)) as Record<string, unknown> | null ?? {};
 }
@@ -160,4 +170,5 @@ export default {
   },
 };
 
+// prettier-ignore
 export { ScannerSchedulerDurableObject };
