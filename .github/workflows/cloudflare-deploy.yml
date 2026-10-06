@@ -105,6 +105,9 @@ jobs:
           SCANNER_BOOTSTRAP_TOKEN="$(node -e "console.log(require('crypto').randomBytes(32).toString('hex'))")"
           echo "::add-mask::$SCANNER_BOOTSTRAP_TOKEN"
 
+          echo "Uploading required Worker authentication secret..."
+          printf '%s' "$ACCOUNT_AUTH_SECRET" | npx wrangler secret put ACCOUNT_AUTH_SECRET
+
           npx wrangler deploy
           printf '%s' "$SCANNER_BOOTSTRAP_TOKEN" | npx wrangler secret put SCANNER_BOOTSTRAP_TOKEN
 
