@@ -1,6 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { createUserMock } = vi.hoisted(() => ({ createUserMock: vi.fn() }));
+const { createUserMock } = vi.hoisted(() => ({
+  createUserMock: vi.fn(),
+}));
 
 vi.mock("../../src/infrastructure/cloudflare/auth-rbac.js", () => ({
   createUser: createUserMock,
@@ -36,7 +38,13 @@ describe("initial Administration bootstrap", () => {
   it("rejects an invalid bootstrap token before reading user state", async () => {
     const db = createDb(0);
     await expect(
-      bootstrapInitialAdmin(db as never, "expected", "wrong", "owner", "a".repeat(12)),
+      bootstrapInitialAdmin(
+        db as never,
+        "expected",
+        "wrong",
+        "owner",
+        "a".repeat(12),
+      ),
     ).rejects.toThrow("Token de configuración inválido.");
     expect(db.prepare).not.toHaveBeenCalled();
     expect(createUserMock).not.toHaveBeenCalled();
@@ -52,14 +60,25 @@ describe("initial Administration bootstrap", () => {
       "a".repeat(12),
     );
     expect(user.username).toBe("owner");
-    expect(createUserMock).toHaveBeenCalledWith(db, "owner", "a".repeat(12), "ADMINISTRATION");
+    expect(createUserMock).toHaveBeenCalledWith(
+      db,
+      "owner",
+      "a".repeat(12),
+      "ADMINISTRATION",
+    );
     expect(db.run).toHaveBeenCalledTimes(1);
   });
 
   it("rejects bootstrap after the first application user exists", async () => {
     const db = createDb(1);
     await expect(
-      bootstrapInitialAdmin(db as never, "expected", "expected", "owner", "a".repeat(12)),
+      bootstrapInitialAdmin(
+        db as never,
+        "expected",
+        "expected",
+        "owner",
+        "a".repeat(12),
+      ),
     ).rejects.toThrow("La configuración inicial ya fue completada.");
     expect(createUserMock).not.toHaveBeenCalled();
   });
