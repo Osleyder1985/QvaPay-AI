@@ -102,15 +102,30 @@ jobs:
 
           echo "Verifying public dashboard HTML..."
           DASHBOARD_HTML="$(curl --fail-with-body --silent --show-error "$WORKER_URL/")"
-          printf '%s' "$DASHBOARD_HTML" | grep -q 'BEST BUY'
-          printf '%s' "$DASHBOARD_HTML" | grep -q 'BEST SELL'
-          printf '%s' "$DASHBOARD_HTML" | grep -q 'Auto-refresh'
-          printf '%s' "$DASHBOARD_HTML" | grep -q 'side==="BUY"?"Comprar":"Vender"'
-          printf '%s' "$DASHBOARD_HTML" | grep -q '.action-buy{background:linear-gradient(135deg,#16a765,#42e69a)'
-          printf '%s' "$DASHBOARD_HTML" | grep -q '.action-sell{background:linear-gradient(135deg,#d83d59,#ff7188)'
-          printf '%s' "$DASHBOARD_HTML" | grep -q 'th{font-size:12px'
-          printf '%s' "$DASHBOARD_HTML" | grep -q 'td{font-size:15px}'
-          printf '%s' "$DASHBOARD_HTML" | grep -q 'th{font-size:13px}.*td{font-size:14px}'
+          printf '%s' "$DASHBOARD_HTML" | node -e '
+            let input = "";
+            process.stdin.on("data", (chunk) => { input += chunk; });
+            process.stdin.on("end", () => {
+              const required = [
+                ["BEST BUY", "best-buy label"],
+                ["BEST SELL", "best-sell label"],
+                ["Auto-refresh", "auto-refresh label"],
+                ['side==="BUY"?"Comprar":"Vender"', "BUY/SELL action mapping"],
+                [".action-buy{background:linear-gradient(135deg,#16a765,#42e69a)", "green BUY action"],
+                [".action-sell{background:linear-gradient(135deg,#d83d59,#ff7188)", "red SELL action"],
+                ["th{font-size:12px", "desktop table header size"],
+                ["td{font-size:15px}", "desktop table cell size"],
+                ["th{font-size:13px}td{font-size:14px}", "mobile table typography"],
+              ];
+              const missing = required
+                .filter(([needle]) => !input.includes(needle))
+                .map(([, label]) => label);
+              if (missing.length > 0) {
+                console.error("Dashboard HTML assertions failed:", missing.join(", "));
+                process.exit(1);
+              }
+            });
+          '
 
 
           START_RESPONSE=""
