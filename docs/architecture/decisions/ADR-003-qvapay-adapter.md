@@ -2,31 +2,31 @@
 
 ## Estado
 
-Aceptado como línea base inicial.
-
-## Contexto
-
-QvaPay es un sistema externo y su contrato no debe contaminar el dominio interno.
+Aceptado e implementado.
 
 ## Decisión
 
-La integración se encapsulará detrás de un adaptador.
+La integración externa se encapsula en:
 
-```
-Application
-    |
-    v
-QvaPayPort
-    |
-    v
-QvaPayAdapter
-    |
-    v
-QvaPay API
-```
+`QvaPayP2PClient → p2p-contract → p2p-mapper → Domain`
 
-El adaptador será responsable de autenticación, llamadas HTTP, validación del contrato, mapeo de respuestas y clasificación de errores.
+El cliente es responsable de:
 
-## Consecuencia
+- autenticación server-side;
+- GET `/p2p`;
+- paginación;
+- timeout;
+- rate limiting;
+- backoff;
+- clasificación de errores;
+- validación del contrato.
 
-Los cambios del contrato externo quedan concentrados en Infrastructure siempre que la semántica de negocio permanezca estable.
+El mapper convierte DTO externos en `Offer`.
+
+## Aplicación de ofertas
+
+El mismo cliente contiene `applyOffer()` para la operación P2P protegida por el Worker. Esta operación está separada de la lectura del mercado y requiere credenciales de servidor.
+
+## Regla
+
+El dominio no importa tipos ni detalles del contrato QvaPay.
