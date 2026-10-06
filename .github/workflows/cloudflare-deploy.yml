@@ -210,7 +210,10 @@ jobs:
             cat /tmp/qvapay-smoke-user-response.json || true
             exit 1
           fi
-          trap 'curl --silent --show-error --request DELETE --header "Authorization: Bearer $SCANNER_BOOTSTRAP_TOKEN" --header "Content-Type: application/json" --data "$(node -e 'process.stdout.write(JSON.stringify({username:process.env.SMOKE_USERNAME}))')" "$WORKER_URL/internal/auth/smoke-user" >/dev/null 2>&1 || true' EXIT
+          cleanup_smoke_user() {
+            curl --silent --show-error               --request DELETE               --header "Authorization: Bearer $SCANNER_BOOTSTRAP_TOKEN"               --header "Content-Type: application/json"               --data "$(node -e 'process.stdout.write(JSON.stringify({username:process.env.SMOKE_USERNAME}))')"               "$WORKER_URL/internal/auth/smoke-user" >/dev/null 2>&1 || true
+          }
+          trap cleanup_smoke_user EXIT
 
           echo "Authenticating production smoke session as ephemeral Administration..."
           LOGIN_RESPONSE="$(curl --fail-with-body --silent --show-error --cookie-jar /tmp/qvapay-cookie.txt --request POST --header "Content-Type: application/json" --header "Accept: application/json" --data "$(node -e 'process.stdout.write(JSON.stringify({username:process.env.SMOKE_USERNAME,password:process.env.ACCOUNT_AUTH_SECRET}))')" "$WORKER_URL/api/auth/login")"
