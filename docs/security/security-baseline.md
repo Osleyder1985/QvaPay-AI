@@ -58,3 +58,12 @@ No registrar:
 ## Alcance
 
 La línea base debe ampliarse antes de introducir autenticación de usuarios, permisos administrativos, automatización financiera o estrategias de arbitraje.
+
+
+## 2026-10-06 public dashboard security boundary
+
+The public dashboard is read-only for state-changing P2P operations. Browser code must not request, store, prompt for, or transmit `P2P_ACTION_TOKEN`, `SCANNER_BOOTSTRAP_TOKEN`, QvaPay application credentials, or `QVAPAY_USER_API_TOKEN`.
+
+Account identity and balance are protected data. The Account Center endpoint requires an authenticated application context (Cloudflare Access when enabled). If that boundary is absent, the endpoint returns `403` rather than exposing account data.
+
+This boundary is aligned with ISO/IEC 27001/27002 principles for least privilege, separation of duties and protection of authentication information; it is not a claim of certification.
