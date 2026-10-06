@@ -18,7 +18,9 @@ test("builds a sanitized account snapshot from QvaPay contracts", async () => {
     fetcher: async (input) => {
       const url = String(input);
       calls.push(url);
-      if (url.endsWith("/v2/balance")) return response(200, { balance: 125.5 });
+      if (url.endsWith("/v2/balance")) {
+        return response(200, { balance: 125.5 });
+      }
       if (url.endsWith("/v2/info")) {
         return response(200, {
           uuid: "app-uuid",
@@ -80,8 +82,12 @@ test("fails closed for incompatible balance and missing identity", async () => {
     appSecret: "secret",
     fetcher: async (input) => {
       const url = String(input);
-      if (url.endsWith("/v2/balance")) return response(200, { data: { balance: 99 } });
-      if (url.endsWith("/v2/info")) return response(503, {});
+      if (url.endsWith("/v2/balance")) {
+        return response(200, { data: { balance: 99 } });
+      }
+      if (url.endsWith("/v2/info")) {
+        return response(503, {});
+      }
       return response(200, { data: [], total: 0 });
     },
   });
