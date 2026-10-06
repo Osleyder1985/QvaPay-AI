@@ -107,20 +107,20 @@ jobs:
           const fs = require("node:fs");
           const input = fs.readFileSync("/tmp/qvapay-dashboard.html", "utf8");
           const required = [
-            ["BEST BUY", "best-buy label"],
-            ["BEST SELL", "best-sell label"],
-            ["Auto-refresh", "auto-refresh label"],
+            ["Dashboard operativo", "dashboard title"],
+            ["Auditoría y trazabilidad", "audit section"],
+            ["ISO/IEC 27001", "ISO security reference"],
+            ["MEJOR BUY", "best-buy label"],
+            ["MEJOR SELL", "best-sell label"],
+            ["Próximo escaneo", "server countdown"],
             ['side==="SELL"?"Comprar":"Vender"', "SELL/BUY action mapping"],
             ['i===0?"best-offer":""', "best-offer row markup"],
-            ["tr.best-offer td{animation:bestOfferHeartbeat", "best-offer heartbeat animation"],
-            ["tr.best-offer td{animation:bestOfferHeartbeat 1.8s ease-in-out infinite;background:rgba(255,215,70,.10)}", "strong golden best-offer base"],
-            ["14%{background:rgba(255,215,70,.24)}", "strong golden heartbeat peak"],
-            ["@keyframes bestOfferHeartbeat", "best-offer heartbeat keyframes"],
-            [".action-buy{background:linear-gradient(135deg,#16a765,#42e69a)", "green BUY action"],
-            [".action-sell{background:linear-gradient(135deg,#d83d59,#ff7188)", "red SELL action"],
-            ["th{font-size:12px", "desktop table header size"],
-            ["td{font-size:15px}", "desktop table cell size"],
-            ["th{font-size:13px}td{font-size:14px}", "mobile table typography"],
+            [".action-buy{background:linear-gradient(135deg,#16a765,#42e69a)", "green buy action"],
+            [".action-sell{background:linear-gradient(135deg,#d83d59,#ff7188)", "red sell action"],
+            ["@keyframes heartbeat", "activity heartbeat animation"],
+            ["@keyframes best", "golden best-offer animation"],
+            ["ISO 9001 · calidad", "ISO quality footer"],
+            ["Server-side 24/7", "server-side footer"],
           ];
           const missing = required
             .filter(([needle]) => !input.includes(needle))
