@@ -73,9 +73,11 @@ Para el dashboard:
 
 La fecha de creación no se utiliza para determinar la mejor oferta.
 
-## Presentación
+## Dashboard y organización operativa
 
-El dashboard expone hasta diez ofertas por lado y muestra:
+El dashboard central está organizado por Inicio, Mercado P2P, Operaciones, Controles y Auditoría. La estructura está alineada con prácticas de calidad, seguridad, continuidad y trazabilidad inspiradas en ISO 9001, ISO/IEC 27001 e ISO 22301, sin declarar certificación.
+
+La interfaz expone hasta diez ofertas por lado y muestra:
 
 - fecha de creación;
 - usuario;
