@@ -27,7 +27,6 @@ export interface ScannerWorkerEnvironment {
   readonly SCANNER_INTERVAL_SECONDS: string;
   readonly SCANNER_BOOTSTRAP_TOKEN: string;
   readonly ACCOUNT_AUTH_SECRET: string;
-  readonly INITIAL_ADMIN_BOOTSTRAP_TOKEN: string;
 }
 
 // prettier-ignore
@@ -62,15 +61,12 @@ export default {
 
     if (url.pathname === "/api/auth/bootstrap") {
       if (request.method !== "POST") return new Response("Method not allowed", { status: 405 });
-      const presentedToken = request.headers.get("x-initial-admin-token") ?? "";
       const input = await body(request);
       const username = typeof input.username === "string" ? input.username : "";
       const password = typeof input.password === "string" ? input.password : "";
       try {
         const user = await bootstrapInitialAdmin(
           env.DB,
-          env.INITIAL_ADMIN_BOOTSTRAP_TOKEN,
-          presentedToken,
           username,
           password,
         );
@@ -80,7 +76,7 @@ export default {
         );
       } catch (error) {
         const message = error instanceof Error ? error.message : "No fue posible completar la configuración inicial.";
-        const status = message === "Token de configuración inválido." ? 401 : message === "La configuración inicial ya fue completada." ? 409 : 400;
+        const status = message === "La configuración inicial ya fue completada." ? 409 : 400;
         return jsonError(message, status);
       }
     }
