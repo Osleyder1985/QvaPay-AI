@@ -2,54 +2,89 @@
 
 ## Propósito
 
-Este documento identifica exclusivamente los componentes que tienen implementación verificable en el repositorio actual.
+Este documento identifica el estado verificable de los componentes presentes en el repositorio actual. No confunde arquitectura futura con implementación existente.
 
-## Implementado
+## Componentes implementados
 
-| Área | Implementación verificable | Estado |
+| Área | Implementación | Estado |
 |---|---|---|
-| Dominio | `src/domain/market.ts`, `src/domain/offer.ts` | Implemented |
-| Caso de uso | `src/application/use-cases/scan-market.ts` | Implemented |
-| Scanner Runtime | `src/application/scanner-runtime.ts` | Tested |
+| Dominio | `src/domain/market.ts`, `src/domain/offer.ts` | Tested |
+| Caso de uso | `src/application/use-cases/scan-market.ts` | Tested |
+| Runtime | `src/application/scanner-runtime.ts` | Tested |
+| Puerto de mercado | `src/application/ports/market-provider.ts` | Implemented |
 | Puerto de scheduler | `src/application/ports/scanner-scheduler.ts` | Implemented |
-| Puerto de proveedor | `src/application/ports/market-provider.ts` | Implemented |
-| Contrato QvaPay P2P | `src/infrastructure/qvapay/p2p-contract.ts` | Implemented |
-| Tipos QvaPay P2P | `src/infrastructure/qvapay/p2p-types.ts` | Implemented |
-| Mapper QvaPay P2P | `src/infrastructure/qvapay/p2p-mapper.ts` | Implemented |
-| Cliente QvaPay P2P | `src/infrastructure/qvapay/qvapay-p2p-client.ts` | Implemented |
-| Cloudflare scheduler adapter | `src/infrastructure/cloudflare/scanner-scheduler.ts` | Tested |
-| Cloudflare Durable Object + Alarm | `src/infrastructure/cloudflare/scanner-scheduler-do.ts` | Implemented |
-| Public web application | `src/infrastructure/cloudflare/public-app.ts`, `worker.ts` | Tested |\n| Live market dashboard | `src/infrastructure/cloudflare/public-app.ts` | Tested |\n| Persisted market snapshot | `src/infrastructure/cloudflare/scanner-scheduler-do-logic.ts` | Tested |\n| Ranked BUY/SELL market view | `src/infrastructure/cloudflare/public-app.ts` | Tested |
-| Public scanner status | `GET /api/scanner/status` | Tested |
-| Worker control boundary | `src/infrastructure/cloudflare/worker.ts` | Implemented |
-| Wrangler deployment configuration | `wrangler.toml` | Implemented |
-| Pruebas de dominio | `tests/domain/*` | Tested |
-| Pruebas del adaptador QvaPay | `tests/infrastructure/*` | Tested |
-| Pruebas del scheduler Cloudflare | `tests/infrastructure/cloudflare-scanner-scheduler.test.ts` | Tested |
+| Contrato QvaPay | `src/infrastructure/qvapay/p2p-contract.ts` | Tested |
+| DTO QvaPay | `src/infrastructure/qvapay/p2p-types.ts` | Implemented |
+| Mapper QvaPay | `src/infrastructure/qvapay/p2p-mapper.ts` | Tested |
+| Cliente QvaPay | `src/infrastructure/qvapay/qvapay-p2p-client.ts` | Tested |
+| Aplicación P2P | `QvaPayP2PClient.applyOffer()` | Implemented |
+| Worker Cloudflare | `src/infrastructure/cloudflare/worker.ts` | Tested |
+| Durable Object | `src/infrastructure/cloudflare/scanner-scheduler-do.ts` | Tested |
+| Lógica del scheduler | `src/infrastructure/cloudflare/scanner-scheduler-do-logic.ts` | Tested |
+| Dashboard público | `src/infrastructure/cloudflare/public-app.ts` | Tested |
+| Estado público | `GET /api/scanner/status` | Tested |
+| Aplicación de oferta | `POST /api/p2p/:uuid/apply` | Implemented |
+| Configuración Wrangler | `wrangler.toml` | Implemented |
+| CI/CD | `.github/workflows/*.yml` | Tested |
 
-## Criterios de observabilidad del dashboard\n\nEl dashboard utiliza métricas operativas alineadas con conceptos de calidad y seguridad habituales en ISO 9001 e ISO/IEC 25010, sin afirmar certificación ISO del producto. La interfaz muestra disponibilidad del runtime, frescura del snapshot, integridad de la identidad de mercado, trazabilidad temporal mediante `observedAt`/`lastCompletedAt`, estado de error, conteo de ofertas, liquidez disponible, mejor BUY, mejor SELL y spread. La separación por moneda evita mezclar mercados.\n\nLas métricas son de observabilidad y análisis; no constituyen por sí mismas una decisión financiera ni una orden de mercado.\n\n## No implementado todavía
+## Datos y comportamiento actualmente persistidos
 
-Los siguientes elementos aparecen en la arquitectura objetivo, pero no tienen implementación identificable en el repositorio actual:
+El Durable Object mantiene:
 
-- Persistencia D1 / Market Snapshot Repository.
-- Webhook P2P.
-- Stream SSE.
-- Event Ingestion Boundary.
-- Reconciliación persistente.
-- Configuración persistente de usuario del intervalo.
-- Arbitrage engine.
-- Ejecución de órdenes.
+- configuración de moneda;
+- intervalo de ejecución;
+- siguiente Alarm;
+- último inicio;
+- última finalización;
+- último error;
+- snapshot de mercado utilizado por el dashboard.
 
-## Estado operativo
+La persistencia es almacenamiento del Durable Object. **D1 todavía no está implementado en el repositorio actual.**
 
-La implementación de Durable Object + Alarm establece la frontera de ejecución server-side. El workflow de Cloudflare debe verificar el bootstrap del scanner y el HTTP 200 de la aplicación pública después de cada deployment de `main`.
+## Dashboard actual
 
-La configuración del scheduler se persiste en el almacenamiento del Durable Object para sobrevivir a evicciones o reinicios. Esto no sustituye la futura persistencia funcional de snapshots en D1.
+La interfaz pública muestra:
 
-La implementación de la interfaz pública y su verificación automatizada se realizan bajo el Issue #61 y el Pull Request #62.
+- mejor BUY;
+- mejor SELL;
+- spread;
+- liquidez;
+- total de ofertas;
+- estado del snapshot;
+- estado operativo;
+- cuenta regresiva;
+- ofertas BUY/SELL;
+- usuario;
+- fecha de creación;
+- QUSD;
+- tasa;
+- importe fiat;
+- estado;
+- VIP;
+- acción correspondiente.
 
-## Regla
+Las mejores ofertas reciben un heartbeat dorado y la acción semántica es:
 
-La presencia de un componente en un diagrama de arquitectura objetivo no constituye evidencia de implementación, prueba, verificación ni certificación.
+- oferta **SELL** → **Comprar** → verde;
+- oferta **BUY** → **Vender** → rojo.
 
-La matriz de trazabilidad, el código, las pruebas y la evidencia operacional son las fuentes para determinar el estado correspondiente.
+## Elementos todavía no implementados
+
+No deben presentarse como capacidades actuales:
+
+- Cloudflare D1;
+- repositorio D1 de snapshots;
+- webhook P2P;
+- stream SSE;
+- Event Ingestion Boundary;
+- reconciliación basada en eventos;
+- motor de arbitraje automático;
+- ejecución automática de estrategias de arbitraje.
+
+## Evidencia
+
+El estado de producción debe verificarse mediante:
+
+**PR → merge → commit de `main` → Quality Gate → Cloudflare Deploy → smoke HTTP/runtime**.
+
+La presencia de código o pruebas no constituye por sí sola certificación de producción.
