@@ -19,7 +19,7 @@ El navegador no puede elegir ni elevar su rol. La autorización se verifica en b
 
 ## Credenciales
 
-Las contraseñas se almacenan únicamente como verificadores PBKDF2-HMAC-SHA-256 con salt aleatorio y 120000 iteraciones. El secret `ACCOUNT_AUTH_SECRET` participa en el bootstrap inicial cuando la tabla de usuarios está vacía y en la firma de sesiones; su valor nunca se almacena en Git.
+Las contraseñas se almacenan únicamente como verificadores PBKDF2-HMAC-SHA-256 con salt aleatorio y 100000 iteraciones. `ACCOUNT_AUTH_SECRET` participa en la firma de sesiones y permanece fuera del navegador. El primer usuario Administration se crea mediante un token de configuración inicial de un solo uso, provisionado por el despliegue y entregado al propietario mediante el resumen privado del workflow; el token se invalida lógicamente cuando D1 deja de estar vacío.
 
 ## Sesiones
 
@@ -35,7 +35,7 @@ La capa de seguridad no modifica las reglas de mercado, scanner, arbitrage ni Ac
 
 ## Bootstrap de Administration
 
-Cuando D1 no contiene usuarios, un login válido contra `ACCOUNT_AUTH_SECRET` crea el primer usuario con rol Administration. Una vez creado, el flujo normal usa la identidad D1. El administrador debe crear las cuentas Auditor y Administration adicionales desde el módulo de Administración.
+Cuando D1 no contiene usuarios, `/setup` permite iniciar la configuración inicial. El propietario utiliza el token de configuración de un solo uso generado por el despliegue y elige el nombre de usuario y la contraseña de la primera cuenta Administration. El endpoint rechaza el token cuando ya existe cualquier usuario. Una vez creado el primer usuario, `/setup` deja de estar disponible y el flujo normal usa la identidad D1. El administrador debe crear las cuentas Auditor y Administration adicionales desde el módulo de Administración.
 
 ## Evidencia requerida antes de producción
 

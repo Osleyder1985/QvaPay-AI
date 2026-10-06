@@ -9,6 +9,10 @@ import { QvaPayAccountClient } from "../qvapay/qvapay-account-client.js";
 // prettier-ignore
 import { createLoginAppResponse } from "./login-app.js";
 // prettier-ignore
+import { bootstrapInitialAdmin } from "./initial-admin-setup.js";
+// prettier-ignore
+import { createInitialAdminSetupResponse } from "./initial-admin-setup-app.js";
+// prettier-ignore
 import { createPublicAppResponse, createPublicScannerStateResponse, toPublicScannerState } from "./public-app.js";
 
 // prettier-ignore
@@ -23,6 +27,7 @@ export interface ScannerWorkerEnvironment {
   readonly SCANNER_INTERVAL_SECONDS: string;
   readonly SCANNER_BOOTSTRAP_TOKEN: string;
   readonly ACCOUNT_AUTH_SECRET: string;
+  readonly INITIAL_ADMIN_BOOTSTRAP_TOKEN: string;
 }
 
 // prettier-ignore
@@ -46,6 +51,38 @@ export default {
 
     if (url.pathname === "/" || url.pathname.startsWith("/api/")) {
       await ensureSecuritySchema(env.DB);
+    }
+
+    if (url.pathname === "/setup") {
+      if (request.method !== "GET") return new Response("Method not allowed", { status: 405 });
+      const count = await env.DB.prepare("SELECT COUNT(*) AS count FROM app_users").first<{ count: number }>();
+      if (Number(count?.count ?? 0) !== 0) return Response.redirect(new URL("/", request.url), 303);
+      return createInitialAdminSetupResponse();
+    }
+
+    if (url.pathname === "/api/auth/bootstrap") {
+      if (request.method !== "POST") return new Response("Method not allowed", { status: 405 });
+      const presentedToken = request.headers.get("x-initial-admin-token") ?? "";
+      const input = await body(request);
+      const username = typeof input.username === "string" ? input.username : "";
+      const password = typeof input.password === "string" ? input.password : "";
+      try {
+        const user = await bootstrapInitialAdmin(
+          env.DB,
+          env.INITIAL_ADMIN_BOOTSTRAP_TOKEN,
+          presentedToken,
+          username,
+          password,
+        );
+        return Response.json(
+          { created: true, user },
+          { status: 201, headers: { "cache-control": "no-store" } },
+        );
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "No fue posible completar la configuración inicial.";
+        const status = message === "Token de configuración inválido." ? 401 : message === "La configuración inicial ya fue completada." ? 409 : 400;
+        return jsonError(message, status);
+      }
     }
 
     if (url.pathname === "/api/auth/login") {
