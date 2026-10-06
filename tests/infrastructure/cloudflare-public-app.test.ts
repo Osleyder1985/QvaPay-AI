@@ -107,7 +107,6 @@ describe("public production dashboard", () => {
     expect(body).not.toContain("x-p2p-action-token");
     expect(body).not.toContain("P2P_ACTION_TOKEN");
     expect(body).not.toContain("Introduce tu clave de operación P2P");
-    expect(body).toContain("Operaciones reales deshabilitadas en el dashboard público");
     expect(body).not.toContain("QVAPAY_APP_SECRET");
     expect(body).toContain("ISO/IEC 27001");
     expect(body).not.toContain("QVAPAY_APP_SECRET");

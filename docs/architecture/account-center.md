@@ -56,7 +56,6 @@ Los campos ausentes se muestran como no disponibles; nunca se inventan valores.
 
 Cada nuevo campo de Cuenta debe identificar su fuente QvaPay, pasar por normalización, tener prueba cuando sea contractual y mantenerse fuera de cualquier secreto o payload upstream completo.
 
+## Límite de seguridad
 
-## Security boundary
-
-Account identity and balance are protected data. The public browser never supplies an infrastructure token. The Account Center endpoint requires an authenticated application context; when that context is absent it returns `403` and the UI presents an authentication-required state. The QvaPay user API token remains server-side only.
+La identidad y el balance de la cuenta son datos protegidos. El navegador público nunca proporciona un token de infraestructura. El endpoint del Centro de Cuenta requiere un contexto de aplicación autenticado; cuando ese contexto no existe devuelve `403` y la interfaz muestra un estado que exige autenticación. El token de API de usuario de QvaPay permanece exclusivamente en el servidor.

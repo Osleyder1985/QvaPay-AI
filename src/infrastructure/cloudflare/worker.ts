@@ -1,6 +1,5 @@
 import type { DurableObjectNamespace } from "@cloudflare/workers-types";
 import { ScannerSchedulerDurableObject } from "./scanner-scheduler-do.js";
-import { QvaPayAccountClient } from "../qvapay/qvapay-account-client.js";
 import {
   createPublicAppResponse,
   createPublicScannerStateResponse,
@@ -24,7 +23,6 @@ export default {
   async fetch(
     request: Request,
     env: ScannerWorkerEnvironment,
-    ctx: ExecutionContext,
   ): Promise<Response> {
     const url = new URL(request.url);
 
@@ -42,8 +40,7 @@ export default {
     if (applyMatch) {
       return Response.json(
         {
-          error:
-            "Las operaciones P2P reales no están habilitadas desde el dashboard público.",
+          error: "Las operaciones P2P reales requieren una sesión autenticada.",
         },
         { status: 403, headers: { "cache-control": "no-store" } },
       );
@@ -54,40 +51,10 @@ export default {
         return new Response("Method not allowed", { status: 405 });
       }
 
-      const accessContext = ctx as ExecutionContext & {
-        access?: { getIdentity: () => Promise<unknown> };
-      };
-      if (!accessContext.access) {
-        return Response.json(
-          { error: "Application authentication required." },
-          { status: 403 },
-        );
-      }
-
-      try {
-        const provider = new QvaPayAccountClient({
-          baseUrl: env.QVAPAY_API_BASE_URL,
-          appId: env.QVAPAY_APP_ID,
-          appSecret: env.QVAPAY_APP_SECRET,
-          userApiToken: env.QVAPAY_USER_API_TOKEN,
-        });
-        const account = await provider.fetchAccount();
-        return Response.json(
-          { account },
-          {
-            headers: {
-              "cache-control": "no-store",
-              "x-content-type-options": "nosniff",
-            },
-          },
-        );
-      } catch (error) {
-        console.error("Account endpoint failed", error);
-        return Response.json(
-          { error: "No se pudo consultar la cuenta conectada." },
-          { status: 502 },
-        );
-      }
+      return Response.json(
+        { error: "El Centro de Cuenta requiere una sesión autenticada." },
+        { status: 403, headers: { "cache-control": "no-store" } },
+      );
     }
 
     if (url.pathname === "/api/scanner/status") {

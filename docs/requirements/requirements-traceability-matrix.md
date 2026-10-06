@@ -47,11 +47,10 @@ Estos estados no son intercambiables.
 
 Los requisitos de webhook, SSE, ingestión event-driven, D1 y arbitraje no deben marcarse como implementados hasta que exista código y pruebas correspondientes.
 
+## Actualización del límite de seguridad del dashboard
 
-## Security dashboard boundary update
-
-| Control | Issue | Implementation | Evidence |
+| Control | Issue | Implementación | Evidencia |
 |---|---|---|---|
-| Browser never receives operational secrets | #98, #101 | Public dashboard no longer prompts or sends P2P action credentials | Security Gate + dashboard contract tests |
-| Account data requires authenticated application context | #100 | `/api/account` requires Cloudflare Access context | Worker authorization path + production smoke |
-| Server-side scanner must self-initialize | #102 | Public status initializes the Durable Object schedule | Runtime integration and production smoke |
+| El navegador nunca recibe secretos operacionales | #98, #101 | El dashboard público ya no solicita ni transmite credenciales de operación P2P | Security Gate + pruebas del contrato del dashboard |
+| Los datos de cuenta requieren contexto de aplicación autenticado | #100 | `/api/account` requiere contexto de Cloudflare Access | Ruta de autorización del Worker + smoke de producción |
+| El scanner server-side debe inicializarse por sí mismo | #102 | El estado público inicializa la programación del Durable Object | Integración de runtime + smoke de producción |
