@@ -105,6 +105,12 @@ jobs:
           printf '%s' "$DASHBOARD_HTML" | grep -q 'BEST BUY'
           printf '%s' "$DASHBOARD_HTML" | grep -q 'BEST SELL'
           printf '%s' "$DASHBOARD_HTML" | grep -q 'Auto-refresh'
+          printf '%s' "$DASHBOARD_HTML" | grep -q 'side==="BUY"?"Comprar":"Vender"'
+          printf '%s' "$DASHBOARD_HTML" | grep -q '.action-buy{background:linear-gradient(135deg,#16a765,#42e69a)'
+          printf '%s' "$DASHBOARD_HTML" | grep -q '.action-sell{background:linear-gradient(135deg,#d83d59,#ff7188)'
+          printf '%s' "$DASHBOARD_HTML" | grep -q 'th{font-size:12px'
+          printf '%s' "$DASHBOARD_HTML" | grep -q 'td{font-size:15px}'
+
 
           START_RESPONSE=""
           for attempt in $(seq 1 7); do
