@@ -34,11 +34,7 @@ export interface QvaPayApplicationIdentity {
 }
 
 export type QvaPayAccountIntegrationStatus = "verified" | "degraded" | "failed";
-export type QvaPayAccountDataStatus =
-  | "verified"
-  | "unavailable"
-  | "degraded"
-  | "failed";
+export type QvaPayAccountDataStatus = "verified" | "unavailable" | "degraded" | "failed";
 
 export interface QvaPayAccountSourceMetadata {
   readonly endpoint: string;
