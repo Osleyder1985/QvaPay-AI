@@ -120,14 +120,20 @@ export default {
       if (request.method !== "GET") return new Response("Method not allowed", { status: 405 });
       const access = await requireRole(request, env.DB, env.ACCOUNT_AUTH_SECRET, ["ADMINISTRATION", "AUDITOR"]);
       if (access instanceof Response) return access;
-      const client = new QvaPayAccountClient({
-        baseUrl: env.QVAPAY_API_BASE_URL,
-        appId: env.QVAPAY_APP_ID,
-        appSecret: env.QVAPAY_APP_SECRET,
-        userApiToken: env.QVAPAY_USER_API_TOKEN,
-      });
-      const account = await client.fetchAccount();
-      return Response.json({ account }, { headers: { "cache-control": "no-store" } });
+      try {
+        const client = new QvaPayAccountClient({
+          baseUrl: env.QVAPAY_API_BASE_URL,
+          appId: env.QVAPAY_APP_ID,
+          appSecret: env.QVAPAY_APP_SECRET,
+          userApiToken: env.QVAPAY_USER_API_TOKEN,
+        });
+        const account = await client.fetchAccount();
+        return Response.json({ account }, { headers: { "cache-control": "no-store" } });
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : "QvaPay account integration failed.";
+        return jsonError(message, 502);
+      }
     }
 
     if (url.pathname === "/api/scanner/status") {
