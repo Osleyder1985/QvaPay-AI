@@ -1,65 +1,60 @@
 # Estructura del proyecto
 
-## Objetivo
+## Estructura real del repositorio
 
-Definir una estructura de repositorio coherente con los límites arquitectónicos del sistema.
-
-```
+```text
 QvaPay-AI/
+├── .github/
+│   └── workflows/
 ├── docs/
 │   ├── architecture/
+│   ├── integration/
+│   ├── operations/
+│   ├── project/
+│   ├── quality/
 │   ├── requirements/
 │   ├── security/
-│   ├── operations/
 │   └── testing/
-├── src/
-│   ├── domain/
-│   ├── application/
-│   ├── infrastructure/
-│   ├── interfaces/
-│   └── shared/
-├── tests/
-│   ├── unit/
-│   ├── integration/
-│   ├── contract/
-│   └── e2e/
-├── migrations/
 ├── scripts/
-├── wrangler.jsonc
+├── src/
+│   ├── application/
+│   │   ├── ports/
+│   │   └── use-cases/
+│   ├── domain/
+│   └── infrastructure/
+│       ├── cloudflare/
+│       └── qvapay/
+├── tests/
+│   ├── application/
+│   ├── domain/
+│   └── infrastructure/
+├── eslint.config.js
 ├── package.json
 ├── tsconfig.json
-├── eslint.config.js
-├── prettier.config.js
+├── vitest.config.ts
+├── wrangler.toml
 └── README.md
 ```
 
-## Reglas
+## Reglas arquitectónicas
 
-- Los nombres de carpetas y archivos son nombres técnicos en inglés.
-- La documentación explicativa está en español.
-- Domain no depende de Infrastructure.
-- Tests se organizan por nivel.
-- La documentación arquitectónica no debe duplicarse en múltiples ubicaciones.
-- Cada módulo relevante deberá tener documentación suficiente para comprender su responsabilidad y trazabilidad.
-## Estructura ejecutable inicial
+- Los nombres de archivos, carpetas, ramas, commits, Issues y Pull Requests permanecen en inglés.
+- La explicación documental se mantiene en español.
+- `Domain` no depende de `Infrastructure`.
+- `Application` depende de puertos y modelos del dominio.
+- `Infrastructure` implementa las fronteras externas.
+- Las pruebas se mantienen próximas a la unidad técnica que verifican.
+- La documentación debe reflejar el código existente y etiquetar explícitamente las capacidades futuras.
 
-A partir de la implementación inicial, la estructura de código seguirá la separación arquitectónica documentada:
+## Infraestructura Cloudflare
 
-```text
-src/
-├── domain/
-│   ├── offer.ts
-│   └── market.ts
-└── application/
-    ├── ports/
-    │   └── market-provider.ts
-    └── use-cases/
-        └── scan-market.ts
+La implementación actual contiene:
 
-tests/
-└── domain/
-    ├── market.test.ts
-    └── offer.test.ts
-```
+- Worker público;
+- Durable Object;
+- Alarm;
+- almacenamiento SQLite del Durable Object;
+- secrets para credenciales y tokens;
+- dashboard HTML servido desde el Worker.
 
-La infraestructura QvaPay, persistencia, interfaces HTTP y ejecución programada permanecen pendientes de implementación. No deben simularse como capacidades existentes.
+No existe actualmente `migrations/` ni configuración D1 en el repositorio.
