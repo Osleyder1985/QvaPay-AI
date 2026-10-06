@@ -210,3 +210,30 @@ export async function logout(request: Request, db: D1Database, secret: string): 
 export function clearSessionCookie(): string {
   return `${SESSION_COOKIE}=; Max-Age=0; Path=/; HttpOnly; Secure; SameSite=Strict`;
 }
+
+export async function setUserActive(db: D1Database, actor: AppUser, userId: string, active: boolean): Promise<AppUser> {
+  const row = await db.prepare("SELECT id, username, role, active, created_at, updated_at, last_login_at FROM app_users WHERE id = ? LIMIT 1")
+    .bind(userId).first<Record<string, unknown>>();
+  if (!row) throw new Error("Usuario no encontrado.");
+  const target = rowToUser(row);
+  if (target.id === actor.id && !active) throw new Error("La Administración no puede desactivarse a sí misma.");
+  const now = new Date().toISOString();
+  await db.prepare("UPDATE app_users SET active = ?, updated_at = ? WHERE id = ?").bind(active ? 1 : 0, now, userId).run();
+  const updated = { ...target, active, updatedAt: now };
+  await writeAudit(db, active ? "user_enabled" : "user_disabled", "SUCCESS", actor, updated);
+  return updated;
+}
+
+export async function changeUserPassword(db: D1Database, actor: AppUser, userId: string, password: string): Promise<AppUser> {
+  const row = await db.prepare("SELECT id, username, role, active, created_at, updated_at, last_login_at FROM app_users WHERE id = ? LIMIT 1")
+    .bind(userId).first<Record<string, unknown>>();
+  if (!row) throw new Error("Usuario no encontrado.");
+  const target = rowToUser(row);
+  const verifier = await createPasswordVerifier(password);
+  const now = new Date().toISOString();
+  await db.prepare("UPDATE app_users SET password_salt = ?, password_hash = ?, password_iterations = ?, updated_at = ? WHERE id = ?")
+    .bind(verifier.salt, verifier.hash, verifier.iterations, now, userId).run();
+  const updated = { ...target, updatedAt: now };
+  await writeAudit(db, "password_changed", "SUCCESS", actor, updated);
+  return updated;
+}
