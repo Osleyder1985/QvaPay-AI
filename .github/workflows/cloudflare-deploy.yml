@@ -100,6 +100,8 @@ jobs:
           echo "::add-mask::$SCANNER_BOOTSTRAP_TOKEN"
 
           printf '%s' "$SCANNER_BOOTSTRAP_TOKEN" | npx wrangler secret put SCANNER_BOOTSTRAP_TOKEN
+          echo "Applying D1 migrations..."
+          npx wrangler d1 migrations apply qvapay-ai-scanner --remote
           npx wrangler deploy
 
           echo "Verifying public application root..."
