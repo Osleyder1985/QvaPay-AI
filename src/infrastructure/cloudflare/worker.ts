@@ -24,6 +24,7 @@ export default {
   async fetch(
     request: Request,
     env: ScannerWorkerEnvironment,
+    ctx: ExecutionContext,
   ): Promise<Response> {
     const url = new URL(request.url);
 
@@ -37,10 +38,67 @@ export default {
 
     const stub = env.SCANNER_SCHEDULER.getByName(OBJECT_NAME);
 
-    const applyMatch = url.pathname.match(/^\\/api\\/p2p\\/([^/]+)\\/apply$/);\n    if (applyMatch) {\n      return Response.json(\n        { error: "Las operaciones P2P reales no están habilitadas desde el dashboard público." },\n        { status: 403, headers: { "cache-control": "no-store" } },\n      );\n    }\n\n    if (url.pathname === "/api/account") {\n      if (request.method !== "GET") {\n        return new Response("Method not allowed", { status: 405 });\n      }\n\n      const accessContext = ctx as ExecutionContext & {\n        access?: { getIdentity: () => Promise<unknown> };\n      };\n      if (!accessContext.access) {\n        return Response.json({ error: "Application authentication required." }, { status: 403 });\n      }\n\n      try {\n        const provider = new QvaPayAccountClient({\n          baseUrl: env.QVAPAY_API_BASE_URL,\n          appId: env.QVAPAY_APP_ID,\n          appSecret: env.QVAPAY_APP_SECRET,\n          userApiToken: env.QVAPAY_USER_API_TOKEN,\n        });\n        const account = await provider.fetchAccount();\n        return Response.json(\n          { account },\n          {\n            headers: {\n              "cache-control": "no-store",\n              "x-content-type-options": "nosniff",\n            },\n          },\n        );\n      } catch (error) {\n        console.error("Account endpoint failed", error);\n        return Response.json(\n          { error: "No se pudo consultar la cuenta conectada." },\n          { status: 502 },\n        );\n      }\n    }\n\n    if (url.pathname === "/api/scanner/status") {
+    const applyMatch = url.pathname.match(/^\\/api\\/p2p\\/([^/]+)\\/apply$/);
+    if (applyMatch) {
+      return Response.json(
+        {
+          error:
+            "Las operaciones P2P reales no están habilitadas desde el dashboard público.",
+        },
+        { status: 403, headers: { "cache-control": "no-store" } },
+      );
+    }
+
+    if (url.pathname === "/api/account") {
       if (request.method !== "GET") {
         return new Response("Method not allowed", { status: 405 });
       }
+
+      const accessContext = ctx as ExecutionContext & {
+        access?: { getIdentity: () => Promise<unknown> };
+      };
+      if (!accessContext.access) {
+        return Response.json(
+          { error: "Application authentication required." },
+          { status: 403 },
+        );
+      }
+
+      try {
+        const provider = new QvaPayAccountClient({
+          baseUrl: env.QVAPAY_API_BASE_URL,
+          appId: env.QVAPAY_APP_ID,
+          appSecret: env.QVAPAY_APP_SECRET,
+          userApiToken: env.QVAPAY_USER_API_TOKEN,
+        });
+        const account = await provider.fetchAccount();
+        return Response.json(
+          { account },
+          {
+            headers: {
+              "cache-control": "no-store",
+              "x-content-type-options": "nosniff",
+            },
+          },
+        );
+      } catch (error) {
+        console.error("Account endpoint failed", error);
+        return Response.json(
+          { error: "No se pudo consultar la cuenta conectada." },
+          { status: 502 },
+        );
+      }
+    }
+
+    if (url.pathname === "/api/scanner/status") {
+      if (request.method !== "GET") {
+        return new Response("Method not allowed", { status: 405 });
+      }
+
+      await stub.ensureScheduled({
+        coin: env.SCANNER_COIN,
+        intervalSeconds: Number(env.SCANNER_INTERVAL_SECONDS),
+      });
 
       return createPublicScannerStateResponse(
         toPublicScannerState(await stub.getState()),
