@@ -1,25 +1,27 @@
 # Pila tecnológica
 
-## Estado
+## Estado actual
 
-Selección tecnológica inicial propuesta. No constituye un requisito funcional.
-
-| Capa | Tecnología propuesta | Justificación |
+| Capa | Tecnología | Estado |
 |---|---|---|
-| Language | TypeScript | Tipado estático y coherencia |
-| Web UI | React | Interfaz dinámica |
-| Runtime | Cloudflare Workers | Ejecución server-side |
-| Scheduler | Durable Objects + Alarms | Ciclo continuo del scanner |
-| Database | Cloudflare D1 | Persistencia SQL gestionada |
-| HTTP framework | Hono | API ligera para Workers |
-| Tests | Vitest | Unitarias e integración |
-| Quality | ESLint + Prettier + TypeScript | Calidad y consistencia |
-| CI/CD | GitHub Actions | Validación automatizada |
+| Lenguaje | TypeScript | Implementado |
+| Runtime | Cloudflare Workers | Implementado |
+| Scheduler | Durable Objects + Alarms | Implementado |
+| HTTP | Fetch API del Worker | Implementado |
+| UI | HTML/CSS/JavaScript servido por Worker | Implementado |
+| Proveedor | QvaPay P2P API | Implementado |
+| Pruebas | Vitest | Implementado |
+| Calidad | ESLint + Prettier + TypeScript | Implementado |
+| CI/CD | GitHub Actions | Implementado |
+| Persistencia actual | Durable Object SQLite storage | Implementado |
+| Base de datos futura | Cloudflare D1 | No implementado |
+| Webhook futuro | QvaPay P2P webhook | No implementado |
+| Stream futuro | SSE | No implementado |
 
-## Condición para QvaPay
+## Decisión
 
-No se cerrará la tecnología de integración hasta validar endpoint, autenticación, esquema, paginación, límites de frecuencia, errores, disponibilidad y semántica de BUY/SELL de la API oficial.
+No se debe describir React, Hono, D1 ni microservicios como tecnologías utilizadas actualmente porque no aparecen en la implementación vigente.
 
-## Tecnologías no adoptadas inicialmente
+## Principio
 
-No se propone microservicios, Kubernetes, message broker externo ni polling desde el navegador como mecanismo principal.
+La documentación tecnológica debe derivarse del repositorio real y actualizarse cuando cambie la implementación.
