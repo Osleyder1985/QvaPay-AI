@@ -105,6 +105,7 @@ function rowToUser(row: Record<string, unknown>): AppUser {
 // canonical schema artifact for controlled database administration.
 let schemaReady: Promise<void> | null = null;
 
+// prettier-ignore
 export async function ensureSecuritySchema(db: D1Database): Promise<void> {
   if (schemaReady) return schemaReady;
   schemaReady = db
