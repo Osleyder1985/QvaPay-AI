@@ -5,8 +5,8 @@ interface Env {
   QVAPAY_API_BASE_URL: string;
   QVAPAY_APP_ID: string;
   QVAPAY_APP_SECRET: string;
-  QVAPAY_USER_API_TOKEN: string;
   SCANNER_COIN: string;
   SCANNER_INTERVAL_SECONDS: string;
   SCANNER_BOOTSTRAP_TOKEN: string;
+  P2P_ACTION_TOKEN?: string;
 }
