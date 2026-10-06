@@ -98,14 +98,11 @@ function rowToUser(row: Record<string, unknown>): AppUser {
   };
 }
 
-// prettier-ignore
-
 // Runtime bootstrap is idempotent and keeps production startup independent of
 // Wrangler's control-plane D1 permissions. The versioned migration remains the
 // canonical schema artifact for controlled database administration.
 let schemaReady: Promise<void> | null = null;
 
-// prettier-ignore
 // prettier-ignore
 export async function ensureSecuritySchema(db: D1Database): Promise<void> {
   if (schemaReady) return schemaReady;
