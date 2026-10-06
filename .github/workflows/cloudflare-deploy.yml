@@ -110,6 +110,7 @@ jobs:
           printf '%s' "$DASHBOARD_HTML" | grep -q '.action-sell{background:linear-gradient(135deg,#d83d59,#ff7188)'
           printf '%s' "$DASHBOARD_HTML" | grep -q 'th{font-size:12px'
           printf '%s' "$DASHBOARD_HTML" | grep -q 'td{font-size:15px}'
+          printf '%s' "$DASHBOARD_HTML" | grep -q 'th{font-size:13px}.*td{font-size:14px}'
 
 
           START_RESPONSE=""
