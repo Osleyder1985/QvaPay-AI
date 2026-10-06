@@ -1,6 +1,5 @@
 import type { DurableObjectNamespace } from "@cloudflare/workers-types";
 import { ScannerSchedulerDurableObject } from "./scanner-scheduler-do.js";
-import { QvaPayP2PClient } from "../qvapay/qvapay-p2p-client.js";
 import { QvaPayAccountClient } from "../qvapay/qvapay-account-client.js";
 import {
   createPublicAppResponse,
@@ -17,7 +16,6 @@ export interface ScannerWorkerEnvironment {
   readonly SCANNER_COIN: string;
   readonly SCANNER_INTERVAL_SECONDS: string;
   readonly SCANNER_BOOTSTRAP_TOKEN: string;
-  readonly P2P_ACTION_TOKEN?: string;
 }
 
 const OBJECT_NAME = "default";
