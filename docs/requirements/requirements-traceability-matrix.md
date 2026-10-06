@@ -22,6 +22,7 @@ Relacionar requisitos con implementación, pruebas y evidencia.
 | SYS-INT-010 | observedAt | Mapper + Offer | pruebas QvaPay | Tested |
 | SYS-INT-011 | Compatibilidad con caché | Documentación operativa | evidencia externa pendiente | Defined |
 | SYS-INT-012 | Evolución segura | Contract parser | pruebas de contrato | Tested |
+| SYS-FR-005 | Centro de Cuenta conectado | QvaPayAccountClient + protected `/api/account` + Public App | `tests/infrastructure/qvapay-account-client.test.ts`, `tests/infrastructure/cloudflare-public-app.test.ts` | Tested |
 
 ## Evidencia de producción
 
