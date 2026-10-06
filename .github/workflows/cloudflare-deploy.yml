@@ -188,13 +188,28 @@ jobs:
           SMOKE_USERNAME="ci-smoke-${GITHUB_RUN_ID}"
           export SMOKE_USERNAME
           echo "Creating ephemeral production Administration smoke account..."
-          curl --fail-with-body --silent --show-error \
-            --request POST \
-            --header "Authorization: Bearer $SCANNER_BOOTSTRAP_TOKEN" \
-            --header "Content-Type: application/json" \
-            --header "Accept: application/json" \
-            --data "$(node -e 'process.stdout.write(JSON.stringify({username:process.env.SMOKE_USERNAME,password:process.env.ACCOUNT_AUTH_SECRET}))')" \
-            "$WORKER_URL/internal/auth/smoke-user"
+          SMOKE_CREATE_STATUS="000"
+          for smoke_attempt in $(seq 1 12); do
+            SMOKE_CREATE_STATUS="$(curl --silent --show-error --output /tmp/qvapay-smoke-user-response.json --write-out '%{http_code}' \
+              --request POST \
+              --header "Authorization: Bearer $SCANNER_BOOTSTRAP_TOKEN" \
+              --header "Content-Type: application/json" \
+              --header "Accept: application/json" \
+              --data "$(node -e 'process.stdout.write(JSON.stringify({username:process.env.SMOKE_USERNAME,password:process.env.ACCOUNT_AUTH_SECRET}))')" \
+              "$WORKER_URL/internal/auth/smoke-user" || true)"
+            printf 'Smoke account creation attempt %s/12: HTTP %s\\n' "$smoke_attempt" "$SMOKE_CREATE_STATUS"
+            if [ "$SMOKE_CREATE_STATUS" = "200" ]; then
+              break
+            fi
+            if [ "$smoke_attempt" -lt 12 ]; then
+              sleep 5
+            fi
+          done
+          if [ "$SMOKE_CREATE_STATUS" != "200" ]; then
+            echo "Production smoke account creation failed after 60 seconds."
+            cat /tmp/qvapay-smoke-user-response.json || true
+            exit 1
+          fi
           trap 'curl --silent --show-error --request DELETE --header "Authorization: Bearer $SCANNER_BOOTSTRAP_TOKEN" --header "Content-Type: application/json" --data "$(node -e 'process.stdout.write(JSON.stringify({username:process.env.SMOKE_USERNAME}))')" "$WORKER_URL/internal/auth/smoke-user" >/dev/null 2>&1 || true' EXIT
 
           echo "Authenticating production smoke session as ephemeral Administration..."
