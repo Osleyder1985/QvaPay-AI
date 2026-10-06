@@ -193,7 +193,8 @@ jobs:
           fi
           printf '%s\n' "$START_RESPONSE"
 
-          for attempt in $(seq 1 18); do
+          FIRST_COMPLETED_AT=""
+          for attempt in $(seq 1 80); do
             STATE_RESPONSE=""
             for state_attempt in $(seq 1 3); do
               if STATE_RESPONSE="$(curl --fail-with-body --silent --show-error \
@@ -210,43 +211,73 @@ jobs:
             done
 
             if [ -z "$STATE_RESPONSE" ]; then
-              echo "Scanner state endpoint not ready on verification attempt $attempt/18"
-              if [ "$attempt" -lt 18 ]; then
+              echo "Scanner state endpoint not ready on verification attempt $attempt/80"
+              if [ "$attempt" -lt 80 ]; then
                 sleep 3
                 continue
               fi
               exit 1
             fi
 
-            printf 'Runtime state attempt %s/18:\n%s\n' "$attempt" "$STATE_RESPONSE"
+            printf 'Runtime state attempt %s/80:\n%s\n' "$attempt" "$STATE_RESPONSE"
 
-            if printf '%s' "$STATE_RESPONSE" | node -e '
+            if printf '%s' "$STATE_RESPONSE" | FIRST_COMPLETED_AT="$FIRST_COMPLETED_AT" node -e '
               let input = "";
               process.stdin.on("data", (chunk) => { input += chunk; });
               process.stdin.on("end", () => {
                 const state = JSON.parse(input);
                 const execution = state.execution;
-                const successful =
+                const completedAt = execution?.lastCompletedAt
+                  ? Date.parse(execution.lastCompletedAt)
+                  : Number.NaN;
+                const startedAt = execution?.lastStartedAt
+                  ? Date.parse(execution.lastStartedAt)
+                  : Number.NaN;
+                const nextAlarmAt = state.nextAlarmAt
+                  ? Date.parse(state.nextAlarmAt)
+                  : Number.NaN;
+                const firstCompletedAt = process.env.FIRST_COMPLETED_AT
+                  ? Date.parse(process.env.FIRST_COMPLETED_AT)
+                  : Number.NaN;
+                const baseValid =
                   state.configured === true &&
                   state.coin === "BANK_CUP" &&
                   Number.isInteger(state.intervalSeconds) &&
                   state.intervalSeconds >= 5 &&
                   state.intervalSeconds <= 300 &&
-                  execution?.lastStartedAt != null &&
-                  execution?.lastCompletedAt != null &&
-                  execution.lastCompletedAt >= execution.lastStartedAt &&
+                  Number.isFinite(startedAt) &&
+                  Number.isFinite(completedAt) &&
+                  completedAt >= startedAt &&
                   execution.lastError == null &&
-                  state.nextAlarmAt != null;
-                process.exit(successful ? 0 : 1);
+                  Number.isFinite(nextAlarmAt) &&
+                  nextAlarmAt > completedAt;
+                const firstCycleValid =
+                  !process.env.FIRST_COMPLETED_AT && baseValid;
+                const secondCycleValid =
+                  Boolean(process.env.FIRST_COMPLETED_AT) &&
+                  baseValid &&
+                  completedAt > firstCompletedAt;
+                if (firstCycleValid || secondCycleValid) {
+                  process.stdout.write(execution.lastCompletedAt);
+                  process.exit(0);
+                }
+                process.exit(1);
               });
-            '; then
-              exit 0
+            ' > /tmp/scanner-completed-at; then
+              COMPLETED_AT="$(cat /tmp/scanner-completed-at)"
+              if [ -z "$FIRST_COMPLETED_AT" ]; then
+                FIRST_COMPLETED_AT="$COMPLETED_AT"
+                echo "First successful scanner cycle observed at $FIRST_COMPLETED_AT; waiting for the next scheduled cycle."
+              else
+                echo "Second successful scanner cycle observed at $COMPLETED_AT; Durable Object Alarm cadence verified."
+                exit 0
+              fi
             fi
 
-            if [ "$attempt" -lt 18 ]; then
+            if [ "$attempt" -lt 80 ]; then
               sleep 5
             fi
           done
 
-          echo "Production scanner runtime verification failed after 90 seconds"
+          echo "Production scanner runtime verification failed: two consecutive successful cycles were not observed within 400 seconds"
           exit 1
