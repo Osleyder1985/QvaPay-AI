@@ -216,8 +216,13 @@ jobs:
           trap cleanup_smoke_user EXIT
 
           echo "Authenticating production smoke session as ephemeral Administration..."
-          LOGIN_RESPONSE="$(curl --fail-with-body --silent --show-error --cookie-jar /tmp/qvapay-cookie.txt --request POST --header "Content-Type: application/json" --header "Accept: application/json" --data "$(node -e 'process.stdout.write(JSON.stringify({username:process.env.SMOKE_USERNAME,password:process.env.ACCOUNT_AUTH_SECRET}))')" "$WORKER_URL/api/auth/login")"
+          LOGIN_RESPONSE="$(curl --silent --show-error --cookie-jar /tmp/qvapay-cookie.txt --request POST --header "Content-Type: application/json" --header "Accept: application/json" --data "$(node -e 'process.stdout.write(JSON.stringify({username:process.env.SMOKE_USERNAME,password:process.env.ACCOUNT_AUTH_SECRET}))')" --write-out '\\n__HTTP_STATUS__=%{http_code}' "$WORKER_URL/api/auth/login")"
           printf '%s\n' "$LOGIN_RESPONSE"
+          LOGIN_STATUS="$(printf '%s\n' "$LOGIN_RESPONSE" | sed -n 's/^__HTTP_STATUS__=//p' | tail -1)"
+          if [ "$LOGIN_STATUS" != "200" ]; then
+            echo "Production authentication smoke login failed with HTTP $LOGIN_STATUS."
+            exit 1
+          fi
           printf '%s' "$LOGIN_RESPONSE" | node -e '
             let input = "";
             process.stdin.on("data", (chunk) => { input += chunk; });
