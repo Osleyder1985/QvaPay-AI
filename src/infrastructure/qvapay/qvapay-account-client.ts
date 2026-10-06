@@ -1,6 +1,7 @@
 import {
   evaluateAccountIntegration,
   type QvaPayAccountSnapshot,
+  type QvaPayAccountSourceMetadata,
   type QvaPayAccountUser,
   type QvaPayApplicationIdentity,
 } from "./account-contract.js";
@@ -129,6 +130,7 @@ async function request(
   readonly status: number;
   readonly ok: boolean;
   readonly payload: unknown;
+  readonly retrievedAt: string;
 }> {
   const fetcher = options.fetcher ?? globalThis.fetch.bind(globalThis);
   const controller = new AbortController();
@@ -163,7 +165,12 @@ async function request(
         payload = null;
       }
     }
-    return { status: response.status, ok: response.ok, payload };
+    return {
+      status: response.status,
+      ok: response.ok,
+      payload,
+      retrievedAt: new Date().toISOString(),
+    };
   } finally {
     clearTimeout(timeout);
   }
@@ -193,6 +200,58 @@ export class QvaPayAccountClient {
     const own = ownOffers.ok
       ? parseOwnOffers(ownOffers.payload)
       : { total: null };
+    const balanceSource: QvaPayAccountSourceMetadata = {
+      endpoint: "/v2/balance",
+      retrievedAt: balance.retrievedAt,
+      httpStatus: balance.status,
+      status:
+        balanceUsd !== null
+          ? "verified"
+          : balance.ok
+            ? "unavailable"
+            : "failed",
+      error:
+        balance.ok && balanceUsd === null
+          ? "QvaPay returned an incompatible balance payload."
+          : balance.ok
+            ? null
+            : `QvaPay balance request failed with HTTP ${balance.status}.`,
+    };
+    const identityProvenance: QvaPayAccountSourceMetadata = {
+      endpoint: "/user",
+      retrievedAt: user.retrievedAt,
+      httpStatus: user.status,
+      status:
+        identity !== null ? "verified" : user.ok ? "unavailable" : "failed",
+      error:
+        user.ok && identity === null
+          ? "QvaPay returned an incompatible authenticated-user payload."
+          : user.ok
+            ? null
+            : `QvaPay authenticated-user request failed with HTTP ${user.status}.`,
+    };
+    const applicationProvenance: QvaPayAccountSourceMetadata = {
+      endpoint: "/v2/info",
+      retrievedAt: info.retrievedAt,
+      httpStatus: info.status,
+      status:
+        application !== null ? "verified" : info.ok ? "unavailable" : "failed",
+      error:
+        info.ok && application === null
+          ? "QvaPay returned an incompatible application payload."
+          : info.ok
+            ? null
+            : `QvaPay application request failed with HTTP ${info.status}.`,
+    };
+    const ownOffersProvenance: QvaPayAccountSourceMetadata = {
+      endpoint: "/p2p?my=1&take=1&page=1",
+      retrievedAt: ownOffers.retrievedAt,
+      httpStatus: ownOffers.status,
+      status: ownOffers.ok ? "verified" : "failed",
+      error: ownOffers.ok
+        ? null
+        : `QvaPay own-offers request failed with HTTP ${ownOffers.status}.`,
+    };
     const integrationStatus = evaluateAccountIntegration({
       balanceOk: balanceUsd !== null,
       identityOk: identity !== null,
@@ -202,6 +261,7 @@ export class QvaPayAccountClient {
 
     return {
       balanceUsd,
+      balanceSource,
       balanceHttpStatus: balance.status,
       balanceOk: balanceUsd !== null,
       balanceError:
@@ -211,6 +271,7 @@ export class QvaPayAccountClient {
             ? null
             : `QvaPay balance request failed with HTTP ${balance.status}.`,
       identity,
+      identityProvenance,
       identitySource: "/user",
       identityHttpStatus: user.status,
       identityOk: identity !== null,
@@ -221,10 +282,12 @@ export class QvaPayAccountClient {
             ? null
             : `QvaPay authenticated-user request failed with HTTP ${user.status}.`,
       application,
+      applicationProvenance,
       applicationHttpStatus: info.status,
       applicationOk: application !== null,
       p2pAccessible: ownOffers.ok,
       ownOffersTotal: own.total,
+      ownOffersProvenance,
       integrationStatus,
       fetchedAt: new Date().toISOString(),
     };

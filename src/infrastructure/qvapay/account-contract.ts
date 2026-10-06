@@ -34,22 +34,36 @@ export interface QvaPayApplicationIdentity {
 }
 
 export type QvaPayAccountIntegrationStatus = "verified" | "degraded" | "failed";
+export type QvaPayAccountDataStatus =
+  "verified" | "unavailable" | "degraded" | "failed";
+
+export interface QvaPayAccountSourceMetadata {
+  readonly endpoint: string;
+  readonly retrievedAt: string | null;
+  readonly httpStatus: number;
+  readonly status: QvaPayAccountDataStatus;
+  readonly error: string | null;
+}
 
 export interface QvaPayAccountSnapshot {
   readonly balanceUsd: number | null;
+  readonly balanceSource: QvaPayAccountSourceMetadata;
   readonly balanceHttpStatus: number;
   readonly balanceOk: boolean;
   readonly balanceError: string | null;
   readonly identity: QvaPayAccountUser | null;
+  readonly identityProvenance: QvaPayAccountSourceMetadata;
   readonly identitySource: "/user";
   readonly identityHttpStatus: number;
   readonly identityOk: boolean;
   readonly identityError: string | null;
   readonly application: QvaPayApplicationIdentity | null;
+  readonly applicationProvenance: QvaPayAccountSourceMetadata;
   readonly applicationHttpStatus: number;
   readonly applicationOk: boolean;
   readonly p2pAccessible: boolean;
   readonly ownOffersTotal: number | null;
+  readonly ownOffersProvenance: QvaPayAccountSourceMetadata;
   readonly integrationStatus: QvaPayAccountIntegrationStatus;
   readonly fetchedAt: string;
 }

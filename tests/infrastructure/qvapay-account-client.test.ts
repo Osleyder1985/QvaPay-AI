@@ -65,10 +65,19 @@ describe("QvaPayAccountClient", () => {
 
     const snapshot = await client.fetchAccount();
 
+    expect(snapshot.balanceSource.endpoint).toBe("/v2/balance");
+    expect(snapshot.balanceSource.status).toBe("verified");
+    expect(snapshot.balanceSource.retrievedAt).toEqual(expect.any(String));
     expect(snapshot.identity?.uuid).toBe("owner-uuid");
     expect(snapshot.identity?.username).toBe("owner-user");
     expect(snapshot.identitySource).toBe("/user");
+    expect(snapshot.identityProvenance.endpoint).toBe("/user");
+    expect(snapshot.identityProvenance.status).toBe("verified");
     expect(snapshot.ownOffersTotal).toBe(12);
+    expect(snapshot.ownOffersProvenance.endpoint).toBe(
+      "/p2p?my=1&take=1&page=1",
+    );
+    expect(snapshot.ownOffersProvenance.status).toBe("verified");
     expect(snapshot.integrationStatus).toBe("verified");
 
     const userCall = calls.find((call) => call.url.endsWith("/user"));
@@ -102,6 +111,11 @@ describe("QvaPayAccountClient", () => {
     const snapshot = await client.fetchAccount();
 
     expect(snapshot.balanceUsd).toBeNull();
+    expect(snapshot.balanceSource.status).toBe("unavailable");
+    expect(snapshot.balanceSource.httpStatus).toBe(200);
+    expect(snapshot.identityProvenance.status).toBe("failed");
+    expect(snapshot.identityProvenance.httpStatus).toBe(401);
+    expect(snapshot.applicationProvenance.status).toBe("failed");
     expect(snapshot.identity).toBeNull();
     expect(snapshot.identitySource).toBe("/user");
     expect(snapshot.integrationStatus).toBe("degraded");
