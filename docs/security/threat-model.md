@@ -1,25 +1,33 @@
-# Modelo inicial de amenazas
+# Modelo de amenazas
 
 ## Activos
 
-- credenciales de integración;
+- credenciales QvaPay;
+- tokens de control;
+- token de aplicación P2P;
 - configuración del scanner;
-- snapshots del mercado;
-- integridad del procesamiento;
+- snapshot de mercado;
+- integridad de BUY/SELL;
 - disponibilidad del scanner.
 
-## Amenazas iniciales
+## Amenazas y controles
 
-| Amenaza | Impacto | Control inicial |
+| Amenaza | Impacto | Control |
 |---|---|---|
-| Exposición de credenciales | Alto | Gestión de secretos |
-| Respuesta externa manipulada o inválida | Alto | Validación de esquema |
-| Configuración no autorizada | Medio/Alto | Autenticación y autorización |
-| Denegación por proveedor | Alto | Timeout, política de reintentos y protección de circuito |
-| Datos BUY/SELL mezclados | Alto | Invariantes de dominio y pruebas |
-| Logs con secretos | Alto | Sanitización de logs |
-| Duplicación por reintentos | Medio | Idempotencia |
+| Exposición de credenciales | Alto | Cloudflare Secrets |
+| Acceso al control del scanner | Alto | Bearer token |
+| Aplicación P2P no autorizada | Alto | `P2P_ACTION_TOKEN` + credenciales server-side |
+| Respuesta QvaPay inválida | Alto | Validación de contrato |
+| BUY/SELL mezclados | Alto | Invariantes de dominio |
+| Mercado equivocado | Alto | Identidad por `coin` |
+| Rate limiting | Medio/Alto | Backoff acotado |
+| Reintentos duplicados | Medio | límites de reintento y control de ejecución |
+| Información sensible en logs | Alto | Sanitización |
 
-## Principio
+## Riesgo operativo
 
-La seguridad debe diseñarse antes de incorporar operaciones que puedan modificar o ejecutar órdenes en QvaPay.
+La capacidad de aplicación P2P es una operación real y no debe confundirse con una simulación. Cualquier automatización posterior requiere controles adicionales, autorización explícita y verificación específica.
+
+## Feed futuro
+
+Si se implementa webhook, deberá añadirse validación criptográfica, control de replay y deduplicación.
