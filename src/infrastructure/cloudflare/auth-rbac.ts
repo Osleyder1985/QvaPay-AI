@@ -21,18 +21,21 @@ const SESSION_TTL_SECONDS = 60 * 60 * 8;
 const PBKDF2_ITERATIONS = 120_000;
 const SALT_BYTES = 16;
 
+// prettier-ignore
 function b64(bytes: Uint8Array): string {
   let binary = "";
   for (const byte of bytes) binary += String.fromCharCode(byte);
   return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
 }
 
+// prettier-ignore
 function unb64(value: string): Uint8Array {
   const normalized = value.replace(/-/g, "+").replace(/_/g, "/") + "===".slice((value.length + 3) % 4);
   const binary = atob(normalized);
   return Uint8Array.from(binary, (c) => c.charCodeAt(0));
 }
 
+// prettier-ignore
 function equalBytes(a: Uint8Array, b: Uint8Array): boolean {
   if (a.length !== b.length) return false;
   let result = 0;
@@ -40,6 +43,7 @@ function equalBytes(a: Uint8Array, b: Uint8Array): boolean {
   return result === 0;
 }
 
+// prettier-ignore
 async function derivePasswordHash(password: string, salt: Uint8Array, iterations = PBKDF2_ITERATIONS): Promise<Uint8Array> {
   const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(password), "PBKDF2", false, ["deriveBits"]);
   const bits = await crypto.subtle.deriveBits(
@@ -50,6 +54,7 @@ async function derivePasswordHash(password: string, salt: Uint8Array, iterations
   return new Uint8Array(bits);
 }
 
+// prettier-ignore
 async function hmac(secret: string, value: string): Promise<string> {
   const key = await crypto.subtle.importKey(
     "raw",
@@ -61,11 +66,13 @@ async function hmac(secret: string, value: string): Promise<string> {
   return b64(new Uint8Array(await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(value))));
 }
 
+// prettier-ignore
 function cookieFromRequest(request: Request): string | null {
   return request.headers.get("cookie")?.split(";").map((part) => part.trim())
     .find((part) => part.startsWith(SESSION_COOKIE + "="))?.slice(SESSION_COOKIE.length + 1) ?? null;
 }
 
+// prettier-ignore
 async function writeAudit(
   db: D1Database,
   eventType: string,
@@ -82,6 +89,7 @@ async function writeAudit(
   ).run();
 }
 
+// prettier-ignore
 function rowToUser(row: Record<string, unknown>): AppUser {
   return {
     id: String(row.id), username: String(row.username), role: String(row.role) as AppRole,
@@ -90,6 +98,7 @@ function rowToUser(row: Record<string, unknown>): AppUser {
   };
 }
 
+// prettier-ignore
 export async function createPasswordVerifier(password: string): Promise<{ salt: string; hash: string; iterations: number }> {
   if (password.length < 12) throw new Error("La contraseña debe tener al menos 12 caracteres.");
   const salt = crypto.getRandomValues(new Uint8Array(SALT_BYTES));
@@ -97,22 +106,26 @@ export async function createPasswordVerifier(password: string): Promise<{ salt: 
   return { salt: b64(salt), hash: b64(hash), iterations: PBKDF2_ITERATIONS };
 }
 
+// prettier-ignore
 async function verifyPassword(password: string, salt: string, expected: string, iterations: number): Promise<boolean> {
   const actual = await derivePasswordHash(password, unb64(salt), iterations);
   return equalBytes(actual, unb64(expected));
 }
 
+// prettier-ignore
 export async function findUserByUsername(db: D1Database, username: string): Promise<AppUser | null> {
   const row = await db.prepare("SELECT id, username, role, active, created_at, updated_at, last_login_at FROM app_users WHERE username = ? COLLATE NOCASE LIMIT 1")
     .bind(username.trim()).first<Record<string, unknown>>();
   return row ? rowToUser(row) : null;
 }
 
+// prettier-ignore
 export async function listUsers(db: D1Database): Promise<AppUser[]> {
   const result = await db.prepare("SELECT id, username, role, active, created_at, updated_at, last_login_at FROM app_users ORDER BY username COLLATE NOCASE").all<Record<string, unknown>>();
   return result.results.map(rowToUser);
 }
 
+// prettier-ignore
 export async function createUser(db: D1Database, username: string, password: string, role: AppRole): Promise<AppUser> {
   const normalized = username.trim();
   if (!/^[a-zA-Z0-9._-]{3,64}$/.test(normalized)) throw new Error("Nombre de usuario inválido.");
@@ -128,6 +141,7 @@ export async function createUser(db: D1Database, username: string, password: str
   return user;
 }
 
+// prettier-ignore
 async function sessionForUser(request: Request, db: D1Database, secret: string): Promise<AuthSession | null> {
   if (!secret) return null;
   const token = cookieFromRequest(request);
@@ -146,6 +160,7 @@ async function sessionForUser(request: Request, db: D1Database, secret: string):
   return user.active ? { user } : null;
 }
 
+// prettier-ignore
 export async function authenticate(
   request: Request,
   db: D1Database,
@@ -183,6 +198,7 @@ export async function authenticate(
   };
 }
 
+// prettier-ignore
 export async function getSession(request: Request, db: D1Database, secret: string): Promise<AuthSession | null> {
   const session = await sessionForUser(request, db, secret);
   if (!session) {
@@ -191,6 +207,7 @@ export async function getSession(request: Request, db: D1Database, secret: strin
   return session;
 }
 
+// prettier-ignore
 export async function requireRole(request: Request, db: D1Database, secret: string, roles: readonly AppRole[]): Promise<AuthSession | Response> {
   const session = await getSession(request, db, secret);
   if (!session) return Response.json({ error: "Autenticación requerida." }, { status: 401, headers: { "cache-control": "no-store" } });
@@ -201,6 +218,7 @@ export async function requireRole(request: Request, db: D1Database, secret: stri
   return session;
 }
 
+// prettier-ignore
 export async function logout(request: Request, db: D1Database, secret: string): Promise<Response> {
   const session = await getSession(request, db, secret);
   if (session) await writeAudit(db, "logout", "SUCCESS", session.user);
@@ -211,6 +229,7 @@ export function clearSessionCookie(): string {
   return `${SESSION_COOKIE}=; Max-Age=0; Path=/; HttpOnly; Secure; SameSite=Strict`;
 }
 
+// prettier-ignore
 export async function setUserActive(db: D1Database, actor: AppUser, userId: string, active: boolean): Promise<AppUser> {
   const row = await db.prepare("SELECT id, username, role, active, created_at, updated_at, last_login_at FROM app_users WHERE id = ? LIMIT 1")
     .bind(userId).first<Record<string, unknown>>();
@@ -224,6 +243,7 @@ export async function setUserActive(db: D1Database, actor: AppUser, userId: stri
   return updated;
 }
 
+// prettier-ignore
 export async function changeUserPassword(db: D1Database, actor: AppUser, userId: string, password: string): Promise<AppUser> {
   const row = await db.prepare("SELECT id, username, role, active, created_at, updated_at, last_login_at FROM app_users WHERE id = ? LIMIT 1")
     .bind(userId).first<Record<string, unknown>>();
