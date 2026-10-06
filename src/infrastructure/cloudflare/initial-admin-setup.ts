@@ -1,19 +1,13 @@
 import type { D1Database } from "@cloudflare/workers-types";
 import { createUser, type AppUser } from "./auth-rbac.js";
 
-function constantTimeEqual(left: string, right: string): boolean {
-  if (left.length !== right.length) return false;
-  let result = 0;
-  for (let index = 0; index < left.length; index += 1) {
-    result |= left.charCodeAt(index) ^ right.charCodeAt(index);
-  }
-  return result === 0;
+function validateInitialAdminCredentials(username: string, password: string): void {
+  if (!/^[a-zA-Z0-9._-]{3,64}$/.test(username.trim())) throw new Error("Nombre de usuario inválido.");
+  if (password.length < 12) throw new Error("La contraseña debe tener al menos 12 caracteres.");
 }
 
 export async function bootstrapInitialAdmin(
   db: D1Database,
-  bootstrapToken: string,
-  presentedToken: string,
   username: string,
   password: string,
 ): Promise<AppUser> {
