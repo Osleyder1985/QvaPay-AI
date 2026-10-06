@@ -111,7 +111,10 @@ jobs:
             exit 1
           fi
 
-          STATUS_RESPONSE="$(curl --fail-with-body --silent --show-error \
+          echo "Verifying Account API security boundary and identity provenance..."\n          ACCOUNT_STATUS="$(curl --silent --show-error --output /tmp/qvapay-account-response.json --write-out '%{http_code}' --max-time 15 \
+            --request GET \
+            --header "Accept: application/json" \
+            "$WORKER_URL/api/account" || true)"\n          printf 'Production /api/account status: HTTP %s\\n' "$ACCOUNT_STATUS"\n\n          if [ "$ACCOUNT_STATUS" != "403" ]; then\n            echo "Account API security-boundary assertion failed: unauthenticated production access must remain HTTP 403."\n            cat /tmp/qvapay-account-response.json || true\n            exit 1\n          fi\n\n          node <<'NODE'\n          const fs = require("node:fs");\n          const body = fs.readFileSync("/tmp/qvapay-account-response.json", "utf8");\n          if (body.includes("QVAPAY_APP_SECRET") || body.includes("QVAPAY_USER_API_TOKEN") || body.includes("app-secret")) {\n            console.error("Production /api/account response contains an operational secret marker.");\n            process.exit(1);\n          }\n          console.log("Production account security boundary passed: unauthenticated access is blocked and no operational secret marker was exposed.");\n          console.log("Account identity provenance remains BLOCKED until an authenticated production session can be exercised; this gate intentionally prevents false certification of Issue #97.");\n          NODE\n\n          STATUS_RESPONSE="$(curl --fail-with-body --silent --show-error \
             --request GET \
             --header "Accept: application/json" \
             "$WORKER_URL/api/scanner/status")"
