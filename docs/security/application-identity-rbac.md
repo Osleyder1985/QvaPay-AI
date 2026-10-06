@@ -19,7 +19,7 @@ El navegador no puede elegir ni elevar su rol. La autorización se verifica en b
 
 ## Credenciales
 
-Las contraseñas se almacenan únicamente como verificadores PBKDF2-HMAC-SHA-256 con salt aleatorio y 120000 iteraciones. El secret `ACCOUNT_AUTH_SECRET` solo participa en el bootstrap inicial cuando la tabla de usuarios está vacía y en la firma de sesiones; su valor nunca se almacena en Git.
+Las contraseñas se almacenan únicamente como verificadores PBKDF2-HMAC-SHA-256 con salt aleatorio y 120000 iteraciones. El secret `ACCOUNT_AUTH_SECRET` participa en el bootstrap inicial cuando la tabla de usuarios está vacía y en la firma de sesiones; su valor nunca se almacena en Git.
 
 ## Sesiones
 
@@ -47,3 +47,8 @@ Cuando D1 no contiene usuarios, un login válido contra `ACCOUNT_AUTH_SECRET` cr
 6. Administration puede crear y desactivar usuarios.
 7. Auditor puede consultar pero recibe 403 ante mutaciones.
 8. Scanner 24/7 mantiene sus ciclos después del cambio de control de acceso.
+
+
+## Smoke de autenticación en producción
+
+El despliegue productivo no depende de una cuenta humana preexistente ni modifica sus credenciales. El smoke crea una cuenta Administration efímera con prefijo `ci-smoke-`, valida el flujo completo de login, sesión, autorización y Account Center, y la elimina mediante el token interno de bootstrap al finalizar el job. La cuenta temporal no forma parte del inventario operativo.
