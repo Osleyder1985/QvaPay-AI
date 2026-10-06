@@ -108,6 +108,19 @@ describe("public production dashboard", () => {
     expect(body).not.toContain("Server-Side Monitoring");
   });
 
+  it("ships a syntactically valid dashboard client script", async () => {
+    const body = await createPublicAppResponse().text();
+    const start = body.indexOf("<script>");
+    const end = body.indexOf("</script>", start);
+
+    expect(start).toBeGreaterThanOrEqual(0);
+    expect(end).toBeGreaterThan(start);
+
+    const script = body.slice(start + "<script>".length, end);
+    expect(() => new Function(script)).not.toThrow();
+    expect(body).toContain("applyOffer(&#39;");
+  });
+
   it("ranks BUY descending and SELL ascending", () => {
     const state = toPublicScannerState(marketState);
 
