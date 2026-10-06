@@ -1,9 +1,16 @@
 import { describe, expect, it } from "vitest";
-import {\n  clearSessionCookie,\n  createSessionCookie,\n  isAuthenticated,\n} from "../../src/infrastructure/cloudflare/account-auth.js";
+import {
+  clearSessionCookie,
+  createSessionCookie,
+  isAuthenticated,
+} from "../../src/infrastructure/cloudflare/account-auth.js";
 
 describe("Account Center session", () => {
   it("creates an HttpOnly Secure SameSite session cookie", async () => {
-    const cookie = await createSessionCookie(\n      "correct-secret",\n      "correct-secret",\n    );
+    const cookie = await createSessionCookie(
+      "correct-secret",
+      "correct-secret",
+    );
     expect(cookie).toContain("qvapay_ai_session=");
     expect(cookie).toContain("HttpOnly");
     expect(cookie).toContain("Secure");
@@ -16,14 +23,21 @@ describe("Account Center session", () => {
   });
 
   it("rejects invalid credentials and tampered cookies", async () => {
-    await expect(\n      createSessionCookie("wrong", "correct-secret"),\n    ).resolves.toBeNull();
-    const cookie = await createSessionCookie("correct-secret", "correct-secret");
+    await expect(
+      createSessionCookie("wrong", "correct-secret"),
+    ).resolves.toBeNull();
+    const cookie = await createSessionCookie(
+      "correct-secret",
+      "correct-secret",
+    );
     const token = cookie!.split(";")[0]!;
     const tampered = token.replace(/\.[^.]+$/, ".tampered");
     const request = new Request("https://example.com/api/account", {
       headers: { cookie: tampered },
     });
-    await expect(isAuthenticated(request, "correct-secret")).resolves.toBe(false);
+    await expect(isAuthenticated(request, "correct-secret")).resolves.toBe(
+      false,
+    );
   });
 
   it("clears the session without exposing credentials", () => {
