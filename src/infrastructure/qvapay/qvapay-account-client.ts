@@ -205,7 +205,11 @@ export class QvaPayAccountClient {
       retrievedAt: balance.retrievedAt,
       httpStatus: balance.status,
       status:
-        balanceUsd !== null ? "verified" : balance.ok ? "unavailable" : "failed",
+        balanceUsd !== null
+          ? "verified"
+          : balance.ok
+            ? "unavailable"
+            : "failed",
       error:
         balance.ok && balanceUsd === null
           ? "QvaPay returned an incompatible balance payload."
@@ -218,7 +222,11 @@ export class QvaPayAccountClient {
       retrievedAt: user.retrievedAt,
       httpStatus: user.status,
       status:
-        identity !== null ? "verified" : user.ok ? "unavailable" : "failed",
+        identity !== null
+          ? "verified"
+          : user.ok
+            ? "unavailable"
+            : "failed",
       error:
         user.ok && identity === null
           ? "QvaPay returned an incompatible authenticated-user payload."
@@ -231,7 +239,11 @@ export class QvaPayAccountClient {
       retrievedAt: info.retrievedAt,
       httpStatus: info.status,
       status:
-        application !== null ? "verified" : info.ok ? "unavailable" : "failed",
+        application !== null
+          ? "verified"
+          : info.ok
+            ? "unavailable"
+            : "failed",
       error:
         info.ok && application === null
           ? "QvaPay returned an incompatible application payload."
