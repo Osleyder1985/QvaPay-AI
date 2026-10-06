@@ -189,9 +189,7 @@ export class QvaPayAccountClient {
 
     const balanceUsd = balance.ok ? parseBalance(balance.payload) : null;
     const application = info.ok ? parseApplication(info.payload) : null;
-    const identity = user.ok
-      ? parseAuthenticatedUser(user.payload)
-      : null;
+    const identity = user.ok ? parseAuthenticatedUser(user.payload) : null;
     const own = ownOffers.ok
       ? parseOwnOffers(ownOffers.payload)
       : { total: null };
