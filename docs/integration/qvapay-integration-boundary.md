@@ -1,43 +1,43 @@
 # Frontera de integración con QvaPay
 
-## Objetivo
+## Implementación actual
 
-Definir qué debe conocerse y validarse antes de implementar la integración real.
+La frontera real está implementada mediante `QvaPayP2PClient`.
 
-## Contrato requerido
-
-La investigación técnica deberá determinar:
-
-1. endpoint oficial para obtener ofertas P2P;
-2. método HTTP;
-3. autenticación;
-4. parámetros;
-5. paginación;
-6. campos de una oferta;
-7. identificación de BUY y SELL;
-8. identificación de mercado/moneda;
-9. rate y cantidades;
-10. límites de frecuencia;
-11. códigos de error;
-12. comportamiento ante timeouts;
-13. condiciones de disponibilidad.
-
-## Regla arquitectónica
-
-Ninguna respuesta externa se utilizará directamente como modelo de dominio.
-
+```text
+QvaPay HTTP response
+        ↓
+p2p-contract
+        ↓
+p2p-mapper
+        ↓
+Offer
+        ↓
+Market
 ```
-QvaPay Response
-      ↓
-Schema Validation
-      ↓
-QvaPay Mapper
-      ↓
-Internal Offer
-      ↓
-Domain
-```
+
+## Responsabilidades
+
+El adaptador:
+
+1. autentica con `app-id` y `app-secret`;
+2. consulta `GET /p2p`;
+3. solicita BUY y SELL por separado;
+4. recorre la paginación;
+5. valida el esquema;
+6. calcula la tasa efectiva;
+7. conserva timestamps y datos de usuario;
+8. clasifica errores;
+9. aplica backoff limitado.
+
+## Operación P2P
+
+`applyOffer(uuid)` utiliza una petición `POST /p2p/:uuid/apply` y permanece exclusivamente en infraestructura.
+
+## Seguridad
+
+Las credenciales nunca se envían al navegador. La ruta pública de aplicación exige `P2P_ACTION_TOKEN` antes de llegar al proveedor.
 
 ## Estado
 
-TBD hasta validar la documentación y comportamiento real de QvaPay.
+La integración de lectura está implementada y probada. Webhook, SSE y reconciliación event-driven permanecen pendientes.
