@@ -1,10 +1,10 @@
 export type QvaPayP2POfferStatus =
-    | "open"
-    | "revision"
-    | "processing"
-    | "paid"
-    | "completed"
-    | "cancelled";
+  | "open"
+  | "revision"
+  | "processing"
+  | "paid"
+  | "completed"
+  | "cancelled";
 
 export interface QvaPayP2PUserDto {
   readonly username?: string;
