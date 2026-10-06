@@ -104,7 +104,9 @@ describe("public production dashboard", () => {
     expect(body).toContain("Auditoría y trazabilidad");
     expect(body).toContain("Cuenta");
     expect(body).toContain("/api/account");
-    expect(body).toContain("x-p2p-action-token");
+    expect(body).not.toContain("x-p2p-action-token");
+    expect(body).not.toContain("P2P_ACTION_TOKEN");
+    expect(body).not.toContain("Introduce tu clave de operación P2P");
     expect(body).not.toContain("QVAPAY_APP_SECRET");
     expect(body).toContain("ISO/IEC 27001");
     expect(body).not.toContain("QVAPAY_APP_SECRET");
@@ -122,7 +124,7 @@ describe("public production dashboard", () => {
 
     const script = body.slice(start + "<script>".length, end);
     expect(() => new Function(script)).not.toThrow();
-    expect(body).toContain("applyOffer(&#39;");
+    expect(body).not.toContain("applyOffer(");
   });
 
   it("ranks BUY descending and SELL ascending", () => {
