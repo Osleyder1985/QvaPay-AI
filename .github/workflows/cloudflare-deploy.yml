@@ -233,8 +233,8 @@ jobs:
                 const startedAt = execution?.lastStartedAt
                   ? Date.parse(execution.lastStartedAt)
                   : Number.NaN;
-                const nextAlarmAt = state.nextAlarmAt
-                  ? Date.parse(state.nextAlarmAt)
+                const nextAlarmAt = Number.isFinite(Number(state.nextAlarmAt))
+                  ? Number(state.nextAlarmAt)
                   : Number.NaN;
                 const firstCompletedAt = process.env.FIRST_COMPLETED_AT
                   ? Date.parse(process.env.FIRST_COMPLETED_AT)
