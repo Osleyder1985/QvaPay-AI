@@ -62,6 +62,11 @@ export default {
         return new Response("Method not allowed", { status: 405 });
       }
 
+      await stub.ensureScheduled({
+        coin: env.SCANNER_COIN,
+        intervalSeconds: Number(env.SCANNER_INTERVAL_SECONDS),
+      });
+
       return createPublicScannerStateResponse(
         toPublicScannerState(await stub.getState()),
       );
