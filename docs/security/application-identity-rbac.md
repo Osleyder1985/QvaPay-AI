@@ -19,7 +19,7 @@ El navegador no puede elegir ni elevar su rol. La autorización se verifica en b
 
 ## Credenciales
 
-Las contraseñas se almacenan únicamente como verificadores PBKDF2-HMAC-SHA-256 con salt aleatorio y 100000 iteraciones. `ACCOUNT_AUTH_SECRET` participa en la firma de sesiones y permanece fuera del navegador. El primer usuario Administration se crea mediante un token de configuración inicial de un solo uso, provisionado por el despliegue y entregado al propietario mediante el resumen privado del workflow; el token se invalida lógicamente cuando D1 deja de estar vacío.
+Las contraseñas se almacenan únicamente como verificadores PBKDF2-HMAC-SHA-256 con salt aleatorio y 100000 iteraciones. `ACCOUNT_AUTH_SECRET` participa en la firma de sesiones y permanece fuera del navegador. El primer usuario Administration se crea mediante el secret privado `INITIAL_ADMIN_BOOTSTRAP_TOKEN`, configurado por el propietario en GitHub Actions. El token no se imprime en logs, summaries, HTML ni respuestas de la aplicación; se invalida lógicamente cuando D1 deja de estar vacío.
 
 ## Sesiones
 
