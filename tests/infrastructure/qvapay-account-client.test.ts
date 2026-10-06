@@ -18,12 +18,14 @@ describe("QvaPayAccountClient", () => {
       userApiToken: "test-profile-token",
       fetcher: vi.fn(async (input, init) => {
         const url = String(input);
-        calls.push({
-          url,
-          authorization: init?.headers
-            ? new Headers(init.headers).get("authorization") ?? undefined
-            : undefined,
-        });
+        const authorization = init?.headers
+          ? new Headers(init.headers).get("authorization")
+          : null;
+        calls.push(
+          authorization
+            ? { url, authorization }
+            : { url },
+        );
 
         if (url.endsWith("/v2/balance")) {
           return response(200, { balance: 125.5 });
