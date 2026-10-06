@@ -60,8 +60,7 @@ export default {
       const body = (await request.json().catch(() => null)) as {
         password?: unknown;
       } | null;
-      const password =
-        typeof body?.password === "string" ? body.password : "";
+      const password = typeof body?.password === "string" ? body.password : "";
       const cookie = await createSessionCookie(
         password,
         env.ACCOUNT_AUTH_SECRET,
