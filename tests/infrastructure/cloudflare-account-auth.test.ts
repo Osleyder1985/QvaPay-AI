@@ -50,6 +50,7 @@ describe("Account Center session", () => {
     expect(cookie).toContain("HttpOnly");
     expect(cookie).not.toContain("correct-secret");
   });
+
   it("allows bootstrap recovery only for the active Administration admin account", () => {
     const user = {
       id: "admin-id",
@@ -61,11 +62,45 @@ describe("Account Center session", () => {
       lastLoginAt: null,
     };
 
-    expect(canRecoverBootstrapAdmin(user, "admin", "strong-bootstrap-secret", "strong-bootstrap-secret")).toBe(true);
-    expect(canRecoverBootstrapAdmin(user, "admin", "wrong-secret", "strong-bootstrap-secret")).toBe(false);
-    expect(canRecoverBootstrapAdmin({ ...user, role: "AUDITOR" }, "admin", "strong-bootstrap-secret", "strong-bootstrap-secret")).toBe(false);
-    expect(canRecoverBootstrapAdmin({ ...user, active: false }, "admin", "strong-bootstrap-secret", "strong-bootstrap-secret")).toBe(false);
-    expect(canRecoverBootstrapAdmin(user, "other", "strong-bootstrap-secret", "strong-bootstrap-secret")).toBe(false);
+    expect(
+      canRecoverBootstrapAdmin(
+        user,
+        "admin",
+        "strong-bootstrap-secret",
+        "strong-bootstrap-secret",
+      ),
+    ).toBe(true);
+    expect(
+      canRecoverBootstrapAdmin(
+        user,
+        "admin",
+        "wrong-secret",
+        "strong-bootstrap-secret",
+      ),
+    ).toBe(false);
+    expect(
+      canRecoverBootstrapAdmin(
+        { ...user, role: "AUDITOR" },
+        "admin",
+        "strong-bootstrap-secret",
+        "strong-bootstrap-secret",
+      ),
+    ).toBe(false);
+    expect(
+      canRecoverBootstrapAdmin(
+        { ...user, active: false },
+        "admin",
+        "strong-bootstrap-secret",
+        "strong-bootstrap-secret",
+      ),
+    ).toBe(false);
+    expect(
+      canRecoverBootstrapAdmin(
+        user,
+        "other",
+        "strong-bootstrap-secret",
+        "strong-bootstrap-secret",
+      ),
+    ).toBe(false);
   });
-
 });
