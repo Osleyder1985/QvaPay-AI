@@ -30,7 +30,9 @@ Relacionar requisitos con diseño, implementación, pruebas y evidencia de runti
 
 La cadena de evidencia vigente es:
 
-`PR → merge → main commit → Repository Quality Gate → Cloudflare Deploy → production smoke`.
+`PR → merge → main commit → Repository Quality Gate → Cloudflare Deploy → production smoke → criterion-specific production evidence`.
+
+Para identidad de cuenta, la evidencia de producción exige además una sesión autenticada reproducible contra `/api/account`. La respuesta `403` sin sesión demuestra el límite de seguridad, pero **no demuestra la identidad del propietario** y no permite certificar SYS-SEC-002 ni Issue #97.
 
 Para el commit de `main` `bac8500cc579e4277852e74cc3a247bf00ed0cc1`:
 
