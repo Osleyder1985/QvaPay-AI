@@ -9,15 +9,22 @@ function response(status: number, payload: unknown): Response {
 }
 
 describe("QvaPayAccountClient", () => {
-  it("builds a sanitized account snapshot from QvaPay contracts", async () => {
-    const calls: string[] = [];
+  it("uses the authenticated QvaPay user endpoint for owner identity", async () => {
+    const calls: Array<{ url: string; authorization?: string }> = [];
     const client = new QvaPayAccountClient({
       baseUrl: "https://api.qvapay.com",
-      appId: "app-id",
-      appSecret: "secret",
-      fetcher: vi.fn(async (input) => {
+      appId: "test-app-id",
+      appSecret: "test-app-secret",
+      userApiToken: "test-profile-token",
+      fetcher: vi.fn(async (input, init) => {
         const url = String(input);
-        calls.push(url);
+        calls.push({
+          url,
+          authorization: init?.headers
+            ? new Headers(init.headers).get("authorization") ?? undefined
+            : undefined,
+        });
+
         if (url.endsWith("/v2/balance")) {
           return response(200, { balance: 125.5 });
         }
@@ -25,37 +32,31 @@ describe("QvaPayAccountClient", () => {
           return response(200, {
             uuid: "app-uuid",
             name: "QvaPay AI",
-            url: "https://example.test",
-            desc: "Test",
-            callback: "https://example.test/callback",
-            success_url: "https://example.test/success",
-            cancel_url: "https://example.test/cancel",
-            logo: "apps/logo.png",
-            app_photo_url: "https://example.test/logo.png",
             active: true,
             enabled: true,
-            card: false,
-            created_at: "2026-01-01T00:00:00.000Z",
-            updated_at: "2026-01-02T00:00:00.000Z",
             "app-secret": "must-not-escape",
+          });
+        }
+        if (url.endsWith("/user")) {
+          return response(200, {
+            uuid: "owner-uuid",
+            username: "owner-user",
+            name: "Owner",
+            lastname: "Account",
+            average_rating: 4.8,
+            kyc: true,
+            golden_check: true,
+            phone_verified: true,
+            telegram: "owner",
+            p2p_enabled: true,
           });
         }
         return response(200, {
           data: [
             {
-              uuid: "offer-uuid",
               User: {
-                uuid: "user-uuid",
-                username: "CRYPTOBRO",
-                name: "Cryptobro",
-                rating_avg: 4.92,
-                rating_count: 897,
-                kyc: true,
-                vip: true,
-                golden_check: true,
-                phone_verified: true,
-                telegram_verified: true,
-                _count: { P2P: 12, P2P_Peer: 8 },
+                uuid: "counterparty-uuid",
+                username: "must-never-be-owner",
               },
             },
           ],
@@ -65,21 +66,26 @@ describe("QvaPayAccountClient", () => {
     });
 
     const snapshot = await client.fetchAccount();
-    expect(snapshot.balanceUsd).toBe(125.5);
-    expect(snapshot.identity?.username).toBe("CRYPTOBRO");
-    expect(snapshot.identity?.ratingCount).toBe(897);
-    expect(snapshot.application?.uuid).toBe("app-uuid");
+
+    expect(snapshot.identity?.uuid).toBe("owner-uuid");
+    expect(snapshot.identity?.username).toBe("owner-user");
+    expect(snapshot.identitySource).toBe("/user");
     expect(snapshot.ownOffersTotal).toBe(12);
     expect(snapshot.integrationStatus).toBe("verified");
+
+    const userCall = calls.find((call) => call.url.endsWith("/user"));
+    expect(userCall?.authorization).toBe("Bearer test-profile-token");
     expect(JSON.stringify(snapshot)).not.toContain("must-not-escape");
-    expect(calls).toHaveLength(3);
+    expect(JSON.stringify(snapshot)).not.toContain("must-never-be-owner");
+    expect(calls).toHaveLength(4);
   });
 
-  it("fails closed for incompatible balance and missing identity", async () => {
+  it("fails closed when the authenticated-user contract is unavailable", async () => {
     const client = new QvaPayAccountClient({
       baseUrl: "https://api.qvapay.com",
-      appId: "app-id",
-      appSecret: "secret",
+      appId: "test-app-id",
+      appSecret: "test-app-secret",
+      userApiToken: "test-profile-token",
       fetcher: vi.fn(async (input) => {
         const url = String(input);
         if (url.endsWith("/v2/balance")) {
@@ -88,13 +94,18 @@ describe("QvaPayAccountClient", () => {
         if (url.endsWith("/v2/info")) {
           return response(503, {});
         }
+        if (url.endsWith("/user")) {
+          return response(401, {});
+        }
         return response(200, { data: [], total: 0 });
       }),
     });
 
     const snapshot = await client.fetchAccount();
+
     expect(snapshot.balanceUsd).toBeNull();
     expect(snapshot.identity).toBeNull();
+    expect(snapshot.identitySource).toBe("/user");
     expect(snapshot.integrationStatus).toBe("degraded");
   });
 });
