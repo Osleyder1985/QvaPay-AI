@@ -236,7 +236,15 @@ jobs:
             });
           '
 
-          AUTH_ACCOUNT_RESPONSE="$(curl --fail-with-body --silent --show-error --cookie /tmp/qvapay-cookie.txt --request GET --header "Accept: application/json" "$WORKER_URL/api/account")"
+          set +e
+          AUTH_ACCOUNT_RESPONSE="$(curl --silent --show-error --cookie /tmp/qvapay-cookie.txt --request GET --header "Accept: application/json" "$WORKER_URL/api/account")"
+          AUTH_ACCOUNT_STATUS=$?
+          set -e
+          printf '%s\n' "$AUTH_ACCOUNT_RESPONSE"
+          if [ "$AUTH_ACCOUNT_STATUS" -ne 0 ]; then
+            echo "Authenticated production /api/account request failed with curl exit code $AUTH_ACCOUNT_STATUS" >&2
+            exit 1
+          fi
           printf 'Authenticated account:\n%s\n' "$AUTH_ACCOUNT_RESPONSE"
           printf '%s' "$AUTH_ACCOUNT_RESPONSE" | node -e '
             let input = "";
