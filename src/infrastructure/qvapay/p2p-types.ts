@@ -1,5 +1,5 @@
 export type QvaPayP2POfferStatus =
-  | "open"
+  "open"
   | "revision"
   | "processing"
   | "paid"
