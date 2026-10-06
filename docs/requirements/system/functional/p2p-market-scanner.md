@@ -2,106 +2,87 @@
 
 ## Propósito
 
-Definir el comportamiento funcional inicial del escáner de mercado P2P de QvaPay-AI.
+Definir el comportamiento funcional actual y objetivo del scanner.
 
 ## SYS-FR-001 — Configurable automatic market scanning
 
-**Statement**
+El sistema deberá ejecutar escaneos automáticos mediante un intervalo validado.
 
-El sistema deberá escanear automáticamente el mercado P2P de QvaPay utilizando un intervalo de escaneo definido por el usuario.
+### Implementación actual
 
-**Acceptance criteria**
+- `SCANNER_INTERVAL_SECONDS` configura el intervalo del Worker.
+- El intervalo válido es 5–300 segundos.
+- El Durable Object conserva la configuración.
+- El Alarm programa el siguiente ciclo.
 
-- El intervalo de escaneo podrá ser configurado por el usuario.
-- El sistema ejecutará nuevos escaneos de acuerdo con el intervalo configurado.
-- El intervalo utilizado deberá ser persistible y observable por los componentes responsables de la ejecución.
+### Estado
 
-**Verification**
-
-TBD. La implementación y el mecanismo exacto de persistencia se definirán posteriormente.
-
----
+**Implemented / Tested.**
 
 ## SYS-FR-002 — Continuous 24/7 scanner execution
 
-**Statement**
+El scanner deberá funcionar sin depender de usuarios conectados.
 
-El escáner deberá funcionar continuamente 24/7 aunque no exista ningún usuario conectado a la aplicación.
+### Implementación actual
 
-**Acceptance criteria**
+Durable Object + Alarm ejecuta el ciclo server-side.
 
-- La ejecución del escáner no dependerá de una sesión de usuario activa.
-- El escaneo deberá continuar cuando no existan clientes web conectados.
-- El mecanismo de ejecución deberá operar como servicio del lado servidor.
+### Estado
 
-**Verification**
-
-TBD. Se requerirá una prueba de ejecución sin clientes conectados.
-
----
+**Implemented / Tested.** La certificación de producción depende de evidencia del workflow Cloudflare.
 
 ## SYS-FR-003 — SELL offers listing
 
-**Statement**
+Las ofertas SELL se mantienen separadas y se ordenan por tasa ascendente.
 
-El sistema deberá mostrar las ofertas de venta (SELL) disponibles del mercado P2P, agrupadas por moneda y ordenadas por tasa ascendente dentro de cada moneda.
+### Implementación actual
 
-**Acceptance criteria**
+El dashboard identifica la mejor SELL como la de menor tasa y la marca visualmente.
 
-- Las ofertas SELL se mostrarán separadas de las ofertas BUY.
-- Las ofertas se agruparán por moneda/mercado.
-- Dentro de cada grupo de moneda, las ofertas se ordenarán por tasa ascendente.
-- No se mezclarán ofertas pertenecientes a monedas o mercados diferentes.
+### Estado
 
-**Verification**
-
-TBD.
-
----
+**Tested.**
 
 ## SYS-FR-004 — BUY offers listing
 
-**Statement**
+Las ofertas BUY se mantienen separadas y se ordenan por tasa descendente para determinar la mejor oferta.
 
-El sistema deberá mostrar las ofertas de compra (BUY) disponibles del mercado P2P, agrupadas por moneda y ordenadas por tasa ascendente dentro de cada moneda.
+### Implementación actual
 
-**Acceptance criteria**
+El dashboard identifica la mejor BUY como la de mayor tasa.
 
-- Las ofertas BUY se mostrarán separadas de las ofertas SELL.
-- Las ofertas se agruparán por moneda/mercado.
-- Dentro de cada grupo de moneda, las ofertas se ordenarán por tasa ascendente.
-- No se mezclarán ofertas pertenecientes a monedas o mercados diferentes.
+### Estado
 
-**Verification**
+**Tested.**
 
-TBD.
+## Identidad de mercado
 
----
+Las ofertas solamente se aceptan cuando `offer.market === market.coin`. No se deben mezclar monedas.
+
+## Datos visibles
+
+El dashboard muestra:
+
+- fecha de creación;
+- usuario;
+- QUSD;
+- tasa;
+- importe fiat;
+- VIP;
+- estado;
+- acción.
+
+## Acciones
+
+- SELL → **Comprar** → botón verde.
+- BUY → **Vender** → botón rojo.
+
+La acción solicita confirmación y una clave de operación antes de llamar al endpoint server-side.
 
 ## Límite de alcance
 
-Estos requisitos describen observación y presentación del mercado. No autorizan por sí mismos la creación, modificación, cancelación o ejecución automática de órdenes.
+La aplicación de una oferta P2P existe como capacidad explícita. Esto no autoriza creación de un motor de arbitraje ni ejecución automática de estrategias.
 
-## Preguntas abiertas
+## Requisitos futuros
 
-- **TBD:** API/endpoint oficial que proporcionará las ofertas P2P.
-- **TBD:** definición exacta de moneda, mercado y par según el contrato de QvaPay.
-- **TBD:** límites mínimo y máximo permitidos para el intervalo configurable.
-- **TBD:** política de recuperación ante errores del proveedor.
-
-
-## Requisitos de interacción con ofertas P2P
-
-El panel de mercado debe:
-
-- mostrar las cantidades de QUSD y los importes fiat con separador de miles mediante coma y exactamente dos decimales, sin modificar la precisión numérica almacenada;
-- mostrar la fecha y hora de creación de la oferta, no solamente la hora del día;
-- identificar mediante un indicador explícito las ofertas restringidas a usuarios VIP;
-- mostrar **Vender** para una oferta BUY porque el usuario pasa a ser el vendedor de QUSD;
-- mostrar **Comprar** para una oferta SELL porque el usuario pasa a ser el comprador de QUSD;
-- exigir una confirmación explícita antes de aplicar a una oferta;
-- exigir una credencial de operación del lado del servidor antes de permitir que la aplicación alcance el endpoint de aplicación P2P de QvaPay;
-- mostrar claramente el estado de tomada/procesando después de una aplicación exitosa;
-- proporcionar transiciones visuales para las actualizaciones del mercado, el estado al pasar sobre una fila, la respuesta de las acciones y los cambios de estado, sin exigir una recarga completa de la página.
-
-La acción de aplicación del lado del servidor nunca debe exponer al navegador las credenciales de la aplicación de QvaPay.
+Webhook, SSE, reconciliación event-driven, D1 y arbitraje requieren requisitos específicos antes de considerarse implementados.
