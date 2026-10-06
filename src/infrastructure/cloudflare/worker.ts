@@ -3,7 +3,7 @@ import type { DurableObjectNamespace, D1Database } from "@cloudflare/workers-typ
 // prettier-ignore
 import { ScannerSchedulerDurableObject } from "./scanner-scheduler-do.js";
 // prettier-ignore
-import { authenticate, createUser, deleteUserByUsername, ensureSecuritySchema, getSession, listUsers, logout, requireRole, setUserActive, changeUserPassword, type AppRole } from "./auth-rbac.js";
+import { authenticate, createUser, deleteUserByUsername, ensureSecuritySchema, getSession, listUsers, logout, requireRole, setUserActive, changeUserPassword } from "./auth-rbac.js";
 // prettier-ignore
 import { QvaPayAccountClient } from "../qvapay/qvapay-account-client.js";
 // prettier-ignore
@@ -198,9 +198,12 @@ export default {
         const input = await body(request);
         const username = typeof input.username === "string" ? input.username : "";
         const password = typeof input.password === "string" ? input.password : "";
-        const role = typeof input.role === "string" ? input.role as AppRole : "AUDITOR";
+        const requestedRole = typeof input.role === "string" ? input.role : "AUDITOR";
+        if (requestedRole !== "AUDITOR") {
+          return jsonError("Solo se pueden crear usuarios con rol Observador.", 400);
+        }
         try {
-          const user = await createUser(env.DB, username, password, role);
+          const user = await createUser(env.DB, username, password, "AUDITOR");
           return Response.json({ user }, { status: 201, headers: { "cache-control": "no-store" } });
         } catch (error) {
           return jsonError(error instanceof Error ? error.message : "No se pudo crear el usuario.", 400);
