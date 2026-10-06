@@ -18,7 +18,6 @@ export interface ScannerWorkerEnvironment {
   readonly SCANNER_INTERVAL_SECONDS: string;
   readonly SCANNER_BOOTSTRAP_TOKEN: string;
   readonly ACCOUNT_AUTH_SECRET: string;
-  readonly ACCOUNT_QVAPAY_USER_TOKEN: string;
 }
 
 const OBJECT_NAME = "default";
@@ -80,7 +79,7 @@ export default {
         baseUrl: env.QVAPAY_API_BASE_URL,
         appId: env.QVAPAY_APP_ID,
         appSecret: env.QVAPAY_APP_SECRET,
-        userApiToken: env.ACCOUNT_QVAPAY_USER_TOKEN || env.QVAPAY_USER_API_TOKEN,
+        userApiToken: env.QVAPAY_USER_API_TOKEN,
       });
       const account = await client.fetchAccount();
       return Response.json({ account }, { headers: { "cache-control": "no-store" } });
