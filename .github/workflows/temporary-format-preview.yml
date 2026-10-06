@@ -1,0 +1,19 @@
+name: Temporary format preview
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install --no-audit --no-fund
+      - run: npx prettier --write src/infrastructure/cloudflare/account-auth.ts src/infrastructure/cloudflare/worker.ts tests/infrastructure/cloudflare-account-auth.test.ts
+      - run: git diff -- src/infrastructure/cloudflare/account-auth.ts src/infrastructure/cloudflare/worker.ts tests/infrastructure/cloudflare-account-auth.test.ts
