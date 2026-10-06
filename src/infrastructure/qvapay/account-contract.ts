@@ -2,6 +2,7 @@ export interface QvaPayAccountUser {
   readonly uuid: string;
   readonly username: string;
   readonly name: string | null;
+  readonly lastname: string | null;
   readonly image: string | null;
   readonly ratingAvg: number | null;
   readonly ratingCount: number | null;
@@ -10,6 +11,7 @@ export interface QvaPayAccountUser {
   readonly goldenCheck: boolean | null;
   readonly phoneVerified: boolean | null;
   readonly telegramVerified: boolean | null;
+  readonly p2pEnabled: boolean | null;
   readonly completedAsOwner: number | null;
   readonly completedAsPeer: number | null;
 }
@@ -39,6 +41,7 @@ export interface QvaPayAccountSnapshot {
   readonly balanceOk: boolean;
   readonly balanceError: string | null;
   readonly identity: QvaPayAccountUser | null;
+  readonly identitySource: "/user";
   readonly identityHttpStatus: number;
   readonly identityOk: boolean;
   readonly identityError: string | null;
