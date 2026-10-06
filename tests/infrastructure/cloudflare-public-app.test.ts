@@ -102,6 +102,10 @@ describe("public production dashboard", () => {
     expect(body).toContain("10");
     expect(body).toContain("Dashboard operativo");
     expect(body).toContain("Auditoría y trazabilidad");
+    expect(body).toContain("Cuenta");
+    expect(body).toContain("/api/account");
+    expect(body).toContain("x-p2p-action-token");
+    expect(body).toContain("No se muestran secretos");
     expect(body).toContain("ISO/IEC 27001");
     expect(body).not.toContain("QVAPAY_APP_SECRET");
     expect(body).not.toContain("SCANNER_BOOTSTRAP_TOKEN");
