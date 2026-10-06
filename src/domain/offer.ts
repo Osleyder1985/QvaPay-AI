@@ -1,12 +1,12 @@
 export type OfferSide = "BUY" | "SELL";
 
 export type OfferStatus =
-  | "open"
-  | "revision"
-  | "processing"
-  | "paid"
-  | "completed"
-  | "cancelled";
+    | "open"
+    | "revision"
+    | "processing"
+    | "paid"
+    | "completed"
+    | "cancelled";
 
 export interface Offer {
   readonly id: string;
