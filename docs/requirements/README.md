@@ -1,46 +1,30 @@
 # Requisitos
 
-Esta sección define la estructura de requisitos de QvaPay-AI.
+## Propósito
 
-## Taxonomía
+Organizar los requisitos de QvaPay-AI y mantener su trazabilidad con diseño, implementación, pruebas y evidencia.
 
-```
+## Convención
+
+- Documentación explicativa: español.
+- Nombres técnicos, identificadores, archivos, carpetas, Issues y Pull Requests: inglés.
+- Los estados formales conservan sus nombres técnicos.
+- `TBD` se utiliza únicamente cuando un elemento todavía no está definido o verificado.
+
+## Niveles
+
+```text
 Requirements
 ├── Business Requirements
 ├── Stakeholder Requirements
 ├── System Requirements
-│   ├── Functional Requirements
-│   ├── Quality Requirements
-│   ├── Interface Requirements
-│   ├── Data Requirements
-│   ├── Security Requirements
-│   ├── Integration / Interoperability Requirements
-│   ├── Operational Requirements
-│   ├── Legal / Regulatory / Compliance Requirements
-│   └── Constraints
 ├── Software Requirements
-│   ├── Functional Requirements
-│   ├── Quality Requirements
-│   ├── Interface Requirements
-│   ├── Data Requirements
-│   ├── Security Requirements
-│   ├── Integration / Interoperability Requirements
-│   ├── Operational Requirements
-│   ├── Legal / Regulatory / Compliance Requirements
-│   └── Constraints
 ├── Transition Requirements
-│   ├── Migration
-│   ├── Deployment
-│   ├── Data Conversion
-│   └── Operational Readiness
 └── Requirements Traceability
 ```
 
-La trazabilidad se considera una disciplina transversal: relaciona los requisitos con objetivos, arquitectura, implementación, pruebas y evidencia de verificación.
+## Regla
 
-## Convenciones
+La documentación no puede elevar el estado de una capacidad por encima de la evidencia disponible.
 
-- Documentación explicativa: español.
-- Nombres técnicos, archivos, carpetas, Issues y PRs: inglés.
-- Los requisitos usan identificadores estables.
-- Los elementos no verificados se marcan como `TBD` y no se presentan como hechos.
+La arquitectura futura no constituye implementación.
