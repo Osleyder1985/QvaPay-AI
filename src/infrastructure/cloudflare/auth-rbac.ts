@@ -2,6 +2,8 @@ import type { D1Database } from "@cloudflare/workers-types";
 
 export type AppRole = "ADMINISTRATION" | "AUDITOR";
 
+/** AUDITOR is the persisted compatibility value; the product-facing role is OBSERVER (Observador). */
+
 export interface AppUser {
   readonly id: string;
   readonly username: string;
@@ -234,14 +236,7 @@ export async function authenticate(
   username: string,
   password: string,
 ): Promise<{ sessionCookie: string; user: AppUser } | null> {
-  let user = await findUserByUsername(db, username);
-  if (!user) {
-    const count = await db.prepare("SELECT COUNT(*) AS count FROM app_users").first<{ count: number }>();
-    if (Number(count?.count ?? 0) === 0 && password === secret) {
-      user = await createUser(db, username || "admin", password, "ADMINISTRATION");
-      await writeAudit(db, "bootstrap_admin_created", "SUCCESS", user, user);
-    }
-  }
+  const user = await findUserByUsername(db, username);
   if (!user) {
     await writeAudit(db, "login", "FAILURE", undefined, undefined, { username: username.trim() });
     return null;
