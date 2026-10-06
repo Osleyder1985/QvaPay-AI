@@ -3,7 +3,7 @@ import type { DurableObjectNamespace, D1Database } from "@cloudflare/workers-typ
 // prettier-ignore
 import { ScannerSchedulerDurableObject } from "./scanner-scheduler-do.js";
 // prettier-ignore
-import { authenticate, createUser, deleteUserByUsername, ensureSecuritySchema, getSession, listUsers, logout, requireRole, setUserActive, changeUserPassword, type AppRole } from "./auth-rbac.js";
+import { authenticate, createUser, deleteUserByUsername, ensureSecuritySchema, getSession, listUsers, logout, requireRole, setUserActive, changeUserPassword } from "./auth-rbac.js";
 // prettier-ignore
 import { QvaPayAccountClient } from "../qvapay/qvapay-account-client.js";
 // prettier-ignore
