@@ -97,6 +97,11 @@ jobs:
         run: |
           set -euo pipefail
 
+          if [ -z "$ACCOUNT_AUTH_SECRET" ]; then
+            echo "Missing required GitHub Actions secret: ACCOUNT_AUTH_SECRET. Configure it before production authentication smoke can run."
+            exit 1
+          fi
+
           SCANNER_BOOTSTRAP_TOKEN="$(node -e "console.log(require('crypto').randomBytes(32).toString('hex'))")"
           echo "::add-mask::$SCANNER_BOOTSTRAP_TOKEN"
 
@@ -148,33 +153,37 @@ jobs:
           console.log("Account identity provenance remains BLOCKED until an authenticated production session can be exercised; this gate intentionally prevents false certification of Issue #97.");
           NODE
 
-          STATUS_RESPONSE="$(curl --fail-with-body --silent --show-error \
+          echo "Verifying unauthenticated scanner boundary..."
+          STATUS_RESPONSE="$(curl --silent --show-error --output /tmp/qvapay-scanner-unauth-response.json --write-out '%{http_code}' --max-time 15 \
             --request GET \
             --header "Accept: application/json" \
-            "$WORKER_URL/api/scanner/status")"
-          printf 'Public scanner status:\n%s\n' "$STATUS_RESPONSE"
+            "$WORKER_URL/api/scanner/status" || true)"
+          printf 'Production /api/scanner/status unauthenticated status: HTTP %s\n' "$STATUS_RESPONSE"
+          if [ "$STATUS_RESPONSE" != "401" ]; then
+            echo "Scanner API security-boundary assertion failed: unauthenticated access must remain HTTP 401."
+            cat /tmp/qvapay-scanner-unauth-response.json || true
+            exit 1
+          fi
 
-          printf '%s' "$STATUS_RESPONSE" | node -e '
-            let input = "";
-            process.stdin.on("data", (chunk) => { input += chunk; });
-            process.stdin.on("end", () => {
-              const state = JSON.parse(input);
-              const valid =
-                typeof state.configured === "boolean" &&
-                state.snapshotStatus === "AVAILABLE" &&
-                Array.isArray(state.buyOffers) &&
-                state.buyOffers.length > 0 &&
-                Array.isArray(state.sellOffers) &&
-                state.sellOffers.length > 0 &&
-                state.metrics &&
-                typeof state.metrics.totalOffers === "number" &&
-                state.metrics.totalOffers > 0 &&
-                state.metrics.snapshotAt != null &&
-                Object.prototype.hasOwnProperty.call(state.metrics, "bestBuyRate") &&
-                Object.prototype.hasOwnProperty.call(state.metrics, "bestSellRate");
-              process.exit(valid ? 0 : 1);
-            });
-          '
+          echo "Verifying unauthenticated root is the protected login surface..."
+          DASHBOARD_HTML="$(curl --fail-with-body --silent --show-error "$WORKER_URL/")"
+          printf '%s' "$DASHBOARD_HTML" > /tmp/qvapay-login.html
+          node <<'NODE'
+          const fs = require("node:fs");
+          const input = fs.readFileSync("/tmp/qvapay-login.html", "utf8");
+          const required = [
+            ["Control de acceso · ISO/IEC 27001", "login security marker"],
+            ["QvaPay-AI · Acceso seguro", "login page title"],
+            ["Autentíquese para acceder a sus módulos y datos.", "protected application message"],
+            ['id="login"', "login form"],
+          ];
+          const missing = required.filter(([needle]) => !input.includes(needle)).map(([, label]) => label);
+          if (missing.length > 0) {
+            console.error("Login HTML assertions failed:", missing.join(", "));
+            process.exit(1);
+          }
+          console.log(`Protected login HTML assertions passed (${required.length}).`);
+          NODE
 
           echo "Authenticating production smoke session as bootstrap Administration..."
           LOGIN_RESPONSE="$(curl --fail-with-body --silent --show-error --cookie-jar /tmp/qvapay-cookie.txt --request POST --header "Content-Type: application/json" --header "Accept: application/json" --data "$(node -e 'process.stdout.write(JSON.stringify({username:"admin",password:process.env.ACCOUNT_AUTH_SECRET}))')" "$WORKER_URL/api/auth/login")"
