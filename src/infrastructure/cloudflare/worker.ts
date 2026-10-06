@@ -1,6 +1,6 @@
 import type { DurableObjectNamespace, D1Database } from "@cloudflare/workers-types";
 import { ScannerSchedulerDurableObject } from "./scanner-scheduler-do.js";
-import { authenticate, clearSessionCookie, createUser, getSession, listUsers, logout, requireRole, setUserActive, changeUserPassword, type AppRole } from "./auth-rbac.js";
+import { authenticate, createUser, getSession, listUsers, logout, requireRole, setUserActive, changeUserPassword, type AppRole } from "./auth-rbac.js";
 import { QvaPayAccountClient } from "../qvapay/qvapay-account-client.js";
 import { createLoginAppResponse } from "./login-app.js";
 import { createPublicAppResponse, createPublicScannerStateResponse, toPublicScannerState } from "./public-app.js";
