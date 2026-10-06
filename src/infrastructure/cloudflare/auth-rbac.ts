@@ -1,4 +1,3 @@
-import { pbkdf2 } from "node:crypto";
 import type { D1Database } from "@cloudflare/workers-types";
 
 export type AppRole = "ADMINISTRATION" | "AUDITOR";
