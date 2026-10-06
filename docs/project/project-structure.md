@@ -20,7 +20,7 @@ QvaPay-AI/
 │   ├── application/
 │   │   ├── ports/
 │   │   └── use-cases/
-│   ├── domain/
+│   ├── domain/\n│   │   ├── user/\n│   │   └── authorization/
 │   └── infrastructure/
 │       ├── cloudflare/
 │       └── qvapay/
@@ -46,7 +46,7 @@ QvaPay-AI/
 - Las pruebas se mantienen próximas a la unidad técnica que verifican.
 - La documentación debe reflejar el código existente y etiquetar explícitamente las capacidades futuras.
 
-## Infraestructura Cloudflare
+## Separación funcional\n\nLa aplicación aplica una frontera de seguridad en el Worker: `authentication → session → user → role → authorization → module`. La interfaz no decide permisos; cada API valida la sesión y el rol en backend. `Administration` puede operar y administrar identidades; `Auditor` solo consulta. Las credenciales QvaPay permanecen exclusivamente en infraestructura server-side.\n\nLos módulos operativos existentes (scanner, mercado, cuenta y arbitrage) conservan sus contratos y lógica de negocio; la seguridad actúa como una capa de acceso, no como una modificación de sus reglas.\n\n## Infraestructura Cloudflare
 
 La implementación actual contiene:
 
@@ -57,4 +57,4 @@ La implementación actual contiene:
 - secrets para credenciales y tokens;
 - dashboard HTML servido desde el Worker.
 
-No existe actualmente `migrations/` ni configuración D1 en el repositorio.
+El repositorio utiliza D1 para identidades y auditoría de seguridad. Las migraciones se versionan en `migrations/` y el binding `DB` apunta a `qvapay-ai-scanner`. El Durable Object continúa siendo responsable del scheduler 24/7.\n\nLa identidad inicial se crea una sola vez cuando D1 está vacío, usando el secret server-side `ACCOUNT_AUTH_SECRET`; después, la autenticación normal usa verificadores PBKDF2 almacenados con saltos aleatorios. No se almacenan contraseñas en texto plano.

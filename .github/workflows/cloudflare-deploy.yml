@@ -100,6 +100,8 @@ jobs:
           echo "::add-mask::$SCANNER_BOOTSTRAP_TOKEN"
 
           printf '%s' "$SCANNER_BOOTSTRAP_TOKEN" | npx wrangler secret put SCANNER_BOOTSTRAP_TOKEN
+          echo "Applying D1 migrations..."
+          npx wrangler d1 migrations apply qvapay-ai-scanner --remote
           npx wrangler deploy
 
           echo "Verifying public application root..."
@@ -123,7 +125,7 @@ jobs:
             exit 1
           fi
 
-          echo "Verifying Account API security boundary and identity provenance..."
+          echo "Verifying authentication boundary and authenticated identity provenance..."
           ACCOUNT_STATUS="$(curl --silent --show-error --output /tmp/qvapay-account-response.json --write-out '%{http_code}' --max-time 15 \
             --request GET \
             --header "Accept: application/json" \
@@ -171,6 +173,44 @@ jobs:
                 state.metrics.snapshotAt != null &&
                 Object.prototype.hasOwnProperty.call(state.metrics, "bestBuyRate") &&
                 Object.prototype.hasOwnProperty.call(state.metrics, "bestSellRate");
+              process.exit(valid ? 0 : 1);
+            });
+          '
+
+          echo "Authenticating production smoke session as bootstrap Administration..."
+          LOGIN_RESPONSE="$(curl --fail-with-body --silent --show-error --cookie-jar /tmp/qvapay-cookie.txt --request POST --header "Content-Type: application/json" --header "Accept: application/json" --data "$(node -e 'process.stdout.write(JSON.stringify({username:"admin",password:process.env.ACCOUNT_AUTH_SECRET}))')" "$WORKER_URL/api/auth/login")"
+          printf '%s\n' "$LOGIN_RESPONSE"
+          printf '%s' "$LOGIN_RESPONSE" | node -e '
+            let input = "";
+            process.stdin.on("data", (chunk) => { input += chunk; });
+            process.stdin.on("end", () => {
+              const data = JSON.parse(input);
+              process.exit(data.authenticated === true && data.user?.role === "ADMINISTRATION" ? 0 : 1);
+            });
+          '
+
+          AUTH_ACCOUNT_RESPONSE="$(curl --fail-with-body --silent --show-error --cookie /tmp/qvapay-cookie.txt --request GET --header "Accept: application/json" "$WORKER_URL/api/account")"
+          printf 'Authenticated account:\n%s\n' "$AUTH_ACCOUNT_RESPONSE"
+          printf '%s' "$AUTH_ACCOUNT_RESPONSE" | node -e '
+            let input = "";
+            process.stdin.on("data", (chunk) => { input += chunk; });
+            process.stdin.on("end", () => {
+              const data = JSON.parse(input);
+              const account = data.account;
+              const valid = account?.identitySource === "/user" && account?.identity?.username;
+              if (!valid) process.exit(1);
+              console.log("Authenticated account identity provenance verified from /user.");
+            });
+          '
+
+          AUTH_SCANNER_STATUS="$(curl --fail-with-body --silent --show-error --cookie /tmp/qvapay-cookie.txt --request GET --header "Accept: application/json" "$WORKER_URL/api/scanner/status")"
+          printf 'Authenticated scanner status:\n%s\n' "$AUTH_SCANNER_STATUS"
+          printf '%s' "$AUTH_SCANNER_STATUS" | node -e '
+            let input = "";
+            process.stdin.on("data", (chunk) => { input += chunk; });
+            process.stdin.on("end", () => {
+              const state = JSON.parse(input);
+              const valid = state.snapshotStatus === "AVAILABLE" && Array.isArray(state.buyOffers) && state.buyOffers.length > 0 && Array.isArray(state.sellOffers) && state.sellOffers.length > 0;
               process.exit(valid ? 0 : 1);
             });
           '

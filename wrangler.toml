@@ -9,6 +9,12 @@ SCANNER_COIN = "BANK_CUP"
 SCANNER_INTERVAL_SECONDS = "10"
 # ACCOUNT_AUTH_SECRET is configured as a Worker secret; never commit its value.
 
+[[d1_databases]]
+binding = "DB"
+database_name = "qvapay-ai-scanner"
+database_id = "839d0bc1-6f86-49ff-939a-91dc238783aa"
+migrations_dir = "migrations"
+
 [durable_objects]
 bindings = [
   { name = "SCANNER_SCHEDULER", class_name = "ScannerSchedulerDurableObject" }
