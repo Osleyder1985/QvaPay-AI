@@ -41,7 +41,13 @@ function optionalNumber(
 
 function readPayload(value: unknown): unknown {
   if (!isRecord(value)) return value;
-  if ("data" in value && Object.keys(value).length <= 2) return value.data;
+  if (
+    "data" in value &&
+    Object.keys(value).length <= 2 &&
+    !Array.isArray(value.data)
+  ) {
+    return value.data;
+  }
   return value;
 }
 
