@@ -8,7 +8,6 @@ on:
 
 permissions:
   contents: read
-  pull-requests: write
 
 jobs:
   documentation-quality:
@@ -142,20 +141,7 @@ jobs:
         run: npm install --no-audit --no-fund
 
       - name: Type check
-        shell: bash
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          set +e
-          output="$(npm run build 2>&1)"
-          status=$?
-          printf '%s\n' "$output"
-          if [ "$status" -ne 0 ] && [ -n "${{ github.event.pull_request.number }}" ]; then
-            gh pr comment "${{ github.event.pull_request.number }}" --body "```text
-$output
-```"
-          fi
-          exit "$status"
+        run: npm run build
 
       - name: Lint
         run: npm run lint
