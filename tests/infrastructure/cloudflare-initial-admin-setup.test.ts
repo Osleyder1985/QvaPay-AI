@@ -35,27 +35,10 @@ describe("initial Administration bootstrap", () => {
     });
   });
 
-  it("rejects an invalid bootstrap token before reading user state", async () => {
-    const db = createDb(0);
-    await expect(
-      bootstrapInitialAdmin(
-        db as never,
-        "expected",
-        "wrong",
-        "owner",
-        "a".repeat(12),
-      ),
-    ).rejects.toThrow("Token de configuración inválido.");
-    expect(db.prepare).not.toHaveBeenCalled();
-    expect(createUserMock).not.toHaveBeenCalled();
-  });
-
-  it("creates the first Administration account with the owner-selected credentials", async () => {
+  it("creates the first Administration account with only owner-selected credentials", async () => {
     const db = createDb(0);
     const user = await bootstrapInitialAdmin(
       db as never,
-      "expected",
-      "expected",
       "owner",
       "a".repeat(12),
     );
@@ -69,16 +52,18 @@ describe("initial Administration bootstrap", () => {
     expect(db.run).toHaveBeenCalledTimes(1);
   });
 
+  it("rejects an invalid username or password before creating the account", async () => {
+    const db = createDb(0);
+    await expect(
+      bootstrapInitialAdmin(db as never, "bad username", "short"),
+    ).rejects.toThrow();
+    expect(createUserMock).not.toHaveBeenCalled();
+  });
+
   it("rejects bootstrap after the first application user exists", async () => {
     const db = createDb(1);
     await expect(
-      bootstrapInitialAdmin(
-        db as never,
-        "expected",
-        "expected",
-        "owner",
-        "a".repeat(12),
-      ),
+      bootstrapInitialAdmin(db as never, "owner", "a".repeat(12)),
     ).rejects.toThrow("La configuración inicial ya fue completada.");
     expect(createUserMock).not.toHaveBeenCalled();
   });
