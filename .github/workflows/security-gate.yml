@@ -85,4 +85,4 @@ jobs:
           NODE
 
       - name: Security-focused tests
-        run: npm test -- --runInBand
+        run: npm test
