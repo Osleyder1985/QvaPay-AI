@@ -21,6 +21,10 @@ La aplicación se sirve directamente desde Cloudflare Workers.
 
 ## 📊 Funcionalidad implementada
 
+### Cuenta conectada
+
+La sección **Cuenta** consulta de forma protegida la cuenta asociada a las credenciales de aplicación de QvaPay. Muestra balance, identidad P2P observada, estado de la aplicación, ofertas propias y diagnóstico de integración. El endpoint `/api/account` requiere la clave de operación P2P y nunca entrega el `app-secret` ni el payload completo de QvaPay.
+
 ### Mercado P2P
 
 - Consulta independiente de BUY y SELL.
