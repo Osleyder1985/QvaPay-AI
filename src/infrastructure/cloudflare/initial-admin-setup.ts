@@ -17,7 +17,11 @@ export async function bootstrapInitialAdmin(
   username: string,
   password: string,
 ): Promise<AppUser> {
-  if (!bootstrapToken || !presentedToken || !constantTimeEqual(bootstrapToken, presentedToken)) {
+  if (
+    !bootstrapToken ||
+    !presentedToken ||
+    !constantTimeEqual(bootstrapToken, presentedToken)
+  ) {
     throw new Error("Token de configuración inválido.");
   }
 
