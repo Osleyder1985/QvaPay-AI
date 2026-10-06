@@ -30,5 +30,8 @@ export function offersBySide(
 ): readonly Offer[] {
   return market.offers
     .filter((offer) => offer.side === side)
-    .sort((left, right) => compareDecimalStrings(left.rate, right.rate));
+    .sort((left, right) => {
+      const comparison = compareDecimalStrings(left.rate, right.rate);
+      return side === "BUY" ? -comparison : comparison;
+    });
 }
