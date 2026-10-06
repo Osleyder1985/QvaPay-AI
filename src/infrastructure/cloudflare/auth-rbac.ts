@@ -307,13 +307,22 @@ export async function changeUserPassword(db: D1Database, actor: AppUser, userId:
   return updated;
 }
 
-export async function deleteUserByUsername(db: D1Database, username: string): Promise<void> {
+// prettier-ignore
+export async function deleteUserByUsername(
+  db: D1Database,
+  username: string,
+): Promise<void> {
   const normalized = username.trim();
   if (!/^ci-smoke-[a-zA-Z0-9-]{3,64}$/.test(normalized)) {
-    throw new Error("Solo se pueden eliminar cuentas de smoke con prefijo ci-smoke-.");
+    throw new Error(
+      "Solo se pueden eliminar cuentas de smoke con prefijo ci-smoke-.",
+    );
   }
   const user = await findUserByUsername(db, normalized);
   if (!user) return;
-  await db.prepare("DELETE FROM app_users WHERE id = ?").bind(user.id).run();
+  await db
+    .prepare("DELETE FROM app_users WHERE id = ?")
+    .bind(user.id)
+    .run();
   await writeAudit(db, "smoke_user_deleted", "SUCCESS", undefined, user);
 }
