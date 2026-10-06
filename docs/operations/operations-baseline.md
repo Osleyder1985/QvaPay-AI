@@ -1,71 +1,66 @@
 # Línea base operativa
 
-## Ciclo
+## Ciclo actual
 
-```
-Idle
+```text
+Alarm
   ↓
-Alarm Triggered
+Load configuration
   ↓
-Load Configuration
+Start scanner runtime
   ↓
-Mark Execution Started
+GET /p2p (BUY + SELL)
   ↓
-Fetch QvaPay Market
+Validate
   ↓
-Validate Response
+Map to Market / Offer
   ↓
-Normalize Offers
+Persist snapshot in Durable Object
   ↓
-Persist Snapshot
+Complete execution
   ↓
-Mark Execution Completed
-  ↓
-Schedule Next Run
-  ↓
-Idle
+Schedule next Alarm
 ```
 
-## Estados
+## Estado de ejecución
 
-- IDLE;
-- RUNNING;
-- SUCCEEDED;
-- FAILED.
-
-## Persistencia de ejecución
-
-El Durable Object mantiene un estado mínimo de ejecución independiente de la instancia en memoria:
+El Durable Object conserva:
 
 - `lastStartedAt`;
 - `lastCompletedAt`;
-- `lastError`.
+- `lastError`;
+- `nextAlarmAt`;
+- snapshot de mercado.
 
-Este estado permite comprobar desde una interfaz HTTP autenticada que un ciclo del scanner realmente comenzó y terminó. La ausencia de `lastCompletedAt` junto con un `lastError` indica un ciclo fallido.
+## Estado del snapshot
 
-## Fallos
+- `UNAVAILABLE`: no existe snapshot;
+- `EMPTY`: snapshot válido sin ofertas;
+- `AVAILABLE`: snapshot con ofertas.
 
-Ante un error de QvaPay:
+## Errores
 
-1. registrar el error técnico sin secretos;
-2. conservar el último snapshot válido;
-3. marcar el intento como fallido;
-4. persistir el error de ejecución;
-5. programar el siguiente ciclo según política;
-6. evitar duplicados lógicos.
+Un fallo de QvaPay:
 
-## Observabilidad
-
-La ejecución debe permitir observar inicio, fin, estado, error y timestamp. La verificación de producción debe utilizar el endpoint interno autenticado de estado y, cuando corresponda, los logs de Cloudflare.
+1. queda registrado como `lastError`;
+2. no expone credenciales;
+3. conserva el último snapshot válido;
+4. programa el siguiente ciclo.
 
 ## Despliegue
 
-El despliegue deberá pasar por CI/CD y no depender de un navegador abierto.
+Cloudflare Deploy se ejecuta después de un Quality Gate exitoso sobre `main`. El workflow verifica la aplicación pública y el runtime del scanner.
 
-## Recuperación
+## Endpoints operativos
 
-El diseño deberá ser idempotente para soportar reintentos y reinicios.
+- `GET /api/scanner/status`: estado público sanitizado.
+- `POST /internal/scanner/start`: bootstrap protegido.
+- `GET /internal/scanner/state`: estado detallado protegido.
+
+## Aplicación P2P
+
+`POST /api/p2p/:uuid/apply` permite una aplicación real a una oferta cuando se presenta `P2P_ACTION_TOKEN`. Esta operación requiere especial cuidado operacional y no equivale a arbitraje automático.
 
 ## Certificación
 
-La existencia del estado persistente no constituye por sí misma evidencia de ejecución en producción. La certificación requiere evidencia objetiva obtenida después del despliegue real del Worker y del Durable Object.
+El estado del código no sustituye la evidencia de producción. La certificación requiere evidencia reproducible del deployment y de una ejecución real.
