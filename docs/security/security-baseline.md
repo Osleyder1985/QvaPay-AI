@@ -17,6 +17,7 @@ El Worker utiliza:
 
 - `QVAPAY_APP_ID`;
 - `QVAPAY_APP_SECRET`;
+- `QVAPAY_USER_API_TOKEN` (API token with the minimum `read` permission required by the authenticated profile endpoint);
 - `SCANNER_BOOTSTRAP_TOKEN`;
 - `P2P_ACTION_TOKEN`.
 
@@ -27,6 +28,10 @@ Ninguno debe almacenarse en archivos versionados.
 ### Scanner
 
 `/internal/scanner/start` y `/internal/scanner/state` requieren Bearer token.
+
+### Cuenta conectada
+
+La identidad del propietario se obtiene exclusivamente mediante `GET /user` con un API Token de QvaPay autenticado. Los participantes de P2P nunca son una fuente de identidad de cuenta.
 
 ### Aplicación P2P
 
