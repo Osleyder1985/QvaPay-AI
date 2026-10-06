@@ -144,7 +144,8 @@ export async function ensureSecuritySchema(db: D1Database): Promise<void> {
     });
   return schemaReady;
 }
-\nexport async function createPasswordVerifier(password: string): Promise<{ salt: string; hash: string; iterations: number }> {
+
+export async function createPasswordVerifier(password: string): Promise<{ salt: string; hash: string; iterations: number }> {
   if (password.length < 12) throw new Error("La contraseña debe tener al menos 12 caracteres.");
   const salt = crypto.getRandomValues(new Uint8Array(SALT_BYTES));
   const hash = await derivePasswordHash(password, salt);
