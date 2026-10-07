@@ -162,7 +162,7 @@ describe("QvaPayAccountClient", () => {
         if (url.endsWith("/user")) {
           return response(200, { uuid: "owner-uuid", username: "owner-user" });
         }
-        return response(200, { data: [{ malformed: true }] });
+        return response(200, { malformed: true });
       }),
     });
 
