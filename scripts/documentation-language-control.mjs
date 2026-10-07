@@ -8,6 +8,7 @@ const IGNORED = new Set([
   "build",
   "coverage",
   ".wrangler",
+  "package-lock.json",
 ]);
 const EXTENSIONS = new Set([
   ".md",
