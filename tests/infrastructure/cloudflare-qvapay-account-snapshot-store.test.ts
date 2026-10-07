@@ -142,6 +142,7 @@ describe("QvaPay account snapshot store", () => {
     const insert = statements.find((entry) =>
       entry.sql.includes("INSERT INTO qvapay_account_snapshots"),
     );
+    expect(insert).toBeDefined();
     expect(insert?.args).toContain(1);
 
     const serialized = String(insert?.args[5]);
