@@ -37,7 +37,7 @@ function createStorage(initialAlarm: number | null = null) {
 }
 
 describe("CloudflareScannerScheduler", () => {
-  it("schedules an alarm using the requested instant", async () => {
+  it("programa un Alarm usando el instante solicitado", async () => {
     let scheduledAt: number | undefined;
     const scheduler = new CloudflareScannerScheduler({
       setAlarm(value) {
@@ -51,7 +51,7 @@ describe("CloudflareScannerScheduler", () => {
     expect(scheduledAt).toBe(runAt.getTime());
   });
 
-  it("creates the initial alarm using the configured interval", async () => {
+  it("crea el Alarm inicial usando el intervalo configurado", async () => {
     const { storage, getAlarm } = createStorage();
     const state = await ensureScannerScheduled(
       storage,
@@ -68,7 +68,7 @@ describe("CloudflareScannerScheduler", () => {
     expect(getAlarm()).toBe(6_000);
   });
 
-  it("keeps an existing alarm when configuration is unchanged", async () => {
+  it("mantiene un Alarm existente cuando la configuración no cambia", async () => {
     const { storage, getAlarm } = createStorage(18_000);
 
     await storage.put("scanner-config", {
@@ -86,7 +86,7 @@ describe("CloudflareScannerScheduler", () => {
     expect(getAlarm()).toBe(18_000);
   });
 
-  it("reprograms the alarm when configuration changes", async () => {
+  it("reprograma el Alarm cuando cambia la configuración", async () => {
     const { storage, getAlarm } = createStorage(8_000);
 
     await storage.put("scanner-config", {
@@ -104,7 +104,7 @@ describe("CloudflareScannerScheduler", () => {
     expect(getAlarm()).toBe(20_000);
   });
 
-  it("reschedules the next alarm after a successful scan", async () => {
+  it("reprograma el siguiente Alarm después de un escaneo exitoso", async () => {
     const { storage, getAlarm } = createStorage();
     const provider = {
       fetchOffers: async () => [],
@@ -120,7 +120,7 @@ describe("CloudflareScannerScheduler", () => {
     expect(getAlarm()).toBeGreaterThan(Date.now());
   });
 
-  it("reschedules a single bounded retry after a provider failure", async () => {
+  it("reprograma un único reintento acotado después de un fallo del proveedor", async () => {
     const { storage, getAlarm } = createStorage();
     const provider = {
       fetchOffers: async () => {
@@ -140,7 +140,7 @@ describe("CloudflareScannerScheduler", () => {
 });
 
 describe("normalizeScannerSchedulerConfig", () => {
-  it("trims the coin and preserves a valid interval", () => {
+  it("recorta la moneda y conserva un intervalo válido", () => {
     expect(
       normalizeScannerSchedulerConfig({
         coin: " QUSD ",
@@ -158,10 +158,10 @@ describe("normalizeScannerSchedulerConfig", () => {
         coin: " ",
         intervalSeconds: 10,
       }),
-    ).toThrow("must not be empty");
+    ).toThrow("no puede estar vacío");
   });
 
-  it("rejects intervals outside the runtime bounds", () => {
+  it("rechaza intervalos fuera de los límites del runtime", () => {
     expect(() =>
       normalizeScannerSchedulerConfig({
         coin: "QUSD",
