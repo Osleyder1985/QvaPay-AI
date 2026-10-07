@@ -51,7 +51,7 @@ export function normalizeAutoApplyConfig(config: AutoApplyConfig): AutoApplyConf
 export function findAutoApplyCandidate(
   offers: readonly Offer[],
   config: AutoApplyConfig,
-  balance: AutoApplyBalance,
+  balance: AutoApplyBalance | null,
 ): AutoApplyCandidate | null {
   const normalized = normalizeAutoApplyConfig(config);
   if (!normalized.enabled) return null;
