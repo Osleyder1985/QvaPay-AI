@@ -1,9 +1,9 @@
-name: Cloudflare Deploy
+name: Despliegue de Cloudflare
 
 on:
   workflow_run:
     workflows:
-      - Security Gate
+      - Control de Seguridad
     types:
       - completed
     branches:
@@ -16,20 +16,20 @@ permissions:
 
 jobs:
   deploy:
-    name: Deploy qvapay-ai-runtime
+    name: Desplegar qvapay-ai-runtime
     if: >-
       ${{ github.event.workflow_run.conclusion == 'success' &&
         github.event.workflow_run.head_branch == 'main' }}
     runs-on: macos-latest
     environment: production
     steps:
-      - name: Checkout verified commit
+      - name: Obtener el commit verificado
         if: github.event_name == 'workflow_run'
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.workflow_run.head_sha }}
 
-      - name: Verify required quality and security gates
+      - name: Verificar los controles de calidad y seguridad requeridos
         env:
           GH_TOKEN: ${{ github.token }}
           VERIFIED_SHA: ${{ github.event.workflow_run.head_sha }}
@@ -53,7 +53,7 @@ jobs:
                     .filter((run) => run.conclusion === "success")
                     .map((run) => run.name),
                 );
-                const required = ["Repository Quality Gate", "Security Gate"];
+                const required = ["Control de Calidad del Repositorio", "Control de Seguridad"];
                 const missing = required.filter((name) => !successful.has(name));
                 if (missing.length === 0) {
                   console.log(`Required gates passed for ${process.env.VERIFIED_SHA}.`);
@@ -73,15 +73,15 @@ jobs:
             sleep 5
           done
 
-      - name: Setup Node.js
+      - name: Configurar Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
 
-      - name: Install dependencies
+      - name: Instalar dependencias
         run: npm install
 
-      - name: Cloudflare deployment preflight
+      - name: Preflight de despliegue de Cloudflare
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -90,7 +90,7 @@ jobs:
           set -euo pipefail
           npx wrangler deploy --dry-run
 
-      - name: Deploy Worker and verify production application
+      - name: Desplegar Worker y verificar la aplicación de producción
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
