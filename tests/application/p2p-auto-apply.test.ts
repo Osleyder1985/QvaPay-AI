@@ -1,3 +1,10 @@
+/**
+ * Propósito: Pruebas de la estrategia Auto Apply.
+ * Ubicación: tests/application/p2p-auto-apply.test.ts
+ * Funciones principales: cubre límites de tasa, capital/saldo y habilitación.
+ * Historial: 2026-10-06 — implementación inicial para Issue #222.
+ */
+
 import { describe, expect, it, vi } from "vitest";
 import { findAutoApplyCandidate, normalizeAutoApplyConfig } from "../../src/application/p2p-auto-apply.js";
 import type { Offer } from "../../src/domain/offer.js";
