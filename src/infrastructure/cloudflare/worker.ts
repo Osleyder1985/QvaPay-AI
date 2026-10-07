@@ -1,3 +1,10 @@
+/**
+ * @archivo src/infrastructure/cloudflare/worker.ts
+ * @proposito Expone el punto de entrada del Worker y enruta las solicitudes.
+ * @responsabilidades Implementar y proteger las reglas propias de este módulo sin mezclar responsabilidades de otras capas.
+ * @ubicacion src/infrastructure/cloudflare dentro de la arquitectura de QvaPay-AI.
+ */
+
 // prettier-ignore
 import type { DurableObjectNamespace, D1Database } from "@cloudflare/workers-types";
 // prettier-ignore
