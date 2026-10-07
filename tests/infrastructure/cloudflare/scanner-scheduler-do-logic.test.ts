@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+/**\n * Propósito: Pruebas de scheduler y ejecución server-side de Auto Apply.\n * Ubicación: tests/infrastructure/cloudflare/scanner-scheduler-do-logic.test.ts\n * Historial: 2026-10-06 — actualización relacionada con Issue #222; cambios funcionales sujetos a auditoría #166.\n */\n\nimport { describe, expect, it } from "vitest";
 import {
   ensureScannerScheduled,
   executeScannerAlarm,
