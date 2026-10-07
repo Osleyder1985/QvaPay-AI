@@ -27,6 +27,10 @@ export interface ScannerRuntimeState {
 const MIN_INTERVAL_SECONDS = 5;
 const MAX_INTERVAL_SECONDS = 300;
 
+/**
+ * @proposito API pública ScannerRuntime: implementa el comportamiento expuesto por este módulo.
+ * @responsabilidades Aplicar las validaciones y reglas de negocio definidas por el contrato del módulo.
+ */
 export class ScannerRuntime {
   private running = false;
   private state: ScannerRuntimeState = {
@@ -93,6 +97,11 @@ export class ScannerRuntime {
   }
 }
 
+/**
+ * @proposito API pública validateInterval: implementa el comportamiento expuesto por este módulo.
+ * @responsabilidades Aplicar las validaciones y reglas de negocio definidas por el contrato del módulo.
+ * @returns Resultado de la operación pública.
+ */
 export function validateInterval(intervalSeconds: number): void {
   if (
     !Number.isInteger(intervalSeconds) ||
