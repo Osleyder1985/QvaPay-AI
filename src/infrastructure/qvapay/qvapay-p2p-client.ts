@@ -49,6 +49,7 @@ export interface QvaPayP2PClientOptions {
   readonly baseUrl: string;
   readonly appId: string;
   readonly appSecret: string;
+  readonly userApiToken?: string;
   readonly fetcher?: typeof fetch;
   readonly take?: number;
   readonly maxRetries?: number;
