@@ -1,3 +1,10 @@
+/**
+ * @archivo src/domain/offer.ts
+ * @proposito Define el modelo de oferta P2P y las utilidades de comparación decimal.
+ * @responsabilidades Implementar y proteger las reglas propias de este módulo sin mezclar responsabilidades de otras capas.
+ * @ubicacion src/domain dentro de la arquitectura de QvaPay-AI.
+ */
+
 export type OfferSide = "BUY" | "SELL";
 
 export type OfferStatus =
