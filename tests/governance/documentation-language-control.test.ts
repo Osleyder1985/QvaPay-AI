@@ -2,7 +2,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
-// @ts-expect-error El módulo MJS se ejecuta como script de Node y no expone declaraciones TypeScript.
+// @ts-ignore El módulo MJS se ejecuta como script de Node y no expone declaraciones TypeScript.
 import {
   analyzeRepository,
   validateCatalog,
