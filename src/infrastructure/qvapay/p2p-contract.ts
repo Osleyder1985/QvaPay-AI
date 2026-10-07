@@ -1,3 +1,10 @@
+/**
+ * @archivo src/infrastructure/qvapay/p2p-contract.ts
+ * @proposito Define el contrato interno de integración P2P de QvaPay.
+ * @responsabilidades Implementar y proteger las reglas propias de este módulo sin mezclar responsabilidades de otras capas.
+ * @ubicacion src/infrastructure/qvapay dentro de la arquitectura de QvaPay-AI.
+ */
+
 import type {
   QvaPayP2PPageDto,
   QvaPayP2POfferDto,
