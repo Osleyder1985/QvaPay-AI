@@ -50,19 +50,19 @@ The relevant control set includes:
 - **8.15 Logging** — relevant to generation and management of event logs.
 - **8.16 Monitoring activities** — relevant to monitoring systems and events.
 
-ISO/IEC 27002:2022 is the control-guidance standard supporting implementation of the ISO/IEC 27001 ISMS requirements. citeturn1search1turn1search5
+ISO/IEC 27002:2022 is the control-guidance standard supporting implementation of the ISO/IEC 27001 ISMS requirements.
 
 **ISO/IEC 25010:2023**
 
-The product-quality model is applicable to software requirements and evaluation. Its security quality concepts include properties such as integrity, non-repudiation, accountability and authenticity, which directly support the requirement for attributable and tamper-resistant evidence. citeturn1search0turn2search33
+The product-quality model is applicable to software requirements and evaluation. Its security quality concepts include properties such as integrity, non-repudiation, accountability and authenticity, which directly support the requirement for attributable and tamper-resistant evidence.
 
 **ISO 9001**
 
-The quality-management framework is relevant to controlled documented information, process operation, monitoring, measurement and evidence of achieved results. ISO's guidance explicitly connects documented information with controlled processes and retained evidence. citeturn0search0turn0search44
+The quality-management framework is relevant to controlled documented information, process operation, monitoring, measurement and evidence of achieved results. ISO's guidance explicitly connects documented information with controlled processes and retained evidence.
 
 **ISO 19011:2026**
 
-This is an audit-guidance standard, not a product-security control. It is applicable to the evidence model because audit evidence must be relevant to audit criteria and verifiable. The current edition is ISO 19011:2026; the 2018 edition is withdrawn. citeturn0search1turn0search6
+This is an audit-guidance standard, not a product-security control. It is applicable to the evidence model because audit evidence must be relevant to audit criteria and verifiable. The current edition is ISO 19011:2026; the 2018 edition is withdrawn.
 
 ### Alternatives considered
 
@@ -198,11 +198,11 @@ A transaction-only design can permit:
 
 ### Applicable ISO criteria
 
-ISO/IEC 27001:2022 and ISO/IEC 27002:2022 apply to protection, access control, integrity and accountability of the ledger information, but **they do not define accounting rules or a chart of accounts**. ISO/IEC 27002 provides security controls and guidance, not accounting standards. citeturn1search1turn1search5
+ISO/IEC 27001:2022 and ISO/IEC 27002:2022 apply to protection, access control, integrity and accountability of the ledger information, but **they do not define accounting rules or a chart of accounts**. ISO/IEC 27002 provides security controls and guidance, not accounting standards.
 
-ISO/IEC 25010:2023 supports evaluation of integrity, accountability, authenticity and related software quality properties for the ledger implementation. citeturn1search0
+ISO/IEC 25010:2023 supports evaluation of integrity, accountability, authenticity and related software quality properties for the ledger implementation.
 
-ISO 9001 supports controlled process operation, documented information, monitoring and evidence of results. citeturn0search0turn0search44
+ISO 9001 supports controlled process operation, documented information, monitoring and evidence of results.
 
 The actual accounting model remains governed by the applicable accounting framework identified under #286.
 
@@ -318,9 +318,9 @@ Uncontrolled historical mutation can cause:
 
 ### Applicable ISO criteria
 
-ISO/IEC 27002:2022 controls for records, access rights and logging are relevant to protecting closed-period information and controlling privileged changes. citeturn1search1turn2search2
+ISO/IEC 27002:2022 controls for records, access rights and logging are relevant to protecting closed-period information and controlling privileged changes.
 
-ISO 9001's documented-information and process-control principles support controlled procedures and retained evidence of results. citeturn0search0turn0search44
+ISO 9001's documented-information and process-control principles support controlled procedures and retained evidence of results.
 
 The actual definition of a legal/accounting close remains subject to #286.
 
@@ -391,9 +391,9 @@ SYS-ACC-004, SYS-ACC-009 and SYS-ACC-012 require external provenance, reconcilia
 
 ### Applicable ISO criteria
 
-ISO/IEC 27002:2022 is applicable to protecting external evidence and controlling access to reconciliation data. ISO 9001 supports monitored processes, documented information and evidence-based evaluation. citeturn1search1turn0search0
+ISO/IEC 27002:2022 is applicable to protecting external evidence and controlling access to reconciliation data. ISO 9001 supports monitored processes, documented information and evidence-based evaluation.
 
-ISO 19011:2026 is relevant as audit guidance for verifiable evidence and structured evaluation, not as an accounting rule. citeturn0search1turn0search6
+ISO 19011:2026 is relevant as audit guidance for verifiable evidence and structured evaluation, not as an accounting rule.
 
 ### Alternatives considered
 
@@ -462,11 +462,11 @@ SYS-AUD-008 and SYS-ACC-011 explicitly prohibit storage of full PAN, CVV, PIN an
 
 ### Applicable ISO criteria
 
-ISO/IEC 27002:2022 provides security controls for access control, information classification, protection of records and privacy/security-related information handling. citeturn1search1
+ISO/IEC 27002:2022 provides security controls for access control, information classification, protection of records and privacy/security-related information handling.
 
-ISO/IEC 27001:2022 provides the ISMS requirements within which applicable information-security risks are managed. citeturn1search5
+ISO/IEC 27001:2022 provides the ISMS requirements within which applicable information-security risks are managed.
 
-ISO/IEC 25010:2023 supports evaluation of confidentiality, integrity and accountability as product-quality properties. citeturn2search33
+ISO/IEC 25010:2023 supports evaluation of confidentiality, integrity and accountability as product-quality properties.
 
 ### Alternatives considered
 
@@ -527,9 +527,9 @@ ISO standards can govern security, quality, lifecycle and auditability, but they
 
 ### Applicable ISO criteria
 
-ISO 9001 supports determination of organizational context, relevant requirements, controlled processes and evaluation of performance, but it does not replace statutory accounting or tax law. citeturn0search0turn0search3
+ISO 9001 supports determination of organizational context, relevant requirements, controlled processes and evaluation of performance, but it does not replace statutory accounting or tax law.
 
-ISO/IEC 27001/27002 support information-security risk and control requirements but are not accounting standards. citeturn1search5turn1search1
+ISO/IEC 27001/27002 support information-security risk and control requirements but are not accounting standards.
 
 ### Selected solution
 
@@ -580,11 +580,11 @@ Audit evidence, economic history and reconciliation serve different purposes and
 
 ### Applicable ISO criteria
 
-ISO/IEC 25010:2023 is relevant to architecture quality through characteristics used for software specification and evaluation, including integrity, accountability and maintainability-related properties. citeturn1search0
+ISO/IEC 25010:2023 is relevant to architecture quality through characteristics used for software specification and evaluation, including integrity, accountability and maintainability-related properties.
 
-ISO/IEC 27002:2022 supports controlled access, segregation and protection of information assets. citeturn1search1
+ISO/IEC 27002:2022 supports controlled access, segregation and protection of information assets.
 
-ISO 9001 supports controlled processes, defined interfaces, documented information and measurement. citeturn0search43
+ISO 9001 supports controlled processes, defined interfaces, documented information and measurement.
 
 ### Alternatives considered
 
