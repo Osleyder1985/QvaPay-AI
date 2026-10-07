@@ -118,7 +118,10 @@ describe("QvaPayAccountClient", () => {
             return response(200, { uuid: "app-uuid", name: "QvaPay AI" });
           }
           if (url.endsWith("/user")) {
-            return response(200, { uuid: "owner-uuid", username: "owner-user" });
+            return response(200, {
+              uuid: "owner-uuid",
+              username: "owner-user",
+            });
           }
           return response(200, { data: [], total: 0 });
         }),
