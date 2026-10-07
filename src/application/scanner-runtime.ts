@@ -95,9 +95,9 @@ export function validateInterval(intervalSeconds: number): void {
     throw new Error(
       "El intervalo del scanner debe ser un entero entre " +
         MIN_INTERVAL_SECONDS +
-        " and " +
+        " y " +
         MAX_INTERVAL_SECONDS +
-        " seconds",
+        " segundos",
     );
   }
 }
