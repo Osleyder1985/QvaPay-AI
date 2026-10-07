@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
-import type { D1Database, D1PreparedStatement } from "@cloudflare/workers-types";
-import type { QvaPayAccountSnapshot } from "../../src/infrastructure/qvapay/account-contract.js";
+import type {
+  D1Database,
+  D1PreparedStatement,
+} from "@cloudflare/workers-types";
+import type {
+  QvaPayAccountSnapshot,
+} from "../../src/infrastructure/qvapay/account-contract.js";
 import {
   getCurrentQvaPayAccountSnapshot,
   getLastSuccessfulQvaPayAccountSnapshot,
