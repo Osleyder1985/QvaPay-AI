@@ -1,3 +1,10 @@
+/**
+ * @archivo src/infrastructure/cloudflare/scanner-scheduler-config.ts
+ * @proposito Define y valida la configuración persistente del scheduler.
+ * @responsabilidades Implementar y proteger las reglas propias de este módulo sin mezclar responsabilidades de otras capas.
+ * @ubicacion src/infrastructure/cloudflare dentro de la arquitectura de QvaPay-AI.
+ */
+
 import { validateInterval } from "../../application/scanner-runtime.js";
 
 export interface ScannerSchedulerConfig {
