@@ -1,3 +1,10 @@
+/**
+ * Propósito: Contrato y parser de detalle de una oferta P2P de QvaPay.
+ * Ubicación: src/infrastructure/qvapay/p2p-detail-contract.ts
+ * Funciones principales: valida y normaliza la respuesta GET /p2p/:uuid.
+ * Historial: 2026-10-06 — implementación inicial para Issue #222.
+ */
+
 import type { QvaPayP2POfferStatus } from "./p2p-types.js";
 
 export interface QvaPayP2POfferParticipant {
