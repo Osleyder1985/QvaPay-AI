@@ -6,95 +6,95 @@ Definir requisitos de software verificables y su relación con los requisitos de
 
 ## Requisitos existentes
 
-## SWR-FR-001 — Scan Market Use Case
+## SWR-FR-001 — Caso de uso de escaneo de mercado
 El software ejecuta un escaneo y produce un mercado normalizado.
 **Trazabilidad:** SYS-FR-001.
-**Estado:** Tested.
+**Estado:** Probado.
 
-## SWR-FR-002 — Continuous Scanner Runtime
+## SWR-FR-002 — Runtime continuo del scanner
 El runtime ejecuta el scanner sin depender de una sesión de usuario.
 **Trazabilidad:** SYS-FR-002.
-**Estado:** Tested.
+**Estado:** Probado.
 
-## SWR-FR-003 — SELL Book Processing
+## SWR-FR-003 — Procesamiento del libro SELL
 El software mantiene BUY y SELL separados y ordena SELL por tasa ascendente.
 **Trazabilidad:** SYS-FR-003.
-**Estado:** Tested.
+**Estado:** Probado.
 
-## SWR-FR-004 — BUY Book Processing
+## SWR-FR-004 — Procesamiento del libro BUY
 El software mantiene BUY y SELL separados y determina la mejor BUY mediante la mayor tasa.
 **Trazabilidad:** SYS-FR-004.
-**Estado:** Tested.
+**Estado:** Probado.
 
-## SWR-IR-001 — External Provider Adapter
+## SWR-IR-001 — Adaptador del proveedor externo
 QvaPay se integra mediante QvaPayP2PClient.
-**Estado:** Tested.
+**Estado:** Probado.
 
-## SWR-IR-002 — Provider Request Policy
+## SWR-IR-002 — Política de solicitudes al proveedor
 El adaptador gestiona paginación, timeout, rate limiting, backoff y errores.
-**Estado:** Tested.
+**Estado:** Probado.
 
-## SWR-IR-003 — External Contract Validation
+## SWR-IR-003 — Validación del contrato externo
 El contrato externo se valida antes del mapeo.
-**Estado:** Tested.
+**Estado:** Probado.
 
-## SWR-DR-001 — Market Snapshot Persistence
+## SWR-DR-001 — Persistencia del snapshot de mercado
 El snapshot se conserva en el almacenamiento del Durable Object.
-**Estado:** Implemented / Tested.
+**Estado:** Implementado / Probado.
 
-## SWR-DR-002 — Decimal Value Preservation
+## SWR-DR-002 — Conservación de valores decimales
 Los valores económicos externos se representan como strings.
-**Estado:** Tested.
+**Estado:** Probado.
 
-## SWR-QR-001 — Controlled Retry
+## SWR-QR-001 — Reintento controlado
 Los reintentos son limitados y utilizan backoff.
-**Estado:** Tested.
+**Estado:** Probado.
 
-## SWR-SR-001 — Secret Isolation
-Las credenciales se mantienen server-side.
-**Estado:** Implemented.
+## SWR-SR-001 — Aislamiento de secretos
+Las credenciales se mantienen del lado del servidor.
+**Estado:** Implementado.
 
 ## Nuevos requisitos de software
 
-### SWR-AUD-001 — Audit Event Persistence
+### SWR-AUD-001 — Persistencia de eventos de auditoría
 Los eventos de auditoría deben persistirse de forma durable, consultable y trazable.
 **Trazabilidad:** SYS-AUD-001, SYS-AUD-004.
-**Estado:** Defined / Blocked.
+**Estado:** Definido / Bloqueado.
 
-### SWR-AUD-002 — Audit State Transition Capture
+### SWR-AUD-002 — Captura de transiciones de estado de auditoría
 Los eventos deben poder registrar estado anterior, estado posterior, resultado y motivo cuando aplique.
 **Trazabilidad:** SYS-AUD-003.
-**Estado:** Defined / Blocked.
+**Estado:** Definido / Bloqueado.
 
-### SWR-AUD-003 — Audit Integrity and Retention
+### SWR-AUD-003 — Integridad y retención de auditoría
 El sistema debe aplicar controles de integridad, retención, acceso y preservación de evidencia.
 **Trazabilidad:** SYS-AUD-005, SYS-AUD-006, SYS-AUD-007.
-**Estado:** Defined / Blocked.
+**Estado:** Definido / Bloqueado.
 
-### SWR-ACC-001 — Economic Ledger
-Las operaciones económicas deben persistirse como un ledger auditable, con referencias internas y externas.
+### SWR-ACC-001 — Libro mayor económico
+Las operaciones económicas deben persistirse como un libro mayor auditable, con referencias internas y externas.
 **Trazabilidad:** SYS-ACC-001, SYS-ACC-004.
-**Estado:** Defined / Blocked.
+**Estado:** Definido / Bloqueado.
 
-### SWR-ACC-002 — Accounting Entries
-El diseño debe evaluar y documentar un modelo de partida doble/general ledger antes de implementación.
+### SWR-ACC-002 — Asientos contables
+El diseño debe evaluar y documentar un modelo de partida doble/general libro mayor antes de implementación.
 **Trazabilidad:** SYS-ACC-010.
-**Estado:** Defined / Blocked.
+**Estado:** Definido / Bloqueado.
 
-### SWR-ACC-003 — Period Close
+### SWR-ACC-003 — Cierre de períodos
 Los períodos contables deben soportar apertura, movimientos, conciliación, cierre y evidencia reproducible; los períodos cerrados deben ser inmutables.
 **Trazabilidad:** SYS-ACC-007, SYS-ACC-012.
-**Estado:** Defined / Blocked.
+**Estado:** Definido / Bloqueado.
 
-### SWR-ACC-004 — Reconciliation
+### SWR-ACC-004 — Conciliación
 Las operaciones internas deben poder reconciliarse con fuentes externas y conservar la evidencia de las diferencias.
 **Trazabilidad:** SYS-ACC-009.
-**Estado:** Defined / Blocked.
+**Estado:** Definido / Bloqueado.
 
-### SWR-ACC-005 — Payment Instrument Minimization
+### SWR-ACC-005 — Minimización de instrumentos de pago
 Los registros contables deben minimizar datos de tarjetas y medios de pago y evitar almacenamiento de secretos de autenticación.
 **Trazabilidad:** SYS-ACC-011.
-**Estado:** Defined / Blocked.
+**Estado:** Definido / Bloqueado.
 
 ## Gobernanza
 
