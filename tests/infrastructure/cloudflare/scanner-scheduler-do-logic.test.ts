@@ -4,7 +4,7 @@ import {
   executeScannerAlarm,
   SCANNER_EXECUTION_STATE_KEY,
   type ScannerRuntimeExecutionState,
-  type ScannerSchedulerPersistentStorage,
+  type ScannerSchedulerPersistentStorage,\n  type AutoApplyProvider,\n  AUTO_APPLY_STATE_KEY,
 } from "../../../src/infrastructure/cloudflare/scanner-scheduler-do-logic.js";
 import type { MarketProvider } from "../../../src/application/ports/market-provider.js";
 
@@ -99,5 +99,69 @@ describe("executeScannerAlarm", () => {
       lastError: "QvaPay unavailable",
     });
     expect(await storage.getAlarm()).toBeGreaterThan(Date.now());
+  });
+});
+
+describe("executeScannerAlarm Auto Apply", () => {
+  it("applies one matching BUY action server-side and persists the result", async () => {
+    const storage = new FakeStorage();
+    await storage.put("auto-apply-config", {
+      enabled: true,
+      buy: { maxRate: "1000", maxCupAmount: "100000" },
+      sell: { minRate: "1100" },
+    });
+
+    const calls: string[] = [];
+    const provider: MarketProvider = {
+      fetchOffers: async () => [
+        {
+          id: "sell-offer",
+          market: "QUSD_CUP",
+          side: "SELL",
+          rate: "999",
+          amount: "100",
+          availableAmount: "100",
+          status: "open",
+          sourceTimestamp: "2026-10-06T00:00:00.000Z",
+          observedAt: "2026-10-06T00:00:00.000Z",
+          createdAt: "2026-10-06T00:00:00.000Z",
+          creatorUsername: "seller",
+          creatorVip: false,
+          onlyVip: false,
+          fiatAmount: "99900",
+        },
+      ],
+    };
+    const autoApply: AutoApplyProvider = {
+      fetchApplicationBalance: async () => "500",
+      applyOffer: async (uuid) => {
+        calls.push("apply:" + uuid);
+        return { message: "Aplicado a la oferta" };
+      },
+      fetchOfferDetail: async (uuid) => ({
+        uuid,
+        status: "processing",
+        type: "sell",
+        coin: "QUSD_CUP",
+      }),
+    };
+
+    await executeScannerAlarm(
+      storage,
+      config,
+      provider,
+      autoApply,
+      Date.parse("2026-10-06T00:00:00.000Z"),
+    );
+
+    expect(calls).toEqual(["apply:sell-offer"]);
+    expect(await storage.get<string[]>("auto-apply-applied-ids")).toEqual([
+      "sell-offer",
+    ]);
+    expect(await storage.get(AUTO_APPLY_STATE_KEY)).toMatchObject({
+      lastAction: "BUY",
+      lastOfferId: "sell-offer",
+      lastResult: "APPLIED",
+    });
   });
 });
