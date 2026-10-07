@@ -104,86 +104,85 @@ async function executeAutoApply(
   const config = await getAutoApplyConfig(storage);
   if (!config?.enabled) return;
 
-  const now = Date.now();
-  const recentAttempts =
-    (await storage.get<number[]>("auto-apply-attempts")) ?? [];
-  const activeAttempts = recentAttempts.filter((timestamp) => now - timestamp < 60_000);
-  if (activeAttempts.length >= 2) {
-    return;
-  }
-
-  const appliedIds =
-    (await storage.get<string[]>("auto-apply-applied-ids")) ?? [];
-  const balance = await provider.fetchApplicationBalance();
-  const candidate = findAutoApplyCandidate(market.offers, config, { qusd: balance });
-  if (!candidate || appliedIds.includes(candidate.offer.id)) {
-    return;
-  }
-
-  await storage.put("auto-apply-attempts", [...activeAttempts, now]);
-  const attemptedAt = new Date(now).toISOString();
-
   try {
-    const result = await provider.applyOffer(candidate.offer.id);
-    let detail: unknown = null;
-    let detailError: string | null = null;
-    try {
-      detail = await provider.fetchOfferDetail(candidate.offer.id);
-    } catch (error) {
-      detailError = error instanceof Error ? error.message : String(error);
-    }
+    const now = Date.now();
+    const recentAttempts =
+      (await storage.get<number[]>("auto-apply-attempts")) ?? [];
+    const activeAttempts = recentAttempts.filter(
+      (timestamp) => now - timestamp < 60_000,
+    );
+    if (activeAttempts.length >= 2) return;
 
-    await storage.put("auto-apply-applied-ids", [
-      ...appliedIds.slice(-499),
-      candidate.offer.id,
-    ]);
-    await storage.put<AutoApplyState>(AUTO_APPLY_STATE_KEY, {
-      lastAttemptAt: attemptedAt,
-      lastAction: candidate.action,
-      lastOfferId: candidate.offer.id,
-      lastResult: "APPLIED",
-      lastError: detailError,
-      lastDetail: detail,
+    const appliedIds =
+      (await storage.get<string[]>("auto-apply-applied-ids")) ?? [];
+    const balance = await provider.fetchApplicationBalance();
+    const candidate = findAutoApplyCandidate(market.offers, config, {
+      qusd: balance,
     });
-    if (audit) {
-      await audit({
-        action: candidate.action,
-        offerId: candidate.offer.id,
-        result: "APPLIED",
-        detail,
-        error: detailError,
+    if (!candidate || appliedIds.includes(candidate.offer.id)) return;
+
+    await storage.put("auto-apply-attempts", [...activeAttempts, now]);
+    const attemptedAt = new Date(now).toISOString();
+
+    try {
+      const result = await provider.applyOffer(candidate.offer.id);
+      let detail: unknown = null;
+      let detailError: string | null = null;
+      try {
+        detail = await provider.fetchOfferDetail(candidate.offer.id);
+      } catch (error) {
+        detailError = error instanceof Error ? error.message : String(error);
+      }
+
+      await storage.put("auto-apply-applied-ids", [
+        ...appliedIds.slice(-499),
+        candidate.offer.id,
+      ]);
+      await storage.put<AutoApplyState>(AUTO_APPLY_STATE_KEY, {
+        lastAttemptAt: attemptedAt,
+        lastAction: candidate.action,
+        lastOfferId: candidate.offer.id,
+        lastResult: "APPLIED",
+        lastError: detailError,
+        lastDetail: detail,
       });
-    }
-    console.info("QvaPay Auto Apply completed", {
-      action: candidate.action,
-      offerId: candidate.offer.id,
-      detailAvailable: detail !== null,
-    });
-    void result;
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    await storage.put<AutoApplyState>(AUTO_APPLY_STATE_KEY, {
-      lastAttemptAt: attemptedAt,
-      lastAction: candidate.action,
-      lastOfferId: candidate.offer.id,
-      lastResult: "FAILED",
-      lastError: message,
-      lastDetail: null,
-    });
-    if (audit) {
-      await audit({
+      if (audit) {
+        await audit({
+          action: candidate.action,
+          offerId: candidate.offer.id,
+          result: "APPLIED",
+          detail,
+          error: detailError,
+        });
+      }
+      void result;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      await storage.put<AutoApplyState>(AUTO_APPLY_STATE_KEY, {
+        lastAttemptAt: attemptedAt,
+        lastAction: candidate.action,
+        lastOfferId: candidate.offer.id,
+        lastResult: "FAILED",
+        lastError: message,
+        lastDetail: null,
+      });
+      if (audit) {
+        await audit({
+          action: candidate.action,
+          offerId: candidate.offer.id,
+          result: "FAILED",
+          detail: null,
+          error: message,
+        });
+      }
+      console.error("QvaPay Auto Apply failed", {
         action: candidate.action,
         offerId: candidate.offer.id,
-        result: "FAILED",
-        detail: null,
         error: message,
       });
     }
-    console.error("QvaPay Auto Apply failed", {
-      action: candidate.action,
-      offerId: candidate.offer.id,
-      error: message,
-    });
+  } catch (error) {
+    console.error("QvaPay Auto Apply evaluation failed", error);
   }
 }
 
