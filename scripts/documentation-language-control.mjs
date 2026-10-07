@@ -30,8 +30,7 @@ function technicalLiteral(text) {
   return false;
 }
 
-function position(source, offset) { const before = source.slice(0, Math.max(0, offset)); return { line: before.split(/\r?\n/).length, column: offset - before.lastIndexOf("
-") }; }
+function position(source, offset) { const before = source.slice(0, Math.max(0, offset)); return { line: before.split(/\r?\n/).length, column: offset - before.lastIndexOf("\n") }; }
 function makeCandidate(file, source, text, category, offset, context) { const pos = position(source, offset); return { file, line: pos.line, column: pos.column, text: text.trim(), category, source: "language-control:" + context }; }
 
 function discover(root) {
