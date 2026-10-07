@@ -2,6 +2,10 @@
  * @archivo src/infrastructure/qvapay/p2p-mapper.ts
  * @proposito Transforma respuestas P2P externas al modelo interno.
  * @responsabilidades Implementar y proteger las reglas propias de este módulo sin mezclar responsabilidades de otras capas.
+* @dependencias DTO QvaPayP2POfferDto y modelo Offer del dominio.
+* @seguridad No gestiona secretos; valida cantidades externas antes de calcular tasas.
+* @superficie-publica mapQvaPayOffer.
+* @mantenimiento Mantener alineado con el contrato P2P y las pruebas de mapeo.
  * @ubicacion src/infrastructure/qvapay dentro de la arquitectura de QvaPay-AI.
  */
 
