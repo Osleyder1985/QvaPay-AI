@@ -37,7 +37,7 @@ export class ScannerRuntime {
   ) {
     validateInterval(options.intervalSeconds);
     if (!options.coin.trim()) {
-      throw new Error("Scanner coin must not be empty");
+      throw new Error("La moneda del scanner no puede estar vacía");
     }
   }
 
