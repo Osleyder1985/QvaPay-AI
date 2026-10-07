@@ -41,12 +41,23 @@ describe("QvaPayAccountClient", () => {
             username: "owner-user",
             name: "Owner",
             lastname: "Account",
+            email: "owner@example.com",
+            bio: "Owner bio",
+            balance: 77.25,
+            satoshis: 123,
+            phone: "+123456789",
             average_rating: 4.8,
             kyc: true,
             golden_check: true,
             phone_verified: true,
-            telegram: "owner",
+            golden_expire: "2030-01-01T00:00:00.000Z",
             p2p_enabled: true,
+            savings_roundup: false,
+            cover: "https://example.com/cover",
+            image: "https://example.com/image",
+            twitter: "@owner",
+            telegram: "owner",
+            two_factor_secret: "***",
           });
         }
         return response(200, {
@@ -70,6 +81,20 @@ describe("QvaPayAccountClient", () => {
     expect(snapshot.balanceSource.retrievedAt).toEqual(expect.any(String));
     expect(snapshot.identity?.uuid).toBe("owner-uuid");
     expect(snapshot.identity?.username).toBe("owner-user");
+    expect(snapshot.identity?.email).toBe("owner@example.com");
+    expect(snapshot.identity?.bio).toBe("Owner bio");
+    expect(snapshot.identity?.balance).toBe(77.25);
+    expect(snapshot.identity?.satoshis).toBe(123);
+    expect(snapshot.identity?.phone).toBe("+123456789");
+    expect(snapshot.identity?.phoneVerified).toBe(true);
+    expect(snapshot.identity?.goldenExpire).toBe("2030-01-01T00:00:00.000Z");
+    expect(snapshot.identity?.savingsRoundup).toBe(false);
+    expect(snapshot.identity?.telegram).toBe("owner");
+    expect(snapshot.identity?.telegramVerified).toBeNull();
+    expect(snapshot.identity?.ratingCount).toBeNull();
+    expect(snapshot.identity?.vip).toBeNull();
+    expect(snapshot.identity?.twoFactorEnabled).toBe(true);
+    expect(JSON.stringify(snapshot)).not.toContain("two_factor_secret");
     expect(snapshot.identitySource).toBe("/user");
     expect(snapshot.identityProvenance.endpoint).toBe("/user");
     expect(snapshot.identityProvenance.status).toBe("verified");
