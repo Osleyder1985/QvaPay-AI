@@ -1,6 +1,5 @@
 import fs from "node:fs";
 import path from "node:path";
-import ts from "typescript";
 
 const IGNORED = new Set([".git", "node_modules", "dist", "build", "coverage", ".wrangler"]);
 const EXTENSIONS = new Set([".md", ".yml", ".yaml", ".json", ".toml", ".ts", ".tsx", ".js", ".jsx", ".mjs", ".sql"]);
@@ -63,37 +62,35 @@ function extractMarkdown(text, file) {
 
 function extractCode(text, file) {
   const result = [];
-  const scanner = ts.createScanner(ts.ScriptTarget.Latest, false, ts.LanguageVariant.Standard, text);
-  let token = scanner.scan();
-  while (token !== ts.SyntaxKind.EndOfFileToken) {
-    if (token === ts.SyntaxKind.SingleLineCommentTrivia || token === ts.SyntaxKind.MultiLineCommentTrivia) {
-      const start = scanner.getTokenPos(); const end = scanner.getTextPos();
-      const raw = text.slice(start, end).replace(/^\/\/!?\s?/, "").replace(/^\/\*[*!]?\s?/, "").replace(/\*\/$/, "").trim();
-      if (raw) result.push(makeCandidate(file, text, raw, "DOC_COMMENT", start, "comment"));
-    }
-    token = scanner.scan();
+  const commentPattern = /\/\/!?[^\r\n]*|\/\*[\s\S]*?\*\//g;
+  for (const match of text.matchAll(commentPattern)) {
+    const raw = match[0].replace(/^\/\/!?\s?/, "").replace(/^\/\*[*!]?\s?/, "").replace(/\*\/$/, "").trim();
+    if (raw) result.push(makeCandidate(file, text, raw, "DOC_COMMENT", match.index, "comment"));
   }
-  const sourceFile = ts.createSourceFile(file, text, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
-  function visit(node) {
-    if (ts.isStringLiteral(node) || ts.isNoSubstitutionTemplateLiteral(node)) {
-      const value = node.text.trim();
-      if (!value || technicalLiteral(value)) { ts.forEachChild(node, visit); return; }
-      if (node.parent && ts.isPropertyAssignment(node.parent) && node.parent.name === node) { ts.forEachChild(node, visit); return; }
-      let category = "PROSE"; let context = "string"; const parent = node.parent;
-      if (parent && ts.isCallExpression(parent)) {
-        const expression = parent.expression;
-        const name = ts.isIdentifier(expression) ? expression.text : ts.isPropertyAccessExpression(expression) ? expression.name.text : "";
-        if (["describe", "it", "test"].includes(name)) { category = "TEST_DESCRIPTION"; context = name; }
-        if (["error", "warn", "log", "info", "debug"].includes(name)) { category = "LOG_MESSAGE"; context = name; }
-      }
-      if (parent && ts.isNewExpression(parent) && ts.isIdentifier(parent.expression) && parent.expression.text === "Error") { category = "ERROR_MESSAGE"; context = "Error"; }
-      result.push(makeCandidate(file, text, value, category, node.getStart(sourceFile), context));
-    }
-    ts.forEachChild(node, visit);
-  }
-  visit(sourceFile); return result;
-}
 
+  const stringPattern = /(['"])(?:\\\\.|(?!\\1)[^\\r\\n])*?\\1/g;
+  for (const match of text.matchAll(stringPattern)) {
+    const value = match[0].slice(1, -1).trim();
+    if (!value || technicalLiteral(value)) continue;
+    const offset = match.index;
+    const before = text.slice(Math.max(0, offset - 80), offset);
+    if (/:\\s*$/.test(before)) continue;
+    let category = "PROSE";
+    let context = "string";
+    if (/\\b(?:describe|it|test)\\s*\\(\\s*$/.test(before)) {
+      category = "TEST_DESCRIPTION";
+      context = "test";
+    } else if (/\\b(?:console\\.(?:error|warn|log|info|debug))\\s*\\(\\s*$/.test(before)) {
+      category = "LOG_MESSAGE";
+      context = "console";
+    } else if (/\\bnew\\s+Error\\s*\\(\\s*$/.test(before) || /\\bthrow\\s+new\\s+Error\\s*\\(\\s*$/.test(before)) {
+      category = "ERROR_MESSAGE";
+      context = "Error";
+    }
+    result.push(makeCandidate(file, text, value, category, offset, context));
+  }
+  return result;
+}
 function extractJson(text, file) {
   const result = []; let data;
   try { data = JSON.parse(text); } catch { return [makeCandidate(file, text, "JSON no válido", "PROSE", 0, "json-parse")]; }
