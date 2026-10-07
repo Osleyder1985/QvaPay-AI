@@ -33,6 +33,21 @@ El endpoint `GET /api/account` requiere una sesión de usuario independiente. La
 
 La ruta `POST /api/p2p/:uuid/apply` también permanece bloqueada para el dashboard público hasta disponer de una frontera de operación autenticada independiente.
 
+## Persistencia server-side
+
+Cada sincronización autenticada de Cuenta se registra en D1 como un snapshot normalizado con:
+
+- identificador único;
+- versión de esquema;
+- estado de integración;
+- instante de obtención y persistencia;
+- modelo contractual normalizado;
+- proveniencia por fuente.
+
+El snapshot más reciente se marca como **current**. Solo un snapshot con estado **verified** puede convertirse en **last successful**; una sincronización `degraded` o `failed` conserva el último snapshot verificado para recuperación histórica. La recuperación mediante `GET /api/account/snapshot` no consulta QvaPay.
+
+El almacenamiento persiste exclusivamente el contrato normalizado. No se almacenan tokens QvaPay, `app-secret`, credenciales de sesión ni payloads upstream completos.
+
 ## Interfaz
 
 Con una sesión autenticada, Cuenta puede mostrar balance, identidad autenticada, estado de la aplicación, metadatos P2P propios y diagnóstico de integración. La sesión de dashboard es independiente de `QVAPAY_USER_API_TOKEN`; este último continúa exclusivamente server-side y se utiliza solo para `GET /user`.
@@ -43,12 +58,6 @@ Con una sesión autenticada, Cuenta puede mostrar balance, identidad autenticada
 - Implementación: `src/infrastructure/qvapay/qvapay-account-client.ts`, `src/infrastructure/qvapay/account-contract.ts`, `src/infrastructure/cloudflare/account-auth.ts` y `src/infrastructure/cloudflare/worker.ts`.
 - UI: `src/infrastructure/cloudflare/public-app.ts`.
 - Tests: `tests/infrastructure/qvapay-account-client.test.ts` y pruebas del contrato público.
-
-## Contrato y unidades
-
-La identidad se obtiene exclusivamente de `GET /user`. El balance de `POST /v2/balance` se trata como USD; no se etiqueta como QUSD por analogía con el mercado P2P. Los campos ausentes o no documentados no se convierten en `false`, `0` o estados verificados.
-
-El metadata `two_factor_secret` de QvaPay no se persiste ni se expone; solo puede derivarse un indicador de presencia de 2FA. `latest_transactions` permanece fuera del modelo hasta completar clasificación y minimización.
 
 ## Regla de evolución
 
