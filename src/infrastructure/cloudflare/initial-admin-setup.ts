@@ -20,6 +20,11 @@ function validateInitialAdminCredentials(
   }
 }
 
+/**
+ * @proposito API pública bootstrapInitialAdmin: implementa el comportamiento expuesto por este módulo.
+ * @responsabilidades Aplicar las validaciones y reglas de negocio definidas por el contrato del módulo.
+ * @returns Resultado de la operación pública.
+ */
 export async function bootstrapInitialAdmin(
   db: D1Database,
   username: string,
