@@ -217,8 +217,13 @@ export class QvaPayAccountClient {
   }
 
   async fetchAccount(): Promise<QvaPayAccountSnapshot> {
-    const spacingMs = Math.max(0, this.options.minimumRequestSpacingMs ?? 1_700);
-    const balance = await request(this.options, "/v2/balance", { method: "POST" });
+    const spacingMs = Math.max(
+      0,
+      this.options.minimumRequestSpacingMs ?? 1_700,
+    );
+    const balance = await request(this.options, "/v2/balance", {
+      method: "POST",
+    });
     await wait(spacingMs);
     const info = await request(this.options, "/v2/info", { method: "POST" });
     await wait(spacingMs);
