@@ -151,7 +151,6 @@ describe("QvaPayAccountClient", () => {
       appId: "test-app-id",
       appSecret: "test-app-secret",
       userApiToken: "test-profile-token",
-      minimumRequestSpacingMs: 0,
       fetcher: vi.fn(async (input) => {
         const url = String(input);
         if (url.endsWith("/v2/balance")) {
