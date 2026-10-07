@@ -11,6 +11,10 @@ export interface DurableObjectAlarmStorage {
   setAlarm(scheduledTimeMs: number): void | Promise<void>;
 }
 
+/**
+ * @proposito API pública CloudflareScannerScheduler: implementa el comportamiento expuesto por este módulo.
+ * @responsabilidades Aplicar el contrato y las validaciones correspondientes a la integración.
+ */
 export class CloudflareScannerScheduler implements ScannerScheduler {
   constructor(private readonly storage: DurableObjectAlarmStorage) {}
 
