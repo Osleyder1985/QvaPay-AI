@@ -50,8 +50,8 @@ describe("control lingüístico documental", () => {
     fs.writeFileSync(
       path.join(root, "ejemplo.ts"),
       [
-        "// This comment explains the system",
-        'describe("validates the configured interval", () => {});',
+        "// Este comentario explica el sistema",
+        'describe("valida el intervalo configurado", () => {});',
       ].join("\n"),
     );
 
@@ -192,7 +192,7 @@ describe("control lingüístico documental", () => {
     const root = createFixture();
     fs.writeFileSync(
       path.join(root, "documento.md"),
-      "The repository must pass the verification before deployment.\n",
+      "El repositorio debe superar la verificación antes del despliegue.\n",
     );
 
     const first = JSON.stringify(analyzeRepository(root));
