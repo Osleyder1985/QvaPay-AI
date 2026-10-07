@@ -2,84 +2,64 @@
 
 ## Propósito
 
-Relacionar requisitos con diseño, implementación, pruebas y evidencia de runtime.
+Relacionar requisitos con diseño, implementación, pruebas, evidencia de runtime y certificación. Un estado superior no puede declararse mientras falte evidencia de una etapa previa.
+
+## Requisitos funcionales existentes
 
 | ID | Requisito | Implementación | Prueba / evidencia | Estado |
 |---|---|---|---|---|
-| SYS-FR-001 | Escaneo automático configurable | Scanner Runtime + Durable Object + Alarm | pruebas de runtime/scheduler + smoke | Verificado |
-| SYS-FR-002 | Ejecución 24/7 server-side | Durable Object + Alarm | Quality Gate + Cloudflare Deploy + smoke | Verificado |
-| SYS-FR-003 | Libro SELL | Market + Public App | pruebas de dominio/API + smoke | Verificado |
-| SYS-FR-004 | Libro BUY | Market + Public App | pruebas de dominio/API + smoke | Verificado |
-| SYS-INT-001 | GET /p2p | QvaPayP2PClient | pruebas de cliente | Probado |
-| SYS-INT-002 | Separación type/coin | Client + Market | pruebas QvaPay | Probado |
-| SYS-INT-003 | Paginación | QvaPayP2PClient | pruebas QvaPay | Probado |
-| SYS-INT-004 | Secretos server-side | Worker + Cloudflare Secrets | Security Gate + smoke | Verificado |
-| SYS-INT-005 | Validación externa | p2p-contract | pruebas de contrato | Probado |
-| SYS-INT-006 | Backoff 429 | QvaPayP2PClient | pruebas QvaPay | Probado |
-| SYS-INT-007 | Clasificación de errores | QvaPayP2PClient | pruebas QvaPay | Probado |
-| SYS-INT-008 | Precisión decimal | DTO + dominio | pruebas de contrato/dominio | Probado |
-| SYS-INT-009 | Lectura del mercado | QvaPayP2PClient | pruebas QvaPay + smoke | Verificado |
-| SYS-INT-010 | observedAt | Mapper + Offer | pruebas QvaPay | Probado |
-| SYS-INT-011 | Compatibilidad con caché | Documentación operativa | evidencia externa pendiente | Definido |
-| SYS-INT-012 | Evolución segura | Contract parser | pruebas de contrato | Probado |
-| SYS-FR-005 | Centro de Cuenta protegido | QvaPayAccountClient + `/api/account` | pruebas de cliente/ruta | Implementado |
-| SYS-SEC-001 | No pedir secretos operacionales al navegador | Public App + Worker | Security Gate + dashboard smoke | Verificado |
-| SYS-SEC-002 | Identidad de cuenta desde `/user` | QvaPayAccountClient | pruebas de cuenta | Verificado |
+| SYS-FR-001 | Escaneo automático configurable | Scanner Runtime + Durable Object + Alarm | pruebas de runtime/scheduler + smoke | Verified |
+| SYS-FR-002 | Ejecución 24/7 server-side | Durable Object + Alarm | Quality Gate + Cloudflare Deploy + smoke | Verified |
+| SYS-FR-003 | Libro SELL | Market + Public App | pruebas de dominio/API + smoke | Verified |
+| SYS-FR-004 | Libro BUY | Market + Public App | pruebas de dominio/API + smoke | Verified |
+| SYS-FR-005 | Centro de Cuenta protegido | QvaPayAccountClient + /api/account | pruebas de cliente/ruta | Implemented |
+| SYS-SEC-001 | No pedir secretos operacionales al navegador | Public App + Worker | Security Gate + dashboard smoke | Verified |
+| SYS-SEC-002 | Identidad de cuenta desde /user | QvaPayAccountClient | pruebas de cuenta | Verified* |
 
-## Evidencia de producción
+## Nuevos requisitos — Audit and Control
 
-La cadena de evidencia vigente es:
+| ID | Requisito | Implementación | Prueba / evidencia | Estado |
+|---|---|---|---|---|
+| SYS-AUD-001 | Audit trail persistente y consultable | TBD | TBD | Defined |
+| SYS-AUD-002 | Actor, acción, objeto y contexto | TBD | TBD | Defined |
+| SYS-AUD-003 | Before/after y resultado | TBD | TBD | Defined |
+| SYS-AUD-004 | Correlation/request/operation traceability | TBD | TBD | Defined |
+| SYS-AUD-005 | Integridad, retención y control de acceso | TBD | TBD | Defined |
+| SYS-AUD-006 | Auditoría del acceso al propio audit trail | TBD | TBD | Defined |
+| SYS-AUD-007 | Exportación y preservación de evidencia | TBD | TBD | Defined |
+| SYS-AUD-008 | Minimización de secretos/datos sensibles | TBD | TBD | Defined |
 
-`PR → merge → main commit → Control de Calidad del Repositorio → Cloudflare Deploy → production smoke → criterion-specific production evidence`.
+## Nuevos requisitos — Accounting and Economic
 
-Para identidad de cuenta, la evidencia de producción exige además una sesión autenticada reproducible contra `/api/account`. La respuesta `403` sin sesión demuestra el límite de seguridad, pero **no demuestra la identidad del propietario** y no permite certificar SYS-SEC-002 ni Issue #97.
+| ID | Requisito | Implementación | Prueba / evidencia | Estado |
+|---|---|---|---|---|
+| SYS-ACC-001 | Ledger económico persistente | TBD | TBD | Defined |
+| SYS-ACC-002 | BUY/SELL y operaciones monetarias | TBD | TBD | Defined |
+| SYS-ACC-003 | Transferencias, ingresos, gastos, comisiones | TBD | TBD | Defined |
+| SYS-ACC-004 | Proveniencia y referencias externas | TBD | TBD | Defined |
+| SYS-ACC-005 | Saldos y estados de cuenta | TBD | TBD | Defined |
+| SYS-ACC-006 | Ganancias, pérdidas y resultado neto | TBD | TBD | Defined |
+| SYS-ACC-007 | Períodos y cierres contables inmutables | TBD | TBD | Defined |
+| SYS-ACC-008 | Ajustes/reversiones controlados | TBD | TBD | Defined |
+| SYS-ACC-009 | Reconciliación con proveedores/medios de pago | TBD | TBD | Defined |
+| SYS-ACC-010 | Modelo de partida doble/general ledger evaluado | TBD | TBD | Defined |
+| SYS-ACC-011 | Minimización y protección de datos de tarjetas | TBD | TBD | Defined |
+| SYS-ACC-012 | Reporting reproducible y evidencia de cierre | TBD | TBD | Defined |
 
-Para el commit de `main` `bac8500cc579e4277852e74cc3a247bf00ed0cc1`:
+## Requisitos de cumplimiento contable
 
-- Control de Calidad del Repositorio: **PASSED**.
-- Security Gate: **PASSED**.
-- Despliegue de Cloudflare #67: **PASADO**.
-- Smoke de producción: dashboard HTTP 200, scanner operativo y snapshot no vacío.
-- El smoke confirmó BUY y SELL no vacíos, `totalOffers > 0`, `snapshotAt`, `bestBuyRate` y `bestSellRate`.
+| ID | Requisito | Estado |
+|---|---|---|
+| SYS-COMP-ACC-001 | Determinar jurisdicción y marco contable aplicable | Defined |
+| SYS-COMP-ACC-002 | Determinar obligaciones fiscales/financieras/payment | Defined |
+| SYS-COMP-ACC-003 | Mapear requisitos legales a controles y evidencia | Defined |
 
-## Inventario normativo
+## Gobernanza
 
-Los siguientes documentos constituyen el inventario normativo que debe permanecer representado en esta matriz:
-
-- `docs/requirements/software/initial-software-requirements.md`
-- `docs/requirements/system/functional/p2p-market-scanner.md`
-- `docs/requirements/system/functional/account-center.md`
-- `docs/requirements/system/integration/qvapay-p2p.md`
-- `docs/requirements/system/quality/initial-quality-requirements.md`
-- `docs/requirements/requirements-traceability-matrix.md`
-
-El Quality Gate descubre automáticamente los documentos Markdown bajo `docs/requirements/` y falla si un documento normativo queda fuera de esta matriz.
+Toda solución para SYS-AUD-* y SYS-ACC-* queda bloqueada por #270 hasta contar con Solution Card ISO-backed, autorización explícita y trazabilidad completa.
 
 ## Estados formales
 
-- **Definido**
-- **Diseñado**
-- **Implementado**
-- **Probado**
-- **Verificado**
-- **Certificado**
-- **Fallido / Rechazado**
-- **Bloqueado**
-
-`TBD` no es un estado formal; cuando falta información o evidencia, el requisito debe permanecer en el estado formal que corresponda (`Definido`, `Diseñado`, `Implementado`, `Probado`, `Verificado` o `Bloqueado`) y la ausencia de evidencia debe quedar descrita explícitamente.
+Defined, Designed, Implemented, Tested, Verified, Certified, Failed / Rejected, Blocked.
 
 Estos estados no son intercambiables. Un deployment exitoso no implica certificación.
-
-## Controles de seguridad
-
-| Control | Issue | Implementación | Estado |
-|---|---|---|---|
-| El navegador nunca recibe secretos operacionales | #98, #101 | Dashboard público sin prompts ni headers de secretos | Verificado |
-| La identidad de cuenta proviene de `/user` | #97 | QvaPayAccountClient + API Token server-side | Verificado |
-| Cuenta requiere frontera de usuario | #100 | `/api/account` devuelve `403` sin sesión | Implementado |
-| Scanner se inicializa server-side | #102 | Estado público asegura programación del Durable Object | Verificado |
-| Operaciones reales requieren frontera independiente | #98, #103 | Ruta pública bloqueada hasta autenticación | Implementado |
-
-## Capacidades futuras
-
-Webhook, SSE, ingestión event-driven completa, D1 como fuente operativa y motor de arbitraje no deben marcarse como implementados hasta que exista código, pruebas y evidencia correspondiente.
