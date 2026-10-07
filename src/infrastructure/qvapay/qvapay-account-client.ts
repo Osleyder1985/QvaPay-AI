@@ -96,6 +96,8 @@ function parseAuthenticatedUser(payload: unknown): QvaPayAccountUser | null {
   const username = optionalString(value, "username");
   if (!uuid || !username) return null;
 
+  const twoFactorSecret = optionalString(value, "two_factor_secret");
+
   return {
     uuid,
     username,
@@ -118,13 +120,9 @@ function parseAuthenticatedUser(payload: unknown): QvaPayAccountUser | null {
     telegram: optionalString(value, "telegram"),
     twoFactorEnabled: twoFactorSecret !== null,
     ratingAvg: optionalNumber(value, "average_rating"),
-    ratingCount: optionalNumber(value, "rating_count"),
-    kyc: optionalBoolean(value, "kyc"),
-    vip: optionalBoolean(value, "vip"),
-    goldenCheck: optionalBoolean(value, "golden_check"),
-    phoneVerified: optionalBoolean(value, "phone_verified"),
-    telegramVerified: optionalString(value, "telegram") !== null,
-    p2pEnabled: optionalBoolean(value, "p2p_enabled"),
+    ratingCount: null,
+    vip: null,
+    telegramVerified: null,
     completedAsOwner: null,
     completedAsPeer: null,
   };
