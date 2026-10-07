@@ -38,6 +38,11 @@ function rowToSnapshot(
   };
 }
 
+/**
+ * @proposito API pública persistQvaPayAccountSnapshot: implementa el comportamiento expuesto por este módulo.
+ * @responsabilidades Aplicar el contrato y las validaciones correspondientes a la integración.
+ * @returns Resultado de la operación pública.
+ */
 export async function persistQvaPayAccountSnapshot(
   db: D1Database,
   snapshot: QvaPayAccountSnapshot,
@@ -87,6 +92,11 @@ export async function persistQvaPayAccountSnapshot(
   };
 }
 
+/**
+ * @proposito API pública getCurrentQvaPayAccountSnapshot: implementa el comportamiento expuesto por este módulo.
+ * @responsabilidades Aplicar el contrato y las validaciones correspondientes a la integración.
+ * @returns Resultado de la operación pública.
+ */
 export async function getCurrentQvaPayAccountSnapshot(
   db: D1Database,
 ): Promise<PersistedQvaPayAccountSnapshot | null> {
@@ -98,6 +108,11 @@ export async function getCurrentQvaPayAccountSnapshot(
   return row ? rowToSnapshot(row) : null;
 }
 
+/**
+ * @proposito API pública getLastSuccessfulQvaPayAccountSnapshot: implementa el comportamiento expuesto por este módulo.
+ * @responsabilidades Aplicar el contrato y las validaciones correspondientes a la integración.
+ * @returns Resultado de la operación pública.
+ */
 export async function getLastSuccessfulQvaPayAccountSnapshot(
   db: D1Database,
 ): Promise<PersistedQvaPayAccountSnapshot | null> {
