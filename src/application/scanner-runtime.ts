@@ -93,7 +93,7 @@ export function validateInterval(intervalSeconds: number): void {
     intervalSeconds > MAX_INTERVAL_SECONDS
   ) {
     throw new Error(
-      "Scanner interval must be an integer between " +
+      "El intervalo del scanner debe ser un entero entre " +
         MIN_INTERVAL_SECONDS +
         " and " +
         MAX_INTERVAL_SECONDS +
