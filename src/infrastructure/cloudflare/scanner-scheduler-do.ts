@@ -1,6 +1,6 @@
 import { DurableObject } from "cloudflare:workers";
 import type { DurableObjectStorage } from "@cloudflare/workers-types";
-import type { Market } from "../../domain/market.js";
+import type { Market } from "../../domain/market.js";\nimport type { AutoApplyConfig } from "../../application/p2p-auto-apply.js";
 import { QvaPayP2PClient } from "../qvapay/qvapay-p2p-client.js";
 import {
   ensureScannerScheduled,
@@ -40,7 +40,7 @@ export class ScannerSchedulerDurableObject extends DurableObject<ScannerSchedule
     return ensureScannerScheduled(this.storage, config);
   }
 
-  async configureAutoApply(config: import("../../application/p2p-auto-apply.js").AutoApplyConfig) {
+  async configureAutoApply(config: AutoApplyConfig) {
     return configureAutoApply(this.storage, config);
   }
 
