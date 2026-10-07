@@ -12,8 +12,14 @@ import { QvaPayP2PClient } from "../qvapay/qvapay-p2p-client.js";
 import {
   ensureScannerScheduled,
   executeScannerAlarm,
+  configureAutoApply,
+  getAutoApplyConfig,
+  createInitialAutoApplyState,
+  AUTO_APPLY_STATE_KEY,
   SCANNER_EXECUTION_STATE_KEY,
   SCANNER_MARKET_SNAPSHOT_KEY,
+  type AutoApplyAuditWriter,
+  type AutoApplyState,
   type ScannerRuntimeExecutionState,
   type ScannerSchedulerPersistentStorage,
 } from "./scanner-scheduler-do-logic.js";
@@ -26,6 +32,8 @@ export interface ScannerSchedulerEnvironment {
   readonly QVAPAY_API_BASE_URL: string;
   readonly QVAPAY_APP_ID: string;
   readonly QVAPAY_APP_SECRET: string;
+  readonly QVAPAY_USER_API_TOKEN: string;
+  readonly DB: D1Database;
 }
 
 export interface ScannerSchedulerRuntimeState extends SchedulerState {
@@ -47,11 +55,11 @@ export class ScannerSchedulerDurableObject extends DurableObject<ScannerSchedule
     return ensureScannerScheduled(this.storage, config);
   }
 
-  async configureAutoApply(config: AutoApplyConfig) {
+  async configureAutoApply(config: AutoApplyConfig): Promise<AutoApplyConfig> {
     return configureAutoApply(this.storage, config);
   }
 
-  async getAutoApplyConfig() {
+  async getAutoApplyConfig(): Promise<AutoApplyConfig | null> {
     return getAutoApplyConfig(this.storage);
   }
 
@@ -93,20 +101,44 @@ export class ScannerSchedulerDurableObject extends DurableObject<ScannerSchedule
   override async alarm(): Promise<void> {
     const config =
       await this.storage.get<ScannerSchedulerConfig>("scanner-config");
-    if (!config) {
-      return;
-    }
+    if (!config) return;
 
     const provider = new QvaPayP2PClient({
       baseUrl: this.env.QVAPAY_API_BASE_URL,
       appId: this.env.QVAPAY_APP_ID,
       appSecret: this.env.QVAPAY_APP_SECRET,
+      userApiToken: this.env.QVAPAY_USER_API_TOKEN,
     });
+
+    const audit: AutoApplyAuditWriter = async (event) => {
+      await this.env.DB.prepare(
+        "INSERT INTO security_audit_log (id, occurred_at, actor_user_id, actor_username, event_type, outcome, target_user_id, target_username, metadata_json) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+      )
+        .bind(
+          crypto.randomUUID(),
+          new Date().toISOString(),
+          null,
+          "SYSTEM",
+          "p2p_auto_apply",
+          event.result === "APPLIED" ? "SUCCESS" : "FAILURE",
+          null,
+          null,
+          JSON.stringify({
+            action: event.action,
+            offerId: event.offerId,
+            detail: event.detail,
+            error: event.error,
+          }),
+        )
+        .run();
+    };
 
     await executeScannerAlarm(
       this.storage satisfies ScannerSchedulerPersistentStorage,
       config,
       provider,
+      provider,
+      audit,
     );
   }
 }
