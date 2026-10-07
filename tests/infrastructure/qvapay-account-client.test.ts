@@ -91,42 +91,42 @@ describe("QvaPayAccountClient", () => {
   it(
     "retries HTTP 429 using Retry-After and returns the successful payload",
     async () => {
-    let attempts = 0;
-    const client = new QvaPayAccountClient({
-      baseUrl: "https://api.qvapay.com",
-      appId: "test-app-id",
-      appSecret: "test-app-secret",
-      userApiToken: "test-profile-token",
-      minimumRequestSpacingMs: 0,
-      retryAttempts: 2,
-      fetcher: vi.fn(async (input) => {
-        attempts += 1;
-        const url = String(input);
-        if (url.endsWith("/v2/balance") && attempts === 1) {
-          return new Response(JSON.stringify({ error: "rate limited" }), {
-            status: 429,
-            headers: {
-              "content-type": "application/json",
-              "retry-after": "0",
-            },
-          });
-        }
-        if (url.endsWith("/v2/balance")) {
-          return response(200, { balance: 125.5 });
-        }
-        if (url.endsWith("/v2/info")) {
-          return response(200, { uuid: "app-uuid", name: "QvaPay AI" });
-        }
-        if (url.endsWith("/user")) {
-          return response(200, { uuid: "owner-uuid", username: "owner-user" });
-        }
-        return response(200, { data: [], total: 0 });
-      }),
-    });
+      let attempts = 0;
+      const client = new QvaPayAccountClient({
+        baseUrl: "https://api.qvapay.com",
+        appId: "test-app-id",
+        appSecret: "test-app-secret",
+        userApiToken: "test-profile-token",
+        minimumRequestSpacingMs: 0,
+        retryAttempts: 2,
+        fetcher: vi.fn(async (input) => {
+          attempts += 1;
+          const url = String(input);
+          if (url.endsWith("/v2/balance") && attempts === 1) {
+            return new Response(JSON.stringify({ error: "rate limited" }), {
+              status: 429,
+              headers: {
+                "content-type": "application/json",
+                "retry-after": "0",
+              },
+            });
+          }
+          if (url.endsWith("/v2/balance")) {
+            return response(200, { balance: 125.5 });
+          }
+          if (url.endsWith("/v2/info")) {
+            return response(200, { uuid: "app-uuid", name: "QvaPay AI" });
+          }
+          if (url.endsWith("/user")) {
+            return response(200, { uuid: "owner-uuid", username: "owner-user" });
+          }
+          return response(200, { data: [], total: 0 });
+        }),
+      });
 
-    const snapshot = await client.fetchAccount();
+      const snapshot = await client.fetchAccount();
 
-    expect(snapshot.balanceUsd).toBe(125.5);
+      expect(snapshot.balanceUsd).toBe(125.5);
       expect(attempts).toBe(5);
     },
   );
