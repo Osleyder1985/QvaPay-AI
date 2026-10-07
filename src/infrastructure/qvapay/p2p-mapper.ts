@@ -1,3 +1,10 @@
+/**
+ * @archivo src/infrastructure/qvapay/p2p-mapper.ts
+ * @proposito Transforma respuestas P2P externas al modelo interno.
+ * @responsabilidades Implementar y proteger las reglas propias de este módulo sin mezclar responsabilidades de otras capas.
+ * @ubicacion src/infrastructure/qvapay dentro de la arquitectura de QvaPay-AI.
+ */
+
 import type { Offer } from "../../domain/offer.js";
 import type { QvaPayP2POfferDto } from "./p2p-types.js";
 
