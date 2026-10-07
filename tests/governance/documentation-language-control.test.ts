@@ -83,6 +83,19 @@ describe("control lingüístico documental", () => {
     expect(report.findings).toHaveLength(0);
   });
 
+  it("ignora propiedades estructurales de JavaScript", () => {
+    const root = createFixture();
+    fs.writeFileSync(
+      path.join(root, "ejemplo.ts"),
+      'const payload = { credentials: "credenciales" };',
+    );
+
+    const report = analyzeRepository(root);
+
+    expect(report.result).toBe("PASS");
+    expect(report.findings).toHaveLength(0);
+  });
+
   it("no marca estados técnicos en prosa española como inglés", () => {
     const root = createFixture();
     fs.writeFileSync(
