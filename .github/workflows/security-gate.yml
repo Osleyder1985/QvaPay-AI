@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   security:
-    name: Verificación de seguridad
+    name: Security verification
     runs-on: macos-latest
     steps:
       - name: Obtener el repositorio
