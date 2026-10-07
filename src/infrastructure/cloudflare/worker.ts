@@ -250,7 +250,7 @@ export default {
       } catch (error) {
         const message =
           error instanceof Error ? error.message : "QvaPay account integration failed.";
-        return jsonError(message, 502);
+        return jsonError(message, providerErrorStatus(error));
       }
     }
 
@@ -312,7 +312,7 @@ export default {
         const detail = await client.fetchOfferDetail(detailMatch[1]!);
         return Response.json({ detail }, { headers: { "cache-control": "no-store" } });
       } catch (error) {
-        return jsonError(error instanceof Error ? error.message : String(error), 502);
+        return jsonError(error instanceof Error ? error.message : String(error), providerErrorStatus(error));
       }
     }
 
