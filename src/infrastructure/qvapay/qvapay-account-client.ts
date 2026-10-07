@@ -297,7 +297,7 @@ export class QvaPayAccountClient {
       applicationProvenance,
       applicationHttpStatus: info.status,
       applicationOk: application !== null,
-      p2pAccessible: ownOffers.ok,
+      p2pAccessible: own.compatible,
       ownOffersTotal: own.total,
       ownOffersProvenance,
       integrationStatus,
