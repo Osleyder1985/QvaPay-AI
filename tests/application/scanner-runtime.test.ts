@@ -77,7 +77,7 @@ describe("ScannerRuntime", () => {
           intervalSeconds: 10,
           scheduler,
         }),
-    ).toThrow("must not be empty");
+    ).toThrow("no puede estar vacío");
   });
 
   it("impide ejecuciones superpuestas", async () => {
