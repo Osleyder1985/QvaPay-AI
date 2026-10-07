@@ -68,7 +68,7 @@ function extractCode(text, file) {
     if (raw) result.push(makeCandidate(file, text, raw, "DOC_COMMENT", match.index, "comment"));
   }
 
-  const stringPattern = /(['"])(?:\\\\.|(?!\\1)[^\\r\\n])*?\\1/g;
+  const stringPattern = /(['"])(?:\\.|(?!\\1)[^\\r\\n])*?\\1/g;
   for (const match of text.matchAll(stringPattern)) {
     const value = match[0].slice(1, -1).trim();
     if (!value || technicalLiteral(value)) continue;
