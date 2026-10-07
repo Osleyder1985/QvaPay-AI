@@ -173,5 +173,4 @@ describe("QvaPayAccountClient", () => {
     expect(snapshot.ownOffersProvenance.status).toBe("unavailable");
     expect(snapshot.integrationStatus).toBe("degraded");
   });
-
 });
