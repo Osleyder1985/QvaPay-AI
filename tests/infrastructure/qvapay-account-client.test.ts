@@ -103,10 +103,15 @@ describe("QvaPayAccountClient", () => {
         if (url.endsWith("/v2/balance") && attempts === 1) {
           return new Response(JSON.stringify({ error: "rate limited" }), {
             status: 429,
-            headers: { "content-type": "application/json", "retry-after": "0" },
+            headers: {
+              "content-type": "application/json",
+              "retry-after": "0",
+            },
           });
         }
-        if (url.endsWith("/v2/balance")) return response(200, { balance: 125.5 });
+        if (url.endsWith("/v2/balance")) {
+          return response(200, { balance: 125.5 });
+        }
         if (url.endsWith("/v2/info")) {
           return response(200, { uuid: "app-uuid", name: "QvaPay AI" });
         }
