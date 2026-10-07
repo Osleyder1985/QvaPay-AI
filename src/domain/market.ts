@@ -1,3 +1,14 @@
+/**
+ * @archivo src/domain/market.ts
+ * @proposito Define la identidad de un mercado y las operaciones de ordenamiento de ofertas.
+ * @responsabilidades Implementar y proteger las reglas propias de este módulo sin mezclar responsabilidades de otras capas.
+ * @dependencias Modelo Offer y utilidades decimales del dominio.
+ * @seguridad No maneja secretos ni acceso externo; aplica invariantes de identidad de mercado.
+ * @superficie-publica Market, createMarket y offersBySide.
+ * @mantenimiento Mantener alineado con las reglas de mercado y su documentación de requisitos.
+ * @ubicacion src/domain dentro de la arquitectura de QvaPay-AI.
+ */
+
 import type { Offer, OfferSide } from "./offer.js";
 import { compareDecimalStrings } from "./offer.js";
 
@@ -6,15 +17,22 @@ export interface Market {
   readonly offers: readonly Offer[];
 }
 
+/**
+ * @proposito API pública createMarket: implementa el comportamiento expuesto por este módulo.
+ * @responsabilidades Aplicar las validaciones y reglas de negocio definidas por el contrato del módulo.
+ * @returns Resultado de la operación pública.
+ */
 export function createMarket(coin: string, offers: readonly Offer[]): Market {
   const normalizedCoin = coin.trim();
   if (!normalizedCoin) {
-    throw new Error("Market coin is required");
+    throw new Error("La moneda del mercado es obligatoria");
   }
 
   for (const offer of offers) {
     if (offer.market !== normalizedCoin) {
-      throw new Error("Offer market does not match market identity");
+      throw new Error(
+        "El mercado de la oferta no coincide con la identidad del mercado",
+      );
     }
   }
 
@@ -24,6 +42,11 @@ export function createMarket(coin: string, offers: readonly Offer[]): Market {
   };
 }
 
+/**
+ * @proposito API pública offersBySide: implementa el comportamiento expuesto por este módulo.
+ * @responsabilidades Aplicar las validaciones y reglas de negocio definidas por el contrato del módulo.
+ * @returns Resultado de la operación pública.
+ */
 export function offersBySide(
   market: Market,
   side: OfferSide,

@@ -1,7 +1,22 @@
+/**
+ * @archivo src/infrastructure/qvapay/qvapay-p2p-client.ts
+ * @proposito Consulta ofertas P2P de QvaPay y aplica sus reglas de acceso.
+ * @responsabilidades Implementar y proteger las reglas propias de este módulo sin mezclar responsabilidades de otras capas.
+ * @dependencias API P2P de QvaPay, p2p-contract.ts, p2p-mapper.ts y modelo Offer.
+ * @seguridad Usa credenciales de aplicación para integración P2P y debe preservar la política de reintentos y límites.
+ * @superficie-publica QvaPayP2PClient y categorías/errores de integración exportados.
+ * @mantenimiento Mantener alineado con docs/integration/qvapay-p2p-api-contract.md y docs/integration/qvapay-p2p-feed-contract.md.
+ * @ubicacion src/infrastructure/qvapay dentro de la arquitectura de QvaPay-AI.
+ */
+
 import type { Offer } from "../../domain/offer.js";
 import { mapQvaPayOffer } from "./p2p-mapper.js";
 import { parseP2PPage } from "./p2p-contract.js";
 
+/**
+ * @proposito API pública QvaPayRateLimitError: implementa el comportamiento expuesto por este módulo.
+ * @responsabilidades Aplicar el contrato y las validaciones correspondientes a la integración.
+ */
 export class QvaPayRateLimitError extends Error {
   readonly retryAfterSeconds: number | undefined;
 
@@ -15,6 +30,10 @@ export class QvaPayRateLimitError extends Error {
 export type QvaPayProviderErrorCategory =
   "invalid-request" | "authentication" | "transient" | "contract";
 
+/**
+ * @proposito API pública QvaPayProviderError: implementa el comportamiento expuesto por este módulo.
+ * @responsabilidades Aplicar el contrato y las validaciones correspondientes a la integración.
+ */
 export class QvaPayProviderError extends Error {
   readonly status: number;
   readonly category: QvaPayProviderErrorCategory;
@@ -31,6 +50,10 @@ export class QvaPayProviderError extends Error {
   }
 }
 
+/**
+ * @proposito API pública QvaPayTransientError: implementa el comportamiento expuesto por este módulo.
+ * @responsabilidades Aplicar el contrato y las validaciones correspondientes a la integración.
+ */
 export class QvaPayTransientError extends Error {
   constructor(message: string, options?: { cause?: unknown }) {
     super(message, options);
@@ -62,6 +85,10 @@ function describeTransportError(error: unknown): string {
   return String(error);
 }
 
+/**
+ * @proposito API pública QvaPayP2PClient: implementa el comportamiento expuesto por este módulo.
+ * @responsabilidades Aplicar el contrato y las validaciones correspondientes a la integración.
+ */
 export class QvaPayP2PClient {
   private readonly fetcher: typeof fetch;
   private readonly take: number;
@@ -77,19 +104,21 @@ export class QvaPayP2PClient {
     this.sleep = options.sleep ?? defaultSleep;
 
     if (!options.appId || !options.appSecret) {
-      throw new Error("QvaPay P2P application credentials are required");
+      throw new Error(
+        "Las credenciales de la aplicación QvaPay P2P son obligatorias",
+      );
     }
 
     if (!Number.isInteger(this.take) || this.take < 1 || this.take > 100) {
-      throw new Error("QvaPay P2P take must be between 1 and 100");
+      throw new Error("QvaPay P2P take debe estar entre 1 y 100");
     }
 
     if (!Number.isInteger(this.maxRetries) || this.maxRetries < 0) {
-      throw new Error("QvaPay P2P maxRetries must be a non-negative integer");
+      throw new Error("QvaPay P2P maxRetries debe ser un entero no negativo");
     }
 
     if (!Number.isInteger(this.timeoutMs) || this.timeoutMs <= 0) {
-      throw new Error("QvaPay P2P timeoutMs must be a positive integer");
+      throw new Error("QvaPay P2P timeoutMs debe ser un entero positivo");
     }
   }
 

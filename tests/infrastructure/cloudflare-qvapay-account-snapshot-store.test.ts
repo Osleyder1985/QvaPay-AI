@@ -127,7 +127,7 @@ function database(rows: Array<Record<string, unknown>> = []) {
 }
 
 describe("QvaPay account snapshot store", () => {
-  it("persists normalized snapshots with schema version and successful-state marker", async () => {
+  it("persiste snapshots normalizados con versión de esquema y marcador de estado exitoso", async () => {
     const { db, statements } = database();
     const result = await persistQvaPayAccountSnapshot(db, snapshot("verified"));
 
@@ -151,7 +151,7 @@ describe("QvaPay account snapshot store", () => {
     expect(serialized).not.toContain("app-secret");
   });
 
-  it("reads the current and last successful snapshots without calling QvaPay", async () => {
+  it("lee el snapshot actual y el último snapshot exitoso sin llamar a QvaPay", async () => {
     const row = {
       id: "snapshot-1",
       schema_version: 1,

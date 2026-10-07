@@ -86,7 +86,7 @@ Cloudflare D1, webhook P2P, stream SSE, ingestión event-driven completa y motor
 
 ## 🧪 Quality Gate
 
-Cada cambio debe pasar **Repository Quality Gate**, incluyendo:
+Cada cambio debe pasar **Control de Calidad del Repositorio**, incluyendo:
 
 - 📚 calidad documental;
 - 🇪🇸 comprobación lingüística;
@@ -114,7 +114,7 @@ El despliegue comprueba:
 10. Ausencia de `lastError`.
 11. Programación de `nextAlarmAt`.
 
-Merge, CI verde y deployment exitoso son evidencia importante, pero **no equivalen automáticamente a Certified**.
+Merge, CI verde y deployment exitoso son evidencia importante, pero **no equivalen automáticamente a Certificado**.
 
 ## 📚 Documentación
 
@@ -133,17 +133,17 @@ Estructura:
 
 ## 📐 Verificación y certificación
 
-La política transversal obligatoria está definida en [`docs/quality/verification-and-certification-policy.md`](docs/quality/verification-and-certification-policy.md). Define los estados formales, la cadena de evidencia y la regla de que **merge, CI green o deployment successful no equivalen a Certified**. La certificación requiere evidencia objetiva y reproducible frente a los criterios aplicables.
+La política transversal obligatoria está definida en [`docs/quality/verification-and-certification-policy.md`](docs/quality/verification-and-certification-policy.md). Define los estados formales, la cadena de evidencia y la regla de que **merge, CI green o deployment successful no equivalen a Certificado**. La certificación requiere evidencia objetiva y reproducible frente a los criterios aplicables.
 
 ## 📐 Regla de trazabilidad
 
-`Requirement → Design → Implementation → Automated Tests → Runtime Verification → Production Verification → Evidence → Certification`
+`Requisito → Diseño → Implementación → Pruebas automatizadas → Verificación del runtime → Verificación de producción → Evidencia → Certificación`
 
 Estados formales:
 
-`Defined → Designed → Implemented → Tested → Verified → Certified`
+`Definido → Diseñado → Implementado → Probado → Verificado → Certificado`
 
-Además: `Failed / Rejected` y `Blocked`.
+Además: `Fallido / Rechazado` y `Bloqueado`.
 
 Un elemento no se marca como certificado sin evidencia objetiva y reproducible.
 

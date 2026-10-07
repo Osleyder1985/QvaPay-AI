@@ -20,7 +20,7 @@ const offer = (
 });
 
 describe("market domain", () => {
-  it("ranks BUY by highest rate and SELL by lowest rate", () => {
+  it("ordena BUY por la tasa más alta y SELL por la tasa más baja", () => {
     const market = createMarket("BANK_CUP", [
       offer("sell-2", "SELL", "1200"),
       offer("buy-2", "BUY", "1150"),
@@ -38,9 +38,11 @@ describe("market domain", () => {
     ]);
   });
 
-  it("rejects an offer belonging to another market", () => {
+  it("rechaza una oferta perteneciente a otro mercado", () => {
     expect(() =>
       createMarket("BANK_CUP", [offer("wrong", "SELL", "1000", "OTHER_CUP")]),
-    ).toThrow("Offer market does not match market identity");
+    ).toThrow(
+      "El mercado de la oferta no coincide con la identidad del mercado",
+    );
   });
 });

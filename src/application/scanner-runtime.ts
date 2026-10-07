@@ -1,3 +1,14 @@
+/**
+ * @archivo src/application/scanner-runtime.ts
+ * @proposito Orquesta la ejecución del scanner, su estado y la programación siguiente.
+ * @responsabilidades Implementar y proteger las reglas propias de este módulo sin mezclar responsabilidades de otras capas.
+ * @dependencias MarketProvider, ScannerScheduler y caso de uso scanMarket.
+ * @seguridad No expone credenciales; valida moneda e intervalo antes de ejecutar el scanner.
+ * @superficie-publica ScannerRuntime, ScannerRuntimeOptions, ScannerRuntimeState y validateInterval.
+ * @mantenimiento Mantener alineado con docs/architecture/scanner-runtime.md y con la trazabilidad de #182.
+ * @ubicacion src/application dentro de la arquitectura de QvaPay-AI.
+ */
+
 import type { Market } from "../domain/market.js";
 import type { MarketProvider } from "./ports/market-provider.js";
 import type { ScannerScheduler } from "./ports/scanner-scheduler.js";
@@ -20,6 +31,10 @@ export interface ScannerRuntimeState {
 const MIN_INTERVAL_SECONDS = 5;
 const MAX_INTERVAL_SECONDS = 300;
 
+/**
+ * @proposito API pública ScannerRuntime: implementa el comportamiento expuesto por este módulo.
+ * @responsabilidades Aplicar las validaciones y reglas de negocio definidas por el contrato del módulo.
+ */
 export class ScannerRuntime {
   private running = false;
   private state: ScannerRuntimeState = {
@@ -37,7 +52,7 @@ export class ScannerRuntime {
   ) {
     validateInterval(options.intervalSeconds);
     if (!options.coin.trim()) {
-      throw new Error("Scanner coin must not be empty");
+      throw new Error("La moneda del scanner no puede estar vacía");
     }
   }
 
@@ -86,6 +101,11 @@ export class ScannerRuntime {
   }
 }
 
+/**
+ * @proposito API pública validateInterval: implementa el comportamiento expuesto por este módulo.
+ * @responsabilidades Aplicar las validaciones y reglas de negocio definidas por el contrato del módulo.
+ * @returns Resultado de la operación pública.
+ */
 export function validateInterval(intervalSeconds: number): void {
   if (
     !Number.isInteger(intervalSeconds) ||
@@ -93,11 +113,11 @@ export function validateInterval(intervalSeconds: number): void {
     intervalSeconds > MAX_INTERVAL_SECONDS
   ) {
     throw new Error(
-      "Scanner interval must be an integer between " +
+      "El intervalo del scanner debe ser un entero entre " +
         MIN_INTERVAL_SECONDS +
-        " and " +
+        " y " +
         MAX_INTERVAL_SECONDS +
-        " seconds",
+        " segundos",
     );
   }
 }

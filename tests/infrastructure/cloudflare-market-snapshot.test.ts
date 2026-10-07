@@ -29,7 +29,7 @@ class MemoryStorage implements ScannerSchedulerPersistentStorage {
 }
 
 describe("scanner market snapshot persistence", () => {
-  it("persists the market returned by the server-side scan", async () => {
+  it("persiste el mercado devuelto por el escaneo server-side", async () => {
     const storage = new MemoryStorage();
     const market: Market = {
       coin: "QUSD",

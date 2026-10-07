@@ -22,7 +22,7 @@ function createHarness() {
 }
 
 describe("ScannerRuntime", () => {
-  it("runs a scan and schedules the next execution after completion", async () => {
+  it("ejecuta un escaneo y programa la siguiente ejecución después de completarlo", async () => {
     const { provider, scheduler } = createHarness();
     const startedAt = new Date("2026-10-04T18:00:00.000Z");
     const completedAt = new Date("2026-10-04T18:02:30.000Z");
@@ -54,7 +54,7 @@ describe("ScannerRuntime", () => {
     });
   });
 
-  it("rejects an invalid interval", () => {
+  it("rechaza un intervalo inválido", () => {
     const { provider, scheduler } = createHarness();
 
     expect(
@@ -64,10 +64,10 @@ describe("ScannerRuntime", () => {
           intervalSeconds: 4,
           scheduler,
         }),
-    ).toThrow("between 5 and 300");
+    ).toThrow("entre 5 y 300");
   });
 
-  it("rejects an empty coin", () => {
+  it("rechaza una moneda vacía", () => {
     const { provider, scheduler } = createHarness();
 
     expect(
@@ -77,10 +77,10 @@ describe("ScannerRuntime", () => {
           intervalSeconds: 10,
           scheduler,
         }),
-    ).toThrow("must not be empty");
+    ).toThrow("no puede estar vacía");
   });
 
-  it("prevents overlapping executions", async () => {
+  it("impide ejecuciones superpuestas", async () => {
     const { provider, scheduler } = createHarness();
     let release!: () => void;
     const blocked = new Promise<void>((resolve) => {
@@ -103,7 +103,7 @@ describe("ScannerRuntime", () => {
     expect(provider.fetchOffers).toHaveBeenCalledTimes(1);
   });
 
-  it("records failures without scheduling another run", async () => {
+  it("registra los fallos sin programar otra ejecución", async () => {
     const { provider, scheduler } = createHarness();
     vi.mocked(provider.fetchOffers).mockRejectedValueOnce(
       new Error("provider unavailable"),
@@ -125,12 +125,12 @@ describe("ScannerRuntime", () => {
 });
 
 describe("validateInterval", () => {
-  it("accepts the configured bounds", () => {
+  it("acepta los límites configurados", () => {
     expect(() => validateInterval(5)).not.toThrow();
     expect(() => validateInterval(300)).not.toThrow();
   });
 
-  it("rejects non-integers and out-of-range values", () => {
+  it("rechaza valores no enteros y valores fuera de rango", () => {
     expect(() => validateInterval(10.5)).toThrow();
     expect(() => validateInterval(301)).toThrow();
   });

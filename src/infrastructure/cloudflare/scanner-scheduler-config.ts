@@ -1,3 +1,10 @@
+/**
+ * @archivo src/infrastructure/cloudflare/scanner-scheduler-config.ts
+ * @proposito Define y valida la configuración persistente del scheduler.
+ * @responsabilidades Implementar y proteger las reglas propias de este módulo sin mezclar responsabilidades de otras capas.
+ * @ubicacion src/infrastructure/cloudflare dentro de la arquitectura de QvaPay-AI.
+ */
+
 import { validateInterval } from "../../application/scanner-runtime.js";
 
 export interface ScannerSchedulerConfig {
@@ -12,12 +19,17 @@ export interface SchedulerState {
   readonly nextAlarmAt: number | null;
 }
 
+/**
+ * @proposito API pública normalizeScannerSchedulerConfig: implementa el comportamiento expuesto por este módulo.
+ * @responsabilidades Aplicar las validaciones y reglas de negocio definidas por el contrato del módulo.
+ * @returns Resultado de la operación pública.
+ */
 export function normalizeScannerSchedulerConfig(
   config: ScannerSchedulerConfig,
 ): ScannerSchedulerConfig {
   const coin = config.coin.trim();
   if (!coin) {
-    throw new Error("Scanner coin must not be empty");
+    throw new Error("La moneda del scanner no puede estar vacía");
   }
 
   validateInterval(config.intervalSeconds);
@@ -28,6 +40,11 @@ export function normalizeScannerSchedulerConfig(
   };
 }
 
+/**
+ * @proposito API pública createScannerSchedulerState: implementa el comportamiento expuesto por este módulo.
+ * @responsabilidades Aplicar las validaciones y reglas de negocio definidas por el contrato del módulo.
+ * @returns Resultado de la operación pública.
+ */
 export function createScannerSchedulerState(
   config: ScannerSchedulerConfig | undefined,
   alarm: number | null,

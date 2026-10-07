@@ -1,3 +1,14 @@
+/**
+ * @archivo src/infrastructure/qvapay/p2p-mapper.ts
+ * @proposito Transforma respuestas P2P externas al modelo interno.
+ * @responsabilidades Implementar y proteger las reglas propias de este módulo sin mezclar responsabilidades de otras capas.
+ * @dependencias DTO QvaPayP2POfferDto y modelo Offer del dominio.
+ * @seguridad No gestiona secretos; valida cantidades externas antes de calcular tasas.
+ * @superficie-publica mapQvaPayOffer.
+ * @mantenimiento Mantener alineado con el contrato P2P y las pruebas de mapeo.
+ * @ubicacion src/infrastructure/qvapay dentro de la arquitectura de QvaPay-AI.
+ */
+
 import type { Offer } from "../../domain/offer.js";
 import type { QvaPayP2POfferDto } from "./p2p-types.js";
 
@@ -9,7 +20,9 @@ function calculateRate(amount: string, receive: string): string {
     qUsdAmount <= 0 ||
     !Number.isFinite(fiatAmount)
   ) {
-    throw new Error("Invalid QvaPay P2P amounts for rate calculation");
+    throw new Error(
+      "Las cantidades QvaPay P2P no son válidas para calcular la tasa",
+    );
   }
 
   return (fiatAmount / qUsdAmount)
@@ -18,6 +31,11 @@ function calculateRate(amount: string, receive: string): string {
     .replace(/\.$/, "");
 }
 
+/**
+ * @proposito API pública mapQvaPayOffer: implementa el comportamiento expuesto por este módulo.
+ * @responsabilidades Aplicar el contrato y las validaciones correspondientes a la integración.
+ * @returns Resultado de la operación pública.
+ */
 export function mapQvaPayOffer(
   dto: QvaPayP2POfferDto,
   observedAt: string,

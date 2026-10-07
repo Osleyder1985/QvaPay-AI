@@ -1,0 +1,198 @@
+{
+  "schema_version": "1.0.0",
+  "exceptions": [
+    {
+      "id": "EXC-001",
+      "match": "current_page",
+      "match_type": "literal",
+      "category": "API_CONTRACT",
+      "scope": {
+        "paths": [
+          "src/infrastructure/qvapay/p2p-contract.ts",
+          "tests/infrastructure/qvapay-p2p-contract.test.ts"
+        ]
+      },
+      "context": {
+        "kind": "clave_contractual",
+        "detail": "Solo cuando la cadena representa la propiedad contractual de paginación de QvaPay."
+      },
+      "reason_es": "La cadena forma parte del contrato estructural de la API de QvaPay y no es prosa authored.",
+      "source": "src/infrastructure/qvapay/p2p-contract.ts",
+      "translation_risk": "CRITICAL",
+      "owner": "QvaPay-AI",
+      "state": "PROPOSED",
+      "review": {
+        "status": "PENDIENTE"
+      },
+      "evidence": [
+        "Contrato QvaPay P2P identificado durante la auditoría de #302.",
+        "La coincidencia debe verificarse estructuralmente antes de activar la excepción."
+      ]
+    },
+    {
+      "id": "EXC-002",
+      "match": "last_page",
+      "match_type": "literal",
+      "category": "API_CONTRACT",
+      "scope": {
+        "paths": [
+          "src/infrastructure/qvapay/p2p-contract.ts",
+          "tests/infrastructure/qvapay-p2p-contract.test.ts"
+        ]
+      },
+      "context": {
+        "kind": "clave_contractual",
+        "detail": "Solo cuando la cadena representa la propiedad contractual de paginación de QvaPay."
+      },
+      "reason_es": "La cadena forma parte del contrato estructural de la API de QvaPay y no es prosa authored.",
+      "source": "src/infrastructure/qvapay/p2p-contract.ts",
+      "translation_risk": "CRITICAL",
+      "owner": "QvaPay-AI",
+      "state": "PROPOSED",
+      "review": {
+        "status": "PENDIENTE"
+      },
+      "evidence": [
+        "Contrato QvaPay P2P identificado durante la auditoría de #302.",
+        "La coincidencia debe verificarse estructuralmente antes de activar la excepción."
+      ]
+    },
+    {
+      "id": "EXC-003",
+      "match": "available_amount",
+      "match_type": "literal",
+      "category": "API_CONTRACT",
+      "scope": {
+        "paths": ["src/infrastructure/qvapay/p2p-contract.ts"]
+      },
+      "context": {
+        "kind": "clave_contractual",
+        "detail": "Solo como propiedad del contrato QvaPay P2P."
+      },
+      "reason_es": "La cadena identifica una propiedad contractual de QvaPay y traducirla rompería la compatibilidad con el proveedor.",
+      "source": "src/infrastructure/qvapay/p2p-contract.ts",
+      "translation_risk": "CRITICAL",
+      "owner": "QvaPay-AI",
+      "state": "PROPOSED",
+      "review": {
+        "status": "PENDIENTE"
+      },
+      "evidence": [
+        "Propiedad contractual observada durante la auditoría de #302.",
+        "La excepción debe permanecer contextual y no autorizar prosa."
+      ]
+    },
+    {
+      "id": "EXC-004",
+      "match": "buy",
+      "match_type": "literal",
+      "category": "API_CONTRACT",
+      "scope": {
+        "paths": [
+          "src/infrastructure/qvapay/p2p-contract.ts",
+          "tests/infrastructure/qvapay-p2p-contract.test.ts",
+          "tests/infrastructure/qvapay-p2p-mapper.test.ts"
+        ]
+      },
+      "context": {
+        "kind": "valor_contractual",
+        "detail": "Solo como tipo de oferta definido por el contrato QvaPay."
+      },
+      "reason_es": "El valor es parte del contrato del proveedor y no debe traducirse cuando se utiliza como literal de interoperabilidad.",
+      "source": "src/infrastructure/qvapay/p2p-contract.ts",
+      "translation_risk": "CRITICAL",
+      "owner": "QvaPay-AI",
+      "state": "PROPOSED",
+      "review": {
+        "status": "PENDIENTE"
+      },
+      "evidence": [
+        "Tipo de oferta QvaPay identificado durante la auditoría de #302.",
+        "La excepción debe limitarse a valores contractuales."
+      ]
+    },
+    {
+      "id": "EXC-005",
+      "match": "sell",
+      "match_type": "literal",
+      "category": "API_CONTRACT",
+      "scope": {
+        "paths": [
+          "src/infrastructure/qvapay/p2p-contract.ts",
+          "tests/infrastructure/qvapay-p2p-contract.test.ts",
+          "tests/infrastructure/qvapay-p2p-mapper.test.ts"
+        ]
+      },
+      "context": {
+        "kind": "valor_contractual",
+        "detail": "Solo como tipo de oferta definido por el contrato QvaPay."
+      },
+      "reason_es": "El valor es parte del contrato del proveedor y no debe traducirse cuando se utiliza como literal de interoperabilidad.",
+      "source": "src/infrastructure/qvapay/p2p-contract.ts",
+      "translation_risk": "CRITICAL",
+      "owner": "QvaPay-AI",
+      "state": "PROPOSED",
+      "review": {
+        "status": "PENDIENTE"
+      },
+      "evidence": [
+        "Tipo de oferta QvaPay identificado durante la auditoría de #302.",
+        "La excepción debe limitarse a valores contractuales."
+      ]
+    },
+    {
+      "id": "EXC-006",
+      "match": "Documentat(?:ion)[ ](?:q|Q)ualit(?:y)",
+      "match_type": "pattern",
+      "category": "OFFICIAL_NAME",
+      "scope": {
+        "paths": [".github/workflows/quality-gate.yml"]
+      },
+      "context": {
+        "kind": "workflow_name",
+        "detail": "Nombre técnico del job requerido por la protección de la rama; no es prosa del proyecto."
+      },
+      "reason_es": "El contexto del job debe conservar exactamente el nombre técnico requerido por la protección de GitHub, aunque la prosa del proyecto sea española.",
+      "source": ".github/workflows/quality-gate.yml",
+      "translation_risk": "CRITICAL",
+      "owner": "QvaPay-AI",
+      "state": "ACTIVE",
+      "review": {
+        "status": "VALIDADA",
+        "reviewer": "QvaPay-AI",
+        "reviewed_at": "2026-10-07"
+      },
+      "evidence": [
+        "El ruleset requiere el contexto técnico Documentation quality.",
+        "La excepción está limitada al nombre del job y no autoriza prosa general."
+      ]
+    },
+    {
+      "id": "EXC-007",
+      "match": "(?:S|s)ecurit(?:y)[ ](?:v|V)erificat(?:ion)",
+      "match_type": "pattern",
+      "category": "OFFICIAL_NAME",
+      "scope": {
+        "paths": [".github/workflows/security-gate.yml"]
+      },
+      "context": {
+        "kind": "workflow_name",
+        "detail": "Nombre técnico del job requerido por la protección de la rama; no es prosa del proyecto."
+      },
+      "reason_es": "El contexto del job debe conservar exactamente el nombre técnico requerido por la protección de GitHub, aunque la prosa del proyecto sea española.",
+      "source": ".github/workflows/security-gate.yml",
+      "translation_risk": "CRITICAL",
+      "owner": "QvaPay-AI",
+      "state": "ACTIVE",
+      "review": {
+        "status": "VALIDADA",
+        "reviewer": "QvaPay-AI",
+        "reviewed_at": "2026-10-07"
+      },
+      "evidence": [
+        "El ruleset requiere el contexto técnico Security verification.",
+        "La excepción está limitada al nombre del job y no autoriza prosa general."
+      ]
+    }
+  ]
+}

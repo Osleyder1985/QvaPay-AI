@@ -1,3 +1,14 @@
+/**
+ * @archivo src/infrastructure/qvapay/qvapay-account-client.ts
+ * @proposito Consulta y normaliza datos de cuenta mediante la API de QvaPay.
+ * @responsabilidades Implementar y proteger las reglas propias de este módulo sin mezclar responsabilidades de otras capas.
+ * @dependencias API de QvaPay y contrato interno account-contract.ts.
+ * @seguridad Gestiona credenciales de aplicación y token de usuario; no debe registrar secretos.
+ * @superficie-publica QvaPayAccountClient y tipos de opciones/resultado expuestos por el módulo.
+ * @mantenimiento Mantener alineado con docs/integration/qvapay-integration-boundary.md y #182.
+ * @ubicacion src/infrastructure/qvapay dentro de la arquitectura de QvaPay-AI.
+ */
+
 import {
   evaluateAccountIntegration,
   type QvaPayAccountSnapshot,
@@ -222,16 +233,22 @@ async function request(
     }
   }
 
-  throw new Error("QvaPay request retry policy exhausted.");
+  throw new Error("Se agotó la política de reintentos de solicitudes QvaPay.");
 }
 
+/**
+ * @proposito API pública QvaPayAccountClient: implementa el comportamiento expuesto por este módulo.
+ * @responsabilidades Aplicar el contrato y las validaciones correspondientes a la integración.
+ */
 export class QvaPayAccountClient {
   constructor(private readonly options: QvaPayAccountClientOptions) {
     if (!options.appId || !options.appSecret) {
-      throw new Error("QvaPay application credentials are required");
+      throw new Error(
+        "Las credenciales de la aplicación QvaPay son obligatorias",
+      );
     }
     if (!options.userApiToken) {
-      throw new Error("QvaPay user API token is required");
+      throw new Error("El token API de usuario de QvaPay es obligatorio");
     }
   }
 

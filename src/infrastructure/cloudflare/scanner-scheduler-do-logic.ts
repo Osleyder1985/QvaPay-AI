@@ -1,3 +1,10 @@
+/**
+ * @archivo src/infrastructure/cloudflare/scanner-scheduler-do-logic.ts
+ * @proposito Contiene la lógica de programación y ejecución del scanner.
+ * @responsabilidades Implementar y proteger las reglas propias de este módulo sin mezclar responsabilidades de otras capas.
+ * @ubicacion src/infrastructure/cloudflare dentro de la arquitectura de QvaPay-AI.
+ */
+
 import type { MarketProvider } from "../../application/ports/market-provider.js";
 import { ScannerRuntime } from "../../application/scanner-runtime.js";
 import type { Market } from "../../domain/market.js";
@@ -39,6 +46,11 @@ export const createInitialScannerRuntimeExecutionState =
     lastSellCount: 0,
   });
 
+/**
+ * @proposito API pública ensureScannerScheduled: implementa el comportamiento expuesto por este módulo.
+ * @responsabilidades Aplicar las validaciones y reglas de negocio definidas por el contrato del módulo.
+ * @returns Resultado de la operación pública.
+ */
 export async function ensureScannerScheduled(
   storage: ScannerSchedulerPersistentStorage,
   config: ScannerSchedulerConfig,
@@ -62,6 +74,11 @@ export async function ensureScannerScheduled(
   return createScannerSchedulerState(normalized, alarm);
 }
 
+/**
+ * @proposito API pública executeScannerAlarm: implementa el comportamiento expuesto por este módulo.
+ * @responsabilidades Aplicar las validaciones y reglas de negocio definidas por el contrato del módulo.
+ * @returns Resultado de la operación pública.
+ */
 export async function executeScannerAlarm(
   storage: ScannerSchedulerPersistentStorage,
   config: ScannerSchedulerConfig,
@@ -89,7 +106,7 @@ export async function executeScannerAlarm(
   try {
     const market = await runtime.run();
     if (!market) {
-      throw new Error("Scanner returned no market snapshot");
+      throw new Error("El scanner no devolvió un snapshot del mercado");
     }
 
     const buyCount = market.offers.filter(
@@ -113,7 +130,7 @@ export async function executeScannerAlarm(
     );
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    console.error("Scanner alarm execution failed", error);
+    console.error("Falló la ejecución del Alarm del scanner", error);
     await storage.put(SCANNER_EXECUTION_STATE_KEY, {
       ...previousState,
       lastStartedAt: new Date(now).toISOString(),

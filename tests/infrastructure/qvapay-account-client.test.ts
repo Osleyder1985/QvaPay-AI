@@ -9,7 +9,7 @@ function response(status: number, payload: unknown): Response {
 }
 
 describe("QvaPayAccountClient", () => {
-  it("uses the authenticated QvaPay user endpoint for owner identity", async () => {
+  it("usa el endpoint de usuario autenticado de QvaPay para la identidad del propietario", async () => {
     const calls: Array<{ url: string; authorization?: string }> = [];
     const client = new QvaPayAccountClient({
       baseUrl: "https://api.qvapay.com",
@@ -113,7 +113,7 @@ describe("QvaPayAccountClient", () => {
     expect(calls).toHaveLength(4);
   });
 
-  it("retries HTTP 429 using Retry-After and returns the successful payload", async () => {
+  it("reintenta HTTP 429 usando Retry-After y devuelve el payload exitoso", async () => {
     let attempts = 0;
     const client = new QvaPayAccountClient({
       baseUrl: "https://api.qvapay.com",
@@ -156,7 +156,7 @@ describe("QvaPayAccountClient", () => {
     expect(attempts).toBe(5);
   });
 
-  it("does not verify P2P integration when the HTTP 200 payload is incompatible", async () => {
+  it("no verifica la integración P2P cuando el payload HTTP 200 es incompatible", async () => {
     const client = new QvaPayAccountClient({
       baseUrl: "https://api.qvapay.com",
       appId: "test-app-id",
@@ -186,7 +186,7 @@ describe("QvaPayAccountClient", () => {
     expect(snapshot.integrationStatus).toBe("degraded");
   });
 
-  it("fails closed when the authenticated-user contract is unavailable", async () => {
+  it("falla de forma segura cuando el contrato de usuario autenticado no está disponible", async () => {
     const client = new QvaPayAccountClient({
       baseUrl: "https://api.qvapay.com",
       appId: "test-app-id",

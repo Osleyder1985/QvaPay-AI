@@ -35,7 +35,7 @@ const config = {
 };
 
 describe("ensureScannerScheduled", () => {
-  it("reschedules when the persisted alarm is stale", async () => {
+  it("reprograma cuando el Alarm persistido está obsoleto", async () => {
     const storage = new FakeStorage();
     const now = Date.parse("2026-10-05T06:00:00.000Z");
     await storage.setAlarm(now - 60_000);
@@ -50,7 +50,7 @@ describe("ensureScannerScheduled", () => {
 });
 
 describe("executeScannerAlarm", () => {
-  it("persists started and completed execution timestamps", async () => {
+  it("persiste las marcas de tiempo de inicio y finalización de la ejecución", async () => {
     const storage = new FakeStorage();
     const provider: MarketProvider = {
       fetchOffers: async () => [],
@@ -74,7 +74,7 @@ describe("executeScannerAlarm", () => {
     expect(state?.lastCompletedAt).toEqual(expect.any(String));
   });
 
-  it("persists the error and schedules the next cycle after failure", async () => {
+  it("persiste el error y programa el siguiente ciclo después del fallo", async () => {
     const storage = new FakeStorage();
     const provider: MarketProvider = {
       fetchOffers: async () => {

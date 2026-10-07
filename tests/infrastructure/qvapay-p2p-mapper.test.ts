@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { mapQvaPayOffer } from "../../src/infrastructure/qvapay/p2p-mapper.js";
 
 describe("QvaPay P2P mapper", () => {
-  it("calculates the effective CUP per QUSD ratio and preserves offer details", () => {
+  it("calcula la proporción efectiva CUP por QUSD y conserva los detalles de la oferta", () => {
     const offer = mapQvaPayOffer(
       {
         uuid: "offer-1",
@@ -28,7 +28,7 @@ describe("QvaPay P2P mapper", () => {
     expect(offer.creatorUsername).toBe("trader123");
   });
 
-  it("does not rank raw CUP totals as the rate", () => {
+  it("no clasifica los totales brutos de CUP como la tasa", () => {
     const small = mapQvaPayOffer(
       {
         uuid: "small",
@@ -60,7 +60,7 @@ describe("QvaPay P2P mapper", () => {
 });
 
 describe("QvaPay P2P mapper VIP metadata", () => {
-  it("preserves offer VIP restriction and creator VIP status", () => {
+  it("conserva la restricción VIP de la oferta y el estado VIP del creador", () => {
     const offer = mapQvaPayOffer(
       {
         uuid: "vip-offer",

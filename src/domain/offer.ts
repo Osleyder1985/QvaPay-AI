@@ -1,3 +1,14 @@
+/**
+ * @archivo src/domain/offer.ts
+ * @proposito Define el modelo de oferta P2P y las utilidades de comparación decimal.
+ * @responsabilidades Implementar y proteger las reglas propias de este módulo sin mezclar responsabilidades de otras capas.
+ * @dependencias Ninguna dependencia externa; utiliza tipos primitivos del dominio.
+ * @seguridad No maneja secretos ni IO; valida representaciones decimales antes de compararlas.
+ * @superficie-publica Offer, OfferSide, OfferStatus y compareDecimalStrings.
+ * @mantenimiento Mantener alineado con los contratos de mercado y las pruebas del dominio.
+ * @ubicacion src/domain dentro de la arquitectura de QvaPay-AI.
+ */
+
 export type OfferSide = "BUY" | "SELL";
 
 export type OfferStatus =
@@ -20,6 +31,11 @@ export interface Offer {
   readonly fiatAmount?: string;
 }
 
+/**
+ * @proposito API pública compareDecimalStrings: implementa el comportamiento expuesto por este módulo.
+ * @responsabilidades Aplicar las validaciones y reglas de negocio definidas por el contrato del módulo.
+ * @returns Resultado de la operación pública.
+ */
 export function compareDecimalStrings(left: string, right: string): number {
   const a = normalizeDecimal(left);
   const b = normalizeDecimal(right);

@@ -35,7 +35,7 @@ describe("initial Administration bootstrap", () => {
     });
   });
 
-  it("creates the first Administration account with only owner-selected credentials", async () => {
+  it("crea la primera cuenta de Administración únicamente con las credenciales seleccionadas por el propietario", async () => {
     const db = createDb(0);
     const user = await bootstrapInitialAdmin(
       db as never,
@@ -52,7 +52,7 @@ describe("initial Administration bootstrap", () => {
     expect(db.run).toHaveBeenCalledTimes(1);
   });
 
-  it("rejects an invalid username or password before creating the account", async () => {
+  it("rechaza un nombre de usuario o contraseña inválidos antes de crear la cuenta", async () => {
     const db = createDb(0);
     await expect(
       bootstrapInitialAdmin(db as never, "bad username", "short"),
@@ -60,7 +60,7 @@ describe("initial Administration bootstrap", () => {
     expect(createUserMock).not.toHaveBeenCalled();
   });
 
-  it("rejects bootstrap after the first application user exists", async () => {
+  it("rechaza el arranque inicial después de que exista el primer usuario de la aplicación", async () => {
     const db = createDb(1);
     await expect(
       bootstrapInitialAdmin(db as never, "owner", "a".repeat(12)),

@@ -1,3 +1,10 @@
+/**
+ * @archivo src/infrastructure/cloudflare/account-auth.ts
+ * @proposito Gestiona sesiones de autenticación de la aplicación.
+ * @responsabilidades Implementar y proteger las reglas propias de este módulo sin mezclar responsabilidades de otras capas.
+ * @ubicacion src/infrastructure/cloudflare dentro de la arquitectura de QvaPay-AI.
+ */
+
 const SESSION_COOKIE = "qvapay_ai_session";
 const SESSION_TTL_SECONDS = 60 * 60 * 8;
 
@@ -34,6 +41,11 @@ function constantTimeEqual(left: string, right: string): boolean {
   return result === 0;
 }
 
+/**
+ * @proposito API pública createSessionCookie: implementa el comportamiento expuesto por este módulo.
+ * @responsabilidades Aplicar las validaciones y reglas de negocio definidas por el contrato del módulo.
+ * @returns Resultado de la operación pública.
+ */
 export async function createSessionCookie(
   loginSecret: string,
   configuredSecret: string,
@@ -47,6 +59,11 @@ export async function createSessionCookie(
   return `${SESSION_COOKIE}=${payload}.${signature}; Max-Age=${SESSION_TTL_SECONDS}; Path=/; HttpOnly; Secure; SameSite=Strict`;
 }
 
+/**
+ * @proposito API pública isAuthenticated: implementa el comportamiento expuesto por este módulo.
+ * @responsabilidades Aplicar las validaciones y reglas de negocio definidas por el contrato del módulo.
+ * @returns Resultado de la operación pública.
+ */
 export async function isAuthenticated(
   request: Request,
   configuredSecret: string,
@@ -72,6 +89,11 @@ export async function isAuthenticated(
   return constantTimeEqual(signature, expected);
 }
 
+/**
+ * @proposito API pública clearSessionCookie: implementa el comportamiento expuesto por este módulo.
+ * @responsabilidades Aplicar las validaciones y reglas de negocio definidas por el contrato del módulo.
+ * @returns Resultado de la operación pública.
+ */
 export function clearSessionCookie(): string {
   return `${SESSION_COOKIE}=; Max-Age=0; Path=/; HttpOnly; Secure; SameSite=Strict`;
 }

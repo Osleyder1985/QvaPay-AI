@@ -1,10 +1,11 @@
-name: Repository Quality Gate
+name: Control de Calidad del Repositorio
 
 on:
   pull_request:
   push:
     branches:
       - main
+      - governance/spanish-language-control
 
 permissions:
   contents: read
@@ -14,10 +15,10 @@ jobs:
     name: Documentation quality
     runs-on: macos-latest
     steps:
-      - name: Checkout repository
+      - name: Obtener el repositorio
         uses: actions/checkout@v4
 
-      - name: Verify required documentation
+      - name: Verificar la documentación requerida
         shell: bash
         run: |
           set -euo pipefail
@@ -38,6 +39,7 @@ jobs:
             "docs/testing/testing-strategy.md"
             "docs/operations/operations-baseline.md"
             "docs/project/project-structure.md"
+            "docs/quality/code-documentation-standard.md"
           )
 
           for file in "${required_files[@]}"; do
@@ -47,7 +49,7 @@ jobs:
             }
           done
 
-      - name: Validate normative requirements inventory and traceability
+      - name: Validar el inventario y la trazabilidad de requisitos normativos
         shell: bash
         run: |
           set -euo pipefail
@@ -88,7 +90,7 @@ jobs:
           print(f"Normative requirements inventory passed: {len(normative)} documents represented.")
           PY
 
-      - name: Validate Markdown structure
+      - name: Validar la estructura Markdown
         shell: bash
         run: |
           set -euo pipefail
@@ -125,7 +127,7 @@ jobs:
               sys.exit(1)
           PY
 
-      - name: Validate internal Markdown targets
+      - name: Validar los destinos Markdown internos
         shell: bash
         run: |
           set -euo pipefail
@@ -164,34 +166,37 @@ jobs:
               sys.exit(1)
           PY
 
-      - name: Check documentation language convention
+      - name: Comprobar la convención lingüística de la documentación
         run: node scripts/check-documentation-language.mjs
 
-      - name: Check repository status
+      - name: Comprobar la documentación del código fuente
+        run: npm run check:code-docs
+
+      - name: Comprobar el estado del repositorio
         shell: bash
         run: |
           set -euo pipefail
           git status --short
 
-      - name: Set up Node.js
+      - name: Configurar Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
 
-      - name: Install dependencies
+      - name: Instalar dependencias
         run: npm install --no-audit --no-fund
 
-      - name: Type check
+      - name: Comprobar tipos
         run: npm run build
 
       - name: Lint
         run: npm run lint
 
-      - name: Validate Cloudflare deployment bundle
+      - name: Validar el paquete de despliegue de Cloudflare
         run: npx wrangler deploy --dry-run
 
-      - name: Format check
+      - name: Comprobar formato
         run: npm run format:check
 
-      - name: Unit tests
+      - name: Pruebas unitarias
         run: npm test

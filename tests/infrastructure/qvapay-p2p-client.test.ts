@@ -37,7 +37,7 @@ const credentials = {
 };
 
 describe("QvaPay P2P client", () => {
-  it("binds the default fetcher to the global scope", async () => {
+  it("vincula el fetcher predeterminado al ámbito global", async () => {
     const originalFetch = globalThis.fetch;
     const calls: URL[] = [];
 
@@ -72,7 +72,7 @@ describe("QvaPay P2P client", () => {
     }
   });
 
-  it("authenticates every market request with application credentials", async () => {
+  it("autentica cada solicitud de mercado con credenciales de aplicación", async () => {
     const fetcher = vi
       .fn()
       .mockResolvedValueOnce(responseFor(page(1, 1, "buy-one", "buy")))
@@ -95,7 +95,7 @@ describe("QvaPay P2P client", () => {
     }
   });
 
-  it("fetches every page independently for BUY and SELL", async () => {
+  it("obtiene cada página de forma independiente para BUY y SELL", async () => {
     const fetcher = vi
       .fn()
       .mockResolvedValueOnce(responseFor(page(1, 2, "buy-one", "buy")))
@@ -124,7 +124,7 @@ describe("QvaPay P2P client", () => {
     ).toEqual(["buy", "buy", "sell"]);
   });
 
-  it("uses Retry-After and retries a 429 response", async () => {
+  it("usa Retry-After y reintenta una respuesta 429", async () => {
     const fetcher = vi
       .fn()
       .mockResolvedValueOnce(
@@ -224,7 +224,7 @@ describe("QvaPay P2P client", () => {
       (_url: URL, init?: RequestInit) =>
         new Promise<Response>((_, reject) => {
           init?.signal?.addEventListener("abort", () => {
-            reject(new DOMException("The operation was aborted", "AbortError"));
+            reject(new DOMException("La operación fue abortada", "AbortError"));
           });
         }),
     );
@@ -240,7 +240,7 @@ describe("QvaPay P2P client", () => {
     await expect(client.fetchOffers("BANK_CUP")).rejects.toMatchObject({
       name: QvaPayTransientError.name,
       message:
-        "QvaPay P2P buy page 1 transport error: AbortError: The operation was aborted",
+        "QvaPay P2P buy page 1 transport error: AbortError: La operación fue abortada",
     });
     expect(fetcher).toHaveBeenCalledTimes(1);
     expect(fetcher.mock.calls[0]?.[1]?.signal?.aborted).toBe(true);
@@ -248,7 +248,7 @@ describe("QvaPay P2P client", () => {
 });
 
 describe("QvaPay P2P apply", () => {
-  it("applies an offer with app credentials", async () => {
+  it("aplica una oferta con credenciales de la aplicación", async () => {
     const fetcher = async (input: RequestInfo | URL, init?: RequestInit) => {
       expect(String(input)).toBe("https://api.qvapay.com/p2p/offer-123/apply");
       expect(init?.method).toBe("POST");

@@ -1,0 +1,150 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Catálogo de excepciones del control lingüístico documental",
+  "description": "Esquema normativo para excepciones técnicas, contractuales, externas u oficiales. No autoriza por sí mismo ninguna excepción.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "exceptions"],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "description": "Versión del contrato del catálogo.",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "exceptions": {
+      "type": "array",
+      "description": "Excepciones candidatas o activas sujetas a validación.",
+      "items": {
+        "$ref": "#/$defs/exception"
+      }
+    }
+  },
+  "$defs": {
+    "exception": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "match",
+        "match_type",
+        "category",
+        "scope",
+        "context",
+        "reason_es",
+        "source",
+        "translation_risk",
+        "owner",
+        "state",
+        "review",
+        "evidence"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^EXC-[0-9]{3,}$"
+        },
+        "match": {
+          "type": "string",
+          "minLength": 1
+        },
+        "match_type": {
+          "type": "string",
+          "enum": ["literal", "pattern"]
+        },
+        "category": {
+          "type": "string",
+          "enum": [
+            "TECH_IDENTIFIER",
+            "API_CONTRACT",
+            "PERSISTED_LITERAL",
+            "TECH_NAME",
+            "COMMAND",
+            "OFFICIAL_NAME",
+            "EXTERNAL_TEXT",
+            "FIXTURE_TEXT"
+          ]
+        },
+        "scope": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["paths"],
+          "properties": {
+            "paths": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        "context": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind"],
+          "properties": {
+            "kind": {
+              "type": "string",
+              "minLength": 1
+            },
+            "detail": {
+              "type": "string"
+            }
+          }
+        },
+        "reason_es": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source": {
+          "type": "string",
+          "minLength": 1
+        },
+        "translation_risk": {
+          "type": "string",
+          "enum": ["LOW", "MEDIUM", "HIGH", "CRITICAL"]
+        },
+        "owner": {
+          "type": "string",
+          "minLength": 1
+        },
+        "state": {
+          "type": "string",
+          "enum": [
+            "PROPOSED",
+            "ACTIVE",
+            "REVIEW_REQUIRED",
+            "EXPIRED",
+            "REVOKED"
+          ]
+        },
+        "review": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status"],
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": ["PENDIENTE", "VALIDADA", "VENCIDA", "REVOCADA"]
+            },
+            "reviewer": {
+              "type": "string"
+            },
+            "reviewed_at": {
+              "type": "string"
+            }
+          }
+        },
+        "evidence": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  }
+}
