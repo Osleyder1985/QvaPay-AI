@@ -94,43 +94,36 @@ function parseAuthenticatedUser(payload: unknown): QvaPayAccountUser | null {
   const username = optionalString(value, "username");
   if (!uuid || !username) return null;
 
-  const twoFactorSecret = optionalString(value, "two_factor_secret");
-
   return {
     uuid,
     username,
     name: optionalString(value, "name"),
     lastname: optionalString(value, "lastname"),
-    email: optionalString(value, "email"),
-    bio: optionalString(value, "bio"),
-    balance: optionalNumber(value, "balance"),
-    satoshis: optionalNumber(value, "satoshis"),
-    phone: optionalString(value, "phone"),
-    phoneVerified: optionalBoolean(value, "phone_verified"),
-    kyc: optionalBoolean(value, "kyc"),
-    goldenCheck: optionalBoolean(value, "golden_check"),
-    goldenExpire: optionalString(value, "golden_expire"),
-    p2pEnabled: optionalBoolean(value, "p2p_enabled"),
-    savingsRoundup: optionalBoolean(value, "savings_roundup"),
-    cover: optionalString(value, "cover"),
     image: optionalString(value, "image"),
-    twitter: optionalString(value, "twitter"),
-    telegram: optionalString(value, "telegram"),
-    twoFactorEnabled: twoFactorSecret !== null,
     ratingAvg: optionalNumber(value, "average_rating"),
-    ratingCount: null,
-    vip: null,
-    telegramVerified: null,
+    ratingCount: optionalNumber(value, "rating_count"),
+    kyc: optionalBoolean(value, "kyc"),
+    vip: optionalBoolean(value, "vip"),
+    goldenCheck: optionalBoolean(value, "golden_check"),
+    phoneVerified: optionalBoolean(value, "phone_verified"),
+    telegramVerified: optionalString(value, "telegram") !== null,
+    p2pEnabled: optionalBoolean(value, "p2p_enabled"),
     completedAsOwner: null,
     completedAsPeer: null,
   };
 }
 
-function parseOwnOffers(payload: unknown): { readonly total: number | null } {
+function parseOwnOffers(payload: unknown): {
+  readonly compatible: boolean;
+  readonly total: number | null;
+} {
   const value = readPayload(payload);
-  if (!isRecord(value)) return { total: null };
+  if (!isRecord(value)) return { compatible: false, total: null };
+
+  const total = optionalNumber(value, "total");
   return {
-    total: optionalNumber(value, "total"),
+    compatible: total !== null,
+    total,
   };
 }
 
@@ -212,7 +205,7 @@ export class QvaPayAccountClient {
     const identity = user.ok ? parseAuthenticatedUser(user.payload) : null;
     const own = ownOffers.ok
       ? parseOwnOffers(ownOffers.payload)
-      : { total: null };
+      : { compatible: false, total: null };
     const balanceSource: QvaPayAccountSourceMetadata = {
       endpoint: "/v2/balance",
       retrievedAt: balance.retrievedAt,
@@ -260,16 +253,22 @@ export class QvaPayAccountClient {
       endpoint: "/p2p?my=1&take=1&page=1",
       retrievedAt: ownOffers.retrievedAt,
       httpStatus: ownOffers.status,
-      status: ownOffers.ok ? "verified" : "failed",
-      error: ownOffers.ok
+      status: own.compatible
+        ? "verified"
+        : ownOffers.ok
+          ? "unavailable"
+          : "failed",
+      error: own.compatible
         ? null
-        : `QvaPay own-offers request failed with HTTP ${ownOffers.status}.`,
+        : ownOffers.ok
+          ? "QvaPay returned an incompatible own-offers payload."
+          : `QvaPay own-offers request failed with HTTP ${ownOffers.status}.`,
     };
     const integrationStatus = evaluateAccountIntegration({
       balanceOk: balanceUsd !== null,
       identityOk: identity !== null,
       applicationOk: application !== null,
-      p2pAccessible: ownOffers.ok,
+      p2pAccessible: own.compatible,
     });
 
     return {
@@ -298,7 +297,7 @@ export class QvaPayAccountClient {
       applicationProvenance,
       applicationHttpStatus: info.status,
       applicationOk: application !== null,
-      p2pAccessible: ownOffers.ok,
+      p2pAccessible: own.compatible,
       ownOffersTotal: own.total,
       ownOffersProvenance,
       integrationStatus,
