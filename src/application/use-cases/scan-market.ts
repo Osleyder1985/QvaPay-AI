@@ -8,6 +8,11 @@
 import { createMarket } from "../../domain/market.js";
 import type { MarketProvider } from "../ports/market-provider.js";
 
+/**
+ * @proposito API pública scanMarket: implementa el comportamiento expuesto por este módulo.
+ * @responsabilidades Aplicar las validaciones y reglas de negocio definidas por el contrato del módulo.
+ * @returns Resultado de la operación pública.
+ */
 export async function scanMarket(
   provider: MarketProvider,
   coin: string,
