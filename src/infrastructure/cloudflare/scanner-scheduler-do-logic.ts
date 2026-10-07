@@ -11,7 +11,7 @@ import {
   type SchedulerState,
 } from "./scanner-scheduler-config.js";
 
-export interface ScannerSchedulerPersistentStorage {
+export type AutoApplyAuditWriter = (event: {\n  readonly action: "BUY" | "SELL";\n  readonly offerId: string;\n  readonly result: "APPLIED" | "FAILED";\n  readonly detail: unknown | null;\n  readonly error: string | null;\n}) => Promise<void>;\n\nexport interface ScannerSchedulerPersistentStorage {
   get<T>(key: string): Promise<T | undefined>;
   put<T>(key: string, value: T): Promise<void>;
   getAlarm(): Promise<number | null>;
@@ -107,7 +107,7 @@ async function executeAutoApply(
       lastError: detailError,
       lastDetail: detail,
     });
-    console.info("QvaPay Auto Apply completed", {
+    if (audit) {\n      await audit({\n        action: candidate.action,\n        offerId: candidate.offer.id,\n        result: "APPLIED",\n        detail,\n        error: detailError,\n      });\n    }\n    console.info("QvaPay Auto Apply completed", {
       action: candidate.action,
       offerId: candidate.offer.id,
       detailAvailable: detail !== null,
@@ -123,7 +123,7 @@ async function executeAutoApply(
       lastError: message,
       lastDetail: null,
     });
-    console.error("QvaPay Auto Apply failed", {
+    if (audit) {\n      await audit({\n        action: candidate.action,\n        offerId: candidate.offer.id,\n        result: "FAILED",\n        detail: null,\n        error: message,\n      });\n    }\n    console.error("QvaPay Auto Apply failed", {
       action: candidate.action,
       offerId: candidate.offer.id,
       error: message,
@@ -191,7 +191,7 @@ export async function executeScannerAlarm(
       (offer) => offer.side === "SELL",
     ).length;
 
-    await storage.put<Market>(SCANNER_MARKET_SNAPSHOT_KEY, market);\n    if (autoApplyProvider) {\n      await executeAutoApply(storage, market, autoApplyProvider);\n    }
+    await storage.put<Market>(SCANNER_MARKET_SNAPSHOT_KEY, market);\n    if (autoApplyProvider) {\n      await executeAutoApply(storage, market, autoApplyProvider, autoApplyAudit);\n    }
     await storage.put<ScannerRuntimeExecutionState>(
       SCANNER_EXECUTION_STATE_KEY,
       {
