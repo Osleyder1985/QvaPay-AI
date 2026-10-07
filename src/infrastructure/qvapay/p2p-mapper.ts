@@ -27,6 +27,11 @@ function calculateRate(amount: string, receive: string): string {
     .replace(/\.$/, "");
 }
 
+/**
+ * @proposito API pública mapQvaPayOffer: implementa el comportamiento expuesto por este módulo.
+ * @responsabilidades Aplicar el contrato y las validaciones correspondientes a la integración.
+ * @returns Resultado de la operación pública.
+ */
 export function mapQvaPayOffer(
   dto: QvaPayP2POfferDto,
   observedAt: string,
