@@ -42,6 +42,12 @@ Para el commit de `main` `bac8500cc579e4277852e74cc3a247bf00ed0cc1`:
 - Smoke de producción: dashboard HTTP 200, scanner operativo y snapshot no vacío.
 - El smoke confirmó BUY y SELL no vacíos, `totalOffers > 0`, `snapshotAt`, `bestBuyRate` y `bestSellRate`.
 
+## Nota de contrato QvaPay
+
+`/v2/balance` se registra y presenta como **USD**. Las unidades QUSD pertenecen al dominio P2P y no se deben reutilizar para etiquetar el balance de la aplicación.
+
+La identidad propietaria continúa proveniendo exclusivamente de `GET /user`; los datos de `GET /p2p?my=1` no pueden inferir identidad.
+
 ## Estados formales
 
 - **Defined**
