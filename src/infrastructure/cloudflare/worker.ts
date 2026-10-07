@@ -6,6 +6,11 @@ import { ScannerSchedulerDurableObject } from "./scanner-scheduler-do.js";
 import { authenticate, createUser, deleteUserByUsername, ensureSecuritySchema, getSession, listUsers, logout, requireRole, setUserActive, changeUserPassword } from "./auth-rbac.js";
 // prettier-ignore
 import { QvaPayAccountClient } from "../qvapay/qvapay-account-client.js";
+import {
+  getCurrentQvaPayAccountSnapshot,
+  getLastSuccessfulQvaPayAccountSnapshot,
+  persistQvaPayAccountSnapshot,
+} from "./qvapay-account-snapshot-store.js";
 // prettier-ignore
 import { createLoginAppResponse } from "./login-app.js";
 // prettier-ignore
@@ -154,6 +159,20 @@ export default {
       return Response.json({ authenticated: true, user: session.user }, { headers: { "cache-control": "no-store" } });
     }
 
+    if (url.pathname === "/api/account/snapshot") {
+      if (request.method !== "GET") return new Response("Method not allowed", { status: 405 });
+      const access = await requireRole(request, env.DB, env.ACCOUNT_AUTH_SECRET, ["ADMINISTRATION", "AUDITOR"]);
+      if (access instanceof Response) return access;
+      const [current, lastSuccessful] = await Promise.all([
+        getCurrentQvaPayAccountSnapshot(env.DB),
+        getLastSuccessfulQvaPayAccountSnapshot(env.DB),
+      ]);
+      return Response.json(
+        { current, lastSuccessful },
+        { headers: { "cache-control": "no-store" } },
+      );
+    }
+
     if (url.pathname === "/api/account/password") {
       if (request.method !== "POST") return new Response("Method not allowed", { status: 405 });
       const access = await requireRole(request, env.DB, env.ACCOUNT_AUTH_SECRET, ["ADMINISTRATION", "AUDITOR"]);
@@ -182,7 +201,11 @@ export default {
           userApiToken: env.QVAPAY_USER_API_TOKEN,
         });
         const account = await client.fetchAccount();
-        return Response.json({ account }, { headers: { "cache-control": "no-store" } });
+        const persisted = await persistQvaPayAccountSnapshot(env.DB, account);
+        return Response.json(
+          { account, snapshot: persisted },
+          { headers: { "cache-control": "no-store" } },
+        );
       } catch (error) {
         const message =
           error instanceof Error ? error.message : "QvaPay account integration failed.";
