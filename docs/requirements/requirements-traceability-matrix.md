@@ -23,10 +23,15 @@ Relacionar requisitos con diseño, implementación, pruebas y evidencia de runti
 | SYS-INT-011 | Compatibilidad con caché | Documentación operativa | evidencia externa pendiente | Defined |
 | SYS-INT-012 | Evolución segura | Contract parser | pruebas de contrato | Tested |
 | SYS-FR-005 | Centro de Cuenta protegido | QvaPayAccountClient + `/api/account` | pruebas de cliente/ruta | Implemented |
+| SYS-FR-006 | Registro completo de la cuenta QvaPay conectada | QvaPayAccountClient + account-contract | pruebas de completitud/proveniencia + smoke autenticado | Defined |
 | SYS-SEC-001 | No pedir secretos operacionales al navegador | Public App + Worker | Security Gate + dashboard smoke | Verified |
 | SYS-SEC-002 | Identidad de cuenta desde `/user` | QvaPayAccountClient | pruebas de cuenta | Verified |
 
 ## Evidencia de producción
+
+### SYS-FR-006 — estado de auditoría
+
+El contrato actual de Cuenta ya modela identidad, balance, aplicación, P2P propio y metadatos de proveniencia. La auditoría detectó que `completedAsOwner` y `completedAsPeer` permanecen siempre en `null` y que todavía no existe evidencia autenticada de producción para certificar el módulo. Por ello SYS-FR-006 permanece **Defined** y no se eleva por documentación o pruebas unitarias solamente.
 
 La cadena de evidencia vigente es:
 
