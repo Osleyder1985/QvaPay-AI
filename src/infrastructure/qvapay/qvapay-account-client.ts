@@ -302,7 +302,7 @@ export class QvaPayAccountClient {
       balanceOk: balanceUsd !== null,
       identityOk: identity !== null,
       applicationOk: application !== null,
-      p2pAccessible: ownOffers.ok,
+      p2pAccessible: own.compatible,
     });
 
     return {
