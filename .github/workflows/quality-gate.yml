@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   documentation-quality:
-    name: Calidad de la documentación
+    name: Documentation quality
     runs-on: macos-latest
     steps:
       - name: Obtener el repositorio
