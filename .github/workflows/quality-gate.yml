@@ -47,6 +47,47 @@ jobs:
             }
           done
 
+      - name: Validate normative requirements inventory and traceability
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          python3 - <<'PY'
+          import pathlib
+          import re
+          import sys
+
+          root = pathlib.Path("docs/requirements")
+          matrix = root / "requirements-traceability-matrix.md"
+          if not matrix.is_file():
+              print(f"Missing traceability matrix: {matrix}")
+              sys.exit(1)
+
+          matrix_text = matrix.read_text(encoding="utf-8")
+          normative = sorted(
+              p for p in root.rglob("*.md")
+              if p.name != "README.md"
+          )
+          failures = []
+
+          for path in normative:
+              text = path.read_text(encoding="utf-8")
+              if not text.strip():
+                  failures.append(f"Empty normative requirements document: {path}")
+                  continue
+              relative = path.as_posix()
+              if relative not in matrix_text and path.name not in matrix_text:
+                  failures.append(
+                      f"Normative requirements document is not represented in traceability matrix: {relative}"
+                  )
+
+          if failures:
+              print("\n".join(failures))
+              sys.exit(1)
+
+          print(f"Normative requirements inventory passed: {len(normative)} documents represented.")
+          PY
+
       - name: Validate Markdown structure
         shell: bash
         run: |
