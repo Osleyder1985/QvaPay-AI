@@ -9,6 +9,10 @@ import type { Offer } from "../../domain/offer.js";
 import { mapQvaPayOffer } from "./p2p-mapper.js";
 import { parseP2PPage } from "./p2p-contract.js";
 
+/**
+ * @proposito API pública QvaPayRateLimitError: implementa el comportamiento expuesto por este módulo.
+ * @responsabilidades Aplicar el contrato y las validaciones correspondientes a la integración.
+ */
 export class QvaPayRateLimitError extends Error {
   readonly retryAfterSeconds: number | undefined;
 
@@ -22,6 +26,10 @@ export class QvaPayRateLimitError extends Error {
 export type QvaPayProviderErrorCategory =
   "invalid-request" | "authentication" | "transient" | "contract";
 
+/**
+ * @proposito API pública QvaPayProviderError: implementa el comportamiento expuesto por este módulo.
+ * @responsabilidades Aplicar el contrato y las validaciones correspondientes a la integración.
+ */
 export class QvaPayProviderError extends Error {
   readonly status: number;
   readonly category: QvaPayProviderErrorCategory;
@@ -38,6 +46,10 @@ export class QvaPayProviderError extends Error {
   }
 }
 
+/**
+ * @proposito API pública QvaPayTransientError: implementa el comportamiento expuesto por este módulo.
+ * @responsabilidades Aplicar el contrato y las validaciones correspondientes a la integración.
+ */
 export class QvaPayTransientError extends Error {
   constructor(message: string, options?: { cause?: unknown }) {
     super(message, options);
@@ -69,6 +81,10 @@ function describeTransportError(error: unknown): string {
   return String(error);
 }
 
+/**
+ * @proposito API pública QvaPayP2PClient: implementa el comportamiento expuesto por este módulo.
+ * @responsabilidades Aplicar el contrato y las validaciones correspondientes a la integración.
+ */
 export class QvaPayP2PClient {
   private readonly fetcher: typeof fetch;
   private readonly take: number;
