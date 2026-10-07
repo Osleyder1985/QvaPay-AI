@@ -32,7 +32,7 @@ afterEach(() => {
 });
 
 describe("control lingüístico documental", () => {
-  it("acepta prosa authored en español", () => {
+  it("acepta prosa escrita en español", () => {
     const root = createFixture();
     fs.writeFileSync(
       path.join(root, "documento.md"),
@@ -45,13 +45,13 @@ describe("control lingüístico documental", () => {
     expect(report.findings).toHaveLength(0);
   });
 
-  it("rechaza comentarios y descripciones de pruebas authored en inglés", () => {
+  it("rechaza comentarios y descripciones de pruebas escritas en inglés", () => {
     const root = createFixture();
     fs.writeFileSync(
       path.join(root, "ejemplo.ts"),
       [
-        "// Este comentario explica el sistema",
-        'describe("valida el intervalo configurado", () => {});',
+        "// This comment explains the system",
+        'describe("validates the configured interval", () => {});'
       ].join("\n"),
     );
 
