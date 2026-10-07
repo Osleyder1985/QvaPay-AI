@@ -68,22 +68,22 @@ function extractCode(text, file) {
     if (raw) result.push(makeCandidate(file, text, raw, "DOC_COMMENT", match.index, "comment"));
   }
 
-  const stringPattern = /(['"])(?:\\.|(?!\\1)[^\\r\\n])*?\\1/g;
+  const stringPattern = /(['"])(?:\.|(?!\1)[^\r\n])*?\1/g;
   for (const match of text.matchAll(stringPattern)) {
     const value = match[0].slice(1, -1).trim();
     if (!value || technicalLiteral(value)) continue;
     const offset = match.index;
     const before = text.slice(Math.max(0, offset - 80), offset);
-    if (/:\\s*$/.test(before)) continue;
+    if (/:\s*$/.test(before)) continue;
     let category = "PROSE";
     let context = "string";
-    if (/\\b(?:describe|it|test)\\s*\\(\\s*$/.test(before)) {
+    if (/\b(?:describe|it|test)\s*\(\s*$/.test(before)) {
       category = "TEST_DESCRIPTION";
       context = "test";
-    } else if (/\\b(?:console\\.(?:error|warn|log|info|debug))\\s*\\(\\s*$/.test(before)) {
+    } else if (/\b(?:console\.(?:error|warn|log|info|debug))\s*\(\s*$/.test(before)) {
       category = "LOG_MESSAGE";
       context = "console";
-    } else if (/\\bnew\\s+Error\\s*\\(\\s*$/.test(before) || /\\bthrow\\s+new\\s+Error\\s*\\(\\s*$/.test(before)) {
+    } else if (/\bnew\s+Error\s*\(\s*$/.test(before) || /\bthrow\s+new\s+Error\s*\(\s*$/.test(before)) {
       category = "ERROR_MESSAGE";
       context = "Error";
     }
