@@ -201,8 +201,8 @@ function technicalLiteral(text) {
   if (/^[A-Z0-9_./:@-]+$/.test(value) && !/\s/.test(value)) return true;
   if (/^[a-z0-9_.:@/-]+$/.test(value) && !/\s/.test(value)) return true;
   if (/^\$\{.*\}$/.test(value)) return true;
-  if (/^[A-Za-z_$][\\w$]*:\\s*$/.test(value)) return true;
-  if (/^[{}[\\],;]+[A-Za-z_$][\\w$]*:\\s*$/.test(value)) return true;
+  if (/^[A-Za-z_$][\w$]*:\s*$/.test(value)) return true;
+  if (/^[{}[\],;]+[A-Za-z_$][\w$]*:\s*$/.test(value)) return true;
   if (/^(SELECT|INSERT|UPDATE|DELETE|CREATE|ALTER|DROP|WITH)\b/i.test(value)) {
     return true;
   }
@@ -586,7 +586,7 @@ export function analyzeRepository(root = process.cwd()) {
       decision: "CORREGIR",
       rule: "AUTHORED_PROSE_MUST_BE_SPANISH",
       message_es:
-        "Se detectó prosa authored en inglés y no existe una excepción activa aplicable.",
+        "Se detectó prosa escrita en inglés y no existe una excepción activa aplicable.",
     });
   }
   for (const error of catalogErrors)
