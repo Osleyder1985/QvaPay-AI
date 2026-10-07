@@ -83,6 +83,32 @@ describe("control lingüístico documental", () => {
     expect(report.findings).toHaveLength(0);
   });
 
+  it("no marca estados técnicos en prosa española como inglés", () => {
+    const root = createFixture();
+    fs.writeFileSync(
+      path.join(root, "documento.md"),
+      "El snapshot actual usa los estados current, verified, degraded y failed según el contrato.",
+    );
+
+    const report = analyzeRepository(root);
+
+    expect(report.result).toBe("PASS");
+    expect(report.findings).toHaveLength(0);
+  });
+
+  it("no marca sentencias SQL como prosa documental", () => {
+    const root = createFixture();
+    fs.writeFileSync(
+      path.join(root, "consulta.ts"),
+      'const query = "SELECT id, username FROM app_users WHERE active = 1";',
+    );
+
+    const report = analyzeRepository(root);
+
+    expect(report.result).toBe("PASS");
+    expect(report.findings).toHaveLength(0);
+  });
+
   it("preserva literales técnicos sin convertirlos en prosa", () => {
     const root = createFixture();
     fs.writeFileSync(
