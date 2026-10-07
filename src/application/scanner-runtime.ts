@@ -2,10 +2,10 @@
  * @archivo src/application/scanner-runtime.ts
  * @proposito Orquesta la ejecución del scanner, su estado y la programación siguiente.
  * @responsabilidades Implementar y proteger las reglas propias de este módulo sin mezclar responsabilidades de otras capas.
-* @dependencias MarketProvider, ScannerScheduler y caso de uso scanMarket.
-* @seguridad No expone credenciales; valida moneda e intervalo antes de ejecutar el scanner.
-* @superficie-publica ScannerRuntime, ScannerRuntimeOptions, ScannerRuntimeState y validateInterval.
-* @mantenimiento Mantener alineado con docs/architecture/scanner-runtime.md y con la trazabilidad de #182.
+ * @dependencias MarketProvider, ScannerScheduler y caso de uso scanMarket.
+ * @seguridad No expone credenciales; valida moneda e intervalo antes de ejecutar el scanner.
+ * @superficie-publica ScannerRuntime, ScannerRuntimeOptions, ScannerRuntimeState y validateInterval.
+ * @mantenimiento Mantener alineado con docs/architecture/scanner-runtime.md y con la trazabilidad de #182.
  * @ubicacion src/application dentro de la arquitectura de QvaPay-AI.
  */
 
