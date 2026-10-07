@@ -1,3 +1,10 @@
+/**
+ * @archivo src/infrastructure/cloudflare/qvapay-account-snapshot-store.ts
+ * @proposito Persiste y recupera snapshots de la cuenta QvaPay.
+ * @responsabilidades Implementar y proteger las reglas propias de este módulo sin mezclar responsabilidades de otras capas.
+ * @ubicacion src/infrastructure/cloudflare dentro de la arquitectura de QvaPay-AI.
+ */
+
 import type { D1Database } from "@cloudflare/workers-types";
 import type {
   QvaPayAccountIntegrationStatus,
