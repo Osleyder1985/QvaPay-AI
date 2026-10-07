@@ -224,7 +224,7 @@ describe("QvaPay P2P client", () => {
       (_url: URL, init?: RequestInit) =>
         new Promise<Response>((_, reject) => {
           init?.signal?.addEventListener("abort", () => {
-            reject(new DOMException("The operation was aborted", "AbortError"));
+            reject(new DOMException("La operación fue abortada", "AbortError"));
           });
         }),
     );
@@ -240,7 +240,7 @@ describe("QvaPay P2P client", () => {
     await expect(client.fetchOffers("BANK_CUP")).rejects.toMatchObject({
       name: QvaPayTransientError.name,
       message:
-        "QvaPay P2P buy page 1 transport error: AbortError: The operation was aborted",
+        "QvaPay P2P buy page 1 transport error: AbortError: La operación fue abortada",
     });
     expect(fetcher).toHaveBeenCalledTimes(1);
     expect(fetcher.mock.calls[0]?.[1]?.signal?.aborted).toBe(true);
