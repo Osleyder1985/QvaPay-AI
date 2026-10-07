@@ -1,3 +1,10 @@
+/**
+ * @archivo src/infrastructure/cloudflare/scanner-scheduler-do.ts
+ * @proposito Implementa el Durable Object que mantiene el scheduler del scanner.
+ * @responsabilidades Implementar y proteger las reglas propias de este módulo sin mezclar responsabilidades de otras capas.
+ * @ubicacion src/infrastructure/cloudflare dentro de la arquitectura de QvaPay-AI.
+ */
+
 import { DurableObject } from "cloudflare:workers";
 import type { DurableObjectStorage } from "@cloudflare/workers-types";
 import type { Market } from "../../domain/market.js";
