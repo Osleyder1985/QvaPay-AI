@@ -77,19 +77,19 @@ export class QvaPayP2PClient {
     this.sleep = options.sleep ?? defaultSleep;
 
     if (!options.appId || !options.appSecret) {
-      throw new Error("QvaPay P2P application credentials are required");
+      throw new Error("Las credenciales de la aplicación QvaPay P2P son obligatorias");
     }
 
     if (!Number.isInteger(this.take) || this.take < 1 || this.take > 100) {
-      throw new Error("QvaPay P2P take must be between 1 and 100");
+      throw new Error("QvaPay P2P take debe estar entre 1 y 100");
     }
 
     if (!Number.isInteger(this.maxRetries) || this.maxRetries < 0) {
-      throw new Error("QvaPay P2P maxRetries must be a non-negative integer");
+      throw new Error("QvaPay P2P maxRetries debe ser un entero no negativo");
     }
 
     if (!Number.isInteger(this.timeoutMs) || this.timeoutMs <= 0) {
-      throw new Error("QvaPay P2P timeoutMs must be a positive integer");
+      throw new Error("QvaPay P2P timeoutMs debe ser un entero positivo");
     }
   }
 
