@@ -232,6 +232,10 @@ async function request(
   throw new Error("Se agotó la política de reintentos de solicitudes QvaPay.");
 }
 
+/**
+ * @proposito API pública QvaPayAccountClient: implementa el comportamiento expuesto por este módulo.
+ * @responsabilidades Aplicar el contrato y las validaciones correspondientes a la integración.
+ */
 export class QvaPayAccountClient {
   constructor(private readonly options: QvaPayAccountClientOptions) {
     if (!options.appId || !options.appSecret) {
