@@ -86,6 +86,11 @@ export interface QvaPayAccountSnapshot {
   readonly fetchedAt: string;
 }
 
+/**
+ * @proposito API pública evaluateAccountIntegration: implementa el comportamiento expuesto por este módulo.
+ * @responsabilidades Aplicar el contrato y las validaciones correspondientes a la integración.
+ * @returns Resultado de la operación pública.
+ */
 export function evaluateAccountIntegration(input: {
   readonly balanceOk: boolean;
   readonly identityOk: boolean;
