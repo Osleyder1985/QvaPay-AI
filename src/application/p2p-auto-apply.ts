@@ -1,3 +1,10 @@
+/**
+ * Propósito: Reglas puras de selección para Auto Apply BUY/SELL.
+ * Ubicación: src/application/p2p-auto-apply.ts
+ * Funciones principales: normaliza configuración y selecciona candidatos sin realizar llamadas externas.
+ * Historial: 2026-10-06 — implementación inicial para Issue #222.
+ */
+
 import type { Offer } from "../domain/offer.js";
 import { compareDecimalStrings } from "../domain/offer.js";
 
