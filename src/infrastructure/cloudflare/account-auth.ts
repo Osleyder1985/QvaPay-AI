@@ -1,3 +1,10 @@
+/**
+ * @archivo src/infrastructure/cloudflare/account-auth.ts
+ * @proposito Gestiona sesiones de autenticación de la aplicación.
+ * @responsabilidades Implementar y proteger las reglas propias de este módulo sin mezclar responsabilidades de otras capas.
+ * @ubicacion src/infrastructure/cloudflare dentro de la arquitectura de QvaPay-AI.
+ */
+
 const SESSION_COOKIE = "qvapay_ai_session";
 const SESSION_TTL_SECONDS = 60 * 60 * 8;
 
