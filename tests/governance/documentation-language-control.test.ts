@@ -47,9 +47,14 @@ describe("control lingüístico documental", () => {
 
   it("rechaza comentarios y descripciones de pruebas escritas en inglés", () => {
     const root = createFixture();
-    const englishComment = ["Th", "is", "comment", "explains", "the", "system"].join(
-      "",
-    );
+    const englishComment = [
+      "Th",
+      "is",
+      "comment",
+      "explains",
+      "the",
+      "system",
+    ].join("");
     const englishDescription = [
       "validates",
       "the",
