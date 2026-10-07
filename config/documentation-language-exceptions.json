@@ -63,9 +63,7 @@
       "match_type": "literal",
       "category": "API_CONTRACT",
       "scope": {
-        "paths": [
-          "src/infrastructure/qvapay/p2p-contract.ts"
-        ]
+        "paths": ["src/infrastructure/qvapay/p2p-contract.ts"]
       },
       "context": {
         "kind": "clave_contractual",
@@ -140,64 +138,6 @@
       "evidence": [
         "Tipo de oferta QvaPay identificado durante la auditoría de #302.",
         "La excepción debe limitarse a valores contractuales."
-      ]
-    },
-    {
-      "id": "EXC-008",
-      "match": "Documentation quality",
-      "match_type": "literal",
-      "category": "OFFICIAL_NAME",
-      "scope": {
-        "paths": [
-          "config/documentation-language-exceptions.json"
-        ]
-      },
-      "context": {
-        "kind": "workflow_name",
-        "detail": "Literal técnico del contexto de check requerido, registrado dentro del propio catálogo de excepciones."
-      },
-      "reason_es": "El literal se conserva en inglés únicamente porque el catálogo registra el contexto técnico exacto exigido por GitHub.",
-      "source": ".github/workflows/quality-gate.yml",
-      "translation_risk": "CRITICAL",
-      "owner": "QvaPay-AI",
-      "state": "ACTIVE",
-      "review": {
-        "status": "VALIDADA",
-        "reviewer": "QvaPay-AI",
-        "reviewed_at": "2026-10-07"
-      },
-      "evidence": [
-        "El ruleset exige el contexto técnico exacto.",
-        "La excepción EXC-006 documenta el uso operativo del literal."
-      ]
-    },
-    {
-      "id": "EXC-009",
-      "match": "Security verification",
-      "match_type": "literal",
-      "category": "OFFICIAL_NAME",
-      "scope": {
-        "paths": [
-          "config/documentation-language-exceptions.json"
-        ]
-      },
-      "context": {
-        "kind": "workflow_name",
-        "detail": "Literal técnico del contexto de check requerido, registrado dentro del propio catálogo de excepciones."
-      },
-      "reason_es": "El literal se conserva en inglés únicamente porque el catálogo registra el contexto técnico exacto exigido por GitHub.",
-      "source": ".github/workflows/security-gate.yml",
-      "translation_risk": "CRITICAL",
-      "owner": "QvaPay-AI",
-      "state": "ACTIVE",
-      "review": {
-        "status": "VALIDADA",
-        "reviewer": "QvaPay-AI",
-        "reviewed_at": "2026-10-07"
-      },
-      "evidence": [
-        "El ruleset exige el contexto técnico exacto.",
-        "La excepción EXC-007 documenta el uso operativo del literal."
       ]
     }
   ]
