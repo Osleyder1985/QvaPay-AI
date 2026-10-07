@@ -11,6 +11,10 @@ import type {
   QvaPayP2POfferStatus,
 } from "./p2p-types.js";
 
+/**
+ * @proposito API pública QvaPayContractError: implementa el comportamiento expuesto por este módulo.
+ * @responsabilidades Aplicar el contrato y las validaciones correspondientes a la integración.
+ */
 export class QvaPayContractError extends Error {
   constructor(message: string) {
     super(message);
@@ -18,6 +22,11 @@ export class QvaPayContractError extends Error {
   }
 }
 
+/**
+ * @proposito API pública parseP2PPage: implementa el comportamiento expuesto por este módulo.
+ * @responsabilidades Aplicar el contrato y las validaciones correspondientes a la integración.
+ * @returns Resultado de la operación pública.
+ */
 export function parseP2PPage(payload: unknown): QvaPayP2PPageDto {
   if (!isRecord(payload) || !Array.isArray(payload.data)) {
     throw new QvaPayContractError("Invalid QvaPay P2P pagination envelope");
