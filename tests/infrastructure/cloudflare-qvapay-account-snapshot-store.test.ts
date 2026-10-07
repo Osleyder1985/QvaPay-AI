@@ -113,10 +113,10 @@ function database(rows: Array<Record<string, unknown>> = []) {
           return statement;
         },
         async first<T>() {
+          statements.push({ sql, args: [] });
           return (rows[0] ?? null) as T | null;
         },
       } as unknown as D1PreparedStatement;
-      statements.push({ sql, args: [] });
       return statement;
     },
     async batch() {
