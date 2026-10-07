@@ -1,4 +1,4 @@
-import type { MarketProvider } from "../../application/ports/market-provider.js";
+/**\n * Propósito: Lógica persistente del scheduler y ejecución server-side del scanner/Auto Apply.\n * Ubicación: src/infrastructure/cloudflare/scanner-scheduler-do-logic.ts\n * Historial: 2026-10-06 — actualización relacionada con Issue #222; cambios funcionales sujetos a auditoría #166.\n */\n\nimport type { MarketProvider } from "../../application/ports/market-provider.js";
 import { findAutoApplyCandidate, normalizeAutoApplyConfig, type AutoApplyConfig } from "../../application/p2p-auto-apply.js";
 import type { QvaPayP2PClient } from "../qvapay/qvapay-p2p-client.js";
 import { ScannerRuntime } from "../../application/scanner-runtime.js";
