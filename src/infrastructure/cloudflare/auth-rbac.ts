@@ -1,3 +1,10 @@
+/**
+ * @archivo src/infrastructure/cloudflare/auth-rbac.ts
+ * @proposito Define usuarios, roles y autorización de la aplicación.
+ * @responsabilidades Implementar y proteger las reglas propias de este módulo sin mezclar responsabilidades de otras capas.
+ * @ubicacion src/infrastructure/cloudflare dentro de la arquitectura de QvaPay-AI.
+ */
+
 import type { D1Database } from "@cloudflare/workers-types";
 
 export type AppRole = "ADMINISTRATION" | "AUDITOR";
