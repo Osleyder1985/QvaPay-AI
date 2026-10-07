@@ -1,5 +1,5 @@
 import { DurableObject } from "cloudflare:workers";
-import type { DurableObjectStorage } from "@cloudflare/workers-types";
+import type { DurableObjectStorage, D1Database } from "@cloudflare/workers-types";
 import type { Market } from "../../domain/market.js";\nimport type { AutoApplyConfig } from "../../application/p2p-auto-apply.js";
 import { QvaPayP2PClient } from "../qvapay/qvapay-p2p-client.js";
 import {
