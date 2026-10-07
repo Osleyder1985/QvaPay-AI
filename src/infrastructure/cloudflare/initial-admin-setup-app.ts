@@ -13,6 +13,10 @@ const COMPLETED_HTML = HTML.replace(
   "<div class=\"eyebrow\">Configuración inicial · Administración</div><div class=\"title\">Configuración ya completada</div><p class=\"copy\">La aplicación ya tiene usuarios registrados. Por seguridad, la creación inicial de Administración está cerrada.</p><div class=\"security\"><b>Acceso protegido.</b> Inicia sesión con una cuenta existente o solicita a un usuario de Administración que gestione las cuentas.</div><a class=\"back\" href=\"/\">← Volver al acceso</a>",
 );
 
+/**
+ * Genera la respuesta HTML para el estado de configuración inicial ya completado.
+ * @returns Respuesta HTTP sin caché con la interfaz de configuración completada.
+ */
 export function createInitialAdminSetupCompletedResponse(): Response {
   return new Response(COMPLETED_HTML, {
     status: 200,
@@ -26,6 +30,10 @@ export function createInitialAdminSetupCompletedResponse(): Response {
   });
 }
 
+/**
+ * Genera la respuesta HTML para el asistente de creación inicial de Administración.
+ * @returns Respuesta HTTP sin caché con el formulario de configuración inicial.
+ */
 export function createInitialAdminSetupResponse(): Response {
   return new Response(HTML, {
     status: 200,
