@@ -40,6 +40,21 @@ export class ScannerSchedulerDurableObject extends DurableObject<ScannerSchedule
     return ensureScannerScheduled(this.storage, config);
   }
 
+  async configureAutoApply(config: import("../../application/p2p-auto-apply.js").AutoApplyConfig) {
+    return configureAutoApply(this.storage, config);
+  }
+
+  async getAutoApplyConfig() {
+    return getAutoApplyConfig(this.storage);
+  }
+
+  async getAutoApplyState(): Promise<AutoApplyState> {
+    return (
+      (await this.storage.get<AutoApplyState>(AUTO_APPLY_STATE_KEY)) ??
+      createInitialAutoApplyState()
+    );
+  }
+
   async getState(): Promise<ScannerSchedulerRuntimeState> {
     const config =
       await this.storage.get<ScannerSchedulerConfig>("scanner-config");
