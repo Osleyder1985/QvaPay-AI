@@ -68,7 +68,9 @@ const findings = [];
 for (const file of collectFiles(ROOT).sort()) {
   const source = fs.readFileSync(file, "utf8");
   const comment = firstCommentBlock(source);
-  const relativeFile = path.relative(process.cwd(), file).replaceAll(path.sep, "/");
+  const relativeFile = path
+    .relative(process.cwd(), file)
+    .replaceAll(path.sep, "/");
   const requiredMarkers = CRITICAL_FILES.has(relativeFile)
     ? CRITICAL_REQUIRED_MARKERS
     : BASE_REQUIRED_MARKERS;
