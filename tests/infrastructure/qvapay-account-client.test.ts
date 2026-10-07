@@ -87,7 +87,6 @@ describe("QvaPayAccountClient", () => {
     expect(calls).toHaveLength(4);
   });
 
-
   it("does not verify P2P integration when a 200 response has an incompatible payload", async () => {
     const client = new QvaPayAccountClient({
       baseUrl: "https://api.qvapay.com",
