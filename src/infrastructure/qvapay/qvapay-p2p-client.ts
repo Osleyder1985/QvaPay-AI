@@ -1,6 +1,7 @@
 import type { Offer } from "../../domain/offer.js";
 import { mapQvaPayOffer } from "./p2p-mapper.js";
 import { parseP2PPage } from "./p2p-contract.js";
+import { parseP2POfferDetail, type QvaPayP2POfferDetail } from "./p2p-detail-contract.js";
 
 export class QvaPayRateLimitError extends Error {
   readonly retryAfterSeconds: number | undefined;
@@ -101,16 +102,23 @@ export class QvaPayP2PClient {
         headers: {
           "app-id": this.options.appId,
           "app-secret": this.options.appSecret,
+          accept: "application/json",
         },
       },
     );
+
+    if (response.status === 429) {
+      throw new QvaPayRateLimitError(
+        this.parseRetryAfter(response.headers.get("retry-after")),
+      );
+    }
 
     if (!response.ok) {
       const body = await response.text();
       throw new QvaPayProviderError(
         response.status,
         body || `QvaPay P2P apply failed with status ${response.status}`,
-        response.status === 401
+        response.status === 401 || response.status === 403
           ? "authentication"
           : response.status >= 400 && response.status < 500
             ? "invalid-request"
@@ -121,7 +129,87 @@ export class QvaPayP2PClient {
     return response.json();
   }
 
-  async fetchOffers(
+  async fetchOfferDetail(uuid: string): Promise<QvaPayP2POfferDetail> {
+    if (!this.options.userApiToken) {
+      throw new QvaPayProviderError(
+        500,
+        "QvaPay user API token is required to retrieve P2P offer details",
+        "authentication",
+      );
+    }
+
+    const response = await this.fetcher(
+      new URL(`/p2p/${encodeURIComponent(uuid)}`, this.options.baseUrl),
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${this.options.userApiToken}`,
+          accept: "application/json",
+        },
+      },
+    );
+
+    if (!response.ok) {
+      const body = await response.text();
+      throw new QvaPayProviderError(
+        response.status,
+        body || `QvaPay P2P detail failed with status ${response.status}`,
+        response.status === 401 || response.status === 403
+          ? "authentication"
+          : response.status >= 400 && response.status < 500
+            ? "invalid-request"
+            : "transient",
+      );
+    }
+
+    return parseP2POfferDetail(await response.json());
+  }
+
+  async fetchApplicationBalance(): Promise<string> {
+    const response = await this.fetcher(
+      new URL("/v2/balance", this.options.baseUrl),
+      {
+        method: "POST",
+        headers: {
+          "app-id": this.options.appId,
+          "app-secret": this.options.appSecret,
+          accept: "application/json",
+          "content-type": "application/json",
+        },
+      },
+    );
+
+    if (!response.ok) {
+      const body = await response.text();
+      throw new QvaPayProviderError(
+        response.status,
+        body || `QvaPay balance failed with status ${response.status}`,
+        response.status === 401 || response.status === 403
+          ? "authentication"
+          : response.status >= 400 && response.status < 500
+            ? "invalid-request"
+            : "transient",
+      );
+    }
+
+    const payload = await response.json();
+    if (
+      typeof payload !== "object" ||
+      payload === null ||
+      typeof (payload as Record<string, unknown>).balance !== "number" ||
+      !Number.isFinite((payload as Record<string, unknown>).balance) ||
+      (payload as Record<string, unknown>).balance < 0
+    ) {
+      throw new QvaPayProviderError(
+        502,
+        "QvaPay returned an incompatible balance payload",
+        "contract",
+      );
+    }
+
+    return String((payload as Record<string, number>).balance);
+  }
+\n  async fetchOffers(
     coin: string,
     observedAt = new Date().toISOString(),
   ): Promise<readonly Offer[]> {
