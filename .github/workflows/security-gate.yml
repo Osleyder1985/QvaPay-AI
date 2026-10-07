@@ -1,4 +1,4 @@
-name: Control de Seguridad
+name: Security Gate
 
 on:
   pull_request:
