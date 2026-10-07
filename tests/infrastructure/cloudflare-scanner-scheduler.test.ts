@@ -152,7 +152,7 @@ describe("normalizeScannerSchedulerConfig", () => {
     });
   });
 
-  it("rejects an empty coin", () => {
+  it("rechaza una moneda vacía", () => {
     expect(() =>
       normalizeScannerSchedulerConfig({
         coin: " ",
@@ -167,19 +167,19 @@ describe("normalizeScannerSchedulerConfig", () => {
         coin: "QUSD",
         intervalSeconds: 4,
       }),
-    ).toThrow("between 5 and 300");
+    ).toThrow("entre 5 y 300");
 
     expect(() =>
       normalizeScannerSchedulerConfig({
         coin: "QUSD",
         intervalSeconds: 301,
       }),
-    ).toThrow("between 5 and 300");
+    ).toThrow("entre 5 y 300");
   });
 });
 
 describe("createScannerSchedulerState", () => {
-  it("represents an unconfigured scheduler", () => {
+  it("representa un scheduler sin configurar", () => {
     expect(createScannerSchedulerState(undefined, null)).toEqual({
       configured: false,
       coin: null,
@@ -188,7 +188,7 @@ describe("createScannerSchedulerState", () => {
     });
   });
 
-  it("represents persisted configuration and alarm state", () => {
+  it("representa la configuración persistida y el estado del Alarm", () => {
     const config: ScannerSchedulerConfig = {
       coin: "QUSD",
       intervalSeconds: 10,
