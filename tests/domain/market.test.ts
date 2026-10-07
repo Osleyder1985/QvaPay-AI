@@ -41,6 +41,8 @@ describe("market domain", () => {
   it("rechaza una oferta perteneciente a otro mercado", () => {
     expect(() =>
       createMarket("BANK_CUP", [offer("wrong", "SELL", "1000", "OTHER_CUP")]),
-    ).toThrow("El mercado de la oferta no coincide con la identidad del mercado");
+    ).toThrow(
+      "El mercado de la oferta no coincide con la identidad del mercado",
+    );
   });
 });

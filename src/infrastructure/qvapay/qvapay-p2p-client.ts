@@ -77,7 +77,9 @@ export class QvaPayP2PClient {
     this.sleep = options.sleep ?? defaultSleep;
 
     if (!options.appId || !options.appSecret) {
-      throw new Error("Las credenciales de la aplicación QvaPay P2P son obligatorias");
+      throw new Error(
+        "Las credenciales de la aplicación QvaPay P2P son obligatorias",
+      );
     }
 
     if (!Number.isInteger(this.take) || this.take < 1 || this.take > 100) {

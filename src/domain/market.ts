@@ -14,7 +14,9 @@ export function createMarket(coin: string, offers: readonly Offer[]): Market {
 
   for (const offer of offers) {
     if (offer.market !== normalizedCoin) {
-      throw new Error("El mercado de la oferta no coincide con la identidad del mercado");
+      throw new Error(
+        "El mercado de la oferta no coincide con la identidad del mercado",
+      );
     }
   }
 

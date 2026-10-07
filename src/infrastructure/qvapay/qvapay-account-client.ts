@@ -228,7 +228,9 @@ async function request(
 export class QvaPayAccountClient {
   constructor(private readonly options: QvaPayAccountClientOptions) {
     if (!options.appId || !options.appSecret) {
-      throw new Error("Las credenciales de la aplicación QvaPay son obligatorias");
+      throw new Error(
+        "Las credenciales de la aplicación QvaPay son obligatorias",
+      );
     }
     if (!options.userApiToken) {
       throw new Error("El token API de usuario de QvaPay es obligatorio");
