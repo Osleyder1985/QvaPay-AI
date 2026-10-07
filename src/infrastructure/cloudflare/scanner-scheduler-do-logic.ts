@@ -1,4 +1,10 @@
-/**\n * Propósito: Lógica persistente del scheduler y ejecución server-side del scanner/Auto Apply.\n * Ubicación: src/infrastructure/cloudflare/scanner-scheduler-do-logic.ts\n * Historial: 2026-10-06 — actualización relacionada con Issue #222; cambios funcionales sujetos a auditoría #166.\n */\n\nimport type { MarketProvider } from "../../application/ports/market-provider.js";
+/**
+ * Propósito: Lógica persistente del scheduler y ejecución server-side del scanner/Auto Apply.
+ * Ubicación: src/infrastructure/cloudflare/scanner-scheduler-do-logic.ts
+ * Historial: 2026-10-06 — actualización relacionada con Issue #222; cambios funcionales sujetos a auditoría #166.
+ */
+
+import type { MarketProvider } from "../../application/ports/market-provider.js";
 import { findAutoApplyCandidate, normalizeAutoApplyConfig, type AutoApplyConfig } from "../../application/p2p-auto-apply.js";
 import type { QvaPayP2PClient } from "../qvapay/qvapay-p2p-client.js";
 import { ScannerRuntime } from "../../application/scanner-runtime.js";
@@ -11,7 +17,21 @@ import {
   type SchedulerState,
 } from "./scanner-scheduler-config.js";
 
-export interface AutoApplyProvider {\n  fetchApplicationBalance(): Promise<string>;\n  applyOffer(uuid: string): Promise<unknown>;\n  fetchOfferDetail(uuid: string): Promise<unknown>;\n}\n\nexport type AutoApplyAuditWriter = (event: {\n  readonly action: "BUY" | "SELL";\n  readonly offerId: string;\n  readonly result: "APPLIED" | "FAILED";\n  readonly detail: unknown | null;\n  readonly error: string | null;\n}) => Promise<void>;\n\nexport interface ScannerSchedulerPersistentStorage {
+export interface AutoApplyProvider {
+  fetchApplicationBalance(): Promise<string>;
+  applyOffer(uuid: string): Promise<unknown>;
+  fetchOfferDetail(uuid: string): Promise<unknown>;
+}
+
+export type AutoApplyAuditWriter = (event: {
+  readonly action: "BUY" | "SELL";
+  readonly offerId: string;
+  readonly result: "APPLIED" | "FAILED";
+  readonly detail: unknown | null;
+  readonly error: string | null;
+}) => Promise<void>;
+
+export interface ScannerSchedulerPersistentStorage {
   get<T>(key: string): Promise<T | undefined>;
   put<T>(key: string, value: T): Promise<void>;
   getAlarm(): Promise<number | null>;
@@ -33,7 +53,25 @@ export const SCANNER_MARKET_SNAPSHOT_KEY = "scanner-market-snapshot";
 export const AUTO_APPLY_CONFIG_KEY = "auto-apply-config";
 export const AUTO_APPLY_STATE_KEY = "auto-apply-state";
 
-export interface AutoApplyState {\n  readonly lastAttemptAt: string | null;\n  readonly lastAction: "BUY" | "SELL" | null;\n  readonly lastOfferId: string | null;\n  readonly lastResult: "APPLIED" | "FAILED" | "SKIPPED" | null;\n  readonly lastError: string | null;\n  readonly lastDetail: unknown | null;\n}\n\nexport const createInitialAutoApplyState = (): AutoApplyState => ({\n  lastAttemptAt: null,\n  lastAction: null,\n  lastOfferId: null,\n  lastResult: null,\n  lastError: null,\n  lastDetail: null,\n});\n\nexport const createInitialScannerRuntimeExecutionState =
+export interface AutoApplyState {
+  readonly lastAttemptAt: string | null;
+  readonly lastAction: "BUY" | "SELL" | null;
+  readonly lastOfferId: string | null;
+  readonly lastResult: "APPLIED" | "FAILED" | "SKIPPED" | null;
+  readonly lastError: string | null;
+  readonly lastDetail: unknown | null;
+}
+
+export const createInitialAutoApplyState = (): AutoApplyState => ({
+  lastAttemptAt: null,
+  lastAction: null,
+  lastOfferId: null,
+  lastResult: null,
+  lastError: null,
+  lastDetail: null,
+});
+
+export const createInitialScannerRuntimeExecutionState =
   (): ScannerRuntimeExecutionState => ({
     lastStartedAt: null,
     lastCompletedAt: null,
@@ -107,7 +145,16 @@ async function executeAutoApply(
       lastError: detailError,
       lastDetail: detail,
     });
-    if (audit) {\n      await audit({\n        action: candidate.action,\n        offerId: candidate.offer.id,\n        result: "APPLIED",\n        detail,\n        error: detailError,\n      });\n    }\n    console.info("QvaPay Auto Apply completed", {
+    if (audit) {
+      await audit({
+        action: candidate.action,
+        offerId: candidate.offer.id,
+        result: "APPLIED",
+        detail,
+        error: detailError,
+      });
+    }
+    console.info("QvaPay Auto Apply completed", {
       action: candidate.action,
       offerId: candidate.offer.id,
       detailAvailable: detail !== null,
@@ -123,7 +170,16 @@ async function executeAutoApply(
       lastError: message,
       lastDetail: null,
     });
-    if (audit) {\n      await audit({\n        action: candidate.action,\n        offerId: candidate.offer.id,\n        result: "FAILED",\n        detail: null,\n        error: message,\n      });\n    }\n    console.error("QvaPay Auto Apply failed", {
+    if (audit) {
+      await audit({
+        action: candidate.action,
+        offerId: candidate.offer.id,
+        result: "FAILED",
+        detail: null,
+        error: message,
+      });
+    }
+    console.error("QvaPay Auto Apply failed", {
       action: candidate.action,
       offerId: candidate.offer.id,
       error: message,
@@ -191,7 +247,10 @@ export async function executeScannerAlarm(
       (offer) => offer.side === "SELL",
     ).length;
 
-    await storage.put<Market>(SCANNER_MARKET_SNAPSHOT_KEY, market);\n    if (autoApplyProvider) {\n      await executeAutoApply(storage, market, autoApplyProvider, autoApplyAudit);\n    }
+    await storage.put<Market>(SCANNER_MARKET_SNAPSHOT_KEY, market);
+    if (autoApplyProvider) {
+      await executeAutoApply(storage, market, autoApplyProvider, autoApplyAudit);
+    }
     await storage.put<ScannerRuntimeExecutionState>(
       SCANNER_EXECUTION_STATE_KEY,
       {
