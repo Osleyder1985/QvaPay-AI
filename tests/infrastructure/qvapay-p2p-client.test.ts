@@ -272,3 +272,87 @@ describe("QvaPay P2P apply", () => {
     });
   });
 });
+
+describe("QvaPay P2P applied-offer detail", () => {
+  it("retrieves the authoritative detail with the server-side user API token", async () => {
+    const fetcher = vi.fn().mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          message: "P2P",
+          p2p: {
+            uuid: "offer-123",
+            type: "sell",
+            coin: "BANK_CUP",
+            amount: 100,
+            receive: 99500,
+            status: "processing",
+            only_kyc: true,
+            only_vip: false,
+            private: false,
+            message: "test",
+            details: { cuenta: "123" },
+            tx_id: null,
+            created_at: "2026-10-06T00:00:00.000Z",
+            updated_at: "2026-10-06T00:01:00.000Z",
+            User: { uuid: "u1", username: "seller", name: "Seller", kyc: true, vip: false, golden_check: false },
+            Peer: { uuid: "u2", username: "buyer", name: "Buyer", kyc: true, vip: false, golden_check: true },
+            Coin: { tick: "BANK_CUP", name: "Transferencia CUP", logo: null },
+            Ratings: [],
+            currentUserId: "u2",
+          },
+        }),
+        { status: 200, headers: { "content-type": "application/json" } },
+      ),
+    );
+
+    const client = new QvaPayP2PClient({
+      baseUrl: "https://api.qvapay.com",
+      ...credentials,
+      userApiToken: "user-api-token",
+      fetcher,
+    });
+
+    const detail = await client.fetchOfferDetail("offer-123");
+    expect(detail.status).toBe("processing");
+    expect(detail.peer?.username).toBe("buyer");
+    expect(detail.details).toEqual({ cuenta: "123" });
+    expect(fetcher).toHaveBeenCalledWith(
+      new URL("https://api.qvapay.com/p2p/offer-123"),
+      expect.objectContaining({
+        method: "GET",
+        headers: {
+          Authorization: "Bearer user-api-token",
+          accept: "application/json",
+        },
+      }),
+    );
+  });
+});
+
+describe("QvaPay application balance", () => {
+  it("reads the owner balance with app credentials", async () => {
+    const fetcher = vi.fn().mockResolvedValue(
+      new Response(JSON.stringify({ balance: 125.5 }), { status: 200 }),
+    );
+
+    const client = new QvaPayP2PClient({
+      baseUrl: "https://api.qvapay.com",
+      ...credentials,
+      fetcher,
+    });
+
+    await expect(client.fetchApplicationBalance()).resolves.toBe("125.5");
+    expect(fetcher).toHaveBeenCalledWith(
+      new URL("https://api.qvapay.com/v2/balance"),
+      expect.objectContaining({
+        method: "POST",
+        headers: {
+          "app-id": "test-app-id",
+          "app-secret": "test-app-secret",
+          accept: "application/json",
+          "content-type": "application/json",
+        },
+      }),
+    );
+  });
+});
