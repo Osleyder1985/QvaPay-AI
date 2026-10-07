@@ -1,4 +1,10 @@
-/**\n * Propósito: Router HTTP del Worker, autenticación, Account y operaciones P2P.\n * Ubicación: src/infrastructure/cloudflare/worker.ts\n * Historial: 2026-10-06 — actualización relacionada con Issue #222; cambios funcionales sujetos a auditoría #166.\n */\n\n// prettier-ignore
+/**
+ * Propósito: Router HTTP del Worker, autenticación, Account y operaciones P2P.
+ * Ubicación: src/infrastructure/cloudflare/worker.ts
+ * Historial: 2026-10-06 — actualización relacionada con Issue #222; cambios funcionales sujetos a auditoría #166.
+ */
+
+// prettier-ignore
 import type { DurableObjectNamespace, D1Database } from "@cloudflare/workers-types";
 // prettier-ignore
 import { ScannerSchedulerDurableObject } from "./scanner-scheduler-do.js";
@@ -18,7 +24,9 @@ import { bootstrapInitialAdmin } from "./initial-admin-setup.js";
 // prettier-ignore
 import { createInitialAdminSetupCompletedResponse, createInitialAdminSetupResponse } from "./initial-admin-setup-app.js";
 // prettier-ignore
-import { createPublicAppResponse, createPublicScannerStateResponse, toPublicScannerState } from "./public-app.js";\nimport { normalizeAutoApplyConfig, type AutoApplyConfig } from "../../application/p2p-auto-apply.js";\nimport { QvaPayP2PClient } from "../qvapay/qvapay-p2p-client.js";
+import { createPublicAppResponse, createPublicScannerStateResponse, toPublicScannerState } from "./public-app.js";
+import { normalizeAutoApplyConfig, type AutoApplyConfig } from "../../application/p2p-auto-apply.js";
+import { QvaPayP2PClient } from "../qvapay/qvapay-p2p-client.js";
 
 // prettier-ignore
 export interface ScannerWorkerEnvironment {
