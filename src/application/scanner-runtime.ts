@@ -1,3 +1,10 @@
+/**
+ * @archivo src/application/scanner-runtime.ts
+ * @proposito Orquesta la ejecución del scanner, su estado y la programación siguiente.
+ * @responsabilidades Implementar y proteger las reglas propias de este módulo sin mezclar responsabilidades de otras capas.
+ * @ubicacion src/application dentro de la arquitectura de QvaPay-AI.
+ */
+
 import type { Market } from "../domain/market.js";
 import type { MarketProvider } from "./ports/market-provider.js";
 import type { ScannerScheduler } from "./ports/scanner-scheduler.js";
