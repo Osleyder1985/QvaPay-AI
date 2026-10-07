@@ -201,6 +201,8 @@ function technicalLiteral(text) {
   if (/^[A-Z0-9_./:@-]+$/.test(value) && !/\s/.test(value)) return true;
   if (/^[a-z0-9_.:@/-]+$/.test(value) && !/\s/.test(value)) return true;
   if (/^\$\{.*\}$/.test(value)) return true;
+  if (/^[A-Za-z_$][\\w$]*:\\s*$/.test(value)) return true;
+  if (/^[{}[\\],;]+[A-Za-z_$][\\w$]*:\\s*$/.test(value)) return true;
   if (/^(SELECT|INSERT|UPDATE|DELETE|CREATE|ALTER|DROP|WITH)\b/i.test(value)) {
     return true;
   }
