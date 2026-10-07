@@ -2,6 +2,10 @@
  * @archivo src/domain/market.ts
  * @proposito Define la identidad de un mercado y las operaciones de ordenamiento de ofertas.
  * @responsabilidades Implementar y proteger las reglas propias de este módulo sin mezclar responsabilidades de otras capas.
+* @dependencias Modelo Offer y utilidades decimales del dominio.
+* @seguridad No maneja secretos ni acceso externo; aplica invariantes de identidad de mercado.
+* @superficie-publica Market, createMarket y offersBySide.
+* @mantenimiento Mantener alineado con las reglas de mercado y su documentación de requisitos.
  * @ubicacion src/domain dentro de la arquitectura de QvaPay-AI.
  */
 
