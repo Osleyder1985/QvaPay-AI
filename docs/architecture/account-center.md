@@ -44,6 +44,12 @@ Con una sesión autenticada, Cuenta puede mostrar balance, identidad autenticada
 - UI: `src/infrastructure/cloudflare/public-app.ts`.
 - Tests: `tests/infrastructure/qvapay-account-client.test.ts` y pruebas del contrato público.
 
+## Contrato y unidades
+
+La identidad se obtiene exclusivamente de `GET /user`. El balance de `POST /v2/balance` se trata como USD; no se etiqueta como QUSD por analogía con el mercado P2P. Los campos ausentes o no documentados no se convierten en `false`, `0` o estados verificados.
+
+El metadata `two_factor_secret` de QvaPay no se persiste ni se expone; solo puede derivarse un indicador de presencia de 2FA. `latest_transactions` permanece fuera del modelo hasta completar clasificación y minimización.
+
 ## Regla de evolución
 
 Cada nuevo campo de Cuenta debe identificar su fuente QvaPay, pasar por normalización contractual, registrar su estado de lectura y tener prueba cuando sea contractual. Nunca se debe sustituir una fuente por datos de mercado ni exponer payloads upstream completos.
