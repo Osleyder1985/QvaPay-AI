@@ -171,11 +171,36 @@ function exceptionMatches(entry, item) {
   return false;
 }
 
+function exceptionCategoryApplies(entry, item) {
+  const compatible = new Map([
+    ["OFFICIAL_NAME", new Set(["CI_MESSAGE", "PROSE"])],
+    ["EXTERNAL_TEXT", new Set(["ERROR_MESSAGE", "LOG_MESSAGE", "PROSE"])],
+    ["FIXTURE_TEXT", new Set(["PROSE", "TEST_DESCRIPTION", "ERROR_MESSAGE", "LOG_MESSAGE"])],
+    ["TECH_IDENTIFIER", new Set(["PROSE"])],
+    ["API_CONTRACT", new Set(["PROSE"])],
+    ["PERSISTED_LITERAL", new Set(["PROSE"])],
+    ["TECH_NAME", new Set(["PROSE"])],
+    ["COMMAND", new Set(["PROSE", "CI_MESSAGE"])],
+  ]);
+  return compatible.get(entry.category)?.has(item.category) ?? false;
+}
+
+function contextMatches(entry, item) {
+  const sourceContext = item.source.split(":").at(-1);
+  const allowed = new Map([
+    ["workflow_name", new Set(["yaml-name"])],
+    ["external_response", new Set(["string", "Error", "console"])],
+    ["fixture", new Set(["string", "test", "Error", "console"])],
+    ["clave_contractual", new Set(["string"])],
+  ]);
+  return !entry.context?.kind || allowed.get(entry.context.kind)?.has(sourceContext) === true;
+}
+
 function resolveException(catalog, item) {
   const matches = (catalog.exceptions || []).filter((entry) =>
     exceptionMatches(entry, item) &&
-    entry.category === item.category &&
-    (!entry.context?.kind || entry.context.kind === item.source.split(":").at(-1)),
+    exceptionCategoryApplies(entry, item) &&
+    contextMatches(entry, item),
   );
   return matches.length === 1 ? matches[0] : null;
 }
