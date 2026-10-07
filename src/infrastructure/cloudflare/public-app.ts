@@ -1,3 +1,10 @@
+/**
+ * @archivo src/infrastructure/cloudflare/public-app.ts
+ * @proposito Construye la interfaz pública de la aplicación.
+ * @responsabilidades Implementar y proteger las reglas propias de este módulo sin mezclar responsabilidades de otras capas.
+ * @ubicacion src/infrastructure/cloudflare dentro de la arquitectura de QvaPay-AI.
+ */
+
 import type { Market } from "../../domain/market.js";
 import type { Offer } from "../../domain/offer.js";
 import { compareDecimalStrings } from "../../domain/offer.js";
