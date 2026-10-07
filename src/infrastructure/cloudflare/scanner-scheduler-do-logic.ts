@@ -46,6 +46,11 @@ export const createInitialScannerRuntimeExecutionState =
     lastSellCount: 0,
   });
 
+/**
+ * @proposito API pública ensureScannerScheduled: implementa el comportamiento expuesto por este módulo.
+ * @responsabilidades Aplicar las validaciones y reglas de negocio definidas por el contrato del módulo.
+ * @returns Resultado de la operación pública.
+ */
 export async function ensureScannerScheduled(
   storage: ScannerSchedulerPersistentStorage,
   config: ScannerSchedulerConfig,
@@ -69,6 +74,11 @@ export async function ensureScannerScheduled(
   return createScannerSchedulerState(normalized, alarm);
 }
 
+/**
+ * @proposito API pública executeScannerAlarm: implementa el comportamiento expuesto por este módulo.
+ * @responsabilidades Aplicar las validaciones y reglas de negocio definidas por el contrato del módulo.
+ * @returns Resultado de la operación pública.
+ */
 export async function executeScannerAlarm(
   storage: ScannerSchedulerPersistentStorage,
   config: ScannerSchedulerConfig,
