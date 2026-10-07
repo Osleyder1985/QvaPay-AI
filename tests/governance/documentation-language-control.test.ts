@@ -75,6 +75,40 @@ describe("control lingüístico documental", () => {
     expect(report.findings).toHaveLength(0);
   });
 
+  it("aplica una excepción ACTIVE solo con revisión VALIDADA y contexto compatible", () => {
+    const root = createFixture();
+    fs.writeFileSync(
+      path.join(root, "workflow.yml"),
+      "name: Security Gate\n",
+    );
+    fs.writeFileSync(
+      path.join(root, "config", "documentation-language-exceptions.json"),
+      JSON.stringify({
+        schema_version: "1.0.0",
+        exceptions: [{
+          id: "EXC-998",
+          match: "Security Gate",
+          match_type: "literal",
+          category: "OFFICIAL_NAME",
+          scope: { paths: ["workflow.yml"] },
+          context: { kind: "workflow_name" },
+          reason_es: "Nombre oficial del flujo de trabajo.",
+          source: "Definición del flujo de trabajo del repositorio.",
+          translation_risk: "HIGH",
+          owner: "QvaPay-AI",
+          state: "ACTIVE",
+          review: { status: "VALIDADA" },
+          evidence: ["El nombre es referenciado por otros flujos del repositorio."],
+        }],
+      }, null, 2),
+    );
+
+    const report = analyzeRepository(root);
+
+    expect(report.result).toBe("PASS");
+    expect(report.findings).toHaveLength(0);
+  });
+
   it("rechaza una excepción ACTIVE sin revisión válida", () => {
     const errors = validateCatalog({
       schema_version: "1.0.0",
