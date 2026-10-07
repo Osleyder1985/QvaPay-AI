@@ -1,6 +1,13 @@
-/**\n * Propósito: Durable Object que coordina scanner, Alarm y Auto Apply.\n * Ubicación: src/infrastructure/cloudflare/scanner-scheduler-do.ts\n * Historial: 2026-10-06 — actualización relacionada con Issue #222; cambios funcionales sujetos a auditoría #166.\n */\n\nimport { DurableObject } from "cloudflare:workers";
+/**
+ * Propósito: Durable Object que coordina scanner, Alarm y Auto Apply.
+ * Ubicación: src/infrastructure/cloudflare/scanner-scheduler-do.ts
+ * Historial: 2026-10-06 — actualización relacionada con Issue #222; cambios funcionales sujetos a auditoría #166.
+ */
+
+import { DurableObject } from "cloudflare:workers";
 import type { DurableObjectStorage, D1Database } from "@cloudflare/workers-types";
-import type { Market } from "../../domain/market.js";\nimport type { AutoApplyConfig } from "../../application/p2p-auto-apply.js";
+import type { Market } from "../../domain/market.js";
+import type { AutoApplyConfig } from "../../application/p2p-auto-apply.js";
 import { QvaPayP2PClient } from "../qvapay/qvapay-p2p-client.js";
 import {
   ensureScannerScheduled,
