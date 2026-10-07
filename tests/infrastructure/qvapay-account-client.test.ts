@@ -88,7 +88,6 @@ describe("QvaPayAccountClient", () => {
     expect(calls).toHaveLength(4);
   });
 
-
   it("retries HTTP 429 using Retry-After and returns the successful payload", async () => {
     let attempts = 0;
     const client = new QvaPayAccountClient({
