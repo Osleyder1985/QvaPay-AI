@@ -158,8 +158,8 @@ describe("executeScannerAlarm Auto Apply", () => {
       storage,
       config,
       provider,
-      autoApply,
       Date.parse("2026-10-06T00:00:00.000Z"),
+      autoApply,
     );
 
     expect(calls).toEqual(["apply:sell-offer"]);
