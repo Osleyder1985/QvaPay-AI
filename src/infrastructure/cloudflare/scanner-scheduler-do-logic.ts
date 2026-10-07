@@ -1,4 +1,6 @@
 import type { MarketProvider } from "../../application/ports/market-provider.js";
+import { findAutoApplyCandidate, normalizeAutoApplyConfig, type AutoApplyConfig } from "../../application/p2p-auto-apply.js";
+import type { QvaPayP2PClient } from "../qvapay/qvapay-p2p-client.js";
 import { ScannerRuntime } from "../../application/scanner-runtime.js";
 import type { Market } from "../../domain/market.js";
 import { CloudflareScannerScheduler } from "./scanner-scheduler.js";
@@ -28,8 +30,10 @@ export interface ScannerRuntimeExecutionState {
 export const SCANNER_CONFIG_KEY = "scanner-config";
 export const SCANNER_EXECUTION_STATE_KEY = "scanner-execution-state";
 export const SCANNER_MARKET_SNAPSHOT_KEY = "scanner-market-snapshot";
+export const AUTO_APPLY_CONFIG_KEY = "auto-apply-config";
+export const AUTO_APPLY_STATE_KEY = "auto-apply-state";
 
-export const createInitialScannerRuntimeExecutionState =
+export interface AutoApplyState {\n  readonly lastAttemptAt: string | null;\n  readonly lastAction: "BUY" | "SELL" | null;\n  readonly lastOfferId: string | null;\n  readonly lastResult: "APPLIED" | "FAILED" | "SKIPPED" | null;\n  readonly lastError: string | null;\n  readonly lastDetail: unknown | null;\n}\n\nexport const createInitialAutoApplyState = (): AutoApplyState => ({\n  lastAttemptAt: null,\n  lastAction: null,\n  lastOfferId: null,\n  lastResult: null,\n  lastError: null,\n  lastDetail: null,\n});\n\nexport const createInitialScannerRuntimeExecutionState =
   (): ScannerRuntimeExecutionState => ({
     lastStartedAt: null,
     lastCompletedAt: null,
@@ -38,6 +42,94 @@ export const createInitialScannerRuntimeExecutionState =
     lastBuyCount: 0,
     lastSellCount: 0,
   });
+
+export async function configureAutoApply(
+  storage: ScannerSchedulerPersistentStorage,
+  config: AutoApplyConfig,
+): Promise<AutoApplyConfig> {
+  const normalized = normalizeAutoApplyConfig(config);
+  await storage.put(AUTO_APPLY_CONFIG_KEY, normalized);
+  return normalized;
+}
+
+export async function getAutoApplyConfig(
+  storage: ScannerSchedulerPersistentStorage,
+): Promise<AutoApplyConfig | null> {
+  return (await storage.get<AutoApplyConfig>(AUTO_APPLY_CONFIG_KEY)) ?? null;
+}
+
+async function executeAutoApply(
+  storage: ScannerSchedulerPersistentStorage,
+  market: Market,
+  provider: QvaPayP2PClient,
+): Promise<void> {
+  const config = await getAutoApplyConfig(storage);
+  if (!config?.enabled) return;
+
+  const now = Date.now();
+  const recentAttempts =
+    (await storage.get<number[]>("auto-apply-attempts")) ?? [];
+  const activeAttempts = recentAttempts.filter((timestamp) => now - timestamp < 60_000);
+  if (activeAttempts.length >= 2) {
+    return;
+  }
+
+  const appliedIds =
+    (await storage.get<string[]>("auto-apply-applied-ids")) ?? [];
+  const balance = await provider.fetchApplicationBalance();
+  const candidate = findAutoApplyCandidate(market.offers, config, { qusd: balance });
+  if (!candidate || appliedIds.includes(candidate.offer.id)) {
+    return;
+  }
+
+  await storage.put("auto-apply-attempts", [...activeAttempts, now]);
+  const attemptedAt = new Date(now).toISOString();
+
+  try {
+    const result = await provider.applyOffer(candidate.offer.id);
+    let detail: unknown = null;
+    let detailError: string | null = null;
+    try {
+      detail = await provider.fetchOfferDetail(candidate.offer.id);
+    } catch (error) {
+      detailError = error instanceof Error ? error.message : String(error);
+    }
+
+    await storage.put("auto-apply-applied-ids", [
+      ...appliedIds.slice(-499),
+      candidate.offer.id,
+    ]);
+    await storage.put<AutoApplyState>(AUTO_APPLY_STATE_KEY, {
+      lastAttemptAt: attemptedAt,
+      lastAction: candidate.action,
+      lastOfferId: candidate.offer.id,
+      lastResult: "APPLIED",
+      lastError: detailError,
+      lastDetail: detail,
+    });
+    console.info("QvaPay Auto Apply completed", {
+      action: candidate.action,
+      offerId: candidate.offer.id,
+      detailAvailable: detail !== null,
+    });
+    void result;
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    await storage.put<AutoApplyState>(AUTO_APPLY_STATE_KEY, {
+      lastAttemptAt: attemptedAt,
+      lastAction: candidate.action,
+      lastOfferId: candidate.offer.id,
+      lastResult: "FAILED",
+      lastError: message,
+      lastDetail: null,
+    });
+    console.error("QvaPay Auto Apply failed", {
+      action: candidate.action,
+      offerId: candidate.offer.id,
+      error: message,
+    });
+  }
+}
 
 export async function ensureScannerScheduled(
   storage: ScannerSchedulerPersistentStorage,
@@ -99,7 +191,7 @@ export async function executeScannerAlarm(
       (offer) => offer.side === "SELL",
     ).length;
 
-    await storage.put<Market>(SCANNER_MARKET_SNAPSHOT_KEY, market);
+    await storage.put<Market>(SCANNER_MARKET_SNAPSHOT_KEY, market);\n    await executeAutoApply(storage, market, provider as QvaPayP2PClient);
     await storage.put<ScannerRuntimeExecutionState>(
       SCANNER_EXECUTION_STATE_KEY,
       {
