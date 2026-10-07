@@ -1,3 +1,10 @@
+/**
+ * @archivo src/infrastructure/cloudflare/initial-admin-setup.ts
+ * @proposito Gestiona la creación inicial de la cuenta de Administración.
+ * @responsabilidades Implementar y proteger las reglas propias de este módulo sin mezclar responsabilidades de otras capas.
+ * @ubicacion src/infrastructure/cloudflare dentro de la arquitectura de QvaPay-AI.
+ */
+
 import type { D1Database } from "@cloudflare/workers-types";
 import { createUser, type AppUser } from "./auth-rbac.js";
 
