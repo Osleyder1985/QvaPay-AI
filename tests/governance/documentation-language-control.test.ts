@@ -70,6 +70,19 @@ describe("control lingüístico documental", () => {
     ).toBe(true);
   });
 
+  it("no clasifica nombres técnicos integrados en prosa española como inglés", () => {
+    const root = createFixture();
+    fs.writeFileSync(
+      path.join(root, "documento.md"),
+      "**Implementación actual verificada:** Worker Cloudflare + Durable Object + Alarm + Scanner Runtime + adaptador QvaPay P2P + dashboard público.\\n",
+    );
+
+    const report = analyzeRepository(root);
+
+    expect(report.result).toBe("PASS");
+    expect(report.findings).toHaveLength(0);
+  });
+
   it("preserva literales técnicos sin convertirlos en prosa", () => {
     const root = createFixture();
     fs.writeFileSync(
