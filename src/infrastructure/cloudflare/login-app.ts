@@ -11,4 +11,9 @@ const HTML = `<!doctype html><html lang="es"><head><meta charset="utf-8"><meta n
 const form=document.getElementById("login"),button=document.getElementById("submit"),error=document.getElementById("error");form.addEventListener("submit",async event=>{event.preventDefault();button.disabled=true;error.textContent="";try{const response=await fetch("/api/auth/login",{method:"POST",headers:{"content-type":"application/json","accept":"application/json"},credentials:"same-origin",body:JSON.stringify({username:document.getElementById("username").value,password:document.getElementById("password").value})});const body=await response.json().catch(()=>({}));if(!response.ok)throw new Error(body.error||"No fue posible iniciar sesión.");document.getElementById("password").value="";location.href="/";}catch(e){error.textContent=e instanceof Error?e.message:String(e)}finally{button.disabled=false}});
 </script></body></html>`;
 // prettier-ignore
+/**
+ * @proposito API pública createLoginAppResponse: implementa el comportamiento expuesto por este módulo.
+ * @responsabilidades Aplicar el contrato y las validaciones correspondientes a la integración.
+ * @returns Resultado de la operación pública.
+ */
 export function createLoginAppResponse(): Response { return new Response(HTML,{status:200,headers:{"content-type":"text/html; charset=UTF-8","cache-control":"no-store","x-content-type-options":"nosniff","content-security-policy":"default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src 'self'; base-uri 'none'; frame-ancestors 'none'"}}); }
