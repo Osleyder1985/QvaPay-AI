@@ -162,4 +162,4 @@ export function analyzeRepository(root = process.cwd()) {
   findings.sort((a, b) => a.file.localeCompare(b.file) || a.line - b.line || a.column - b.column || a.text.localeCompare(b.text));
   return { version: "1.0.0", catalog_version: catalog.schema_version, result: findings.length === 0 ? "PASS" : "FAIL", findings, summary: { files: allFiles.length, candidates: candidates.length, findings: findings.length, errors: findings.filter((x) => x.severity === "ERROR").length, review_required: findings.filter((x) => x.severity === "REVIEW_REQUIRED").length } };
 }\n
-if (import.meta.url === new URL(process.argv[1], "file:").href) { const report = analyzeRepository(process.cwd()); console.log(JSON.stringify(report, null, 2)); process.exit(report.result === "PASS" ? 0 : 1); }\n
+if (import.meta.url === new URL(process.argv[1], "file:").href) { const report = analyzeRepository(process.cwd()); console.log(JSON.stringify(report, null, 2)); process.exit(report.result === "PASS" ? 0 : 1); }
