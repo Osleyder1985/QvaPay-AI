@@ -16,24 +16,24 @@ Relacionar requisitos con diseño, implementación, pruebas, evidencia de runtim
 | SYS-SEC-001 | No pedir secretos operacionales al navegador | Public App + Worker | Security Gate + dashboard smoke | Verified |
 | SYS-SEC-002 | Identidad de cuenta desde /user | QvaPayAccountClient | pruebas de cuenta | Verified* |
 
-## Nuevos requisitos — Audit and Control
+## Nuevos requisitos — Auditoría y Control
 
 | ID | Requisito | Implementación | Prueba / evidencia | Estado |
 |---|---|---|---|---|
-| SYS-AUD-001 | Audit trail persistente y consultable | TBD | TBD | Defined |
+| SYS-AUD-001 | Registro de auditoría persistente y consultable | TBD | TBD | Defined |
 | SYS-AUD-002 | Actor, acción, objeto y contexto | TBD | TBD | Defined |
-| SYS-AUD-003 | Before/after y resultado | TBD | TBD | Defined |
-| SYS-AUD-004 | Correlation/request/operation traceability | TBD | TBD | Defined |
+| SYS-AUD-003 | Estado anterior/posterior y resultado | TBD | TBD | Defined |
+| SYS-AUD-004 | Trazabilidad de correlación, solicitud y operación | TBD | TBD | Defined |
 | SYS-AUD-005 | Integridad, retención y control de acceso | TBD | TBD | Defined |
-| SYS-AUD-006 | Auditoría del acceso al propio audit trail | TBD | TBD | Defined |
+| SYS-AUD-006 | Auditoría del acceso al propio registro de auditoría | TBD | TBD | Defined |
 | SYS-AUD-007 | Exportación y preservación de evidencia | TBD | TBD | Defined |
 | SYS-AUD-008 | Minimización de secretos/datos sensibles | TBD | TBD | Defined |
 
-## Nuevos requisitos — Accounting and Economic
+## Nuevos requisitos — Contabilidad y Economía
 
 | ID | Requisito | Implementación | Prueba / evidencia | Estado |
 |---|---|---|---|---|
-| SYS-ACC-001 | Ledger económico persistente | TBD | TBD | Defined |
+| SYS-ACC-001 | Libro mayor económico persistente | TBD | TBD | Defined |
 | SYS-ACC-002 | BUY/SELL y operaciones monetarias | TBD | TBD | Defined |
 | SYS-ACC-003 | Transferencias, ingresos, gastos, comisiones | TBD | TBD | Defined |
 | SYS-ACC-004 | Proveniencia y referencias externas | TBD | TBD | Defined |
@@ -44,22 +44,22 @@ Relacionar requisitos con diseño, implementación, pruebas, evidencia de runtim
 | SYS-ACC-009 | Reconciliación con proveedores/medios de pago | TBD | TBD | Defined |
 | SYS-ACC-010 | Modelo de partida doble/general ledger evaluado | TBD | TBD | Defined |
 | SYS-ACC-011 | Minimización y protección de datos de tarjetas | TBD | TBD | Defined |
-| SYS-ACC-012 | Reporting reproducible y evidencia de cierre | TBD | TBD | Defined |
+| SYS-ACC-012 | Informes reproducibles y evidencia de cierre | TBD | TBD | Defined |
 
 ## Requisitos de cumplimiento contable
 
 | ID | Requisito | Estado |
 |---|---|---|
 | SYS-COMP-ACC-001 | Determinar jurisdicción y marco contable aplicable | Defined |
-| SYS-COMP-ACC-002 | Determinar obligaciones fiscales/financieras/payment | Defined |
+| SYS-COMP-ACC-002 | Determinar obligaciones fiscales/financieras y de medios de pago | Defined |
 | SYS-COMP-ACC-003 | Mapear requisitos legales a controles y evidencia | Defined |
 
 ## Gobernanza
 
-Toda solución para SYS-AUD-* y SYS-ACC-* queda bloqueada por #270 hasta contar con Solution Card ISO-backed, autorización explícita y trazabilidad completa.
+Toda solución para SYS-AUD-* y SYS-ACC-* queda bloqueada por #270 hasta contar con Solution Card respaldada por ISO, autorización explícita y trazabilidad completa.
 
 ## Estados formales
 
-Defined, Designed, Implemented, Tested, Verified, Certified, Failed / Rejected, Blocked.
+Definido, Diseñado, Implementado, Probado, Verificado, Certificado, Fallido / Rechazado, Bloqueado.
 
-Estos estados no son intercambiables. Un deployment exitoso no implica certificación.
+Estos estados no son intercambiables. Un despliegue exitoso no implica certificación.
