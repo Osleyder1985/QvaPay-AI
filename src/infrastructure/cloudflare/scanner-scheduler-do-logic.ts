@@ -11,7 +11,7 @@ import {
   type SchedulerState,
 } from "./scanner-scheduler-config.js";
 
-export type AutoApplyAuditWriter = (event: {\n  readonly action: "BUY" | "SELL";\n  readonly offerId: string;\n  readonly result: "APPLIED" | "FAILED";\n  readonly detail: unknown | null;\n  readonly error: string | null;\n}) => Promise<void>;\n\nexport interface ScannerSchedulerPersistentStorage {
+export interface AutoApplyProvider {\n  fetchApplicationBalance(): Promise<string>;\n  applyOffer(uuid: string): Promise<unknown>;\n  fetchOfferDetail(uuid: string): Promise<unknown>;\n}\n\nexport type AutoApplyAuditWriter = (event: {\n  readonly action: "BUY" | "SELL";\n  readonly offerId: string;\n  readonly result: "APPLIED" | "FAILED";\n  readonly detail: unknown | null;\n  readonly error: string | null;\n}) => Promise<void>;\n\nexport interface ScannerSchedulerPersistentStorage {
   get<T>(key: string): Promise<T | undefined>;
   put<T>(key: string, value: T): Promise<void>;
   getAlarm(): Promise<number | null>;
