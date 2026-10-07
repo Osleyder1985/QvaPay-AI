@@ -4,11 +4,11 @@
 
 **Design stage only — no runtime implementation authorized by this document.**
 
-This document applies the mandatory decision sequence established by Issue #270:
+Este documento aplica the mandatory decision sequence established by Issue #270:
 
 **Finding → objective evidence → risk/impact → requirement → applicable ISO criterion → alternatives → selected solution → Why → Purpose → impact → tests → documentation → implementation → verification → objective evidence → certification.**
 
-The requirements covered here are defined in #283, #284, #285 and #286. The baseline documentation is proposed in PR #288.
+Los requisitos cubiertos aquí están defined in #283, #284, #285 and #286. The baseline documentation is proposed in PR #288.
 
 ---
 
@@ -16,15 +16,15 @@ The requirements covered here are defined in #283, #284, #285 and #286. The base
 
 ### Problem / finding
 
-The system needs a first-class Audit and Control capability. Existing application logs and operational state are not sufficient to provide a persistent, queryable, attributable and preserved record of security, administration, configuration, identity, operational and financially relevant actions.
+El sistema necesita a first-class Audit and Control capability. Existing application logs and operational state are not sufficient to provide a persistent, queryable, attributable and preserved record of security, administration, configuration, identity, operational and financially relevant actions.
 
 ### Objective evidence
 
-The requirement baseline in #283 explicitly requires durable audit records containing actor, action, target, reason, source, before/after state, result, correlation identifiers, provenance, classification and retention metadata. It also explicitly states that ordinary application logs do not satisfy the requirement.
+La línea base de requisitos in #283 explicitly requires durable audit records containing actor, action, target, reason, source, before/after state, result, correlation identifiers, provenance, classification and retention metadata. It also explicitly states that ordinary application logs do not satisfy the requirement.
 
 ### Risk / impact
 
-Without a controlled audit trail:
+Sin una trazabilidad de auditoría controlada:
 
 - actions may not be attributable to a unique actor;
 - state transitions may be impossible to reconstruct;
@@ -42,7 +42,7 @@ Without a controlled audit trail:
 
 **ISO/IEC 27001:2022 / ISO/IEC 27002:2022**
 
-The relevant control set includes:
+El conjunto de controles pertinente incluye:
 
 - **5.15 Access control** — governs authorized access to information and associated assets.
 - **5.18 Access rights** — governs provisioning, review, modification and termination of access rights.
@@ -50,19 +50,19 @@ The relevant control set includes:
 - **8.15 Logging** — relevant to generation and management of event logs.
 - **8.16 Monitoring activities** — relevant to monitoring systems and events.
 
-ISO/IEC 27002:2022 is the control-guidance standard supporting implementation of the ISO/IEC 27001 ISMS requirements.
+ISO/IEC 27002:2022 es el estándar de orientación de controles supporting implementation of the ISO/IEC 27001 ISMS requirements.
 
 **ISO/IEC 25010:2023**
 
-The product-quality model is applicable to software requirements and evaluation. Its security quality concepts include properties such as integrity, non-repudiation, accountability and authenticity, which directly support the requirement for attributable and tamper-resistant evidence.
+El modelo de calidad del producto es aplicable to software requirements and evaluation. Its security quality concepts include properties such as integrity, non-repudiation, accountability and authenticity, which directly support the requirement for attributable and tamper-resistant evidence.
 
 **ISO 9001**
 
-The quality-management framework is relevant to controlled documented information, process operation, monitoring, measurement and evidence of achieved results. ISO's guidance explicitly connects documented information with controlled processes and retained evidence.
+El marco de gestión de calidad es pertinente to controlled documented information, process operation, monitoring, measurement and evidence of achieved results. ISO's guidance explicitly connects documented information with controlled processes and retained evidence.
 
 **ISO 19011:2026**
 
-This is an audit-guidance standard, not a product-security control. It is applicable to the evidence model because audit evidence must be relevant to audit criteria and verifiable. The current edition is ISO 19011:2026; the 2018 edition is withdrawn.
+Este es un estándar de orientación para auditoría, not a product-security control. It is applicable to the evidence model because audit evidence must be relevant to audit criteria and verifiable. The current edition is ISO 19011:2026; the 2018 edition is withdrawn.
 
 ### Alternatives considered
 
@@ -101,11 +101,11 @@ Audit records must not contain passwords, access tokens, CVV, PINs or unnecessar
 
 ### Why?
 
-Because the system needs evidence that is attributable, durable and independently queryable rather than merely diagnostic telemetry. The selected boundary also prevents every business capability from inventing its own incompatible audit model.
+Porque el sistema necesita evidence that is attributable, durable and independently queryable rather than merely diagnostic telemetry. The selected boundary also prevents every business capability from inventing its own incompatible audit model.
 
 ### Purpose?
 
-To make security, administrative, operational and financial actions reconstructible and verifiable without rewriting business history.
+Para hacer que las acciones, administrative, operational and financial actions reconstructible and verifiable without rewriting business history.
 
 ### Impact
 
@@ -149,7 +149,7 @@ To make security, administrative, operational and financial actions reconstructi
 
 ### Verification evidence
 
-Required before Verified:
+Requerido antes de Verified:
 
 - repository test evidence;
 - schema/migration evidence;
@@ -170,7 +170,7 @@ Not certifiable until the complete evidence chain exists and #270/#186 authoriza
 
 ### Problem / finding
 
-The requested Accounting and Economic capability must reconstruct economic history, balances, income/expenses, gains/losses, BUY/SELL operations, transfers, fees and corrections. A mutable transaction table is insufficient if historical economic state must be reproducible.
+La capacidad de Accounting and Economic solicitada must reconstruct economic history, balances, income/expenses, gains/losses, BUY/SELL operations, transfers, fees and corrections. A mutable transaction table is insufficient if historical economic state must be reproducible.
 
 ### Objective evidence
 
@@ -178,7 +178,7 @@ The requested Accounting and Economic capability must reconstruct economic histo
 
 ### Risk / impact
 
-A transaction-only design can permit:
+Un diseño basado únicamente en transacciones puede permitir:
 
 - unbalanced economic movements;
 - ambiguous asset/currency direction;
@@ -198,13 +198,13 @@ A transaction-only design can permit:
 
 ### Applicable ISO criteria
 
-ISO/IEC 27001:2022 and ISO/IEC 27002:2022 apply to protection, access control, integrity and accountability of the ledger information, but **they do not define accounting rules or a chart of accounts**. ISO/IEC 27002 provides security controls and guidance, not accounting standards.
+ISO/IEC 27001:2022 e ISO/IEC 27002:2022 son aplicables to protection, access control, integrity and accountability of the ledger information, but **they do not define accounting rules or a chart of accounts**. ISO/IEC 27002 provides security controls and guidance, not accounting standards.
 
 ISO/IEC 25010:2023 supports evaluation of integrity, accountability, authenticity and related software quality properties for the ledger implementation.
 
 ISO 9001 supports controlled process operation, documented information, monitoring and evidence of results.
 
-The actual accounting model remains governed by the applicable accounting framework identified under #286.
+El modelo contable efectivo permanece governed by the applicable accounting framework identified under #286.
 
 ### Alternatives considered
 
@@ -246,7 +246,7 @@ Because economic history must be reproducible and mathematically coherent, not m
 
 ### Purpose?
 
-To produce reliable balances, statements, P&L and period closes from a controlled economic history.
+Para producir saldos balances, statements, P&L and period closes from a controlled economic history.
 
 ### Impact
 
@@ -322,7 +322,7 @@ ISO/IEC 27002:2022 controls for records, access rights and logging are relevant 
 
 ISO 9001's documented-information and process-control principles support controlled procedures and retained evidence of results.
 
-The actual definition of a legal/accounting close remains subject to #286.
+La definición efectiva de un cierre legal/contable permanece subject to #286.
 
 ### Alternatives considered
 
@@ -383,7 +383,7 @@ No certification until the accounting framework and legal retention requirements
 
 ### Problem / finding
 
-Internal economic records must be compared with QvaPay, bank/payment evidence and other external sources without overwriting internal history.
+Los registros económicos internos deben compararse with QvaPay, bank/payment evidence and other external sources without overwriting internal history.
 
 ### Objective evidence
 
@@ -426,11 +426,11 @@ Create a Reconciliation and Reporting bounded context that stores:
 - resolution evidence;
 - report/close linkage.
 
-Reconciliation may identify differences but must not silently rewrite the ledger.
+La conciliación puede identificar differences but must not silently rewrite the ledger.
 
 ### Why?
 
-Because reconciliation is a comparison process, not a replacement of historical truth.
+Porque la conciliación es a comparison process, not a replacement of historical truth.
 
 ### Purpose?
 
@@ -454,7 +454,7 @@ To detect, classify, resolve and evidence economic differences.
 
 ### Problem / finding
 
-Accounting requirements include bank-card/payment-method references, but storing full payment credentials would create unnecessary security and privacy exposure.
+Los requisitos contables incluyen bank-card/payment-method references, but storing full payment credentials would create unnecessary security and privacy exposure.
 
 ### Objective evidence
 
@@ -462,7 +462,7 @@ SYS-AUD-008 and SYS-ACC-011 explicitly prohibit storage of full PAN, CVV, PIN an
 
 ### Applicable ISO criteria
 
-ISO/IEC 27002:2022 provides security controls for access control, information classification, protection of records and privacy/security-related information handling.
+ISO/IEC 27002:2022 proporciona security controls for access control, information classification, protection of records and privacy/security-related information handling.
 
 ISO/IEC 27001:2022 provides the ISMS requirements within which applicable information-security risks are managed.
 
@@ -497,7 +497,7 @@ Authentication secrets and card security codes remain outside the accounting dom
 
 ### Why?
 
-To reduce attack surface and prevent the accounting system from becoming an unnecessary credential repository.
+Para reducir la superficie de ataque and prevent the accounting system from becoming an unnecessary credential repository.
 
 ### Purpose?
 
@@ -519,7 +519,7 @@ To preserve accounting traceability without retaining sensitive payment secrets.
 
 ### Problem / finding
 
-ISO standards can govern security, quality, lifecycle and auditability, but they do not establish the accounting rules, tax treatment or legal reporting obligations for this system.
+Los estándares ISO pueden gobernar security, quality, lifecycle and auditability, but they do not establish the accounting rules, tax treatment or legal reporting obligations for this system.
 
 ### Objective evidence
 
@@ -537,7 +537,7 @@ Create a regulatory applicability matrix:
 
 **legal/accounting requirement → authoritative source → jurisdiction → system requirement → control → implementation → test → evidence → certification status**
 
-The matrix must identify, at minimum:
+La matriz debe identificar, at minimum:
 
 - jurisdiction(s);
 - legal entity and operating model;
@@ -552,7 +552,7 @@ The matrix must identify, at minimum:
 
 ### Why?
 
-Because software correctness cannot establish legal accounting conformity.
+Porque la corrección del software cannot establish legal accounting conformity.
 
 ### Purpose?
 
@@ -568,7 +568,7 @@ To prevent certification of accounting outputs against the wrong legal or accoun
 
 ### Problem / finding
 
-Audit evidence, economic history and reconciliation serve different purposes and must not become one mutable data structure.
+La evidencia de auditoría, la historia económica and reconciliation serve different purposes and must not become one mutable data structure.
 
 ### Objective evidence
 
@@ -615,9 +615,9 @@ QvaPay-AI
 └── Reconciliation & Reporting
 ```
 
-Cross-context correlation is allowed, but data ownership remains explicit.
+La correlación entre contextos es allowed, but data ownership remains explicit.
 
-A SELL, for example, may create:
+Un SELL, por ejemplo, puede crear:
 
 - one or more Audit events;
 - one or more Accounting entries;
@@ -627,7 +627,7 @@ None of these replaces the others.
 
 ### Why?
 
-To prevent coupling between security evidence, economic truth and external comparison state.
+Para evitar el acoplamiento between security evidence, economic truth and external comparison state.
 
 ### Purpose?
 
@@ -647,7 +647,7 @@ To provide a controlled architecture that can evolve without corrupting historic
 
 ## 8. Consolidated decision
 
-The selected design direction is:
+La dirección de diseño seleccionada es:
 
 - **Dedicated Audit and Control capability** for operational/security evidence.
 - **Double-entry-capable Accounting and Economic capability** for economic truth, subject to the applicable accounting framework.
@@ -657,7 +657,7 @@ The selected design direction is:
 - **Explicit cross-context correlation without merging the data models.**
 - **Accounting certification blocked until jurisdiction and accounting framework are established.**
 
-These decisions are design decisions only. They do not authorize runtime implementation.
+Estas decisiones son únicamente de diseño. They do not authorize runtime implementation.
 
 ## 9. Authorization and implementation gate
 
@@ -675,7 +675,7 @@ Before implementation begins, the following must be true:
 
 ## 11. ISO applicability matrix
 
-The following mappings are control/criterion-specific and must be treated as design constraints, not as generic certification claims:
+Las siguientes correspondencias son control/criterion-specific and must be treated as design constraints, not as generic certification claims:
 
 | Capability | Requirement scope | ISO reference | Application |
 |---|---|---|---|
@@ -688,25 +688,25 @@ The following mappings are control/criterion-specific and must be treated as des
 | Accounting software quality | SYS-ACC-001..012 | ISO/IEC 25010:2023 | Evaluate integrity, authenticity, accountability and maintainability of the implementation. |
 | Reconciliation evidence | SYS-ACC-004, 009, 012 | ISO 19011:2026 evidence-based approach | Structure evidence and evaluation records; it does not define accounting rules. |
 
-These references do not establish accounting, tax or statutory reporting conformity. Those obligations remain governed by the authoritative framework resolved by #286/#294.
+Estas referencias no establecen accounting, tax or statutory reporting conformity. Those obligations remain governed by the authoritative framework resolved by #286/#294.
 
 ## 12. Objective acceptance criteria by lifecycle status
 
 ### Defined
 
-The requirement, risk, evidence and traceability exist in the repository. No implementation claim is permitted.
+El requisito, riesgo, evidencia and traceability exist in the repository. No implementation claim is permitted.
 
 ### Designed
 
-An approved Solution Card identifies the selected design, rationale, alternatives, applicable criteria, impacts, tests and evidence. No runtime implementation claim is permitted.
+Una Solution Card aprobada identifica the selected design, rationale, alternatives, applicable criteria, impacts, tests and evidence. No runtime implementation claim is permitted.
 
 ### Implemented
 
-The approved design exists in code/configuration/migrations, with traceability to the requirement and Solution Card. Implementation alone is not evidence of correctness or certification.
+El diseño aprobado existe in code/configuration/migrations, with traceability to the requirement and Solution Card. Implementation alone is not evidence of correctness or certification.
 
 ### Tested
 
-Required automated and manual tests execute against the implemented scope, with retained results showing expected and negative-path behavior. Test success alone is not production verification.
+Las pruebas automatizadas y manuales requeridas se ejecutan against the implemented scope, with retained results showing expected and negative-path behavior. Test success alone is not production verification.
 
 ### Verified
 
@@ -714,7 +714,7 @@ Implementation, tests, documentation, CI/security evidence, migration evidence a
 
 ### Certified
 
-Verification is complete; required governance/change authorization is satisfied; applicable legal/accounting requirements are resolved; objective production evidence exists; traceability is complete; and an authorized certification decision is recorded. Certification is never inferred from CI, deployment or demonstration alone.
+La verificación está completa; required governance/change authorization is satisfied; applicable legal/accounting requirements are resolved; objective production evidence exists; traceability is complete; and an authorized certification decision is recorded. Certification is never inferred from CI, deployment or demonstration alone.
 
 ## 13. Implementation prohibition until gates close
 
