@@ -191,7 +191,7 @@ export async function executeScannerAlarm(
       (offer) => offer.side === "SELL",
     ).length;
 
-    await storage.put<Market>(SCANNER_MARKET_SNAPSHOT_KEY, market);\n    await executeAutoApply(storage, market, provider as QvaPayP2PClient);
+    await storage.put<Market>(SCANNER_MARKET_SNAPSHOT_KEY, market);\n    if (autoApplyProvider) {\n      await executeAutoApply(storage, market, autoApplyProvider);\n    }
     await storage.put<ScannerRuntimeExecutionState>(
       SCANNER_EXECUTION_STATE_KEY,
       {
