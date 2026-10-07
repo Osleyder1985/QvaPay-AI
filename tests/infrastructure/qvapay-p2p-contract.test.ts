@@ -5,7 +5,7 @@ import {
 } from "../../src/infrastructure/qvapay/p2p-contract.js";
 
 describe("QvaPay P2P contract", () => {
-  it("validates and preserves decimal strings", () => {
+  it("valida y conserva cadenas decimales", () => {
     const page = parseP2PPage({
       data: [
         {
@@ -29,7 +29,7 @@ describe("QvaPay P2P contract", () => {
     expect(page.data[0]?.status).toBe("processing");
   });
 
-  it("accepts serialized pagination integers from QvaPay", () => {
+  it("acepta enteros de paginación serializados de QvaPay", () => {
     const page = parseP2PPage({
       data: [
         {
@@ -74,7 +74,7 @@ describe("QvaPay P2P contract", () => {
     ).toThrow(QvaPayContractError);
   });
 
-  it("derives last_page when the provider omits it", () => {
+  it("deriva last_page cuando el proveedor lo omite", () => {
     const page = parseP2PPage({
       data: [],
       current_page: 2,
@@ -85,7 +85,7 @@ describe("QvaPay P2P contract", () => {
     expect(page.last_page).toBe(3);
   });
 
-  it("rejects numeric decimals instead of silently coercing them", () => {
+  it("rechaza decimales numéricos en lugar de convertirlos silenciosamente", () => {
     expect(() =>
       parseP2PPage({
         data: [
@@ -108,7 +108,7 @@ describe("QvaPay P2P contract", () => {
 });
 
 describe("QvaPay P2P offer status", () => {
-  it("defaults public offers to open when the provider omits status", () => {
+  it("establece open como estado predeterminado de las ofertas públicas cuando el proveedor omite el estado", () => {
     const page = parseP2PPage({
       data: [
         {
