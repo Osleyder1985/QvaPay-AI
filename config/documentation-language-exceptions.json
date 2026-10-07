@@ -148,9 +148,7 @@
       "match_type": "pattern",
       "category": "OFFICIAL_NAME",
       "scope": {
-        "paths": [
-          ".github/workflows/quality-gate.yml"
-        ]
+        "paths": [".github/workflows/quality-gate.yml"]
       },
       "context": {
         "kind": "workflow_name",
@@ -177,9 +175,7 @@
       "match_type": "pattern",
       "category": "OFFICIAL_NAME",
       "scope": {
-        "paths": [
-          ".github/workflows/security-gate.yml"
-        ]
+        "paths": [".github/workflows/security-gate.yml"]
       },
       "context": {
         "kind": "workflow_name",
