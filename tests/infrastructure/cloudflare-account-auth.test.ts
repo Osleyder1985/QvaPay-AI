@@ -24,7 +24,7 @@ describe("Account Center session", () => {
     );
   });
 
-  it("rejects invalid credentials and tampered cookies", async () => {
+  it("rechaza credenciales inválidas y cookies manipuladas", async () => {
     await expect(
       createSessionCookie("wrong", "correct-secret"),
     ).resolves.toBeNull();
@@ -42,7 +42,7 @@ describe("Account Center session", () => {
     );
   });
 
-  it("clears the session without exposing credentials", () => {
+  it("limpia la sesión sin exponer credenciales", () => {
     const cookie = clearSessionCookie();
     expect(cookie).toContain("qvapay_ai_session=");
     expect(cookie).toContain("Max-Age=0");
