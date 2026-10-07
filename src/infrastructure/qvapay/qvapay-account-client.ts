@@ -113,11 +113,17 @@ function parseAuthenticatedUser(payload: unknown): QvaPayAccountUser | null {
   };
 }
 
-function parseOwnOffers(payload: unknown): { readonly total: number | null } {
+function parseOwnOffers(payload: unknown): {
+  readonly compatible: boolean;
+  readonly total: number | null;
+} {
   const value = readPayload(payload);
-  if (!isRecord(value)) return { total: null };
+  if (!isRecord(value)) return { compatible: false, total: null };
+
+  const total = optionalNumber(value, "total");
   return {
-    total: optionalNumber(value, "total"),
+    compatible: total !== null,
+    total,
   };
 }
 
@@ -199,7 +205,7 @@ export class QvaPayAccountClient {
     const identity = user.ok ? parseAuthenticatedUser(user.payload) : null;
     const own = ownOffers.ok
       ? parseOwnOffers(ownOffers.payload)
-      : { total: null };
+      : { compatible: false, total: null };
     const balanceSource: QvaPayAccountSourceMetadata = {
       endpoint: "/v2/balance",
       retrievedAt: balance.retrievedAt,
@@ -247,16 +253,22 @@ export class QvaPayAccountClient {
       endpoint: "/p2p?my=1&take=1&page=1",
       retrievedAt: ownOffers.retrievedAt,
       httpStatus: ownOffers.status,
-      status: ownOffers.ok ? "verified" : "failed",
-      error: ownOffers.ok
+      status: own.compatible
+        ? "verified"
+        : ownOffers.ok
+          ? "unavailable"
+          : "failed",
+      error: own.compatible
         ? null
-        : `QvaPay own-offers request failed with HTTP ${ownOffers.status}.`,
+        : ownOffers.ok
+          ? "QvaPay returned an incompatible own-offers payload."
+          : `QvaPay own-offers request failed with HTTP ${ownOffers.status}.`,
     };
     const integrationStatus = evaluateAccountIntegration({
       balanceOk: balanceUsd !== null,
       identityOk: identity !== null,
       applicationOk: application !== null,
-      p2pAccessible: ownOffers.ok,
+      p2pAccessible: own.compatible,
     });
 
     return {
