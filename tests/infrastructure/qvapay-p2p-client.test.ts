@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+/**\n * Propósito: Pruebas del cliente QvaPay P2P, aplicación, detalle y balance.\n * Ubicación: tests/infrastructure/qvapay-p2p-client.test.ts\n * Historial: 2026-10-06 — actualización relacionada con Issue #222; cambios funcionales sujetos a auditoría #166.\n */\n\nimport { describe, expect, it, vi } from "vitest";
 import {
   QvaPayP2PClient,
   QvaPayProviderError,
