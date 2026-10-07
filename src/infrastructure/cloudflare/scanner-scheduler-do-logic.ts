@@ -6,7 +6,6 @@
 
 import type { MarketProvider } from "../../application/ports/market-provider.js";
 import { findAutoApplyCandidate, normalizeAutoApplyConfig, type AutoApplyConfig } from "../../application/p2p-auto-apply.js";
-import type { QvaPayP2PClient } from "../qvapay/qvapay-p2p-client.js";
 import { ScannerRuntime } from "../../application/scanner-runtime.js";
 import type { Market } from "../../domain/market.js";
 import { CloudflareScannerScheduler } from "./scanner-scheduler.js";
@@ -99,7 +98,8 @@ export async function getAutoApplyConfig(
 async function executeAutoApply(
   storage: ScannerSchedulerPersistentStorage,
   market: Market,
-  provider: QvaPayP2PClient,
+  provider: AutoApplyProvider,
+  audit?: AutoApplyAuditWriter,
 ): Promise<void> {
   const config = await getAutoApplyConfig(storage);
   if (!config?.enabled) return;
@@ -214,6 +214,8 @@ export async function executeScannerAlarm(
   storage: ScannerSchedulerPersistentStorage,
   config: ScannerSchedulerConfig,
   provider: MarketProvider,
+  autoApplyProvider?: AutoApplyProvider,
+  autoApplyAudit?: AutoApplyAuditWriter,
   now = Date.now(),
 ): Promise<void> {
   const scheduler = new CloudflareScannerScheduler(storage);
