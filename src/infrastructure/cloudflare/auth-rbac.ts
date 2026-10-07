@@ -2,7 +2,7 @@ import type { D1Database } from "@cloudflare/workers-types";
 
 export type AppRole = "ADMINISTRATION" | "AUDITOR";
 
-/** AUDITOR is the persisted compatibility value; the product-facing role is OBSERVER (Observador). */
+/** AUDITOR es el valor de compatibilidad persistido; el rol mostrado al usuario es OBSERVER (Observador). */
 
 export interface AppUser {
   readonly id: string;
