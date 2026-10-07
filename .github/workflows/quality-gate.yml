@@ -168,6 +168,9 @@ jobs:
       - name: Comprobar la convención lingüística de la documentación
         run: node scripts/check-documentation-language.mjs
 
+      - name: Comprobar la documentación del código fuente
+        run: npm run check:code-docs
+
       - name: Comprobar el estado del repositorio
         shell: bash
         run: |
