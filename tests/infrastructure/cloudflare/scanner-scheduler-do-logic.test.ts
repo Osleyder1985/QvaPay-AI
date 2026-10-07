@@ -1,10 +1,18 @@
-/**\n * Propósito: Pruebas de scheduler y ejecución server-side de Auto Apply.\n * Ubicación: tests/infrastructure/cloudflare/scanner-scheduler-do-logic.test.ts\n * Historial: 2026-10-06 — actualización relacionada con Issue #222; cambios funcionales sujetos a auditoría #166.\n */\n\nimport { describe, expect, it } from "vitest";
+/**
+ * Propósito: Pruebas de scheduler y ejecución server-side de Auto Apply.
+ * Ubicación: tests/infrastructure/cloudflare/scanner-scheduler-do-logic.test.ts
+ * Historial: 2026-10-06 — actualización relacionada con Issue #222; cambios funcionales sujetos a auditoría #166.
+ */
+
+import { describe, expect, it } from "vitest";
 import {
   ensureScannerScheduled,
   executeScannerAlarm,
   SCANNER_EXECUTION_STATE_KEY,
   type ScannerRuntimeExecutionState,
-  type ScannerSchedulerPersistentStorage,\n  type AutoApplyProvider,\n  AUTO_APPLY_STATE_KEY,
+  type ScannerSchedulerPersistentStorage,
+  type AutoApplyProvider,
+  AUTO_APPLY_STATE_KEY,
 } from "../../../src/infrastructure/cloudflare/scanner-scheduler-do-logic.js";
 import type { MarketProvider } from "../../../src/application/ports/market-provider.js";
 
