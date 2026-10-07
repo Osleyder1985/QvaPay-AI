@@ -182,6 +182,11 @@ function buildMarketView(market: Market | null, completedAt: string | null) {
   };
 }
 
+/**
+ * @proposito API pública toPublicScannerState: implementa el comportamiento expuesto por este módulo.
+ * @responsabilidades Aplicar el contrato y las validaciones correspondientes a la integración.
+ * @returns Resultado de la operación pública.
+ */
 export function toPublicScannerState(
   state: ScannerSchedulerRuntimeState,
 ): PublicScannerState {
@@ -222,6 +227,11 @@ async function toggleApplicationUser(id,action){const response=await fetch("/api
 async function refreshSession(){try{const r=await fetch("/api/session",{headers:{Accept:"application/json"},credentials:"same-origin",cache:"no-store"});if(!r.ok){location.href="/";return;}const payload=await r.json();const user=payload.user;const role=user.role==="ADMINISTRATION"?"ADMINISTRACIÓN":"OBSERVADOR";if(user.role==="ADMINISTRATION"){const section=document.getElementById("administracion");if(section)section.style.display="block";const nav=document.getElementById("adminNav");if(nav)nav.style.display="flex";loadApplicationUsers();}const live=document.getElementById("live");if(live){const label=document.createElement("span");label.textContent=" · "+user.username+" · "+role;live.appendChild(label);}}catch{location.href="/";}}
 async function refresh(){try{const r=await fetch(\"/api/scanner/status\",{headers:{Accept:\"application/json\"},cache:\"no-store\"});if(!r.ok)throw new Error(\"HTTP \"+r.status);state=await r.json();render();}catch(error){$(\"live\").className=\"live bad\";$(\"liveText\").textContent=\"SIN CONEXIÓN\";$(\"health\").textContent=\"No se puede contactar con el runtime del servidor\";}}\nfunction tick(){if(!state){$(\"countdown\").textContent=\"—\";return}if(state.running){$(\"countdown\").innerHTML='ESCANEANDO <small>servidor</small>';return}if(!state.nextAlarmAt){$(\"countdown\").innerHTML=state.lastError?'REINTENTANDO <small>servidor</small>':'— <small>programado</small>';return}const offset=state.serverNowAt-Date.now();const seconds=Math.ceil((state.nextAlarmAt-(Date.now()+offset))/1000);$(\"countdown\").innerHTML=(seconds<0?\"AHORA\":seconds+' <small>segundos</small>');}\ndocument.querySelectorAll(\".navitem\").forEach(link=>link.addEventListener(\"click\",()=>{document.querySelectorAll(\".navitem\").forEach(item=>item.classList.remove(\"active\"));link.classList.add(\"active\");if(link.getAttribute(\"href\")===\"#cuenta\")refreshAccount();}));refreshSession();refresh();tick();setInterval(refresh,1000);setInterval(tick,1000);\n</script>\n</body></html>`
 
+/**
+ * @proposito API pública createPublicAppResponse: implementa el comportamiento expuesto por este módulo.
+ * @responsabilidades Aplicar el contrato y las validaciones correspondientes a la integración.
+ * @returns Resultado de la operación pública.
+ */
 export function createPublicAppResponse(): Response {
   return new Response(HTML, {
     status: 200,
@@ -235,6 +245,11 @@ export function createPublicAppResponse(): Response {
   });
 }
 
+/**
+ * @proposito API pública createPublicScannerStateResponse: implementa el comportamiento expuesto por este módulo.
+ * @responsabilidades Aplicar el contrato y las validaciones correspondientes a la integración.
+ * @returns Resultado de la operación pública.
+ */
 export function createPublicScannerStateResponse(
   state: PublicScannerState,
 ): Response {
