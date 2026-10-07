@@ -1,3 +1,10 @@
+/**
+ * @archivo src/infrastructure/qvapay/qvapay-p2p-client.ts
+ * @proposito Consulta ofertas P2P de QvaPay y aplica sus reglas de acceso.
+ * @responsabilidades Implementar y proteger las reglas propias de este módulo sin mezclar responsabilidades de otras capas.
+ * @ubicacion src/infrastructure/qvapay dentro de la arquitectura de QvaPay-AI.
+ */
+
 import type { Offer } from "../../domain/offer.js";
 import { mapQvaPayOffer } from "./p2p-mapper.js";
 import { parseP2PPage } from "./p2p-contract.js";
