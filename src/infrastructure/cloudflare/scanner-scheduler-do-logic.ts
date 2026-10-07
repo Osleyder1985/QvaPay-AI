@@ -214,9 +214,9 @@ export async function executeScannerAlarm(
   storage: ScannerSchedulerPersistentStorage,
   config: ScannerSchedulerConfig,
   provider: MarketProvider,
+  now = Date.now(),
   autoApplyProvider?: AutoApplyProvider,
   autoApplyAudit?: AutoApplyAuditWriter,
-  now = Date.now(),
 ): Promise<void> {
   const scheduler = new CloudflareScannerScheduler(storage);
   const previousState =
