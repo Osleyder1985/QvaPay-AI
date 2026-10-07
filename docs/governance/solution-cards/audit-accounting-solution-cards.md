@@ -671,13 +671,51 @@ Before implementation begins, the following must be true:
 6. Each implementation PR links the applicable card and requirement IDs.
 7. Tests and objective evidence are defined before code is merged.
 8. Verification and certification remain separate from implementation.
+\n## 10. Certification rule\n\nA capability may progress through:\n\n**Defined → Designed → Implemented → Tested → Verified → Certified**\n\nA successful CI run, deployment, or working demonstration is not certification.\n\nOnly a complete evidence chain may enter the Certified Functional Baseline.
 
-## 10. Certification rule
+## 11. ISO applicability matrix
 
-A capability may progress through:
+The following mappings are control/criterion-specific and must be treated as design constraints, not as generic certification claims:
 
-**Defined → Designed → Implemented → Tested → Verified → Certified**
+| Capability | Requirement scope | ISO reference | Application |
+|---|---|---|---|
+| Audit and Control | SYS-AUD-001..008 | ISO/IEC 27002:2022 5.33, 8.15, 8.16 | Protect records, generate/manage logs, and monitor relevant events. |
+| Audit access | SYS-AUD-005..006 | ISO/IEC 27002:2022 5.15, 5.18 | Restrict and govern access rights to audit information, including audit-of-audit access. |
+| Audit evidence | SYS-AUD-007 | ISO 19011:2026 evidence-based approach | Define evidence so it is relevant, verifiable and preserved for audit purposes; this is audit guidance, not an ISMS control. |
+| Software security quality | SYS-AUD-001..008 | ISO/IEC 25010:2023 security quality model | Evaluate integrity, accountability, authenticity and related security quality properties. |
+| Controlled processes | SYS-AUD / SYS-ACC / SYS-COMP-ACC | ISO 9001:2015 7.5, 8, 9 | Control documented information, operations and performance evidence where applicable to the QMS scope. |
+| Accounting data protection | SYS-ACC-001..012 | ISO/IEC 27002:2022 5.33, 5.15, 5.18, 8.15 | Protect ledger records and restrict privileged access and changes. |
+| Accounting software quality | SYS-ACC-001..012 | ISO/IEC 25010:2023 | Evaluate integrity, authenticity, accountability and maintainability of the implementation. |
+| Reconciliation evidence | SYS-ACC-004, 009, 012 | ISO 19011:2026 evidence-based approach | Structure evidence and evaluation records; it does not define accounting rules. |
 
-A successful CI run, deployment, or working demonstration is not certification.
+These references do not establish accounting, tax or statutory reporting conformity. Those obligations remain governed by the authoritative framework resolved by #286/#294.
 
-Only a complete evidence chain may enter the Certified Functional Baseline.
+## 12. Objective acceptance criteria by lifecycle status
+
+### Defined
+
+The requirement, risk, evidence and traceability exist in the repository. No implementation claim is permitted.
+
+### Designed
+
+An approved Solution Card identifies the selected design, rationale, alternatives, applicable criteria, impacts, tests and evidence. No runtime implementation claim is permitted.
+
+### Implemented
+
+The approved design exists in code/configuration/migrations, with traceability to the requirement and Solution Card. Implementation alone is not evidence of correctness or certification.
+
+### Tested
+
+Required automated and manual tests execute against the implemented scope, with retained results showing expected and negative-path behavior. Test success alone is not production verification.
+
+### Verified
+
+Implementation, tests, documentation, CI/security evidence, migration evidence and deployed runtime evidence are mutually consistent and independently reviewable for the claimed scope. Contradictory documentation or missing production evidence prevents Verified.
+
+### Certified
+
+Verification is complete; required governance/change authorization is satisfied; applicable legal/accounting requirements are resolved; objective production evidence exists; traceability is complete; and an authorized certification decision is recorded. Certification is never inferred from CI, deployment or demonstration alone.
+
+## 13. Implementation prohibition until gates close
+
+No runtime implementation Issue or PR derived from these cards may be treated as authorized for Accounting and Economic until #286/#294 resolves the applicable jurisdiction and accounting authority. Audit and Control implementation also remains subject to #270 and the project change-authorization controls. Creating an implementation issue for planning is not equivalent to authorizing implementation.
