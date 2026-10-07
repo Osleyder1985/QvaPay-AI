@@ -1,3 +1,10 @@
+/**
+ * @archivo src/infrastructure/cloudflare/scanner-scheduler-do-logic.ts
+ * @proposito Contiene la lógica de programación y ejecución del scanner.
+ * @responsabilidades Implementar y proteger las reglas propias de este módulo sin mezclar responsabilidades de otras capas.
+ * @ubicacion src/infrastructure/cloudflare dentro de la arquitectura de QvaPay-AI.
+ */
+
 import type { MarketProvider } from "../../application/ports/market-provider.js";
 import { ScannerRuntime } from "../../application/scanner-runtime.js";
 import type { Market } from "../../domain/market.js";
