@@ -94,20 +94,33 @@ function parseAuthenticatedUser(payload: unknown): QvaPayAccountUser | null {
   const username = optionalString(value, "username");
   if (!uuid || !username) return null;
 
+  const twoFactorSecret = optionalString(value, "two_factor_secret");
+
   return {
     uuid,
     username,
     name: optionalString(value, "name"),
     lastname: optionalString(value, "lastname"),
-    image: optionalString(value, "image"),
-    ratingAvg: optionalNumber(value, "average_rating"),
-    ratingCount: optionalNumber(value, "rating_count"),
-    kyc: optionalBoolean(value, "kyc"),
-    vip: optionalBoolean(value, "vip"),
-    goldenCheck: optionalBoolean(value, "golden_check"),
+    email: optionalString(value, "email"),
+    bio: optionalString(value, "bio"),
+    balance: optionalNumber(value, "balance"),
+    satoshis: optionalNumber(value, "satoshis"),
+    phone: optionalString(value, "phone"),
     phoneVerified: optionalBoolean(value, "phone_verified"),
-    telegramVerified: optionalString(value, "telegram") !== null,
+    kyc: optionalBoolean(value, "kyc"),
+    goldenCheck: optionalBoolean(value, "golden_check"),
+    goldenExpire: optionalString(value, "golden_expire"),
     p2pEnabled: optionalBoolean(value, "p2p_enabled"),
+    savingsRoundup: optionalBoolean(value, "savings_roundup"),
+    cover: optionalString(value, "cover"),
+    image: optionalString(value, "image"),
+    twitter: optionalString(value, "twitter"),
+    telegram: optionalString(value, "telegram"),
+    twoFactorEnabled: twoFactorSecret !== null,
+    ratingAvg: optionalNumber(value, "average_rating"),
+    ratingCount: null,
+    vip: null,
+    telegramVerified: null,
     completedAsOwner: null,
     completedAsPeer: null,
   };
