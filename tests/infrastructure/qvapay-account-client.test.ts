@@ -88,7 +88,9 @@ describe("QvaPayAccountClient", () => {
     expect(calls).toHaveLength(4);
   });
 
-  it("retries HTTP 429 using Retry-After and returns the successful payload", async () => {
+  it(
+    "retries HTTP 429 using Retry-After and returns the successful payload",
+    async () => {
     let attempts = 0;
     const client = new QvaPayAccountClient({
       baseUrl: "https://api.qvapay.com",
@@ -125,8 +127,9 @@ describe("QvaPayAccountClient", () => {
     const snapshot = await client.fetchAccount();
 
     expect(snapshot.balanceUsd).toBe(125.5);
-    expect(attempts).toBe(5);
-  });
+      expect(attempts).toBe(5);
+    },
+  );
 
   it("fails closed when the authenticated-user contract is unavailable", async () => {
     const client = new QvaPayAccountClient({
