@@ -4,10 +4,7 @@
   "description": "Esquema normativo para excepciones técnicas, contractuales, externas u oficiales. No autoriza por sí mismo ninguna excepción.",
   "type": "object",
   "additionalProperties": false,
-  "required": [
-    "schema_version",
-    "exceptions"
-  ],
+  "required": ["schema_version", "exceptions"],
   "properties": {
     "schema_version": {
       "type": "string",
@@ -52,10 +49,7 @@
         },
         "match_type": {
           "type": "string",
-          "enum": [
-            "literal",
-            "regex"
-          ]
+          "enum": ["literal", "regex"]
         },
         "category": {
           "type": "string",
@@ -73,9 +67,7 @@
         "scope": {
           "type": "object",
           "additionalProperties": false,
-          "required": [
-            "paths"
-          ],
+          "required": ["paths"],
           "properties": {
             "paths": {
               "type": "array",
@@ -90,9 +82,7 @@
         "context": {
           "type": "object",
           "additionalProperties": false,
-          "required": [
-            "kind"
-          ],
+          "required": ["kind"],
           "properties": {
             "kind": {
               "type": "string",
@@ -113,12 +103,7 @@
         },
         "translation_risk": {
           "type": "string",
-          "enum": [
-            "LOW",
-            "MEDIUM",
-            "HIGH",
-            "CRITICAL"
-          ]
+          "enum": ["LOW", "MEDIUM", "HIGH", "CRITICAL"]
         },
         "owner": {
           "type": "string",
@@ -137,18 +122,11 @@
         "review": {
           "type": "object",
           "additionalProperties": false,
-          "required": [
-            "status"
-          ],
+          "required": ["status"],
           "properties": {
             "status": {
               "type": "string",
-              "enum": [
-                "PENDIENTE",
-                "VALIDADA",
-                "VENCIDA",
-                "REVOCADA"
-              ]
+              "enum": ["PENDIENTE", "VALIDADA", "VENCIDA", "REVOCADA"]
             },
             "reviewer": {
               "type": "string"
