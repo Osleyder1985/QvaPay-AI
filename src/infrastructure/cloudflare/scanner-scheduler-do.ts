@@ -33,6 +33,10 @@ export interface ScannerSchedulerRuntimeState extends SchedulerState {
   readonly market: Market | null;
 }
 
+/**
+ * @proposito API pública ScannerSchedulerDurableObject: implementa el comportamiento expuesto por este módulo.
+ * @responsabilidades Aplicar las validaciones y reglas de negocio definidas por el contrato del módulo.
+ */
 export class ScannerSchedulerDurableObject extends DurableObject<ScannerSchedulerEnvironment> {
   private readonly storage: DurableObjectStorage;
 
