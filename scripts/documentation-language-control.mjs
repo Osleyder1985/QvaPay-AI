@@ -161,10 +161,31 @@ export function validateCatalog(catalog) {
 }
 
 function loadCatalog(root) { return JSON.parse(fs.readFileSync(path.join(root, "config", "documentation-language-exceptions.json"), "utf8")); }
+function exceptionMatches(entry, item) {
+  if (entry.state !== "ACTIVE" || entry.review?.status !== "VALIDADA") return false;
+  if (!entry.scope?.paths?.includes(item.file)) return false;
+  if (entry.match_type === "literal") return entry.match === item.text;
+  if (entry.match_type === "pattern") {
+    try { return new RegExp(entry.match).test(item.text); } catch { return false; }
+  }
+  return false;
+}
+
+function resolveException(catalog, item) {
+  const matches = (catalog.exceptions || []).filter((entry) =>
+    exceptionMatches(entry, item) &&
+    entry.category === item.category &&
+    (!entry.context?.kind || entry.context.kind === item.source.split(":").at(-1)),
+  );
+  return matches.length === 1 ? matches[0] : null;
+}
+
 
 export function analyzeRepository(root = process.cwd()) {
   const catalog = loadCatalog(root); const catalogErrors = validateCatalog(catalog); const allFiles = discover(root); const candidates = allFiles.flatMap((file) => extract(file, root)); const findings = [];
   for (const item of candidates) {
+    const exception = resolveException(catalog, item);
+    if (exception) continue;
     if (!likelyEnglish(item.text)) continue;
     findings.push({ ...item, severity: "ERROR", decision: "CORREGIR", rule: "AUTHORED_PROSE_MUST_BE_SPANISH", message_es: "Se detectó prosa authored en inglés y no existe una excepción activa aplicable." });
   }
