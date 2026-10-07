@@ -137,6 +137,7 @@ export class ScannerSchedulerDurableObject extends DurableObject<ScannerSchedule
       this.storage satisfies ScannerSchedulerPersistentStorage,
       config,
       provider,
+      Date.now(),
       provider,
       audit,
     );
