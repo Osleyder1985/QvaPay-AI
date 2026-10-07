@@ -253,11 +253,9 @@ export class QvaPayAccountClient {
       "user",
     );
     await wait(spacingMs);
-    const ownOffers = await request(
-      this.options,
-      "/p2p?my=1&take=1&page=1",
-      { method: "GET" },
-    );
+    const ownOffers = await request(this.options, "/p2p?my=1&take=1&page=1", {
+      method: "GET",
+    });
 
     const balanceUsd = balance.ok ? parseBalance(balance.payload) : null;
     const application = info.ok ? parseApplication(info.payload) : null;
