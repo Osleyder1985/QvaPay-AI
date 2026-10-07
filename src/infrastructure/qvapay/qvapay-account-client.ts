@@ -2,6 +2,10 @@
  * @archivo src/infrastructure/qvapay/qvapay-account-client.ts
  * @proposito Consulta y normaliza datos de cuenta mediante la API de QvaPay.
  * @responsabilidades Implementar y proteger las reglas propias de este módulo sin mezclar responsabilidades de otras capas.
+* @dependencias API de QvaPay y contrato interno account-contract.ts.
+* @seguridad Gestiona credenciales de aplicación y token de usuario; no debe registrar secretos.
+* @superficie-publica QvaPayAccountClient y tipos de opciones/resultado expuestos por el módulo.
+* @mantenimiento Mantener alineado con docs/integration/qvapay-integration-boundary.md y #182.
  * @ubicacion src/infrastructure/qvapay dentro de la arquitectura de QvaPay-AI.
  */
 
