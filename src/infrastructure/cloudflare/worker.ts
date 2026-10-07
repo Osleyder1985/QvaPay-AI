@@ -26,7 +26,7 @@ import { createInitialAdminSetupCompletedResponse, createInitialAdminSetupRespon
 // prettier-ignore
 import { createPublicAppResponse, createPublicScannerStateResponse, toPublicScannerState } from "./public-app.js";
 import { normalizeAutoApplyConfig, type AutoApplyConfig } from "../../application/p2p-auto-apply.js";
-import { QvaPayP2PClient } from "../qvapay/qvapay-p2p-client.js";
+import { QvaPayP2PClient, QvaPayProviderError, QvaPayRateLimitError } from "../qvapay/qvapay-p2p-client.js";
 
 // prettier-ignore
 export interface ScannerWorkerEnvironment {
@@ -56,6 +56,14 @@ async function body(request: Request): Promise<Record<string, unknown>> {
 }
 
 // prettier-ignore
+function providerErrorStatus(error: unknown): number {
+  if (error instanceof QvaPayRateLimitError) return 429;
+  if (error instanceof QvaPayProviderError) {
+    return error.status >= 400 && error.status < 600 ? error.status : 502;
+  }
+  return 502;
+}
+
 async function writeP2PAudit(
   db: D1Database,
   actor: { readonly id: string; readonly username: string },
