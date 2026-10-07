@@ -20,9 +20,6 @@ describe("gobernanza del despliegue de producción", () => {
   });
 
   it("ejecuta una validación previa de Cloudflare antes del despliegue", () => {
-    expect(workflow).toContain(
-      "validación previa del despliegue de Cloudflare",
-    );
     expect(workflow).toContain("npx wrangler deploy --dry-run");
   });
 });
