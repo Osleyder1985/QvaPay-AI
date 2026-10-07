@@ -74,7 +74,7 @@ describe("control lingüístico documental", () => {
     const root = createFixture();
     fs.writeFileSync(
       path.join(root, "documento.md"),
-      "**Implementación actual verificada:** Worker Cloudflare + Durable Object + Alarm + Scanner Runtime + adaptador QvaPay P2P + dashboard público.\\n",
+      "**Implementación actual verificada:** Worker Cloudflare + Durable Object + Alarm + Scanner Runtime + adaptador QvaPay P2P + dashboard público.\n",
     );
 
     const report = analyzeRepository(root);
