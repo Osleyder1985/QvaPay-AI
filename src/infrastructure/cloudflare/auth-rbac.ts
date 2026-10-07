@@ -119,8 +119,8 @@ function rowToUser(row: Record<string, unknown>): AppUser {
 
 // prettier-ignore
 
-// Runtime bootstrap is idempotent and keeps production startup independent of
-// Wrangler's control-plane D1 permissions. The versioned migration remains the
+// El arranque del runtime es idempotente y mantiene el inicio de producción independiente de
+// los permisos de D1 del plano de control de Wrangler. La migración versionada sigue siendo el
 // canonical schema artifact for controlled database administration.
 let schemaReady: Promise<void> | null = null;
 
