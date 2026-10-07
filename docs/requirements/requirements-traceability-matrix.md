@@ -42,6 +42,19 @@ Para el commit de `main` `bac8500cc579e4277852e74cc3a247bf00ed0cc1`:
 - Smoke de producción: dashboard HTTP 200, scanner operativo y snapshot no vacío.
 - El smoke confirmó BUY y SELL no vacíos, `totalOffers > 0`, `snapshotAt`, `bestBuyRate` y `bestSellRate`.
 
+## Inventario normativo
+
+Los siguientes documentos constituyen el inventario normativo que debe permanecer representado en esta matriz:
+
+- `docs/requirements/software/initial-software-requirements.md`
+- `docs/requirements/system/functional/p2p-market-scanner.md`
+- `docs/requirements/system/functional/account-center.md`
+- `docs/requirements/system/integration/qvapay-p2p.md`
+- `docs/requirements/system/quality/initial-quality-requirements.md`
+- `docs/requirements/requirements-traceability-matrix.md`
+
+El Quality Gate descubre automáticamente los documentos Markdown bajo `docs/requirements/` y falla si un documento normativo queda fuera de esta matriz.
+
 ## Estados formales
 
 - **Defined**
