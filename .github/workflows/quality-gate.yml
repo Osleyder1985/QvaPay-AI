@@ -39,6 +39,7 @@ jobs:
             "docs/testing/testing-strategy.md"
             "docs/operations/operations-baseline.md"
             "docs/project/project-structure.md"
+            "docs/quality/code-documentation-standard.md"
           )
 
           for file in "${required_files[@]}"; do
