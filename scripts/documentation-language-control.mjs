@@ -548,7 +548,7 @@ function exceptionCategoryApplies(entry, item) {
 function contextMatches(entry, item) {
   const sourceContext = item.source.split(":").at(-1);
   const allowed = new Map([
-    ["workflow_name", new Set(["yaml-name"])],
+    ["workflow_name", new Set(["yaml-name", "json-value"])],
     ["external_response", new Set(["string", "Error", "console"])],
     ["fixture", new Set(["string", "test", "Error", "console"])],
     ["clave_contractual", new Set(["string"])],
