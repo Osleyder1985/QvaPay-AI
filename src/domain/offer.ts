@@ -27,6 +27,11 @@ export interface Offer {
   readonly fiatAmount?: string;
 }
 
+/**
+ * @proposito API pública compareDecimalStrings: implementa el comportamiento expuesto por este módulo.
+ * @responsabilidades Aplicar las validaciones y reglas de negocio definidas por el contrato del módulo.
+ * @returns Resultado de la operación pública.
+ */
 export function compareDecimalStrings(left: string, right: string): number {
   const a = normalizeDecimal(left);
   const b = normalizeDecimal(right);
