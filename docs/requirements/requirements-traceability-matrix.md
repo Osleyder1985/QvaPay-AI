@@ -69,6 +69,8 @@ Los siguientes documentos constituyen el inventario normativo que debe permanece
 - `docs/requirements/system/integration/qvapay-p2p.md`
 - `docs/requirements/system/quality/initial-quality-requirements.md`
 - `docs/requirements/requirements-traceability-matrix.md`
+- `docs/requirements/system/functional/audit-and-control.md`
+- `docs/requirements/system/functional/accounting-and-economic.md`
 
 El Quality Gate descubre automáticamente los documentos Markdown bajo `docs/requirements/` y falla si un documento normativo queda fuera de esta matriz.
 
