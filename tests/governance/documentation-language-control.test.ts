@@ -55,8 +55,8 @@ describe("control lingüístico documental", () => {
     const report = analyzeRepository(root);
 
     expect(report.result).toBe("FAIL");
-    expect(report.findings.some((item) => item.category === "DOC_COMMENT")).toBe(true);
-    expect(report.findings.some((item) => item.category === "TEST_DESCRIPTION")).toBe(true);
+    expect(report.findings.some((item: { category: string }) => item.category === "DOC_COMMENT")).toBe(true);
+    expect(report.findings.some((item: { category: string }) => item.category === "TEST_DESCRIPTION")).toBe(true);
   });
 
   it("preserva literales técnicos sin convertirlos en prosa", () => {
