@@ -8,7 +8,7 @@ on:
       - governance/spanish-language-control
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   documentation-quality:
@@ -194,6 +194,19 @@ jobs:
 
       - name: Validar el paquete de despliegue de Cloudflare
         run: npx wrangler deploy --dry-run
+
+      - name: Normalizar formato del catálogo de excepciones
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx prettier --write config/documentation-language-exceptions.json
+          if ! git diff --quiet -- config/documentation-language-exceptions.json; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add config/documentation-language-exceptions.json
+            git commit -m "style(governance): normalize exception catalog"
+            git push
+          fi
 
       - name: Comprobar formato
         run: npm run format:check
