@@ -39,10 +39,14 @@ Con una sesión autenticada, Cuenta puede mostrar balance, identidad autenticada
 
 ## Trazabilidad
 
-- Requisito: Issue #95 y hallazgos #97/#100.
+- Requisitos: Issue #95, SYS-FR-006 / Issue #187 y hallazgos #97/#100.
 - Implementación: `src/infrastructure/qvapay/qvapay-account-client.ts`, `src/infrastructure/qvapay/account-contract.ts`, `src/infrastructure/cloudflare/account-auth.ts` y `src/infrastructure/cloudflare/worker.ts`.
 - UI: `src/infrastructure/cloudflare/public-app.ts`.
 - Tests: `tests/infrastructure/qvapay-account-client.test.ts` y pruebas del contrato público.
+
+## Requisito de completitud
+
+El registro de Cuenta se rige por SYS-FR-006 / Issue #187. La implementación debe cubrir todos los campos admitidos por el contrato de las fuentes autorizadas, con proveniencia y estado por dato. Los campos que actualmente no tienen una fuente contractual identificada no se pueden presentar como verificados.
 
 ## Regla de evolución
 
