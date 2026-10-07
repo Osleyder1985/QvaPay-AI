@@ -1,3 +1,10 @@
+/**
+ * @archivo src/domain/market.ts
+ * @proposito Define la identidad de un mercado y las operaciones de ordenamiento de ofertas.
+ * @responsabilidades Implementar y proteger las reglas propias de este módulo sin mezclar responsabilidades de otras capas.
+ * @ubicacion src/domain dentro de la arquitectura de QvaPay-AI.
+ */
+
 import type { Offer, OfferSide } from "./offer.js";
 import { compareDecimalStrings } from "./offer.js";
 
