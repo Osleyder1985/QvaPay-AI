@@ -115,10 +115,13 @@ async function executeAutoApply(
 
     const appliedIds =
       (await storage.get<string[]>("auto-apply-applied-ids")) ?? [];
-    const balance = await provider.fetchApplicationBalance();
-    const candidate = findAutoApplyCandidate(market.offers, config, {
-      qusd: balance,
-    });
+    let candidate = findAutoApplyCandidate(market.offers, config, null);
+    if (!candidate) {
+      const balance = await provider.fetchApplicationBalance();
+      candidate = findAutoApplyCandidate(market.offers, config, {
+        qusd: balance,
+      });
+    }
     if (!candidate || appliedIds.includes(candidate.offer.id)) return;
 
     await storage.put("auto-apply-attempts", [...activeAttempts, now]);
