@@ -17,7 +17,7 @@ export function normalizeScannerSchedulerConfig(
 ): ScannerSchedulerConfig {
   const coin = config.coin.trim();
   if (!coin) {
-    throw new Error("Scanner coin must not be empty");
+    throw new Error("La moneda del scanner no puede estar vacía");
   }
 
   validateInterval(config.intervalSeconds);
