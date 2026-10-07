@@ -64,7 +64,7 @@ describe("ScannerRuntime", () => {
           intervalSeconds: 4,
           scheduler,
         }),
-    ).toThrow("between 5 and 300");
+    ).toThrow("entre 5 y 300");
   });
 
   it("rechaza una moneda vacía", () => {
@@ -77,7 +77,7 @@ describe("ScannerRuntime", () => {
           intervalSeconds: 10,
           scheduler,
         }),
-    ).toThrow("no puede estar vacío");
+    ).toThrow("no puede estar vacía");
   });
 
   it("impide ejecuciones superpuestas", async () => {
