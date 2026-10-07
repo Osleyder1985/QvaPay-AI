@@ -16,7 +16,6 @@ describe("QvaPayAccountClient", () => {
       appId: "test-app-id",
       appSecret: "test-app-secret",
       userApiToken: "test-profile-token",
-      minimumRequestSpacingMs: 0,
       fetcher: vi.fn(async (input, init) => {
         const url = String(input);
         const authorization = init?.headers
@@ -42,12 +41,23 @@ describe("QvaPayAccountClient", () => {
             username: "owner-user",
             name: "Owner",
             lastname: "Account",
+            email: "owner@example.com",
+            bio: "Owner bio",
+            balance: 77.25,
+            satoshis: 123,
+            phone: "+123456789",
             average_rating: 4.8,
             kyc: true,
             golden_check: true,
             phone_verified: true,
-            telegram: "owner",
+            golden_expire: "2030-01-01T00:00:00.000Z",
             p2p_enabled: true,
+            savings_roundup: false,
+            cover: "https://example.com/cover",
+            image: "https://example.com/image",
+            twitter: "@owner",
+            telegram: "owner",
+            two_factor_secret: "***",
           });
         }
         return response(200, {
@@ -71,6 +81,20 @@ describe("QvaPayAccountClient", () => {
     expect(snapshot.balanceSource.retrievedAt).toEqual(expect.any(String));
     expect(snapshot.identity?.uuid).toBe("owner-uuid");
     expect(snapshot.identity?.username).toBe("owner-user");
+    expect(snapshot.identity?.email).toBe("owner@example.com");
+    expect(snapshot.identity?.bio).toBe("Owner bio");
+    expect(snapshot.identity?.balance).toBe(77.25);
+    expect(snapshot.identity?.satoshis).toBe(123);
+    expect(snapshot.identity?.phone).toBe("+123456789");
+    expect(snapshot.identity?.phoneVerified).toBe(true);
+    expect(snapshot.identity?.goldenExpire).toBe("2030-01-01T00:00:00.000Z");
+    expect(snapshot.identity?.savingsRoundup).toBe(false);
+    expect(snapshot.identity?.telegram).toBe("owner");
+    expect(snapshot.identity?.telegramVerified).toBeNull();
+    expect(snapshot.identity?.ratingCount).toBeNull();
+    expect(snapshot.identity?.vip).toBeNull();
+    expect(snapshot.identity?.twoFactorEnabled).toBe(true);
+    expect(JSON.stringify(snapshot)).not.toContain("two_factor_secret");
     expect(snapshot.identitySource).toBe("/user");
     expect(snapshot.identityProvenance.endpoint).toBe("/user");
     expect(snapshot.identityProvenance.status).toBe("verified");
@@ -170,7 +194,6 @@ describe("QvaPayAccountClient", () => {
       appId: "test-app-id",
       appSecret: "test-app-secret",
       userApiToken: "test-profile-token",
-      minimumRequestSpacingMs: 0,
       fetcher: vi.fn(async (input) => {
         const url = String(input);
         if (url.endsWith("/v2/balance")) {
@@ -196,6 +219,34 @@ describe("QvaPayAccountClient", () => {
     expect(snapshot.applicationProvenance.status).toBe("failed");
     expect(snapshot.identity).toBeNull();
     expect(snapshot.identitySource).toBe("/user");
+    expect(snapshot.integrationStatus).toBe("degraded");
+  });
+  it("does not verify P2P integration when the HTTP 200 payload is incompatible", async () => {
+    const client = new QvaPayAccountClient({
+      baseUrl: "https://api.qvapay.com",
+      appId: "test-app-id",
+      appSecret: "test-app-secret",
+      userApiToken: "test-profile-token",
+      fetcher: vi.fn(async (input) => {
+        const url = String(input);
+        if (url.endsWith("/v2/balance")) {
+          return response(200, { balance: 125.5 });
+        }
+        if (url.endsWith("/v2/info")) {
+          return response(200, { uuid: "app-uuid", name: "QvaPay AI" });
+        }
+        if (url.endsWith("/user")) {
+          return response(200, { uuid: "owner-uuid", username: "owner-user" });
+        }
+        return response(200, { malformed: true });
+      }),
+    });
+
+    const snapshot = await client.fetchAccount();
+
+    expect(snapshot.p2pAccessible).toBe(false);
+    expect(snapshot.ownOffersTotal).toBeNull();
+    expect(snapshot.ownOffersProvenance.status).toBe("unavailable");
     expect(snapshot.integrationStatus).toBe("degraded");
   });
 });
