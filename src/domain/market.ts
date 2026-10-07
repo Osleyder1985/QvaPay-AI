@@ -9,12 +9,12 @@ export interface Market {
 export function createMarket(coin: string, offers: readonly Offer[]): Market {
   const normalizedCoin = coin.trim();
   if (!normalizedCoin) {
-    throw new Error("Market coin is required");
+    throw new Error("La moneda del mercado es obligatoria");
   }
 
   for (const offer of offers) {
     if (offer.market !== normalizedCoin) {
-      throw new Error("Offer market does not match market identity");
+      throw new Error("El mercado de la oferta no coincide con la identidad del mercado");
     }
   }
 
