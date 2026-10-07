@@ -1,4 +1,10 @@
-/**\n * Propósito: Cliente server-side para mercado P2P, aplicación de ofertas, detalle y balance.\n * Ubicación: src/infrastructure/qvapay/qvapay-p2p-client.ts\n * Historial: 2026-10-06 — actualización relacionada con Issue #222; cambios funcionales sujetos a auditoría #166.\n */\n\nimport type { Offer } from "../../domain/offer.js";
+/**
+ * Propósito: Cliente server-side para mercado P2P, aplicación de ofertas, detalle y balance.
+ * Ubicación: src/infrastructure/qvapay/qvapay-p2p-client.ts
+ * Historial: 2026-10-06 — actualización relacionada con Issue #222; cambios funcionales sujetos a auditoría #166.
+ */
+
+import type { Offer } from "../../domain/offer.js";
 import { mapQvaPayOffer } from "./p2p-mapper.js";
 import { parseP2PPage } from "./p2p-contract.js";
 import { parseP2POfferDetail, type QvaPayP2POfferDetail } from "./p2p-detail-contract.js";
@@ -209,7 +215,8 @@ export class QvaPayP2PClient {
 
     return String((payload as Record<string, number>).balance);
   }
-\n  async fetchOffers(
+
+  async fetchOffers(
     coin: string,
     observedAt = new Date().toISOString(),
   ): Promise<readonly Offer[]> {
