@@ -1,4 +1,4 @@
-import type { Market } from "../../domain/market.js";
+/**\n * Propósito: Interfaz HTML del dashboard autenticado y controles operativos.\n * Ubicación: src/infrastructure/cloudflare/public-app.ts\n * Historial: 2026-10-06 — actualización relacionada con Issue #222; cambios funcionales sujetos a auditoría #166.\n */\n\nimport type { Market } from "../../domain/market.js";
 import type { Offer } from "../../domain/offer.js";
 import { compareDecimalStrings } from "../../domain/offer.js";
 import type { ScannerSchedulerRuntimeState } from "./scanner-scheduler-do.js";
