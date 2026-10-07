@@ -89,7 +89,7 @@ export async function executeScannerAlarm(
   try {
     const market = await runtime.run();
     if (!market) {
-      throw new Error("Scanner returned no market snapshot");
+      throw new Error("El scanner no devolvió un snapshot del mercado");
     }
 
     const buyCount = market.offers.filter(
@@ -113,7 +113,7 @@ export async function executeScannerAlarm(
     );
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    console.error("Scanner alarm execution failed", error);
+    console.error("Falló la ejecución del Alarm del scanner", error);
     await storage.put(SCANNER_EXECUTION_STATE_KEY, {
       ...previousState,
       lastStartedAt: new Date(now).toISOString(),
