@@ -1,3 +1,10 @@
+/**
+ * @archivo src/infrastructure/qvapay/account-contract.ts
+ * @proposito Define el contrato interno de integración de cuenta QvaPay.
+ * @responsabilidades Implementar y proteger las reglas propias de este módulo sin mezclar responsabilidades de otras capas.
+ * @ubicacion src/infrastructure/qvapay dentro de la arquitectura de QvaPay-AI.
+ */
+
 export interface QvaPayAccountUser {
   readonly uuid: string;
   readonly username: string;
