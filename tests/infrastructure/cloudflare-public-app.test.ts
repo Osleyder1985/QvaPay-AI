@@ -87,7 +87,7 @@ const marketState: ScannerSchedulerRuntimeState = {
 };
 
 describe("public production dashboard", () => {
-  it("serves the application without credentials", async () => {
+  it("sirve la aplicación sin credenciales", async () => {
     const response = createPublicAppResponse();
     const body = await response.text();
 
@@ -166,7 +166,7 @@ describe("public production dashboard", () => {
     expect(state.sellOffers).toEqual([]);
   });
 
-  it("marks the pre-scan state as unavailable", () => {
+  it("marca el estado previo al escaneo como no disponible", () => {
     const state = toPublicScannerState({
       ...marketState,
       market: null,
