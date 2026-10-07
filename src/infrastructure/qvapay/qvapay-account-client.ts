@@ -222,16 +222,16 @@ async function request(
     }
   }
 
-  throw new Error("QvaPay request retry policy exhausted.");
+  throw new Error("Se agotó la política de reintentos de solicitudes QvaPay.");
 }
 
 export class QvaPayAccountClient {
   constructor(private readonly options: QvaPayAccountClientOptions) {
     if (!options.appId || !options.appSecret) {
-      throw new Error("QvaPay application credentials are required");
+      throw new Error("Las credenciales de la aplicación QvaPay son obligatorias");
     }
     if (!options.userApiToken) {
-      throw new Error("QvaPay user API token is required");
+      throw new Error("El token API de usuario de QvaPay es obligatorio");
     }
   }
 
