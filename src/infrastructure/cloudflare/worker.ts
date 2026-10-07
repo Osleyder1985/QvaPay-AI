@@ -1,4 +1,4 @@
-// prettier-ignore
+/**\n * Propósito: Router HTTP del Worker, autenticación, Account y operaciones P2P.\n * Ubicación: src/infrastructure/cloudflare/worker.ts\n * Historial: 2026-10-06 — actualización relacionada con Issue #222; cambios funcionales sujetos a auditoría #166.\n */\n\n// prettier-ignore
 import type { DurableObjectNamespace, D1Database } from "@cloudflare/workers-types";
 // prettier-ignore
 import { ScannerSchedulerDurableObject } from "./scanner-scheduler-do.js";
