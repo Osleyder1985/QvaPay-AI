@@ -14,7 +14,9 @@ describe("production deployment governance", () => {
   it("deploys only the verified Security Gate commit", () => {
     expect(workflow).toContain("github.event.workflow_run.head_sha");
     expect(workflow).not.toContain("github.sha }}");
-    expect(workflow).toContain("github.event.workflow_run.conclusion == 'success'");
+    expect(workflow).toContain(
+      "github.event.workflow_run.conclusion == 'success'",
+    );
   });
 
   it("runs a Cloudflare dry-run before deployment", () => {
