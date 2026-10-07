@@ -130,7 +130,11 @@ describe("QvaPay account snapshot store", () => {
 
     expect(result.schemaVersion).toBe(1);
     expect(result.integrationStatus).toBe("verified");
-    expect(statements.some((entry) => entry.sql.includes("INSERT INTO qvapay_account_snapshots"))).toBe(true);
+    expect(
+      statements.some((entry) =>
+        entry.sql.includes("INSERT INTO qvapay_account_snapshots"),
+      ),
+    ).toBe(true);
 
     const insert = statements.find((entry) =>
       entry.sql.includes("INSERT INTO qvapay_account_snapshots"),
@@ -159,6 +163,8 @@ describe("QvaPay account snapshot store", () => {
 
     expect(current?.id).toBe("snapshot-1");
     expect(successful?.snapshot.identity?.username).toBe("owner-user");
-    expect(statements.filter((entry) => entry.sql.startsWith("SELECT")).length).toBe(2);
+    expect(
+      statements.filter((entry) => entry.sql.startsWith("SELECT")).length,
+    ).toBe(2);
   });
 });
