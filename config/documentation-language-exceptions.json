@@ -63,9 +63,7 @@
       "match_type": "literal",
       "category": "API_CONTRACT",
       "scope": {
-        "paths": [
-          "src/infrastructure/qvapay/p2p-contract.ts"
-        ]
+        "paths": ["src/infrastructure/qvapay/p2p-contract.ts"]
       },
       "context": {
         "kind": "clave_contractual",
