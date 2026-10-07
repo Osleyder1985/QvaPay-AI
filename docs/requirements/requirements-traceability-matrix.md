@@ -42,6 +42,23 @@ Para el commit de `main` `bac8500cc579e4277852e74cc3a247bf00ed0cc1`:
 - Smoke de producción: dashboard HTTP 200, scanner operativo y snapshot no vacío.
 - El smoke confirmó BUY y SELL no vacíos, `totalOffers > 0`, `snapshotAt`, `bestBuyRate` y `bestSellRate`.
 
+## Nuevos requisitos — Audit, Accounting and Reconciliation
+
+| ID | Requisito | Diseño / solución | Prueba / evidencia | Estado |
+|---|---|---|---|---|
+| SYS-AUD-001 | Audit trail persistente y consultable | #283 + AUD-FR-001..010 + Solution Card Audit and Control | Pendiente de diseño autorizado, implementación y evidencia | Defined / Blocked |
+| SYS-ACC-001 | Ledger económico de operaciones | #284 + ACC-FR-001..013 + Solution Card Accounting and Economic | Pendiente de marco contable, diseño autorizado, implementación y evidencia | Defined / Blocked |
+| SYS-ARCH-001 | Separación Audit / Accounting / Reconciliation | #285 + architecture/audit-accounting-boundaries.md | Pendiente de diseño detallado y revisión arquitectónica | Defined / Blocked |
+| SYS-COMP-001 | Marco contable y regulatorio aplicable | #286 | Jurisdicción y marco contable pendientes de determinar | Defined / Blocked |
+
+### Governance gate
+
+Estos requisitos no se consideran implementados por la existencia de documentación. Cualquier solución técnica debe pasar por #270 antes de implementación y por #271 para el ciclo de Issue/PR. Solo una cadena completa de implementación, pruebas, evidencia de producción, trazabilidad y autorización puede elevar un requisito a Verified/Certified.
+
+### Separation of concerns
+
+Audit records and accounting records are distinct. A single business operation MAY create both, plus reconciliation evidence. Neither record substitutes for the other.
+
 ## Inventario normativo
 
 Los siguientes documentos constituyen el inventario normativo que debe permanecer representado en esta matriz:
