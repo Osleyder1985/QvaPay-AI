@@ -51,7 +51,7 @@ for (const file of collectFiles(ROOT).sort()) {
   }
 
   const source = fs.readFileSync(file, "utf8");
-  const behaviorPattern = /(?:^|\n)(\s*)export\\s+(?:(?:async)\\s+)?(?:function|class)\\s+[A-Za-z_$][\\w$]*/g;
+  const behaviorPattern = /(?:^|\n)(\s*)export\s+(?:(?:async)\s+)?(?:function|class)\\s+[A-Za-z_$][\\w$]*/g;
   for (const match of source.matchAll(behaviorPattern)) {
     const before = source.slice(0, match.index + match[0].lastIndexOf("export"));
     if (!/\\/\\*[\\s\\S]*\\*\\/\\s*$/.test(before)) {
