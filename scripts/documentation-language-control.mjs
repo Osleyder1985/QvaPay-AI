@@ -184,10 +184,11 @@ function likelyEnglish(text) {
   }
   const value = text.trim().toLocaleLowerCase("en");
   const strong =
-    /^(the|this|these|those)\b/i.test(value) ||
-    /\b(must|failed|missing|verification|repository|deployment|credentials)\b/i.test(
-      value,
-    );
+    es === 0 &&
+    (/^(the|this|these|those)\b/i.test(value) ||
+      /\b(must|failed|missing|verification|repository|deployment|credentials)\b/i.test(
+        value,
+      ));
   return strong || (en >= 2 && en > es && tokens.length >= 2);
 }
 
