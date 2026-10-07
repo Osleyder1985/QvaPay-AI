@@ -87,6 +87,40 @@ describe("QvaPayAccountClient", () => {
     expect(calls).toHaveLength(4);
   });
 
+
+  it("does not verify P2P integration when a 200 response has an incompatible payload", async () => {
+    const client = new QvaPayAccountClient({
+      baseUrl: "https://api.qvapay.com",
+      appId: "test-app-id",
+      appSecret: "test-app-secret",
+      userApiToken: "test-profile-token",
+      fetcher: vi.fn(async (input) => {
+        const url = String(input);
+        if (url.endsWith("/v2/balance")) {
+          return response(200, { balance: 125.5 });
+        }
+        if (url.endsWith("/v2/info")) {
+          return response(200, { uuid: "app-uuid", name: "QvaPay AI" });
+        }
+        if (url.endsWith("/user")) {
+          return response(200, {
+            uuid: "owner-uuid",
+            username: "owner-user",
+          });
+        }
+        return response(200, { data: [] });
+      }),
+    });
+
+    const snapshot = await client.fetchAccount();
+
+    expect(snapshot.p2pAccessible).toBe(false);
+    expect(snapshot.ownOffersTotal).toBeNull();
+    expect(snapshot.ownOffersProvenance.status).toBe("unavailable");
+    expect(snapshot.ownOffersProvenance.httpStatus).toBe(200);
+    expect(snapshot.integrationStatus).toBe("degraded");
+  });
+
   it("fails closed when the authenticated-user contract is unavailable", async () => {
     const client = new QvaPayAccountClient({
       baseUrl: "https://api.qvapay.com",
