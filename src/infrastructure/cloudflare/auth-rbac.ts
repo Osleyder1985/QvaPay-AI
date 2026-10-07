@@ -133,6 +133,11 @@ let schemaReady: Promise<void> | null = null;
 
 // prettier-ignore
 // prettier-ignore
+/**
+ * @proposito API pública ensureSecuritySchema: implementa el comportamiento expuesto por este módulo.
+ * @responsabilidades Aplicar las validaciones y reglas de negocio definidas por el contrato del módulo.
+ * @returns Resultado de la operación pública.
+ */
 export async function ensureSecuritySchema(db: D1Database): Promise<void> {
   if (schemaReady) return schemaReady;
   schemaReady = db
@@ -187,6 +192,11 @@ export async function ensureSecuritySchema(db: D1Database): Promise<void> {
 }
 
 // prettier-ignore
+/**
+ * @proposito API pública createPasswordVerifier: implementa el comportamiento expuesto por este módulo.
+ * @responsabilidades Aplicar las validaciones y reglas de negocio definidas por el contrato del módulo.
+ * @returns Resultado de la operación pública.
+ */
 export async function createPasswordVerifier(password: string): Promise<{ salt: string; hash: string; iterations: number }> {
   if (password.length < 12) throw new Error("La contraseña debe tener al menos 12 caracteres.");
   const salt = crypto.getRandomValues(new Uint8Array(SALT_BYTES));
@@ -201,6 +211,11 @@ async function verifyPassword(password: string, salt: string, expected: string, 
 }
 
 // prettier-ignore
+/**
+ * @proposito API pública findUserByUsername: implementa el comportamiento expuesto por este módulo.
+ * @responsabilidades Aplicar las validaciones y reglas de negocio definidas por el contrato del módulo.
+ * @returns Resultado de la operación pública.
+ */
 export async function findUserByUsername(db: D1Database, username: string): Promise<AppUser | null> {
   const row = await db.prepare("SELECT id, username, role, active, created_at, updated_at, last_login_at FROM app_users WHERE username = ? COLLATE NOCASE LIMIT 1")
     .bind(username.trim()).first<Record<string, unknown>>();
@@ -208,12 +223,22 @@ export async function findUserByUsername(db: D1Database, username: string): Prom
 }
 
 // prettier-ignore
+/**
+ * @proposito API pública listUsers: implementa el comportamiento expuesto por este módulo.
+ * @responsabilidades Aplicar las validaciones y reglas de negocio definidas por el contrato del módulo.
+ * @returns Resultado de la operación pública.
+ */
 export async function listUsers(db: D1Database): Promise<AppUser[]> {
   const result = await db.prepare("SELECT id, username, role, active, created_at, updated_at, last_login_at FROM app_users ORDER BY username COLLATE NOCASE").all<Record<string, unknown>>();
   return result.results.map(rowToUser);
 }
 
 // prettier-ignore
+/**
+ * @proposito API pública createUser: implementa el comportamiento expuesto por este módulo.
+ * @responsabilidades Aplicar las validaciones y reglas de negocio definidas por el contrato del módulo.
+ * @returns Resultado de la operación pública.
+ */
 export async function createUser(db: D1Database, username: string, password: string, role: AppRole): Promise<AppUser> {
   const normalized = username.trim();
   if (!/^[a-zA-Z0-9._-]{3,64}$/.test(normalized)) throw new Error("Nombre de usuario inválido.");
@@ -249,6 +274,11 @@ async function sessionForUser(request: Request, db: D1Database, secret: string):
 }
 
 // prettier-ignore
+/**
+ * @proposito API pública authenticate: implementa el comportamiento expuesto por este módulo.
+ * @responsabilidades Aplicar las validaciones y reglas de negocio definidas por el contrato del módulo.
+ * @returns Resultado de la operación pública.
+ */
 export async function authenticate(
   request: Request,
   db: D1Database,
@@ -280,6 +310,11 @@ export async function authenticate(
 }
 
 // prettier-ignore
+/**
+ * @proposito API pública getSession: implementa el comportamiento expuesto por este módulo.
+ * @responsabilidades Aplicar las validaciones y reglas de negocio definidas por el contrato del módulo.
+ * @returns Resultado de la operación pública.
+ */
 export async function getSession(request: Request, db: D1Database, secret: string): Promise<AuthSession | null> {
   const session = await sessionForUser(request, db, secret);
   if (!session) {
@@ -289,6 +324,11 @@ export async function getSession(request: Request, db: D1Database, secret: strin
 }
 
 // prettier-ignore
+/**
+ * @proposito API pública requireRole: implementa el comportamiento expuesto por este módulo.
+ * @responsabilidades Aplicar las validaciones y reglas de negocio definidas por el contrato del módulo.
+ * @returns Resultado de la operación pública.
+ */
 export async function requireRole(request: Request, db: D1Database, secret: string, roles: readonly AppRole[]): Promise<AuthSession | Response> {
   const session = await getSession(request, db, secret);
   if (!session) return Response.json({ error: "Autenticación requerida." }, { status: 401, headers: { "cache-control": "no-store" } });
@@ -300,17 +340,32 @@ export async function requireRole(request: Request, db: D1Database, secret: stri
 }
 
 // prettier-ignore
+/**
+ * @proposito API pública logout: implementa el comportamiento expuesto por este módulo.
+ * @responsabilidades Aplicar las validaciones y reglas de negocio definidas por el contrato del módulo.
+ * @returns Resultado de la operación pública.
+ */
 export async function logout(request: Request, db: D1Database, secret: string): Promise<Response> {
   const session = await getSession(request, db, secret);
   if (session) await writeAudit(db, "logout", "SUCCESS", session.user);
   return new Response(null, { status: 204, headers: { "cache-control": "no-store", "set-cookie": `${SESSION_COOKIE}=; Max-Age=0; Path=/; HttpOnly; Secure; SameSite=Strict` } });
 }
 
+/**
+ * @proposito API pública clearSessionCookie: implementa el comportamiento expuesto por este módulo.
+ * @responsabilidades Aplicar las validaciones y reglas de negocio definidas por el contrato del módulo.
+ * @returns Resultado de la operación pública.
+ */
 export function clearSessionCookie(): string {
   return `${SESSION_COOKIE}=; Max-Age=0; Path=/; HttpOnly; Secure; SameSite=Strict`;
 }
 
 // prettier-ignore
+/**
+ * @proposito API pública setUserActive: implementa el comportamiento expuesto por este módulo.
+ * @responsabilidades Aplicar las validaciones y reglas de negocio definidas por el contrato del módulo.
+ * @returns Resultado de la operación pública.
+ */
 export async function setUserActive(db: D1Database, actor: AppUser, userId: string, active: boolean): Promise<AppUser> {
   const row = await db.prepare("SELECT id, username, role, active, created_at, updated_at, last_login_at FROM app_users WHERE id = ? LIMIT 1")
     .bind(userId).first<Record<string, unknown>>();
@@ -325,6 +380,11 @@ export async function setUserActive(db: D1Database, actor: AppUser, userId: stri
 }
 
 // prettier-ignore
+/**
+ * @proposito API pública changeUserPassword: implementa el comportamiento expuesto por este módulo.
+ * @responsabilidades Aplicar las validaciones y reglas de negocio definidas por el contrato del módulo.
+ * @returns Resultado de la operación pública.
+ */
 export async function changeUserPassword(db: D1Database, actor: AppUser, userId: string, password: string): Promise<AppUser> {
   const row = await db.prepare("SELECT id, username, role, active, created_at, updated_at, last_login_at FROM app_users WHERE id = ? LIMIT 1")
     .bind(userId).first<Record<string, unknown>>();
@@ -340,6 +400,11 @@ export async function changeUserPassword(db: D1Database, actor: AppUser, userId:
 }
 
 // prettier-ignore
+/**
+ * @proposito API pública deleteUserByUsername: implementa el comportamiento expuesto por este módulo.
+ * @responsabilidades Aplicar las validaciones y reglas de negocio definidas por el contrato del módulo.
+ * @returns Resultado de la operación pública.
+ */
 export async function deleteUserByUsername(
   db: D1Database,
   username: string,
