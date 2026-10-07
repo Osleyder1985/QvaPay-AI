@@ -2,10 +2,10 @@
  * @archivo src/infrastructure/qvapay/qvapay-p2p-client.ts
  * @proposito Consulta ofertas P2P de QvaPay y aplica sus reglas de acceso.
  * @responsabilidades Implementar y proteger las reglas propias de este módulo sin mezclar responsabilidades de otras capas.
-* @dependencias API P2P de QvaPay, p2p-contract.ts, p2p-mapper.ts y modelo Offer.
-* @seguridad Usa credenciales de aplicación para integración P2P y debe preservar la política de reintentos y límites.
-* @superficie-publica QvaPayP2PClient y categorías/errores de integración exportados.
-* @mantenimiento Mantener alineado con docs/integration/qvapay-p2p-api-contract.md y docs/integration/qvapay-p2p-feed-contract.md.
+ * @dependencias API P2P de QvaPay, p2p-contract.ts, p2p-mapper.ts y modelo Offer.
+ * @seguridad Usa credenciales de aplicación para integración P2P y debe preservar la política de reintentos y límites.
+ * @superficie-publica QvaPayP2PClient y categorías/errores de integración exportados.
+ * @mantenimiento Mantener alineado con docs/integration/qvapay-p2p-api-contract.md y docs/integration/qvapay-p2p-feed-contract.md.
  * @ubicacion src/infrastructure/qvapay dentro de la arquitectura de QvaPay-AI.
  */
 
