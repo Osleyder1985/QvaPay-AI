@@ -13,6 +13,11 @@ export interface Market {
   readonly offers: readonly Offer[];
 }
 
+/**
+ * @proposito API pública createMarket: implementa el comportamiento expuesto por este módulo.
+ * @responsabilidades Aplicar las validaciones y reglas de negocio definidas por el contrato del módulo.
+ * @returns Resultado de la operación pública.
+ */
 export function createMarket(coin: string, offers: readonly Offer[]): Market {
   const normalizedCoin = coin.trim();
   if (!normalizedCoin) {
@@ -33,6 +38,11 @@ export function createMarket(coin: string, offers: readonly Offer[]): Market {
   };
 }
 
+/**
+ * @proposito API pública offersBySide: implementa el comportamiento expuesto por este módulo.
+ * @responsabilidades Aplicar las validaciones y reglas de negocio definidas por el contrato del módulo.
+ * @returns Resultado de la operación pública.
+ */
 export function offersBySide(
   market: Market,
   side: OfferSide,
