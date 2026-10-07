@@ -1,0 +1,39 @@
+name: Formateo controlado de la rama de gobernanza
+
+on:
+  push:
+    branches:
+      - governance/spanish-language-control
+
+permissions:
+  contents: write
+
+jobs:
+  format:
+    name: Formatear archivos de control lingüístico
+    runs-on: ubuntu-latest
+    steps:
+      - name: Obtener repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Aplicar Prettier
+        run: npx --yes prettier@3.9.0 --write scripts/documentation-language-control.mjs tests/governance/documentation-language-control.test.ts config/documentation-language-exceptions.json config/documentation-language-exceptions.schema.json
+
+      - name: Publicar formato
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git diff --quiet; then
+            echo "No hay cambios de formato."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add scripts/documentation-language-control.mjs tests/governance/documentation-language-control.test.ts config/documentation-language-exceptions.json config/documentation-language-exceptions.schema.json
+          git commit -m "style: aplicar formato Prettier al control lingüístico"
+          git push
