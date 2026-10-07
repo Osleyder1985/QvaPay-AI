@@ -33,6 +33,21 @@ El endpoint `GET /api/account` requiere una sesión de usuario independiente. La
 
 La ruta `POST /api/p2p/:uuid/apply` también permanece bloqueada para el dashboard público hasta disponer de una frontera de operación autenticada independiente.
 
+## Persistencia server-side
+
+Cada sincronización autenticada de Cuenta se registra en D1 como un snapshot normalizado con:
+
+- identificador único;
+- versión de esquema;
+- estado de integración;
+- instante de obtención y persistencia;
+- modelo contractual normalizado;
+- proveniencia por fuente.
+
+El snapshot más reciente se marca como **current**. Solo un snapshot con estado **verified** puede convertirse en **last successful**; una sincronización `degraded` o `failed` conserva el último snapshot verificado para recuperación histórica. La recuperación mediante `GET /api/account/snapshot` no consulta QvaPay.
+
+El almacenamiento persiste exclusivamente el contrato normalizado. No se almacenan tokens QvaPay, `app-secret`, credenciales de sesión ni payloads upstream completos.
+
 ## Interfaz
 
 Con una sesión autenticada, Cuenta puede mostrar balance, identidad autenticada, estado de la aplicación, metadatos P2P propios y diagnóstico de integración. La sesión de dashboard es independiente de `QVAPAY_USER_API_TOKEN`; este último continúa exclusivamente server-side y se utiliza solo para `GET /user`.
