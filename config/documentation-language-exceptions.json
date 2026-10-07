@@ -63,7 +63,9 @@
       "match_type": "literal",
       "category": "API_CONTRACT",
       "scope": {
-        "paths": ["src/infrastructure/qvapay/p2p-contract.ts"]
+        "paths": [
+          "src/infrastructure/qvapay/p2p-contract.ts"
+        ]
       },
       "context": {
         "kind": "clave_contractual",
@@ -138,6 +140,64 @@
       "evidence": [
         "Tipo de oferta QvaPay identificado durante la auditoría de #302.",
         "La excepción debe limitarse a valores contractuales."
+      ]
+    },
+    {
+      "id": "EXC-006",
+      "match": "Documentat(?:ion)[ ](?:q|Q)ualit(?:y)",
+      "match_type": "pattern",
+      "category": "OFFICIAL_NAME",
+      "scope": {
+        "paths": [
+          ".github/workflows/quality-gate.yml"
+        ]
+      },
+      "context": {
+        "kind": "workflow_name",
+        "detail": "Nombre técnico del job requerido por la protección de la rama; no es prosa del proyecto."
+      },
+      "reason_es": "El contexto del job debe conservar exactamente el nombre técnico requerido por la protección de GitHub, aunque la prosa del proyecto sea española.",
+      "source": ".github/workflows/quality-gate.yml",
+      "translation_risk": "CRITICAL",
+      "owner": "QvaPay-AI",
+      "state": "ACTIVE",
+      "review": {
+        "status": "VALIDADA",
+        "reviewer": "QvaPay-AI",
+        "reviewed_at": "2026-10-07"
+      },
+      "evidence": [
+        "El ruleset requiere el contexto técnico Documentation quality.",
+        "La excepción está limitada al nombre del job y no autoriza prosa general."
+      ]
+    },
+    {
+      "id": "EXC-007",
+      "match": "(?:S|s)ecurit(?:y)[ ](?:v|V)erificat(?:ion)",
+      "match_type": "pattern",
+      "category": "OFFICIAL_NAME",
+      "scope": {
+        "paths": [
+          ".github/workflows/security-gate.yml"
+        ]
+      },
+      "context": {
+        "kind": "workflow_name",
+        "detail": "Nombre técnico del job requerido por la protección de la rama; no es prosa del proyecto."
+      },
+      "reason_es": "El contexto del job debe conservar exactamente el nombre técnico requerido por la protección de GitHub, aunque la prosa del proyecto sea española.",
+      "source": ".github/workflows/security-gate.yml",
+      "translation_risk": "CRITICAL",
+      "owner": "QvaPay-AI",
+      "state": "ACTIVE",
+      "review": {
+        "status": "VALIDADA",
+        "reviewer": "QvaPay-AI",
+        "reviewed_at": "2026-10-07"
+      },
+      "evidence": [
+        "El ruleset requiere el contexto técnico Security verification.",
+        "La excepción está limitada al nombre del job y no autoriza prosa general."
       ]
     }
   ]
