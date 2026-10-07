@@ -13,8 +13,6 @@ export interface QvaPayAccountClientOptions {
   readonly userApiToken: string;
   readonly fetcher?: typeof fetch;
   readonly timeoutMs?: number;
-  readonly retryAttempts?: number;
-  readonly minimumRequestSpacingMs?: number;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -142,25 +140,6 @@ function parseOwnOffers(payload: unknown): {
   };
 }
 
-function retryDelayMs(response: Response, attempt: number): number {
-  const retryAfter = response.headers.get("retry-after");
-  if (retryAfter) {
-    const seconds = Number(retryAfter);
-    if (Number.isFinite(seconds) && seconds >= 0) {
-      return Math.min(10_000, seconds * 1_000);
-    }
-    const retryAt = Date.parse(retryAfter);
-    if (!Number.isNaN(retryAt)) {
-      return Math.min(10_000, Math.max(0, retryAt - Date.now()));
-    }
-  }
-  return Math.min(10_000, 1_000 * 2 ** attempt);
-}
-
-function wait(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
 async function request(
   options: QvaPayAccountClientOptions,
   path: string,
@@ -173,6 +152,11 @@ async function request(
   readonly retrievedAt: string;
 }> {
   const fetcher = options.fetcher ?? globalThis.fetch.bind(globalThis);
+  const controller = new AbortController();
+  const timeout = setTimeout(
+    () => controller.abort(),
+    options.timeoutMs ?? 10_000,
+  );
   const authHeaders =
     authentication === "user"
       ? { Authorization: `Bearer ${options.userApiToken}` }
@@ -181,48 +165,34 @@ async function request(
           "app-secret": options.appSecret,
         };
 
-  const attempts = Math.max(1, options.retryAttempts ?? 3);
-  for (let attempt = 0; attempt < attempts; attempt += 1) {
-    const controller = new AbortController();
-    const timeout = setTimeout(
-      () => controller.abort(),
-      options.timeoutMs ?? 10_000,
-    );
-    try {
-      const response = await fetcher(new URL(path, options.baseUrl), {
-        ...init,
-        headers: {
-          accept: "application/json",
-          ...authHeaders,
-          ...init.headers,
-        },
-        signal: controller.signal,
-      });
-      if (response.status !== 429 || attempt === attempts - 1) {
-        const text = await response.text();
-        let payload: unknown = null;
-        if (text) {
-          try {
-            payload = JSON.parse(text);
-          } catch {
-            payload = null;
-          }
-        }
-        return {
-          status: response.status,
-          ok: response.ok,
-          payload,
-          retrievedAt: new Date().toISOString(),
-        };
+  try {
+    const response = await fetcher(new URL(path, options.baseUrl), {
+      ...init,
+      headers: {
+        accept: "application/json",
+        ...authHeaders,
+        ...init.headers,
+      },
+      signal: controller.signal,
+    });
+    const text = await response.text();
+    let payload: unknown = null;
+    if (text) {
+      try {
+        payload = JSON.parse(text);
+      } catch {
+        payload = null;
       }
-      const delay = retryDelayMs(response, attempt);
-      await wait(delay);
-    } finally {
-      clearTimeout(timeout);
     }
+    return {
+      status: response.status,
+      ok: response.ok,
+      payload,
+      retrievedAt: new Date().toISOString(),
+    };
+  } finally {
+    clearTimeout(timeout);
   }
-
-  throw new Error("QvaPay request retry policy exhausted.");
 }
 
 export class QvaPayAccountClient {
@@ -236,28 +206,12 @@ export class QvaPayAccountClient {
   }
 
   async fetchAccount(): Promise<QvaPayAccountSnapshot> {
-    const spacingMs = Math.max(
-      0,
-      this.options.minimumRequestSpacingMs ?? 1_700,
-    );
-    const balance = await request(this.options, "/v2/balance", {
-      method: "POST",
-    });
-    await wait(spacingMs);
-    const info = await request(this.options, "/v2/info", { method: "POST" });
-    await wait(spacingMs);
-    const user = await request(
-      this.options,
-      "/user",
-      { method: "GET" },
-      "user",
-    );
-    await wait(spacingMs);
-    const ownOffers = await request(
-      this.options,
-      "/p2p?my=1&take=1&page=1",
-      { method: "GET" },
-    );
+    const [balance, info, user, ownOffers] = await Promise.all([
+      request(this.options, "/v2/balance", { method: "POST" }),
+      request(this.options, "/v2/info", { method: "POST" }),
+      request(this.options, "/user", { method: "GET" }, "user"),
+      request(this.options, "/p2p?my=1&take=1&page=1", { method: "GET" }),
+    ]);
 
     const balanceUsd = balance.ok ? parseBalance(balance.payload) : null;
     const application = info.ok ? parseApplication(info.payload) : null;
@@ -356,7 +310,7 @@ export class QvaPayAccountClient {
       applicationProvenance,
       applicationHttpStatus: info.status,
       applicationOk: application !== null,
-      p2pAccessible: own.compatible,
+      p2pAccessible: ownOffers.ok,
       ownOffersTotal: own.total,
       ownOffersProvenance,
       integrationStatus,
