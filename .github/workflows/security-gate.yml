@@ -11,36 +11,36 @@ permissions:
 
 jobs:
   security:
-    name: Security verification
+    name: Verificación de seguridad
     runs-on: macos-latest
     steps:
-      - name: Checkout repository
+      - name: Obtener el repositorio
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
+      - name: Configurar Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
 
-      - name: Install dependencies
+      - name: Instalar dependencias
         run: npm install --no-audit --no-fund
 
-      - name: Dependency vulnerability verification
+      - name: Verificación de vulnerabilidades de dependencias
         run: npm audit --omit=dev --audit-level=high
 
-      - name: TypeScript type check
+      - name: Comprobación de tipos de TypeScript
         run: npm run build
 
       - name: Lint
         run: npm run lint
 
-      - name: Format verification
+      - name: Verificación de formato
         run: npm run format:check
 
-      - name: Documentation language verification
+      - name: Verificación lingüística de la documentación
         run: npm run check:docs-language
 
-      - name: Secret exposure scan
+      - name: Análisis de exposición de secretos
         shell: bash
         run: |
           set -euo pipefail
@@ -57,7 +57,7 @@ jobs:
 
           echo "No hard-coded credential patterns detected."
 
-      - name: Browser security boundary verification
+      - name: Verificación de la frontera de seguridad del navegador
         shell: bash
         run: |
           set -euo pipefail
@@ -84,5 +84,5 @@ jobs:
           console.log("Browser security boundary passed.");
           NODE
 
-      - name: Security-focused tests
+      - name: Pruebas centradas en seguridad
         run: npm test
