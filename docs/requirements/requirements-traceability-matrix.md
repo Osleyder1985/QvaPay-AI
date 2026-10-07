@@ -63,3 +63,17 @@ Toda solución para SYS-AUD-* y SYS-ACC-* queda bloqueada por #270 hasta contar 
 Defined, Designed, Implemented, Tested, Verified, Certified, Failed / Rejected, Blocked.
 
 Estos estados no son intercambiables. Un deployment exitoso no implica certificación.
+## Inventario normativo de documentos de requisitos
+
+El Quality Gate considera normativo todo documento Markdown dentro de `docs/requirements`, excepto sus archivos `README.md`. Cada documento debe aparecer explícitamente en esta matriz para mantener trazabilidad documental completa.
+
+| Documento normativo | Alcance | Estado |
+|---|---|---|
+| `docs/requirements/requirements-traceability-matrix.md` | Matriz maestra de trazabilidad | Defined |
+| `docs/requirements/software/initial-software-requirements.md` | Requisitos iniciales de software | Defined |
+| `docs/requirements/system/functional/account-center.md` | Requisitos funcionales del Centro de Cuenta | Defined |
+| `docs/requirements/system/functional/p2p-market-scanner.md` | Requisitos funcionales de mercado y scanner P2P | Defined |
+| `docs/requirements/system/integration/qvapay-p2p.md` | Requisitos de integración P2P con QvaPay | Defined |
+| `docs/requirements/system/quality/initial-quality-requirements.md` | Requisitos iniciales de calidad | Defined |
+
+La presencia en este inventario demuestra trazabilidad documental, no implementación ni certificación. Las contradicciones o requisitos obsoletos identificados en estos documentos deben reconciliarse mediante el proceso de cambio controlado correspondiente.
