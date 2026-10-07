@@ -1,11 +1,13 @@
 import fs from "node:fs";
 import path from "node:path";
-import ts from "typescript";\n
+import ts from "typescript";
+
 const IGNORED = new Set([".git", "node_modules", "dist", "build", "coverage", ".wrangler"]);
 const EXTENSIONS = new Set([".md", ".yml", ".yaml", ".json", ".toml", ".ts", ".tsx", ".js", ".jsx", ".mjs", ".sql"]);
 const EXCEPTION_CATEGORIES = new Set(["TECH_IDENTIFIER", "API_CONTRACT", "PERSISTED_LITERAL", "TECH_NAME", "COMMAND", "OFFICIAL_NAME", "EXTERNAL_TEXT", "FIXTURE_TEXT"]);
 const SPANISH = new Set(["el","la","los","las","un","una","de","del","para","por","con","sin","que","se","es","son","en","y","o","como","cuando","donde","debe","deben","esta","este","estos","estas","puede","pueden","solo","también","texto","control","documentación","archivo","archivos","error","mensaje","prueba","pruebas","configuración","seguridad","cuenta","mercado","oferta","ofertas","usuario","usuarios","datos","estado","válido","válida","requiere","requieren","ejecución","verificación","verificar","evidencia","catálogo","excepción","excepciones","pendiente","permitido","permitida"]);
-const ENGLISH = new Set(["the","this","these","those","and","or","of","to","for","from","with","without","is","are","was","were","be","been","as","by","on","in","into","through","after","before","when","where","which","that","must","should","can","cannot","does","do","not","only","all","any","using","used","use","valid","invalid","required","failed","failure","request","response","status","repository","documentation","system","software","adapter","checkout","install","setup","verify","verification","deploy","deployment","production","security","passed","missing","expected","received","creates","created","accepts","rejects","preserves","preserve","schedules","schedule","configured","configuration","interval","scanner","alarm","execution","application","credentials","page","offer","market","coin"]);\n
+const ENGLISH = new Set(["the","this","these","those","and","or","of","to","for","from","with","without","is","are","was","were","be","been","as","by","on","in","into","through","after","before","when","where","which","that","must","should","can","cannot","does","do","not","only","all","any","using","used","use","valid","invalid","required","failed","failure","request","response","status","repository","documentation","system","software","adapter","checkout","install","setup","verify","verification","deploy","deployment","production","security","passed","missing","expected","received","creates","created","accepts","rejects","preserves","preserve","schedules","schedule","configured","configuration","interval","scanner","alarm","execution","application","credentials","page","offer","market","coin"]);
+
 function likelyEnglish(text) {
   const tokens = text.toLocaleLowerCase("en").normalize("NFKC").match(/[a-záéíóúüñ]+(?:'[a-z]+)?/gi) || [];
   let en = 0; let es = 0;
@@ -13,7 +15,8 @@ function likelyEnglish(text) {
   const value = text.trim().toLocaleLowerCase("en");
   const strong = /^(the|this|these|those)\b/i.test(value) || /\b(must|failed|missing|verification|repository|deployment|credentials)\b/i.test(value);
   return strong || (en >= 2 && en > es && tokens.length >= 2);
-}\n
+}
+
 function technicalLiteral(text) {
   const value = text.trim();
   if (!value) return true;
@@ -25,9 +28,12 @@ function technicalLiteral(text) {
   if (/^(BUY|SELL|open|processing|paid|completed|cancelled|revision)$/i.test(value)) return true;
   if (/^(npm\s+run|npx\s|node\s|git\s|wrangler\s)/i.test(value)) return true;
   return false;
-}\n
-function position(source, offset) { const before = source.slice(0, Math.max(0, offset)); return { line: before.split(/\r?\n/).length, column: offset - before.lastIndexOf("\n") }; }
-function makeCandidate(file, source, text, category, offset, context) { const pos = position(source, offset); return { file, line: pos.line, column: pos.column, text: text.trim(), category, source: "language-control:" + context }; }\n
+}
+
+function position(source, offset) { const before = source.slice(0, Math.max(0, offset)); return { line: before.split(/\r?\n/).length, column: offset - before.lastIndexOf("
+") }; }
+function makeCandidate(file, source, text, category, offset, context) { const pos = position(source, offset); return { file, line: pos.line, column: pos.column, text: text.trim(), category, source: "language-control:" + context }; }
+
 function discover(root) {
   const result = [];
   function visit(directory) {
@@ -40,7 +46,8 @@ function discover(root) {
     }
   }
   visit(root); return result.sort();
-}\n
+}
+
 function extractMarkdown(text, file) {
   const result = []; let fence = false; let offset = 0; const fenceMarker = String.fromCharCode(96).repeat(3);
   for (const raw of text.split(/\r?\n/)) {
@@ -53,7 +60,8 @@ function extractMarkdown(text, file) {
     offset += raw.length + 1;
   }
   return result;
-}\n
+}
+
 function extractCode(text, file) {
   const result = [];
   const scanner = ts.createScanner(ts.ScriptTarget.Latest, false, ts.LanguageVariant.Standard, text);
@@ -85,7 +93,8 @@ function extractCode(text, file) {
     ts.forEachChild(node, visit);
   }
   visit(sourceFile); return result;
-}\n
+}
+
 function extractJson(text, file) {
   const result = []; let data;
   try { data = JSON.parse(text); } catch { return [makeCandidate(file, text, "JSON no válido", "PROSE", 0, "json-parse")]; }
@@ -95,7 +104,8 @@ function extractJson(text, file) {
     if (value && typeof value === "object") Object.values(value).forEach(visit);
   }
   visit(data); return result;
-}\n
+}
+
 function extractLineFormat(text, file, kind) {
   const result = []; let offset = 0;
   for (const raw of text.split(/\r?\n/)) {
@@ -119,7 +129,8 @@ function extractLineFormat(text, file, kind) {
     offset += raw.length + 1;
   }
   return result;
-}\n
+}
+
 function extract(file, root) {
   const relative = path.relative(root, file).replaceAll(path.sep, "/"); const text = fs.readFileSync(file, "utf8"); const ext = path.extname(file).toLowerCase();
   if (ext === ".md") return extractMarkdown(text, relative);
@@ -129,7 +140,8 @@ function extract(file, root) {
   if (ext === ".toml") return extractLineFormat(text, relative, "toml");
   if (ext === ".sql") return extractLineFormat(text, relative, "sql");
   return [];
-}\n
+}
+
 export function validateCatalog(catalog) {
   const errors = []; const ids = new Set();
   if (!catalog || typeof catalog !== "object") return ["El catálogo no es un objeto."];
@@ -150,8 +162,10 @@ export function validateCatalog(catalog) {
     if (entry.scope?.paths?.some((value) => value === "." || value === "**" || value === "**/*")) errors.push(entry.id + ": no se permite alcance global.");
   }
   return errors;
-}\n
-function loadCatalog(root) { return JSON.parse(fs.readFileSync(path.join(root, "config", "documentation-language-exceptions.json"), "utf8")); }\n
+}
+
+function loadCatalog(root) { return JSON.parse(fs.readFileSync(path.join(root, "config", "documentation-language-exceptions.json"), "utf8")); }
+
 export function analyzeRepository(root = process.cwd()) {
   const catalog = loadCatalog(root); const catalogErrors = validateCatalog(catalog); const allFiles = discover(root); const candidates = allFiles.flatMap((file) => extract(file, root)); const findings = [];
   for (const item of candidates) {
@@ -161,5 +175,6 @@ export function analyzeRepository(root = process.cwd()) {
   for (const error of catalogErrors) findings.push({ file: "config/documentation-language-exceptions.json", line: 1, column: 1, text: error, category: "PROSE", source: "catalog-validator", severity: "ERROR", decision: "REVISAR", rule: "VALID_CATALOG_REQUIRED", message_es: error });
   findings.sort((a, b) => a.file.localeCompare(b.file) || a.line - b.line || a.column - b.column || a.text.localeCompare(b.text));
   return { version: "1.0.0", catalog_version: catalog.schema_version, result: findings.length === 0 ? "PASS" : "FAIL", findings, summary: { files: allFiles.length, candidates: candidates.length, findings: findings.length, errors: findings.filter((x) => x.severity === "ERROR").length, review_required: findings.filter((x) => x.severity === "REVIEW_REQUIRED").length } };
-}\n
+}
+
 if (import.meta.url === new URL(process.argv[1], "file:").href) { const report = analyzeRepository(process.cwd()); console.log(JSON.stringify(report, null, 2)); process.exit(report.result === "PASS" ? 0 : 1); }
