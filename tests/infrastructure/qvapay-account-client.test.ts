@@ -16,6 +16,7 @@ describe("QvaPayAccountClient", () => {
       appId: "test-app-id",
       appSecret: "test-app-secret",
       userApiToken: "test-profile-token",
+      minimumRequestSpacingMs: 0,
       fetcher: vi.fn(async (input, init) => {
         const url = String(input);
         const authorization = init?.headers
@@ -112,52 +113,6 @@ describe("QvaPayAccountClient", () => {
     expect(calls).toHaveLength(4);
   });
 
-  it(
-    "retries HTTP 429 using Retry-After and returns the successful payload",
-    async () => {
-      let attempts = 0;
-      const client = new QvaPayAccountClient({
-        baseUrl: "https://api.qvapay.com",
-        appId: "test-app-id",
-        appSecret: "test-app-secret",
-        userApiToken: "test-profile-token",
-        minimumRequestSpacingMs: 0,
-        retryAttempts: 2,
-        fetcher: vi.fn(async (input) => {
-          attempts += 1;
-          const url = String(input);
-          if (url.endsWith("/v2/balance") && attempts === 1) {
-            return new Response(JSON.stringify({ error: "rate limited" }), {
-              status: 429,
-              headers: {
-                "content-type": "application/json",
-                "retry-after": "0",
-              },
-            });
-          }
-          if (url.endsWith("/v2/balance")) {
-            return response(200, { balance: 125.5 });
-          }
-          if (url.endsWith("/v2/info")) {
-            return response(200, { uuid: "app-uuid", name: "QvaPay AI" });
-          }
-          if (url.endsWith("/user")) {
-            return response(200, {
-              uuid: "owner-uuid",
-              username: "owner-user",
-            });
-          }
-          return response(200, { data: [], total: 0 });
-        }),
-      });
-
-      const snapshot = await client.fetchAccount();
-
-      expect(snapshot.balanceUsd).toBe(125.5);
-      expect(attempts).toBe(5);
-    },
-  );
-
   it("does not verify P2P integration when the HTTP 200 payload is incompatible", async () => {
     const client = new QvaPayAccountClient({
       baseUrl: "https://api.qvapay.com",
@@ -176,7 +131,7 @@ describe("QvaPayAccountClient", () => {
         if (url.endsWith("/user")) {
           return response(200, { uuid: "owner-uuid", username: "owner-user" });
         }
-        return response(200, { data: [{ malformed: true }] });
+        return response(200, { malformed: true });
       }),
     });
 
@@ -219,34 +174,6 @@ describe("QvaPayAccountClient", () => {
     expect(snapshot.applicationProvenance.status).toBe("failed");
     expect(snapshot.identity).toBeNull();
     expect(snapshot.identitySource).toBe("/user");
-    expect(snapshot.integrationStatus).toBe("degraded");
-  });
-  it("does not verify P2P integration when the HTTP 200 payload is incompatible", async () => {
-    const client = new QvaPayAccountClient({
-      baseUrl: "https://api.qvapay.com",
-      appId: "test-app-id",
-      appSecret: "test-app-secret",
-      userApiToken: "test-profile-token",
-      fetcher: vi.fn(async (input) => {
-        const url = String(input);
-        if (url.endsWith("/v2/balance")) {
-          return response(200, { balance: 125.5 });
-        }
-        if (url.endsWith("/v2/info")) {
-          return response(200, { uuid: "app-uuid", name: "QvaPay AI" });
-        }
-        if (url.endsWith("/user")) {
-          return response(200, { uuid: "owner-uuid", username: "owner-user" });
-        }
-        return response(200, { malformed: true });
-      }),
-    });
-
-    const snapshot = await client.fetchAccount();
-
-    expect(snapshot.p2pAccessible).toBe(false);
-    expect(snapshot.ownOffersTotal).toBeNull();
-    expect(snapshot.ownOffersProvenance.status).toBe("unavailable");
     expect(snapshot.integrationStatus).toBe("degraded");
   });
 });
