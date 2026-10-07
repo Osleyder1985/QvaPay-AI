@@ -1,0 +1,112 @@
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
+import { afterEach, describe, expect, it } from "vitest";
+import { analyzeRepository, validateCatalog } from "../../scripts/documentation-language-control.mjs";
+
+const temporaryDirectories: string[] = [];
+
+function createFixture() {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "qvapay-language-"));
+  temporaryDirectories.push(root);
+  fs.mkdirSync(path.join(root, "config"), { recursive: true });
+  fs.writeFileSync(
+    path.join(root, "config", "documentation-language-exceptions.json"),
+    JSON.stringify({ schema_version: "1.0.0", exceptions: [] }, null, 2),
+  );
+  fs.writeFileSync(
+    path.join(root, "config", "documentation-language-exceptions.schema.json"),
+    "{}",
+  );
+  return root;
+}
+
+afterEach(() => {
+  for (const directory of temporaryDirectories.splice(0)) {
+    fs.rmSync(directory, { recursive: true, force: true });
+  }
+});
+
+describe("control lingüístico documental", () => {
+  it("acepta prosa authored en español", () => {
+    const root = createFixture();
+    fs.writeFileSync(
+      path.join(root, "documento.md"),
+      "# Documento\n\nLa verificación del control requiere evidencia.\n",
+    );
+
+    const report = analyzeRepository(root);
+
+    expect(report.result).toBe("PASS");
+    expect(report.findings).toHaveLength(0);
+  });
+
+  it("rechaza comentarios y descripciones de pruebas authored en inglés", () => {
+    const root = createFixture();
+    fs.writeFileSync(
+      path.join(root, "ejemplo.ts"),
+      [
+        "// This comment explains the system",
+        "describe(\"validates the configured interval\", () => {});",
+      ].join("\n"),
+    );
+
+    const report = analyzeRepository(root);
+
+    expect(report.result).toBe("FAIL");
+    expect(report.findings.some((item) => item.category === "DOC_COMMENT")).toBe(true);
+    expect(report.findings.some((item) => item.category === "TEST_DESCRIPTION")).toBe(true);
+  });
+
+  it("preserva literales técnicos sin convertirlos en prosa", () => {
+    const root = createFixture();
+    fs.writeFileSync(
+      path.join(root, "contrato.ts"),
+      [
+        "const current_page = \"current_page\";",
+        "const operation = \"buy\";",
+      ].join("\n"),
+    );
+
+    const report = analyzeRepository(root);
+
+    expect(report.result).toBe("PASS");
+    expect(report.findings).toHaveLength(0);
+  });
+
+  it("rechaza una excepción ACTIVE sin revisión válida", () => {
+    const errors = validateCatalog({
+      schema_version: "1.0.0",
+      exceptions: [{
+        id: "EXC-999",
+        match: "current_page",
+        match_type: "literal",
+        category: "API_CONTRACT",
+        scope: { paths: ["src/example.ts"] },
+        context: { kind: "clave_contractual" },
+        reason_es: "Cadena contractual.",
+        source: "contrato externo",
+        translation_risk: "CRITICAL",
+        owner: "QvaPay-AI",
+        state: "ACTIVE",
+        review: { status: "PENDIENTE" },
+        evidence: ["Evidencia de prueba."],
+      }],
+    });
+
+    expect(errors).toContain("EXC-999: ACTIVE requiere revisión VALIDADA.");
+  });
+
+  it("produce resultados deterministas", () => {
+    const root = createFixture();
+    fs.writeFileSync(
+      path.join(root, "documento.md"),
+      "The repository must pass the verification before deployment.\n",
+    );
+
+    const first = JSON.stringify(analyzeRepository(root));
+    const second = JSON.stringify(analyzeRepository(root));
+
+    expect(first).toBe(second);
+  });
+});
