@@ -566,6 +566,7 @@ function contextMatches(entry, item) {
     ["external_response", new Set(["string", "Error", "console"])],
     ["fixture", new Set(["string", "test", "Error", "console"])],
     ["clave_contractual", new Set(["string"])],
+    ["valor_contractual", new Set(["string"])],
   ]);
   return (
     !entry.context?.kind ||
