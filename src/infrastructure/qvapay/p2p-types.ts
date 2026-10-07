@@ -1,3 +1,10 @@
+/**
+ * @archivo src/infrastructure/qvapay/p2p-types.ts
+ * @proposito Define tipos de datos recibidos desde QvaPay P2P.
+ * @responsabilidades Implementar y proteger las reglas propias de este módulo sin mezclar responsabilidades de otras capas.
+ * @ubicacion src/infrastructure/qvapay dentro de la arquitectura de QvaPay-AI.
+ */
+
 export type QvaPayP2POfferStatus =
   "open" | "revision" | "processing" | "paid" | "completed" | "cancelled";
 
