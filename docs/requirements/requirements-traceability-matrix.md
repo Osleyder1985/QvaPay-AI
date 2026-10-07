@@ -24,7 +24,7 @@ Relacionar requisitos con diseño, implementación, pruebas y evidencia de runti
 | SYS-INT-012 | Evolución segura | Contract parser | pruebas de contrato | Tested |
 | SYS-FR-005 | Centro de Cuenta protegido | QvaPayAccountClient + `/api/account` | pruebas de cliente/ruta | Implemented |
 | SYS-SEC-001 | No pedir secretos operacionales al navegador | Public App + Worker | Security Gate + dashboard smoke | Verified |
-| SYS-SEC-002 | Identidad de cuenta desde `/user` | QvaPayAccountClient | pruebas de cuenta | Verified |
+| SYS-SEC-002 | Identidad de cuenta desde `/user` | QvaPayAccountClient | pruebas de cuenta | Verified |\n| SYS-FR-006 | Aplicar oferta P2P BUY/SELL de forma autenticada | Worker + QvaPayP2PClient | pruebas de cliente + seguridad + smoke autenticado | Implemented |\n| SYS-FR-007 | Obtener detalle autoritativo después de aplicar una oferta | QvaPayP2PClient + p2p-detail-contract | pruebas de contrato + smoke autenticado | Implemented |\n| SYS-FR-008 | Auto Apply server-side con límites de tasa y fondos | Durable Object + Auto Apply strategy | pruebas de estrategia/scheduler + smoke financiero | Implemented |
 
 ## Evidencia de producción
 
@@ -48,7 +48,7 @@ Los siguientes documentos constituyen el inventario normativo que debe permanece
 
 - `docs/requirements/software/initial-software-requirements.md`
 - `docs/requirements/system/functional/p2p-market-scanner.md`
-- `docs/requirements/system/functional/account-center.md`
+- `docs/requirements/system/functional/account-center.md`\n- `docs/requirements/system/functional/p2p-operations.md`
 - `docs/requirements/system/integration/qvapay-p2p.md`
 - `docs/requirements/system/quality/initial-quality-requirements.md`
 - `docs/requirements/requirements-traceability-matrix.md`
