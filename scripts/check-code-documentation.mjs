@@ -39,11 +39,25 @@ function firstCommentBlock(source) {
 const findings = [];
 for (const file of collectFiles(ROOT).sort()) {
   const comment = firstCommentBlock(fs.readFileSync(file, "utf8"));
+  const relativeFile = path.relative(process.cwd(), file).replaceAll(path.sep, "/");
+
   for (const marker of REQUIRED_MARKERS) {
     if (!comment.includes(marker)) {
       findings.push({
-        file: path.relative(process.cwd(), file).replaceAll(path.sep, "/"),
+        file: relativeFile,
         marker,
+      });
+    }
+  }
+
+  const source = fs.readFileSync(file, "utf8");
+  const behaviorPattern = /(?:^|\n)(\s*)export\\s+(?:(?:async)\\s+)?(?:function|class)\\s+[A-Za-z_$][\\w$]*/g;
+  for (const match of source.matchAll(behaviorPattern)) {
+    const before = source.slice(0, match.index + match[0].lastIndexOf("export"));
+    if (!/\\/\\*[\\s\\S]*\\*\\/\\s*$/.test(before)) {
+      findings.push({
+        file: relativeFile,
+        marker: "JSDoc/TSDoc para API de comportamiento exportada",
       });
     }
   }
