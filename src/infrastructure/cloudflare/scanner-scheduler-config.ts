@@ -19,6 +19,11 @@ export interface SchedulerState {
   readonly nextAlarmAt: number | null;
 }
 
+/**
+ * @proposito API pública normalizeScannerSchedulerConfig: implementa el comportamiento expuesto por este módulo.
+ * @responsabilidades Aplicar las validaciones y reglas de negocio definidas por el contrato del módulo.
+ * @returns Resultado de la operación pública.
+ */
 export function normalizeScannerSchedulerConfig(
   config: ScannerSchedulerConfig,
 ): ScannerSchedulerConfig {
@@ -35,6 +40,11 @@ export function normalizeScannerSchedulerConfig(
   };
 }
 
+/**
+ * @proposito API pública createScannerSchedulerState: implementa el comportamiento expuesto por este módulo.
+ * @responsabilidades Aplicar las validaciones y reglas de negocio definidas por el contrato del módulo.
+ * @returns Resultado de la operación pública.
+ */
 export function createScannerSchedulerState(
   config: ScannerSchedulerConfig | undefined,
   alarm: number | null,
