@@ -10,27 +10,27 @@ Nada se considera completo, terminado, aprobado, operativo o certificado sin evi
 
 ## Estados formales
 
-- **Defined:** requisito definido.
-- **Designed:** existe diseño suficiente.
-- **Implemented:** existe implementación identificable.
-- **Tested:** existe una prueba ejecutada satisfactoriamente.
-- **Verified:** existe evidencia suficiente frente a los criterios aplicables.
-- **Certified:** se completó la verificación requerida y la evidencia quedó registrada.
-- **Failed / Rejected:** existe incumplimiento o rechazo.
-- **Blocked:** no puede ejecutarse la verificación requerida por una dependencia o condición externa.
+- **Definido:** requisito definido.
+- **Diseñado:** existe diseño suficiente.
+- **Implementado:** existe implementación identificable.
+- **Probado:** existe una prueba ejecutada satisfactoriamente.
+- **Verificado:** existe evidencia suficiente frente a los criterios aplicables.
+- **Certificado:** se completó la verificación requerida y la evidencia quedó registrada.
+- **Fallido / Rechazado:** existe incumplimiento o rechazo.
+- **Bloqueado:** no puede ejecutarse la verificación requerida por una dependencia o condición externa.
 
 ## Distinciones obligatorias
 
-- Implemented ≠ Tested.
-- Tested ≠ Verified.
-- Verified ≠ Certified.
-- Merged ≠ Certified.
-- CI green ≠ Certified.
-- Deployment successful ≠ Certified.
+- Implementado ≠ Probado.
+- Probado ≠ Verificado.
+- Verificado ≠ Certificado.
+- Merged ≠ Certificado.
+- CI green ≠ Certificado.
+- Despliegue exitoso ≠ Certificado.
 
 ## Cadena de evidencia
 
-**Requirement → Design → Implementation → Automated Tests → Runtime Verification → Production Verification → Evidence → Certification**
+**Requisito → Diseño → Implementación → Pruebas automatizadas → Verificación del runtime → Verificación de producción → Evidencia → Certificación**
 
 Cuando una etapa sea aplicable y no exista evidencia, el estado no puede elevarse artificialmente.
 
