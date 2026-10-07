@@ -49,7 +49,7 @@
         },
         "match_type": {
           "type": "string",
-          "enum": ["literal", "regex"]
+          "enum": ["literal", "pattern"]
         },
         "category": {
           "type": "string",
