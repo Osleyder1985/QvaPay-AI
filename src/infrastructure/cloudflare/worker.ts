@@ -18,7 +18,7 @@ import { bootstrapInitialAdmin } from "./initial-admin-setup.js";
 // prettier-ignore
 import { createInitialAdminSetupCompletedResponse, createInitialAdminSetupResponse } from "./initial-admin-setup-app.js";
 // prettier-ignore
-import { createPublicAppResponse, createPublicScannerStateResponse, toPublicScannerState } from "./public-app.js";
+import { createPublicAppResponse, createPublicScannerStateResponse, toPublicScannerState } from "./public-app.js";\nimport { normalizeAutoApplyConfig, type AutoApplyConfig } from "../../application/p2p-auto-apply.js";\nimport { QvaPayP2PClient } from "../qvapay/qvapay-p2p-client.js";
 
 // prettier-ignore
 export interface ScannerWorkerEnvironment {
@@ -48,6 +48,31 @@ async function body(request: Request): Promise<Record<string, unknown>> {
 }
 
 // prettier-ignore
+async function writeP2PAudit(
+  db: D1Database,
+  actor: { readonly id: string; readonly username: string },
+  eventType: string,
+  outcome: "SUCCESS" | "FAILURE",
+  metadata: Record<string, unknown>,
+): Promise<void> {
+  await db
+    .prepare(
+      "INSERT INTO security_audit_log (id, occurred_at, actor_user_id, actor_username, event_type, outcome, target_user_id, target_username, metadata_json) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+    )
+    .bind(
+      crypto.randomUUID(),
+      new Date().toISOString(),
+      actor.id,
+      actor.username,
+      eventType,
+      outcome,
+      null,
+      null,
+      JSON.stringify(metadata),
+    )
+    .run();
+}
+
 export default {
   async fetch(request: Request, env: ScannerWorkerEnvironment): Promise<Response> {
     const url = new URL(request.url);
@@ -223,9 +248,89 @@ export default {
 
     const applyMatch = url.pathname.match(/^\/api\/p2p\/([^/]+)\/apply$/);
     if (applyMatch) {
+      if (request.method !== "POST") return new Response("Method not allowed", { status: 405 });
       const access = await requireRole(request, env.DB, env.ACCOUNT_AUTH_SECRET, ["ADMINISTRATION"]);
       if (access instanceof Response) return access;
-      return jsonError("La operación P2P está protegida y su ejecución seguirá el contrato operativo existente.", 501);
+      const uuid = applyMatch[1]!;
+      const client = new QvaPayP2PClient({
+        baseUrl: env.QVAPAY_API_BASE_URL,
+        appId: env.QVAPAY_APP_ID,
+        appSecret: env.QVAPAY_APP_SECRET,
+        userApiToken: env.QVAPAY_USER_API_TOKEN,
+      });
+      try {
+        const applyResult = await client.applyOffer(uuid);
+        const detail = await client.fetchOfferDetail(uuid);
+        await writeP2PAudit(env.DB, access.user, "p2p_apply", "SUCCESS", {
+          uuid,
+          detailStatus: detail.status,
+          type: detail.type,
+          coin: detail.coin,
+        });
+        return Response.json(
+          { applied: true, apply: applyResult, detail },
+          { status: 201, headers: { "cache-control": "no-store" } },
+        );
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        await writeP2PAudit(env.DB, access.user, "p2p_apply", "FAILURE", {
+          uuid,
+          error: message,
+        });
+        return jsonError(message, 502);
+      }
+    }
+
+    const detailMatch = url.pathname.match(/^\/api\/p2p\/([^/]+)$/);
+    if (detailMatch) {
+      if (request.method !== "GET") return new Response("Method not allowed", { status: 405 });
+      const access = await requireRole(request, env.DB, env.ACCOUNT_AUTH_SECRET, ["ADMINISTRATION", "AUDITOR"]);
+      if (access instanceof Response) return access;
+      const client = new QvaPayP2PClient({
+        baseUrl: env.QVAPAY_API_BASE_URL,
+        appId: env.QVAPAY_APP_ID,
+        appSecret: env.QVAPAY_APP_SECRET,
+        userApiToken: env.QVAPAY_USER_API_TOKEN,
+      });
+      try {
+        const detail = await client.fetchOfferDetail(detailMatch[1]!);
+        return Response.json({ detail }, { headers: { "cache-control": "no-store" } });
+      } catch (error) {
+        return jsonError(error instanceof Error ? error.message : String(error), 502);
+      }
+    }
+
+    if (url.pathname === "/api/p2p/auto-apply/config") {
+      if (request.method === "GET") {
+        const access = await requireRole(request, env.DB, env.ACCOUNT_AUTH_SECRET, ["ADMINISTRATION", "AUDITOR"]);
+        if (access instanceof Response) return access;
+        return Response.json(
+          { config: await stub.getAutoApplyConfig(), state: await stub.getAutoApplyState() },
+          { headers: { "cache-control": "no-store" } },
+        );
+      }
+      if (request.method !== "POST") return new Response("Method not allowed", { status: 405 });
+      const access = await requireRole(request, env.DB, env.ACCOUNT_AUTH_SECRET, ["ADMINISTRATION"]);
+      if (access instanceof Response) return access;
+      try {
+        const input = await body(request);
+        const config = normalizeAutoApplyConfig(input as unknown as AutoApplyConfig);
+        const saved = await stub.configureAutoApply(config);
+        if (saved.enabled) {
+          await stub.ensureScheduled({
+            coin: env.SCANNER_COIN,
+            intervalSeconds: Number(env.SCANNER_INTERVAL_SECONDS),
+          });
+        }
+        await writeP2PAudit(env.DB, access.user, "p2p_auto_apply_configured", "SUCCESS", {
+          enabled: saved.enabled,
+          buy: saved.buy,
+          sell: saved.sell,
+        });
+        return Response.json({ config: saved }, { headers: { "cache-control": "no-store" } });
+      } catch (error) {
+        return jsonError(error instanceof Error ? error.message : String(error), 400);
+      }
     }
 
     if (url.pathname.startsWith("/api/admin/")) {
