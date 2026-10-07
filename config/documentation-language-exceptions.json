@@ -143,64 +143,6 @@
       ]
     },
     {
-      "id": "EXC-006",
-      "match": "Documentation quality",
-      "match_type": "literal",
-      "category": "OFFICIAL_NAME",
-      "scope": {
-        "paths": [
-          ".github/workflows/quality-gate.yml"
-        ]
-      },
-      "context": {
-        "kind": "workflow_name",
-        "detail": "Nombre de contexto de check requerido por el ruleset de protección de main; no representa prosa funcional del proyecto."
-      },
-      "reason_es": "GitHub utiliza este contexto como nombre técnico obligatorio del check requerido por el ruleset main-production-governance. Traducirlo rompería la correspondencia con la protección de la rama.",
-      "source": ".github/workflows/quality-gate.yml",
-      "translation_risk": "CRITICAL",
-      "owner": "QvaPay-AI",
-      "state": "ACTIVE",
-      "review": {
-        "status": "VALIDADA",
-        "reviewer": "QvaPay-AI",
-        "reviewed_at": "2026-10-07"
-      },
-      "evidence": [
-        "El ruleset main-production-governance exige exactamente el contexto Documentation quality.",
-        "El cambio a un nombre español produjo el bloqueo de merge por check requerido ausente."
-      ]
-    },
-    {
-      "id": "EXC-007",
-      "match": "Security verification",
-      "match_type": "literal",
-      "category": "OFFICIAL_NAME",
-      "scope": {
-        "paths": [
-          ".github/workflows/security-gate.yml"
-        ]
-      },
-      "context": {
-        "kind": "workflow_name",
-        "detail": "Nombre de contexto de check requerido por el ruleset de protección de main; no representa prosa funcional del proyecto."
-      },
-      "reason_es": "GitHub utiliza este contexto como nombre técnico obligatorio del check requerido por el ruleset main-production-governance. Traducirlo rompería la correspondencia con la protección de la rama.",
-      "source": ".github/workflows/security-gate.yml",
-      "translation_risk": "CRITICAL",
-      "owner": "QvaPay-AI",
-      "state": "ACTIVE",
-      "review": {
-        "status": "VALIDADA",
-        "reviewer": "QvaPay-AI",
-        "reviewed_at": "2026-10-07"
-      },
-      "evidence": [
-        "El ruleset main-production-governance exige exactamente el contexto Security verification.",
-        "El cambio a un nombre español produjo el bloqueo de merge por check requerido ausente."
-      ]
-    },
-    {
       "id": "EXC-008",
       "match": "Documentation quality",
       "match_type": "literal",
