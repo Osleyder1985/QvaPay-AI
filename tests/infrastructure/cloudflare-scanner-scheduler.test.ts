@@ -158,7 +158,7 @@ describe("normalizeScannerSchedulerConfig", () => {
         coin: " ",
         intervalSeconds: 10,
       }),
-    ).toThrow("no puede estar vacío");
+    ).toThrow("no puede estar vacía");
   });
 
   it("rechaza intervalos fuera de los límites del runtime", () => {
