@@ -6,6 +6,7 @@
  */
 
 import { renderApplicationShellNavigation } from "./application-shell.js";
+import { renderApplicationShellWorkAreaStart } from "./application-shell-work-area.js";
 
 /** Renderiza la apertura estructural del Application Shell. */
 export function renderApplicationShellStart(): string {
@@ -18,7 +19,7 @@ ${renderApplicationShellNavigation()}
 </nav>
 <div class="framework"><b>MARCO DE GESTIÓN</b><p>Calidad · seguridad · continuidad · trazabilidad. Alineación ISO no equivale a certificación.</p></div>
 </aside>
-<main id="contenido-principal" tabindex="-1">`;
+${renderApplicationShellWorkAreaStart()}`;
 }
 
 /** Renderiza el cierre estructural del Application Shell. */
