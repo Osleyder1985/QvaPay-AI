@@ -15,10 +15,10 @@ describe("seguridad y contratos del cliente Dashboard", () => {
     "valida tipo de contenido y forma mínima antes de consumir JSON",
     () => {
       expect(DASHBOARD_CLIENT_SCRIPT).toContain(
-      'response.headers.get("content-type")',
-    );
-    expect(DASHBOARD_CLIENT_SCRIPT).toContain("isScannerState");
-    expect(DASHBOARD_CLIENT_SCRIPT).toContain("isAccountPayload");
+        'response.headers.get("content-type")',
+      );
+      expect(DASHBOARD_CLIENT_SCRIPT).toContain("isScannerState");
+      expect(DASHBOARD_CLIENT_SCRIPT).toContain("isAccountPayload");
       expect(DASHBOARD_CLIENT_SCRIPT).toContain("isUsersPayload");
     },
   );
