@@ -200,6 +200,21 @@ export default {
       if (request.method !== "GET") return new Response("Method not allowed", { status: 405 });
       const access = await requireRole(request, env.DB, env.ACCOUNT_AUTH_SECRET, ["ADMINISTRATION", "AUDITOR"]);
       if (access instanceof Response) return access;
+      const current = await getCurrentQvaPayAccountSnapshot(env.DB);
+      const lastSuccessful = await getLastSuccessfulQvaPayAccountSnapshot(env.DB);
+      return Response.json(
+        {
+          account: current?.snapshot ?? lastSuccessful?.snapshot ?? null,
+          snapshot: current ?? lastSuccessful ?? null,
+        },
+        { headers: { "cache-control": "no-store" } },
+      );
+    }
+
+    if (url.pathname === "/api/account/sync") {
+      if (request.method !== "POST") return new Response("Method not allowed", { status: 405 });
+      const access = await requireRole(request, env.DB, env.ACCOUNT_AUTH_SECRET, ["ADMINISTRATION"]);
+      if (access instanceof Response) return access;
       try {
         const client = new QvaPayAccountClient({
           baseUrl: env.QVAPAY_API_BASE_URL,
@@ -209,13 +224,25 @@ export default {
         });
         const account = await client.fetchAccount();
         const persisted = await persistQvaPayAccountSnapshot(env.DB, account);
+        await env.DB.prepare(
+          "INSERT INTO security_audit_log (id, occurred_at, actor_user_id, actor_username, event_type, outcome, target_user_id, target_username, metadata_json) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        ).bind(
+          crypto.randomUUID(),
+          new Date().toISOString(),
+          access.user.id,
+          access.user.username,
+          "qvapay_account_sync",
+          "SUCCESS",
+          null,
+          null,
+          JSON.stringify({ snapshotId: persisted.id, integrationStatus: persisted.integrationStatus }),
+        ).run();
         return Response.json(
           { account, snapshot: persisted },
           { headers: { "cache-control": "no-store" } },
         );
       } catch (error) {
-        const message =
-          error instanceof Error ? error.message : "QvaPay account integration failed.";
+        const message = error instanceof Error ? error.message : "QvaPay account synchronization failed.";
         return jsonError(message, 502);
       }
     }
