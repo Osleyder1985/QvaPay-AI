@@ -21,6 +21,9 @@ export interface Offer {
   readonly rate: string;
   readonly amount: string;
   readonly availableAmount: string;
+  readonly reservedAmount?: string;
+  readonly orderMin?: string;
+  readonly orderMax?: string;
   readonly status: OfferStatus;
   readonly sourceTimestamp: string;
   readonly observedAt: string;
