@@ -314,7 +314,9 @@ export class QvaPayAccountClient {
     }
 
     const balanceEndpoint =
-      balanceUsd !== null && primaryBalanceUsd === null ? "/user" : "/v2/balance";
+      balanceUsd !== null && primaryBalanceUsd === null
+        ? "/user"
+        : "/v2/balance";
     let balanceStatus: QvaPayAccountSourceMetadata["status"] = "failed";
     if (balanceUsd !== null) {
       balanceStatus = "verified";
@@ -336,8 +338,7 @@ export class QvaPayAccountClient {
       endpoint: balanceEndpoint,
       retrievedAt:
         balanceEndpoint === "/user" ? user.retrievedAt : balance.retrievedAt,
-      httpStatus:
-        balanceEndpoint === "/user" ? user.status : balance.status,
+      httpStatus: balanceEndpoint === "/user" ? user.status : balance.status,
       status: balanceStatus,
       error: balanceError,
     };
