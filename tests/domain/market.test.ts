@@ -52,8 +52,8 @@ describe("market domain", () => {
 });
 
 
-describe("market actionability", () => {
-  it("excludes non-open and exhausted offers from execution metrics while keeping them visible", () => {
+describe("accionabilidad del mercado", () => {
+  it("excluye ofertas no abiertas y agotadas de las métricas de ejecución sin ocultarlas", () => {
     const market = createMarket("BANK_CUP", [
       offer("open", "BUY", "1000"),
       { ...offer("processing", "BUY", "1200"), status: "processing" },
