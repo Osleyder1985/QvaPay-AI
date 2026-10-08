@@ -19,6 +19,6 @@ const MODULE_HEADERS: Readonly<Record<string, { title: string; description: stri
 };
 /** Renderiza el encabezado contextual de la ruta activa. */
 export function renderApplicationShellHeader(moduleId = "inicio"): string {
-  const header = MODULE_HEADERS[moduleId] ?? MODULE_HEADERS.inicio;
+  const header = MODULE_HEADERS[moduleId] ?? { title: "Centro de mando", description: "Una vista clara del estado operativo y los indicadores esenciales." };
   return `<header class="top" id="pageHeader" aria-labelledby="inicio-title"><div class="title"><h1 id="inicio-title">${header.title}</h1><p>${header.description}</p></div><div id="live" class="live"><i class="dot"></i><strong id="liveText">CONECTANDO</strong><span>·</span><span id="updated">—</span><button class="logout-button" id="logoutButton" type="button">Cerrar sesión</button></div></header>`;
 }
