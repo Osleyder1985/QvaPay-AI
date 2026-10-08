@@ -51,5 +51,5 @@ export function renderApplicationShellNavigation(): string {
       '</span><span>' +
       label +
       "</span></a>",
-  ).join("\\n");
+  ).join("\n");
 }
