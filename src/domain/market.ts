@@ -48,7 +48,10 @@ export function createMarket(coin: string, offers: readonly Offer[]): Market {
  * @returns Resultado de la operación pública.
  */
 export function isActionableOffer(offer: Offer): boolean {
-  return offer.status === "open" && compareDecimalStrings(offer.availableAmount, "0") > 0;
+  return (
+    offer.status === "open" &&
+    compareDecimalStrings(offer.availableAmount, "0") > 0
+  );
 }
 
 /**
