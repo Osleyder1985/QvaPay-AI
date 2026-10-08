@@ -270,7 +270,7 @@ describe("QvaPayAccountClient", () => {
     const snapshot = await client.fetchAccount();
 
     expect(snapshot.ownerCorrelationOk).toBe(false);
-    expect(snapshot.ownerCorrelationProvenance.status).toBe("unavailable");
+    expect(snapshot.ownerCorrelationProvenance.status).toBe("failed");
     expect(snapshot.ownerCorrelationProvenance.error).toContain("no coincide");
     expect(snapshot.integrationStatus).toBe("degraded");
   });
