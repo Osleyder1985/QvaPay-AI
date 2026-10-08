@@ -29,7 +29,7 @@ Los estados de integración distinguen, según corresponda:
 
 El token de API de usuario de QvaPay permanece exclusivamente en el Worker. El `app-secret`, `QVAPAY_USER_API_TOKEN`, `SCANNER_BOOTSTRAP_TOKEN` y `P2P_ACTION_TOKEN` nunca se entregan al navegador.
 
-El endpoint `GET /api/account` requiere una sesión de usuario independiente. La sesión se crea mediante `POST /api/auth/login`, usando una credencial de autenticación configurada como secreto del Worker, y se conserva en una cookie `HttpOnly`, `Secure`, `SameSite=Strict` con firma HMAC y expiración. Sin sesión devuelve `403`. La credencial de autenticación nunca se conserva en almacenamiento del navegador ni se utiliza como credencial QvaPay.
+El endpoint `GET /api/account` requiere una sesión de usuario independiente y es exclusivamente observacional: devuelve el último snapshot persistido sin consultar QvaPay ni modificar D1. La sincronización se ejecuta mediante `POST /api/account/sync`, autenticado para Administración, y registra un evento de auditoría. La sesión se crea mediante `POST /api/auth/login`, usando una credencial de autenticación configurada como secreto del Worker, y se conserva en una cookie `HttpOnly`, `Secure`, `SameSite=Strict` con firma HMAC y expiración. Sin sesión devuelve `403`. La credencial de autenticación nunca se conserva en almacenamiento del navegador ni se utiliza como credencial QvaPay.
 
 La ruta `POST /api/p2p/:uuid/apply` también permanece bloqueada para el dashboard público hasta disponer de una frontera de operación autenticada independiente.
 
@@ -62,3 +62,8 @@ Con una sesión autenticada, Cuenta puede mostrar balance, identidad autenticada
 ## Regla de evolución
 
 Cada nuevo campo de Cuenta debe identificar su fuente QvaPay, pasar por normalización contractual, registrar su estado de lectura y tener prueba cuando sea contractual. Nunca se debe sustituir una fuente por datos de mercado ni exponer payloads upstream completos.
+
+
+## Separación de lectura y sincronización
+
+La lectura de Cuenta y la sincronización externa son operaciones distintas. Los clientes pueden repetir `GET /api/account` sin generar tráfico hacia QvaPay ni nuevos snapshots. La acción explícita de sincronización usa `POST /api/account/sync`, actualiza el snapshot y registra quién inició la operación, el resultado y el identificador del snapshot. Esta separación implementa #221 y mantiene vinculados #178 y #187.
