@@ -68,9 +68,9 @@ const MODULE_HEADERS: Readonly<
 export function renderApplicationShellHeader(moduleId = "inicio"): string {
   const header = MODULE_HEADERS[moduleId] ?? DEFAULT_MODULE_HEADER;
   return [
-    '<header class="top" id="pageHeader" aria-labelledby="inicio-title">',
+    '<header class="top" id="pageHeader" aria-labelledby="page-title">',
     '<div class="title">',
-    `<h1 id="inicio-title">${header.title}</h1>`,
+    `<h1 id="page-title">${header.title}</h1>`,
     `<p>${header.description}</p>`,
     "</div>",
     '<div id="live" class="live">',
