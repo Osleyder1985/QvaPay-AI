@@ -342,11 +342,7 @@ export class QvaPayAccountClient {
       endpoint: `/app/${this.options.appId}`,
       retrievedAt: ownerApplication.retrievedAt,
       httpStatus: ownerApplication.status,
-      status: ownerCorrelationOk
-        ? "verified"
-        : ownerApplication.ok
-          ? "unavailable"
-          : "failed",
+      status: ownerCorrelationOk ? "verified" : "failed",
       error: ownerCorrelationOk
         ? null
         : ownerApplication.ok
