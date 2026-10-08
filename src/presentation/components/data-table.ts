@@ -24,34 +24,21 @@ export function renderDataTable(
   rows: readonly DataTableRow[],
 ): string {
   const header = columns
-    .map((column) => "<th scope=\"col\">" + escapeHtml(column.label) + "</th>")
+    .map(
+      (column) =>
+        `<th scope="col">${escapeHtml(column.label)}</th>`,
+    )
     .join("");
   const body = rows
     .map((row) => {
       const cells = columns
         .map(
           (column) =>
-            "<td>" +
-            escapeHtml(row.cells[column.key] ?? "—") +
-            "</td>",
+            `<td>${escapeHtml(row.cells[column.key] ?? "—")}</td>`,
         )
         .join("");
-      return (
-        '<tr data-row-id="' +
-        escapeHtml(row.id) +
-        '">' +
-        cells +
-        "</tr>"
-      );
+      return `<tr data-row-id="${escapeHtml(row.id)}">${cells}</tr>`;
     })
     .join("");
-  return (
-    '<div class="qva-data-table-wrap"><table class="qva-data-table" aria-label="' +
-    escapeHtml(label) +
-    '"><thead><tr>' +
-    header +
-    "</tr></thead><tbody>" +
-    body +
-    "</tbody></table></div>"
-  );
+  return `<div class="qva-data-table-wrap"><table class="qva-data-table" aria-label="${escapeHtml(label)}"><thead><tr>${header}</tr></thead><tbody>${body}</tbody></table></div>`;
 }
