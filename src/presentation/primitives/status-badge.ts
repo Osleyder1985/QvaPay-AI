@@ -7,6 +7,7 @@
 
 import type { UiState } from "../states/ui-state.js";
 
+/** Genera un indicador accesible para el estado visual proporcionado. */
 export function renderStatusBadge(state: UiState): string {
   const labels: Record<UiState, string> = {
     loading: "Cargando",
