@@ -49,7 +49,9 @@ export function mapQvaPayOffer(
     rate: calculateRate(dto.amount, dto.receive),
     amount: dto.amount,
     availableAmount: dto.available_amount,
-    ...(dto.reserved_amount === undefined ? {} : { reservedAmount: dto.reserved_amount }),
+    ...(dto.reserved_amount === undefined
+      ? {}
+      : { reservedAmount: dto.reserved_amount }),
     ...(dto.order_min === undefined ? {} : { orderMin: dto.order_min }),
     ...(dto.order_max === undefined ? {} : { orderMax: dto.order_max }),
     status: dto.status ?? "open",
