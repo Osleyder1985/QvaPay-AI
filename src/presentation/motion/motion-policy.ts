@@ -15,5 +15,5 @@ export const MOTION_POLICY = [
   "animation-iteration-count:1 !important;",
   "transition-duration:.01ms !important;",
   "}",
-  "}"
+  "}",
 ].join("");
