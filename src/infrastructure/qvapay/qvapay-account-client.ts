@@ -75,29 +75,13 @@ function parseBalance(payload: unknown): number | null {
     : null;
 }
 
-function describePayloadShape(payload: unknown): string {
-  if (Array.isArray(payload)) {
-    return `array(length=${payload.length})`;
-  }
-  if (!isRecord(payload)) {
-    return typeof payload;
-  }
-  return Object.keys(payload).sort().join(",");
-}
-
 function parseApplication(payload: unknown): QvaPayApplicationIdentity | null {
   const unwrapped = readPayload(payload);
   let value: Record<string, unknown> | null = null;
 
-  if (Array.isArray(unwrapped)) {
-    if (unwrapped.length === 1 && isRecord(unwrapped[0])) {
-      value = unwrapped[0];
-    }
-  } else if (isRecord(unwrapped)) {
-    if (Array.isArray(unwrapped.data)) {
-      if (unwrapped.data.length === 1 && isRecord(unwrapped.data[0])) {
-        value = unwrapped.data[0];
-      }
+  if (isRecord(unwrapped)) {
+    if (isRecord(unwrapped.app)) {
+      value = unwrapped.app;
     } else if (isRecord(unwrapped.application)) {
       value = unwrapped.application;
     } else {
