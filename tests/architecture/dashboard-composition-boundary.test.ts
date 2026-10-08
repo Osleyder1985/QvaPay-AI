@@ -4,13 +4,18 @@ import { fileURLToPath } from "node:url";
 import { DASHBOARD_COMPOSITION } from "../../src/presentation/dashboard/dashboard-composition.js";
 
 describe("frontera de composición del Dashboard", () => {
-  it("expone estilos, vista y script como un único contrato de presentación", () => {
+  it(
+    "expone estilos, vista y script como un único contrato de presentación",
+    () => {
     expect(DASHBOARD_COMPOSITION.styles).toContain("<style>");
     expect(DASHBOARD_COMPOSITION.body).toContain('id="overview"');
     expect(DASHBOARD_COMPOSITION.script).toContain("<script>");
-  });
+    },
+  );
 
-  it("impide que public-app ensamble directamente recursos concretos del Dashboard", () => {
+  it(
+    "impide que public-app ensamble directamente recursos concretos del Dashboard",
+    () => {
     const path = fileURLToPath(
       new URL("../../src/infrastructure/cloudflare/public-app.ts", import.meta.url),
     );
@@ -19,5 +24,6 @@ describe("frontera de composición del Dashboard", () => {
     expect(source).not.toContain("dashboard-view.js");
     expect(source).not.toContain("dashboard-styles.js");
     expect(source).not.toContain("dashboard-client.js");
-  });
+    },
+  );
 });
