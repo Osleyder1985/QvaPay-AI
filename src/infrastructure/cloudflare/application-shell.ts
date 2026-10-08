@@ -20,7 +20,12 @@ export const APPLICATION_SHELL_MODULES: readonly ApplicationShellModule[] = [
   { id: "cuenta", label: "Cuenta QvaPay", icon: "◎", href: "/app/cuenta" },
   { id: "mercado", label: "Mercado P2P", icon: "◈", href: "/app/mercado" },
   { id: "arbitraje", label: "Arbitraje", icon: "⇄", href: "/app/arbitraje" },
-  { id: "operaciones", label: "Operaciones", icon: "↔", href: "/app/operaciones" },
+  {
+    id: "operaciones",
+    label: "Operaciones",
+    icon: "↔",
+    href: "/app/operaciones",
+  },
   {
     id: "usuarios",
     label: "Usuarios y acceso",
