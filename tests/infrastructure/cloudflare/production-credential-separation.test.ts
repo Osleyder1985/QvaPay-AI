@@ -32,12 +32,12 @@ describe("production credential separation", () => {
 
   it("provisiona y utiliza credenciales de producción separadas en CI", () => {
     expect(deployWorkflow).toContain("PRODUCTION_SMOKE_TOKEN=");
-    expect(deployWorkflow).toContain(
-      "secret put PRODUCTION_SMOKE_TOKEN",
-    );
+    expect(deployWorkflow).toContain("secret put PRODUCTION_SMOKE_TOKEN");
     const smokeLifecycle = deployWorkflow.slice(
       deployWorkflow.indexOf("cleanup_smoke_user()"),
-      deployWorkflow.indexOf('echo "Authenticating smoke account against production..."'),
+      deployWorkflow.indexOf(
+        'echo "Authenticating smoke account against production..."'
+      ),
     );
     expect(smokeLifecycle).toContain(
       "Authorization: Bearer $PRODUCTION_SMOKE_TOKEN",
