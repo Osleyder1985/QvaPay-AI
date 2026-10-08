@@ -3,12 +3,14 @@ import { createLoginAppResponse } from "../../src/infrastructure/cloudflare/logi
 
 describe("estado de envío del login", () => {
   it("expone busy state y live region para la autenticación", async () => {
-    const html = await (await createLoginAppResponse()).text();
+    const response = await createLoginAppResponse();
+    const html = await response.text();
+
     expect(html).toContain('aria-busy="false"');
     expect(html).toContain('id="loginStatus"');
     expect(html).toContain('aria-live="polite"');
     expect(html).toContain('button.setAttribute("aria-disabled","true")');
     expect(html).toContain('form.setAttribute("aria-busy","true")');
-    expect(html).toContain('Iniciando sesión…');
+    expect(html).toContain("Iniciando sesión…");
   });
 });
