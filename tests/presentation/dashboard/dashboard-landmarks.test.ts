@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { renderDashboardView } from "../../src/presentation/dashboard/dashboard-view.js";
-import { renderApplicationShellHeader } from "../../src/infrastructure/cloudflare/application-shell-header.js";
+import { renderDashboardView } from "../../../src/presentation/dashboard/dashboard-view.js";
+import { renderApplicationShellHeader } from "../../../src/infrastructure/cloudflare/application-shell-header.js";
 
 describe("landmarks y headings del dashboard", () => {
   it("nombra el header navegable mediante su heading visible", () => {
