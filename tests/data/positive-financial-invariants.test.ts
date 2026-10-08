@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 
-import { parseP2PPage, QvaPayContractError } from "../../src/infrastructure/qvapay/p2p-contract.js";
+import {
+  parseP2PPage,
+  QvaPayContractError,
+} from "../../src/infrastructure/qvapay/p2p-contract.js";
 import { mapQvaPayOffer } from "../../src/infrastructure/qvapay/p2p-mapper.js";
 import { createMarket } from "../../src/domain/market.js";
 
