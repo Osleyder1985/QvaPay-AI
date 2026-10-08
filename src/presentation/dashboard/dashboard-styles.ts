@@ -9,7 +9,7 @@ import { ACCESSIBILITY_POLICY } from "../accessibility/accessibility-policy.js";
 import { MOTION_POLICY } from "../motion/motion-policy.js";
 import { DESIGN_TOKENS } from "../tokens/design-tokens.js";
 
-export const DASHBOARD_STYLES = String.raw`<style>${DESIGN_TOKENS}${ACCESSIBILITY_POLICY}${MOTION_POLICY}${String.raw`
+export const DASHBOARD_STYLES = String.raw`<style>${DESIGN_TOKENS}${ACCESSIBILITY_POLICY}${MOTION_POLICY}
 
 :root{color-scheme:dark;--bg:var(--qva-color-background);--panel:var(--qva-color-surface);--panel2:var(--qva-color-surface-raised);--line:var(--qva-color-border);--text:var(--qva-color-text);--muted:var(--qva-color-text-muted);--good:var(--qva-color-positive);--warn:var(--qva-color-warning);--bad:var(--qva-color-negative);--accent:var(--qva-color-accent);--buy:var(--qva-color-buy);--sell:var(--qva-color-sell);--gold:#ffd746;font-family:var(--qva-font-ui)}
 *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;min-height:100vh;background:radial-gradient(circle at 10% 0,#16233f,transparent 34%),radial-gradient(circle at 90% 8%,#211a3e,transparent 30%),var(--bg);color:var(--text)}a{color:inherit;text-decoration:none}button{font:inherit} :focus-visible{outline:2px solid var(--accent);outline-offset:3px}
