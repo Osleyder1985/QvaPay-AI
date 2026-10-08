@@ -119,7 +119,8 @@ jobs:
           printf '%s' "$QVAPAY_USER_API_TOKEN" | npx wrangler secret put QVAPAY_USER_API_TOKEN
           printf '%s' "$SCANNER_BOOTSTRAP_TOKEN" | npx wrangler secret put SCANNER_BOOTSTRAP_TOKEN
 
-
+          echo "Waiting for Cloudflare secret propagation before authenticated smoke..." 
+          sleep 10
 
           echo "Verifying public application root..."
           ROOT_STATUS="000"
@@ -215,13 +216,26 @@ jobs:
           }
           trap cleanup_smoke_user EXIT
 
-          CREATE_SMOKE_RESPONSE="$(curl --fail-with-body --silent --show-error --max-time 15 \
-            --request POST \
-            --header "Authorization: Bearer $SCANNER_BOOTSTRAP_TOKEN" \
-            --header "Accept: application/json" \
-            --header "Content-Type: application/json" \
-            --data "{\"username\":\"$SMOKE_USERNAME\",\"password\":\"$SMOKE_PASSWORD\"}" \
-            "$WORKER_URL/internal/auth/smoke-user")"
+          CREATE_SMOKE_RESPONSE=""
+          for attempt in $(seq 1 7); do
+            if CREATE_SMOKE_RESPONSE="$(curl --fail-with-body --silent --show-error --max-time 15 \
+              --request POST \
+              --header "Authorization: Bearer $SCANNER_BOOTSTRAP_TOKEN" \
+              --header "Accept: application/json" \
+              --header "Content-Type: application/json" \
+              --data "{\"username\":\"$SMOKE_USERNAME\",\"password\":\"$SMOKE_PASSWORD\"}" \
+              "$WORKER_URL/internal/auth/smoke-user")"; then
+              break
+            fi
+            echo "Production smoke-user creation not ready on attempt $attempt/7."
+            if [ "$attempt" -lt 7 ]; then
+              sleep 5
+            fi
+          done
+          if [ -z "$CREATE_SMOKE_RESPONSE" ]; then
+            echo "Production smoke-user creation failed after 40 seconds."
+            exit 1
+          fi
           printf '%s\n' "$CREATE_SMOKE_RESPONSE" | node -e '
             let input = "";
             process.stdin.on("data", (chunk) => { input += chunk; });
