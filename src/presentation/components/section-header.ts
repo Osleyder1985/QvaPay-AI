@@ -8,9 +8,14 @@
 import { escapeHtml } from "./escape-html.js";
 
 /** Genera el encabezado visual de una sección. */
-export function renderSectionHeader(title: string, description?: string): string {
+export function renderSectionHeader(
+  title: string,
+  description?: string,
+): string {
   const detail = description
-    ? '<p class="qva-section-header__description">' + escapeHtml(description) + "</p>"
+    ? '<p class="qva-section-header__description">' +
+      escapeHtml(description) +
+      "</p>"
     : "";
   return (
     '<header class="qva-section-header">' +
