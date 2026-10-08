@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { DASHBOARD_CLIENT_SCRIPT } from "../../../src/presentation/dashboard/dashboard-client.js";
+import {
+  DASHBOARD_CLIENT_SCRIPT,
+} from "../../../src/presentation/dashboard/dashboard-client.js";
 
 describe("contratos JSON del Dashboard", () => {
   it("rechaza respuestas sin application/json o con formas no objeto", () => {
