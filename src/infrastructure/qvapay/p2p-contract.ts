@@ -12,7 +12,8 @@ import type {
 } from "./p2p-types.js";
 
 /**
- * Error de dominio de infraestructura para respuestas P2P inválidas de QvaPay.
+ * @proposito API pública QvaPayContractError: implementa el comportamiento expuesto por este módulo.
+ * @responsabilidades Aplicar el contrato y las validaciones correspondientes a la integración.
  */
 export class QvaPayContractError extends Error {
   constructor(message: string) {
@@ -22,11 +23,9 @@ export class QvaPayContractError extends Error {
 }
 
 /**
- * Valida y transforma una respuesta paginada P2P de QvaPay al contrato interno.
- *
- * @param payload Respuesta externa recibida desde QvaPay.
- * @returns Página P2P validada y normalizada.
- * @throws QvaPayContractError Si el payload no cumple el contrato esperado.
+ * @proposito API pública parseP2PPage: implementa el comportamiento expuesto por este módulo.
+ * @responsabilidades Aplicar el contrato y las validaciones correspondientes a la integración.
+ * @returns Resultado de la operación pública.
  */
 export function parseP2PPage(payload: unknown): QvaPayP2PPageDto {
   if (!isRecord(payload) || !Array.isArray(payload.data)) {
