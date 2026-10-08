@@ -17,7 +17,7 @@ const base = {
 };
 
 describe("invariantes financieras P2P", () => {
-  for (const field of ["amount", "receive", "available_amount"]) {
+  for (const field of ["amount", "receive"]) {
     it(`rechaza ${field}=0`, () => {
       expect(() =>
         parseP2PPage({
@@ -42,6 +42,29 @@ describe("invariantes financieras P2P", () => {
       ).toThrow(QvaPayContractError);
     });
   }
+
+  it("acepta available_amount=0 como dato no accionable", () => {
+    const page = parseP2PPage({
+      data: [{ ...base, available_amount: "0" }],
+      current_page: 1,
+      last_page: 1,
+      per_page: 100,
+      total: 1,
+    });
+    expect(page.data[0]?.available_amount).toBe("0");
+  });
+
+  it("rechaza available_amount negativo", () => {
+    expect(() =>
+      parseP2PPage({
+        data: [{ ...base, available_amount: "-1" }],
+        current_page: 1,
+        last_page: 1,
+        per_page: 100,
+        total: 1,
+      }),
+    ).toThrow(QvaPayContractError);
+  });
 
   it("acepta cantidades positivas pequeñas", () => {
     const page = parseP2PPage({

@@ -63,7 +63,7 @@ function parseOffer(value: unknown): QvaPayP2POfferDto {
   );
   assertPositiveDecimal(amount, "amount");
   assertPositiveDecimal(receive, "receive");
-  assertPositiveDecimal(availableAmount, "available_amount");
+  assertNonNegativeDecimal(availableAmount, "available_amount");
 
   if (type !== "buy" && type !== "sell") {
     throw new QvaPayContractError("Invalid QvaPay P2P offer type");
@@ -181,6 +181,14 @@ function assertPositiveDecimal(value: string, field: string): void {
   if (compareDecimal(value, "0") <= 0) {
     throw new QvaPayContractError(
       `QvaPay financial quantity must be positive: ${field}`,
+    );
+  }
+}
+
+function assertNonNegativeDecimal(value: string, field: string): void {
+  if (compareDecimal(value, "0") < 0) {
+    throw new QvaPayContractError(
+      `QvaPay financial quantity cannot be negative: ${field}`,
     );
   }
 }
