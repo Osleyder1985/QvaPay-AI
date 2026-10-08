@@ -11,6 +11,9 @@ import type {
   QvaPayP2POfferStatus,
 } from "./p2p-types.js";
 
+/**
+ * Error de dominio de infraestructura para respuestas P2P inválidas de QvaPay.
+ */
 export class QvaPayContractError extends Error {
   constructor(message: string) {
     super(message);
@@ -18,6 +21,13 @@ export class QvaPayContractError extends Error {
   }
 }
 
+/**
+ * Valida y transforma una respuesta paginada P2P de QvaPay al contrato interno.
+ *
+ * @param payload Respuesta externa recibida desde QvaPay.
+ * @returns Página P2P validada y normalizada.
+ * @throws QvaPayContractError Si el payload no cumple el contrato esperado.
+ */
 export function parseP2PPage(payload: unknown): QvaPayP2PPageDto {
   if (!isRecord(payload) || !Array.isArray(payload.data)) {
     throw new QvaPayContractError("Invalid QvaPay P2P pagination envelope");
@@ -48,7 +58,10 @@ function parseOffer(value: unknown): QvaPayP2POfferDto {
   const coin = stringField(value.coin, "coin");
   const amount = decimalString(value.amount, "amount");
   const receive = decimalString(value.receive, "receive");
-  const availableAmount = decimalString(value.available_amount, "available_amount");
+  const availableAmount = decimalString(
+    value.available_amount,
+    "available_amount",
+  );
   assertPositiveDecimal(amount, "amount");
   assertPositiveDecimal(receive, "receive");
   assertPositiveDecimal(availableAmount, "available_amount");
@@ -57,7 +70,10 @@ function parseOffer(value: unknown): QvaPayP2POfferDto {
     throw new QvaPayContractError("Invalid QvaPay P2P offer type");
   }
 
-  const reservedAmount = optionalDecimal(value.reserved_amount, "reserved_amount");
+  const reservedAmount = optionalDecimal(
+    value.reserved_amount,
+    "reserved_amount",
+  );
   const orderMin = optionalDecimal(value.order_min, "order_min");
   const orderMax = optionalDecimal(value.order_max, "order_max");
   const createdAt = optionalTimestamp(value.created_at, "created_at");
@@ -74,7 +90,9 @@ function parseOffer(value: unknown): QvaPayP2POfferDto {
     receive,
     available_amount: availableAmount,
     status,
-    ...(reservedAmount === undefined ? {} : { reserved_amount: reservedAmount }),
+    ...(reservedAmount === undefined
+      ? {}
+      : { reserved_amount: reservedAmount }),
     ...(orderMin === undefined ? {} : { order_min: orderMin }),
     ...(orderMax === undefined ? {} : { order_max: orderMax }),
     ...(createdAt === undefined ? {} : { created_at: createdAt }),
@@ -103,14 +121,21 @@ function optionalStatus(value: unknown): QvaPayP2POfferStatus {
   return value as QvaPayP2POfferStatus;
 }
 
-function optionalUser(value: unknown): { username?: string; name?: string } | undefined {
+function optionalUser(
+  value: unknown,
+): { username?: string; name?: string } | undefined {
   if (value === undefined || value === null) return undefined;
   if (!isRecord(value)) {
     throw new QvaPayContractError("Invalid QvaPay P2P user");
   }
-  const username = value.username === undefined ? undefined : stringField(value.username, "User.username");
-  const name = value.name === undefined ? undefined : stringField(value.name, "User.name");
-  const vip = value.vip === undefined ? undefined : booleanField(value.vip, "User.vip");
+  const username =
+    value.username === undefined
+      ? undefined
+      : stringField(value.username, "User.username");
+  const name =
+    value.name === undefined ? undefined : stringField(value.name, "User.name");
+  const vip =
+    value.vip === undefined ? undefined : booleanField(value.vip, "User.vip");
   if (username === undefined && name === undefined) return undefined;
   return {
     ...(username === undefined ? {} : { username }),
@@ -126,7 +151,10 @@ function booleanField(value: unknown, field: string): boolean {
   return value;
 }
 
-function optionalBoolean(value: unknown, field: string): boolean | undefined {
+function optionalBoolean(
+  value: unknown,
+  field: string,
+): boolean | undefined {
   if (value === undefined || value === null) return undefined;
   return booleanField(value, field);
 }
@@ -151,7 +179,9 @@ function decimalString(value: unknown, field: string): string {
 
 function assertPositiveDecimal(value: string, field: string): void {
   if (compareDecimal(value, "0") <= 0) {
-    throw new QvaPayContractError(`QvaPay financial quantity must be positive: ${field}`);
+    throw new QvaPayContractError(
+      `QvaPay financial quantity must be positive: ${field}`,
+    );
   }
 }
 
@@ -175,7 +205,9 @@ function compareDecimal(left: string, right: string): number {
   return a.sign === 1 ? fractionComparison : -fractionComparison;
 }
 
-function normalizeDecimal(value: string): { sign: -1 | 1; integer: string; fraction: string } {
+function normalizeDecimal(
+  value: string,
+): { sign: -1 | 1; integer: string; fraction: string } {
   const negative = value.startsWith("-");
   const unsigned = negative ? value.slice(1) : value;
   const [integerPart = "0", fraction = ""] = unsigned.split(".");
@@ -216,13 +248,17 @@ function resolveLastPage(payload: Record<string, unknown>): number {
 
 function positiveInteger(value: unknown, field: string): number {
   const parsed = providerInteger(value, field);
-  if (parsed < 1) throw new QvaPayContractError(`Invalid QvaPay integer: ${field}`);
+  if (parsed < 1) {
+    throw new QvaPayContractError(`Invalid QvaPay integer: ${field}`);
+  }
   return parsed;
 }
 
 function nonNegativeInteger(value: unknown, field: string): number {
   const parsed = providerInteger(value, field);
-  if (parsed < 0) throw new QvaPayContractError(`Invalid QvaPay integer: ${field}`);
+  if (parsed < 0) {
+    throw new QvaPayContractError(`Invalid QvaPay integer: ${field}`);
+  }
   return parsed;
 }
 
