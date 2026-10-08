@@ -9,9 +9,7 @@ import type { Market } from "../../domain/market.js";
 import type { Offer } from "../../domain/offer.js";
 import { compareDecimalStrings } from "../../domain/offer.js";
 import type { ScannerSchedulerRuntimeState } from "./scanner-scheduler-do.js";
-import {
-  DASHBOARD_COMPOSITION,
-} from "../../presentation/dashboard/dashboard-composition.js";
+import { DASHBOARD_COMPOSITION } from "../../presentation/dashboard/dashboard-composition.js";
 
 import {
   renderApplicationShellEnd,
