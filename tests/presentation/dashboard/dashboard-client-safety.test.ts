@@ -7,6 +7,7 @@ describe("seguridad y contratos del cliente Dashboard", () => {
     expect(DASHBOARD_CLIENT_SCRIPT).not.toContain("error.message:String(error)");
     expect(DASHBOARD_CLIENT_SCRIPT).toContain("safeError(");
   });
+
   it("valida tipo de contenido y forma mínima antes de consumir JSON", () => {
     expect(DASHBOARD_CLIENT_SCRIPT).toContain('response.headers.get("content-type")');
     expect(DASHBOARD_CLIENT_SCRIPT).toContain("isScannerState");
