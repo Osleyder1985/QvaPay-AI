@@ -44,13 +44,14 @@ describe("market domain", () => {
 
   it("rechaza una oferta perteneciente a otro mercado", () => {
     expect(() =>
-      createMarket("BANK_CUP", [offer("wrong", "SELL", "1000", "OTHER_CUP")]),
+      createMarket("BANK_CUP", [
+        offer("wrong", "SELL", "1000", "OTHER_CUP"),
+      ]),
     ).toThrow(
       "El mercado de la oferta no coincide con la identidad del mercado",
     );
   });
 });
-
 
 describe("accionabilidad del mercado", () => {
   it("excluye ofertas no abiertas y agotadas de las métricas de ejecución sin ocultarlas", () => {
@@ -67,11 +68,9 @@ describe("accionabilidad del mercado", () => {
     ]);
     expect(
       actionableOffersBySide(market, "BUY").map((item) => item.id),
-    ).toEqual([
-      "open",
-    ]);
-    expect(actionableOffersBySide(market, "SELL").map((item) => item.id)).toEqual([
-      "sell-open",
-    ]);
+    ).toEqual(["open"]);
+    expect(
+      actionableOffersBySide(market, "SELL").map((item) => item.id),
+    ).toEqual(["sell-open"]);
   });
 });
