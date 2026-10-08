@@ -60,9 +60,9 @@ Configuración efectiva; origen; rango; estado; última modificación; edición;
 
 ## 12. Flujo visual de estados
 
-Estados operativos mínimos: loading → ready → stale/degraded → failed.
+Estados operativos mínimos: cargando → listo → obsoleto/degradado → fallido.
 
-Cuando corresponda: ready → blocked → authorized/preconditioned → submitted → confirmed/rejected/ambiguous → reconciled.
+Cuando corresponda: listo → bloqueado → autorizado/precondicionado → enviado → confirmado/rechazado/ambiguo → reconciliado.
 
 No se representa una transición como completada antes de la evidencia correspondiente.
 
