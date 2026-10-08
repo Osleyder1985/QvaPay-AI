@@ -151,10 +151,7 @@ function booleanField(value: unknown, field: string): boolean {
   return value;
 }
 
-function optionalBoolean(
-  value: unknown,
-  field: string,
-): boolean | undefined {
+function optionalBoolean(value: unknown, field: string): boolean | undefined {
   if (value === undefined || value === null) return undefined;
   return booleanField(value, field);
 }
