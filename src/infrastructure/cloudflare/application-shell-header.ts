@@ -1,7 +1,7 @@
 /**
  * @archivo src/infrastructure/cloudflare/application-shell-header.ts
- * @proposito Define la composición del encabezado contextual del Application Shell.
- * @responsabilidades Mantener separada la presentación del contexto de navegación respecto de los módulos.
+ * @proposito Define el encabezado contextual del Application Shell.
+ * @responsabilidades Separar el contexto de navegación de la presentación de cada módulo.
  * @ubicacion src/infrastructure/cloudflare dentro de la arquitectura de QvaPay-AI.
  */
 
@@ -60,5 +60,6 @@ const MODULE_HEADERS: Readonly<
 export function renderApplicationShellHeader(moduleId = "inicio"): string {
   const fallbackHeader = MODULE_HEADERS.inicio;
   const header = MODULE_HEADERS[moduleId] ?? fallbackHeader;
+  // prettier-ignore
   return `<header class="top" id="pageHeader" aria-labelledby="inicio-title"><div class="title"><h1 id="inicio-title">${header.title}</h1><p>${header.description}</p></div><div id="live" class="live"><i class="dot"></i><strong id="liveText">CONECTANDO</strong><span>·</span><span id="updated">—</span><button class="logout-button" id="logoutButton" type="button">Cerrar sesión</button></div></header>`;
 }
