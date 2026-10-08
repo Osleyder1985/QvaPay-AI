@@ -3,7 +3,9 @@ import { describe, expect, it } from "vitest";
 import { createPublicAppResponse } from "../../src/infrastructure/cloudflare/public-app.js";
 
 describe("logout autenticado del dashboard", () => {
-  it("expone un control accesible que invoca el endpoint server-side autorizado", async () => {
+  it(
+    "expone un control accesible que invoca el endpoint server-side autorizado",
+    async () => {
     const html = await createPublicAppResponse().text();
 
     expect(html).toContain('id="logoutButton"');
@@ -12,7 +14,8 @@ describe("logout autenticado del dashboard", () => {
     expect(html).toContain('method:"POST"');
     expect(html).toContain('credentials:"same-origin"');
     expect(html).toContain('response.status!==401');
-  });
+    },
+  );
 
   it("mantiene el control en estado pendiente durante la solicitud", async () => {
     const html = await createPublicAppResponse().text();
