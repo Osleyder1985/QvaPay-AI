@@ -102,12 +102,14 @@ export function evaluateAccountIntegration(input: {
   readonly balanceOk: boolean;
   readonly identityOk: boolean;
   readonly applicationOk: boolean;
+  readonly ownerCorrelationOk: boolean;
   readonly p2pAccessible: boolean;
 }): QvaPayAccountIntegrationStatus {
   const critical = [
     input.balanceOk,
     input.identityOk,
     input.applicationOk,
+    input.ownerCorrelationOk,
     input.p2pAccessible,
   ];
   if (critical.every(Boolean)) return "verified";
