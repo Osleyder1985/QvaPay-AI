@@ -9,9 +9,9 @@ import type { Market } from "../../domain/market.js";
 import type { Offer } from "../../domain/offer.js";
 import { compareDecimalStrings } from "../../domain/offer.js";
 import type { ScannerSchedulerRuntimeState } from "./scanner-scheduler-do.js";
-import { renderDashboardView } from "../../presentation/dashboard/dashboard-view.js";
-import { DASHBOARD_STYLES } from "../../presentation/dashboard/dashboard-styles.js";
-import { DASHBOARD_CLIENT_SCRIPT } from "../../presentation/dashboard/dashboard-client.js";
+import {
+  DASHBOARD_COMPOSITION,
+} from "../../presentation/dashboard/dashboard-composition.js";
 
 import {
   renderApplicationShellEnd,
@@ -238,15 +238,15 @@ const HTML = `<!doctype html>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="description" content="QvaPay-AI · Dashboard operativo P2P con observabilidad, control y trazabilidad">
 <title>QvaPay-AI · Dashboard</title>
-${DASHBOARD_STYLES}
+${DASHBOARD_COMPOSITION.styles}
 </head>
 ${renderApplicationShellStart()}
 ${renderApplicationShellHeader()}
 ${renderApplicationShellModuleMountStart()}
-${renderDashboardView()}
+${DASHBOARD_COMPOSITION.body}
 ${renderApplicationShellModuleMountEnd()}
 ${renderApplicationShellEnd()}
-${DASHBOARD_CLIENT_SCRIPT}
+${DASHBOARD_COMPOSITION.script}
 </body></html>`
 
 /**
