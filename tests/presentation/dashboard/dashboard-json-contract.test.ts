@@ -3,7 +3,9 @@ import { DASHBOARD_CLIENT_SCRIPT } from "../../../src/presentation/dashboard/das
 
 describe("contratos JSON del Dashboard", () => {
   it("rechaza respuestas sin application/json o con formas no objeto", () => {
-    expect(DASHBOARD_CLIENT_SCRIPT).toContain('response.headers.get("content-type")');
+    expect(DASHBOARD_CLIENT_SCRIPT).toContain(
+      'response.headers.get("content-type")',
+    );
     expect(DASHBOARD_CLIENT_SCRIPT).toContain("Respuesta de contrato no válida.");
     expect(DASHBOARD_CLIENT_SCRIPT).toContain("Array.isArray(payload)");
   });
