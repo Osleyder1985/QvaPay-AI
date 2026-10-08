@@ -272,5 +272,4 @@ describe("QvaPayAccountClient", () => {
     expect(snapshot.ownerCorrelationProvenance.error).toContain("no coincide");
     expect(snapshot.integrationStatus).toBe("degraded");
   });
-
 });
