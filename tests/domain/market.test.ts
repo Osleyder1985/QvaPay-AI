@@ -65,7 +65,9 @@ describe("accionabilidad del mercado", () => {
       "processing",
       "open",
     ]);
-    expect(actionableOffersBySide(market, "BUY").map((item) => item.id)).toEqual([
+    expect(
+      actionableOffersBySide(market, "BUY").map((item) => item.id),
+    ).toEqual([
       "open",
     ]);
     expect(actionableOffersBySide(market, "SELL").map((item) => item.id)).toEqual([
