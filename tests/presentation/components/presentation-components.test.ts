@@ -23,7 +23,11 @@ describe("componentes de presentación", () => {
   });
 
   it("usa roles coherentes con la severidad", () => {
-    expect(renderAlert("warning", "Aviso", "Revisar")).toContain('role="alert"');
-    expect(renderAlert("info", "Info", "Disponible")).toContain('role="status"');
+    expect(renderAlert("warning", "Aviso", "Revisar")).toContain(
+      'role="alert"',
+    );
+    expect(renderAlert("info", "Info", "Disponible")).toContain(
+      'role="status"',
+    );
   });
 });
