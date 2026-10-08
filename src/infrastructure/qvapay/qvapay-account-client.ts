@@ -108,6 +108,13 @@ function parseApplication(payload: unknown): QvaPayApplicationIdentity | null {
     callback: optionalString(value, "callback"),
     successUrl: optionalString(value, "success_url"),
     cancelUrl: optionalString(value, "cancel_url"),
+    logo: optionalString(value, "logo"),
+    appPhotoUrl: optionalString(value, "app_photo_url"),
+    active: optionalBoolean(value, "active"),
+    enabled: optionalBoolean(value, "enabled"),
+    card: optionalBoolean(value, "card"),
+    createdAt: optionalString(value, "created_at"),
+    updatedAt: optionalString(value, "updated_at"),
   };
 }
 
