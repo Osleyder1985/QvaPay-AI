@@ -61,6 +61,9 @@ function parseOffer(value: unknown): QvaPayP2POfferDto {
     value.available_amount,
     "available_amount",
   );
+  assertPositiveDecimal(amount, "amount");
+  assertPositiveDecimal(receive, "receive");
+  assertPositiveDecimal(availableAmount, "available_amount");
 
   if (type !== "buy" && type !== "sell") {
     throw new QvaPayContractError("Invalid QvaPay P2P offer type");
@@ -172,6 +175,27 @@ function decimalString(value: unknown, field: string): string {
     throw new QvaPayContractError(`Invalid QvaPay decimal: ${field}`);
   }
   return value;
+}
+
+function assertPositiveDecimal(value: string, field: string): void {
+  if (compareDecimal(value, "0") <= 0) {
+    throw new QvaPayContractError(`QvaPay financial quantity must be positive: ${field}`);
+  }
+}
+
+function compareDecimal(left: string, right: string): number {
+  const [leftInteger, leftFraction = ""] = left.split(".");
+  const [rightInteger, rightFraction = ""] = right.split(".");
+  const normalizedLeft = leftInteger.replace(/^0+(?=d)/, "");
+  const normalizedRight = rightInteger.replace(/^0+(?=d)/, "");
+  if (normalizedLeft.length !== normalizedRight.length) {
+    return normalizedLeft.length > normalizedRight.length ? 1 : -1;
+  }
+  if (normalizedLeft !== normalizedRight) return normalizedLeft > normalizedRight ? 1 : -1;
+  const length = Math.max(leftFraction.length, rightFraction.length);
+  const a = leftFraction.padEnd(length, "0");
+  const b = rightFraction.padEnd(length, "0");
+  return a === b ? 0 : a > b ? 1 : -1;
 }
 
 function optionalDecimal(value: unknown, field: string): string | undefined {
