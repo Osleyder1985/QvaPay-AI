@@ -76,8 +76,17 @@ function parseBalance(payload: unknown): number | null {
 }
 
 function parseApplication(payload: unknown): QvaPayApplicationIdentity | null {
-  const value = readPayload(payload);
-  if (!isRecord(value)) return null;
+  const unwrapped = readPayload(payload);
+  const value = Array.isArray(unwrapped)
+    ? unwrapped.length === 1 && isRecord(unwrapped[0])
+      ? unwrapped[0]
+      : null
+    : isRecord(unwrapped)
+      ? isRecord(unwrapped.application)
+        ? unwrapped.application
+        : unwrapped
+      : null;
+  if (!value) return null;
   const uuid = optionalString(value, "uuid");
   const name = optionalString(value, "name");
   if (!uuid || !name) return null;
@@ -85,7 +94,7 @@ function parseApplication(payload: unknown): QvaPayApplicationIdentity | null {
     uuid,
     name,
     url: optionalString(value, "url"),
-    description: optionalString(value, "desc"),
+    description: optionalString(value, "description") ?? optionalString(value, "desc"),
     callback: optionalString(value, "callback"),
     successUrl: optionalString(value, "success_url"),
     cancelUrl: optionalString(value, "cancel_url"),
