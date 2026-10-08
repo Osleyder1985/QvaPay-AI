@@ -56,6 +56,52 @@ describe("QvaPayAccountClient", () => {
     expect(snapshot.integrationStatus).toBe("verified");
   });
 
+  it("normaliza el envoltorio app de la aplicación autorizada", async () => {
+    const client = new QvaPayAccountClient({
+      baseUrl: "https://api.qvapay.com",
+      appId: "app-uuid",
+      appSecret: "test-app-secret",
+      userApiToken: "test-profile-token",
+      minimumRequestSpacingMs: 0,
+      fetcher: vi.fn(async (input) => {
+        const url = String(input);
+        if (url.endsWith("/v2/balance")) {
+          return response(200, { balance: 125.5 });
+        }
+        if (url.endsWith("/v2/info")) {
+          return response(200, {
+            uuid: "app-uuid",
+            name: "QvaPay AI",
+          });
+        }
+        if (url.endsWith("/user")) {
+          return response(200, {
+            uuid: "owner-uuid",
+            username: "owner-user",
+          });
+        }
+        if (url.endsWith("/app/app-uuid")) {
+          return response(200, {
+            app: {
+              uuid: "app-uuid",
+              name: "QvaPay AI",
+              description: "Cuenta",
+            },
+            result: true,
+          });
+        }
+        return response(200, { data: [], total: 0 });
+      }),
+    });
+
+    const snapshot = await client.fetchAccount();
+
+    expect(snapshot.ownerCorrelationOk).toBe(true);
+    expect(snapshot.ownerCorrelationProvenance.status).toBe("verified");
+    expect(snapshot.application?.uuid).toBe("app-uuid");
+    expect(snapshot.integrationStatus).toBe("verified");
+  });
+
   it("usa el endpoint de usuario autenticado de QvaPay para la identidad del propietario", async () => {
     const calls: Array<{ url: string; authorization?: string }> = [];
     const client = new QvaPayAccountClient({
