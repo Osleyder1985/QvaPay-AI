@@ -11,7 +11,9 @@ describe("frontera de composición del Dashboard", () => {
   });
 
   it("impide que public-app ensamble directamente recursos concretos del Dashboard", () => {
-    const path = fileURLToPath(new URL("../../src/infrastructure/cloudflare/public-app.ts", import.meta.url));
+    const path = fileURLToPath(
+      new URL("../../src/infrastructure/cloudflare/public-app.ts", import.meta.url),
+    );
     const source = readFileSync(path, "utf8");
     expect(source).toContain("dashboard-composition.js");
     expect(source).not.toContain("dashboard-view.js");
