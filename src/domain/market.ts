@@ -47,6 +47,22 @@ export function createMarket(coin: string, offers: readonly Offer[]): Market {
  * @responsabilidades Aplicar las validaciones y reglas de negocio definidas por el contrato del módulo.
  * @returns Resultado de la operación pública.
  */
+export function isActionableOffer(offer: Offer): boolean {
+  return offer.status === "open" && compareDecimalStrings(offer.availableAmount, "0") > 0;
+}
+
+/**
+ * @proposito Filtra ofertas que representan oportunidades actualmente accionables.
+ * @responsabilidades Excluir estados no ejecutables y cantidades disponibles agotadas sin ocultarlas del snapshot.
+ * @returns Ofertas elegibles para métricas de ejecución.
+ */
+export function actionableOffersBySide(
+  market: Market,
+  side: OfferSide,
+): readonly Offer[] {
+  return offersBySide(market, side).filter(isActionableOffer);
+}
+
 export function offersBySide(
   market: Market,
   side: OfferSide,
