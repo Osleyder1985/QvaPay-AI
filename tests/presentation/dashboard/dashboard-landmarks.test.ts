@@ -6,8 +6,8 @@ import { renderApplicationShellHeader } from "../../../src/infrastructure/cloudf
 describe("landmarks y relaciones de encabezados del Dashboard", () => {
   it("nombra el header mediante su heading visible", () => {
     const html = renderApplicationShellHeader();
-    expect(html).toContain('aria-labelledby="application-shell-title"');
-    expect(html).toContain('id="application-shell-title"');
+    expect(html).toContain('aria-labelledby="inicio-title"');
+    expect(html).toContain('id="inicio-title"');
   });
 
   it("asocia cada región navegable con un heading estable", () => {
