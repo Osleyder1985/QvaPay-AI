@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { mapQvaPayOffer } from "../../src/infrastructure/qvapay/p2p-mapper.js";
 
-describe("QvaPay P2P mapper", () => {
+describe("mapeador P2P de QvaPay", () => {
   it("calcula la proporción efectiva CUP por QUSD y conserva los detalles de la oferta", () => {
     const offer = mapQvaPayOffer(
       {
@@ -65,7 +65,7 @@ describe("QvaPay P2P mapper", () => {
   });
 });
 
-describe("QvaPay P2P mapper VIP metadata", () => {
+describe("mapeador P2P de QvaPay VIP metadata", () => {
   it("conserva la restricción VIP de la oferta y el estado VIP del creador", () => {
     const offer = mapQvaPayOffer(
       {
