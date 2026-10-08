@@ -63,10 +63,7 @@ describe("invariantes financieras P2P", () => {
 
   it("rechaza receive no positivo también al mapear", () => {
     expect(() =>
-      mapQvaPayOffer(
-        { ...base, receive: "0" },
-        "2026-10-08T00:00:00Z",
-      ),
+      mapQvaPayOffer({ ...base, receive: "0" }, "2026-10-08T00:00:00Z"),
     ).toThrow();
   });
 
