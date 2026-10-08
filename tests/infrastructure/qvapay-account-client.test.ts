@@ -61,6 +61,14 @@ describe("QvaPayAccountClient", () => {
             two_factor_secret: "***",
           });
         }
+        if (url.endsWith("/app/app-uuid")) {
+          return response(200, {
+            uuid: "app-uuid",
+            name: "QvaPay AI",
+            active: true,
+            enabled: true,
+          });
+        }
         return response(200, {
           data: [
             {
@@ -104,13 +112,15 @@ describe("QvaPayAccountClient", () => {
       "/p2p?my=1&take=1&page=1",
     );
     expect(snapshot.ownOffersProvenance.status).toBe("verified");
+    expect(snapshot.ownerCorrelationOk).toBe(true);
+    expect(snapshot.ownerCorrelationProvenance.status).toBe("verified");
     expect(snapshot.integrationStatus).toBe("verified");
 
     const userCall = calls.find((call) => call.url.endsWith("/user"));
     expect(userCall?.authorization).toBe("Bearer test-profile-token");
     expect(JSON.stringify(snapshot)).not.toContain("must-not-escape");
     expect(JSON.stringify(snapshot)).not.toContain("must-never-be-owner");
-    expect(calls).toHaveLength(4);
+    expect(calls).toHaveLength(5);
   });
 
   it("reintenta HTTP 429 usando Retry-After y devuelve el payload exitoso", async () => {
@@ -146,6 +156,9 @@ describe("QvaPayAccountClient", () => {
             username: "owner-user",
           });
         }
+        if (url.endsWith("/app/app-uuid")) {
+          return response(200, { uuid: "app-uuid", name: "QvaPay AI" });
+        }
         return response(200, { data: [], total: 0 });
       }),
     });
@@ -173,6 +186,9 @@ describe("QvaPayAccountClient", () => {
         }
         if (url.endsWith("/user")) {
           return response(200, { uuid: "owner-uuid", username: "owner-user" });
+        }
+        if (url.endsWith("/app/app-uuid")) {
+          return response(200, { uuid: "app-uuid", name: "QvaPay AI" });
         }
         return response(200, []);
       }),
@@ -204,6 +220,9 @@ describe("QvaPayAccountClient", () => {
         if (url.endsWith("/user")) {
           return response(401, {});
         }
+        if (url.endsWith("/app/app-uuid")) {
+          return response(404, {});
+        }
         return response(200, { data: [], total: 0 });
       }),
     });
@@ -221,3 +240,37 @@ describe("QvaPayAccountClient", () => {
     expect(snapshot.integrationStatus).toBe("degraded");
   });
 });
+
+
+  it("rechaza la integración cuando la aplicación autorizada no coincide con la configurada", async () => {
+    const client = new QvaPayAccountClient({
+      baseUrl: "https://api.qvapay.com",
+      appId: "configured-app",
+      appSecret: "test-app-secret",
+      userApiToken: "test-profile-token",
+      minimumRequestSpacingMs: 0,
+      fetcher: vi.fn(async (input) => {
+        const url = String(input);
+        if (url.endsWith("/v2/balance")) {
+          return response(200, { balance: 125.5 });
+        }
+        if (url.endsWith("/v2/info")) {
+          return response(200, { uuid: "configured-app", name: "QvaPay AI" });
+        }
+        if (url.endsWith("/user")) {
+          return response(200, { uuid: "owner-uuid", username: "owner-user" });
+        }
+        if (url.endsWith("/app/configured-app")) {
+          return response(200, { uuid: "different-app", name: "Other App" });
+        }
+        return response(200, { data: [], total: 0 });
+      }),
+    });
+
+    const snapshot = await client.fetchAccount();
+
+    expect(snapshot.ownerCorrelationOk).toBe(false);
+    expect(snapshot.ownerCorrelationProvenance.status).toBe("unavailable");
+    expect(snapshot.ownerCorrelationProvenance.error).toContain("no coincide");
+    expect(snapshot.integrationStatus).toBe("degraded");
+  });
