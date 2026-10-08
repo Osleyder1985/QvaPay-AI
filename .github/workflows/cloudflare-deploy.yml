@@ -110,7 +110,9 @@ jobs:
             exit 1
           fi
           SCANNER_BOOTSTRAP_TOKEN="$(node -e "console.log(require('crypto').randomBytes(32).toString('hex'))")"
+          PRODUCTION_SMOKE_TOKEN="$(node -e "console.log(require('crypto').randomBytes(32).toString('hex'))")"
           echo "::add-mask::$SCANNER_BOOTSTRAP_TOKEN"
+          echo "::add-mask::$PRODUCTION_SMOKE_TOKEN"
 
           npx wrangler deploy
 
@@ -118,6 +120,7 @@ jobs:
           printf '%s' "$ACCOUNT_AUTH_SECRET" | npx wrangler secret put ACCOUNT_AUTH_SECRET
           printf '%s' "$QVAPAY_USER_API_TOKEN" | npx wrangler secret put QVAPAY_USER_API_TOKEN
           printf '%s' "$SCANNER_BOOTSTRAP_TOKEN" | npx wrangler secret put SCANNER_BOOTSTRAP_TOKEN
+          printf '%s' "$PRODUCTION_SMOKE_TOKEN" | npx wrangler secret put PRODUCTION_SMOKE_TOKEN
 
           echo "Waiting for Cloudflare secret propagation before authenticated smoke..." 
           sleep 10
@@ -208,7 +211,7 @@ jobs:
           cleanup_smoke_user() {
             curl --silent --show-error --output /dev/null --max-time 15 \
               --request DELETE \
-              --header "Authorization: Bearer $SCANNER_BOOTSTRAP_TOKEN" \
+              --header "Authorization: Bearer $PRODUCTION_SMOKE_TOKEN" \
               --header "Accept: application/json" \
               --header "Content-Type: application/json" \
               --data "{\"username\":\"$SMOKE_USERNAME\"}" \
@@ -220,7 +223,7 @@ jobs:
           for attempt in $(seq 1 7); do
             if CREATE_SMOKE_RESPONSE="$(curl --fail-with-body --silent --show-error --max-time 15 \
               --request POST \
-              --header "Authorization: Bearer $SCANNER_BOOTSTRAP_TOKEN" \
+              --header "Authorization: Bearer $PRODUCTION_SMOKE_TOKEN" \
               --header "Accept: application/json" \
               --header "Content-Type: application/json" \
               --data "{\"username\":\"$SMOKE_USERNAME\",\"password\":\"$SMOKE_PASSWORD\"}" \
