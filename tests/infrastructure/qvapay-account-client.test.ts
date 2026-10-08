@@ -18,18 +18,32 @@ describe("QvaPayAccountClient", () => {
       minimumRequestSpacingMs: 0,
       fetcher: vi.fn(async (input) => {
         const url = String(input);
-        if (url.endsWith("/v2/balance")) return response(200, { balance: 125.5 });
-        if (url.endsWith("/v2/info")) return response(200, {
-          uuid: "app-uuid",
-          name: "QvaPay AI",
-        });
-        if (url.endsWith("/user")) return response(200, {
-          uuid: "owner-uuid",
-          username: "owner-user",
-        });
-        if (url.endsWith("/app/app-uuid")) return response(200, {
-          data: [{ uuid: "app-uuid", name: "QvaPay AI", description: "Cuenta" }],
-        });
+        if (url.endsWith("/v2/balance")) {
+          return response(200, { balance: 125.5 });
+        }
+        if (url.endsWith("/v2/info")) {
+          return response(200, {
+            uuid: "app-uuid",
+            name: "QvaPay AI",
+          });
+        }
+        if (url.endsWith("/user")) {
+          return response(200, {
+            uuid: "owner-uuid",
+            username: "owner-user",
+          });
+        }
+        if (url.endsWith("/app/app-uuid")) {
+          return response(200, {
+            data: [
+              {
+                uuid: "app-uuid",
+                name: "QvaPay AI",
+                description: "Cuenta",
+              },
+            ],
+          });
+        }
         return response(200, { data: [], total: 0 });
       }),
     });
