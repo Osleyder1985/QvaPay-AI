@@ -1,3 +1,11 @@
+/**
+ * @archivo src/infrastructure/cloudflare/application-shell.ts
+ * @proposito Define el contrato estructural del Application Shell público.
+ * @responsabilidades Centralizar módulos de navegación y su renderizado sin introducir autoridad de negocio.
+ * @ubicacion src/infrastructure/cloudflare dentro de la arquitectura de QvaPay-AI.
+ */
+
+/** Contrato de un módulo navegable del Application Shell. */
 export interface ApplicationShellModule {
   readonly id: string;
   readonly label: string;
