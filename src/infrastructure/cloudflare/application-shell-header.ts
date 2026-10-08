@@ -1,8 +1,8 @@
 /**
  * @archivo src/infrastructure/cloudflare/application-shell-header.ts
  * @proposito Define el encabezado contextual del Application Shell.
- * @responsabilidades Separar el contexto de navegación de la presentación de cada módulo.
- * @ubicacion src/infrastructure/cloudflare dentro de la arquitectura de QvaPay-AI.
+ * @responsabilidades Separar navegación y presentación contextual de módulos.
+ * @ubicacion Capa de infraestructura Cloudflare de QvaPay-AI.
  */
 
 /** Metadatos por defecto cuando una ruta no tiene encabezado específico. */
