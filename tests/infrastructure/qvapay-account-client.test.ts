@@ -13,7 +13,7 @@ describe("QvaPayAccountClient", () => {
     const calls: Array<{ url: string; authorization?: string }> = [];
     const client = new QvaPayAccountClient({
       baseUrl: "https://api.qvapay.com",
-      appId: "test-app-id",
+      appId: "app-uuid",
       appSecret: "test-app-secret",
       userApiToken: "test-profile-token",
       minimumRequestSpacingMs: 0,
@@ -166,7 +166,7 @@ describe("QvaPayAccountClient", () => {
     const snapshot = await client.fetchAccount();
 
     expect(snapshot.balanceUsd).toBe(125.5);
-    expect(attempts).toBe(5);
+    expect(attempts).toBe(6);
   });
 
   it("no verifica la integración P2P cuando el payload HTTP 200 es incompatible", async () => {
