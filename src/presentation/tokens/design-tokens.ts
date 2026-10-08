@@ -27,5 +27,5 @@ export const DESIGN_TOKENS = [
   "--qva-radius-sm:8px;--qva-radius-md:12px;--qva-radius-lg:16px;",
   "--qva-shadow-panel:0 14px 42px rgba(0,0,0,.22);",
   "--qva-motion-fast:140ms;--qva-motion-standard:220ms;--qva-motion-slow:360ms;",
-  "}"
+  "}",
 ].join("");
