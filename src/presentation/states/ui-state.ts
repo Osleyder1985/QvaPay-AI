@@ -26,56 +26,24 @@ export interface UiStateDescriptor {
   readonly allowsDataInteraction: boolean;
 }
 
-const descriptor = (
-  state: UiState,
-  label: string,
-  tone: UiStateDescriptor["tone"],
-  allowsDataInteraction: boolean,
-): UiStateDescriptor => ({
-  state,
-  label,
-  tone,
-  allowsDataInteraction,
-});
+const descriptorEntries = [
+  ["loading", "Cargando", "neutral", false],
+  ["ready", "Actualizado", "positive", true],
+  ["stale", "Datos potencialmente desactualizados", "warning", true],
+  ["empty", "Sin datos disponibles", "neutral", false],
+  ["partial", "Datos parciales", "warning", true],
+  ["degraded", "Servicio degradado", "warning", true],
+  ["error", "No se pudo completar la consulta", "negative", false],
+  ["unauthorized", "Sesión requerida", "warning", false],
+  ["forbidden", "Acceso no permitido", "negative", false],
+  ["offline", "Sin conexión", "warning", false],
+  ["reconnecting", "Reconectando", "neutral", false],
+  ["success", "Operación completada", "positive", true],
+] as const;
 
-const descriptors: Record<UiState, UiStateDescriptor> = {
-  loading: descriptor("loading", "Cargando", "neutral", false),
-  ready: descriptor("ready", "Actualizado", "positive", true),
-  stale: descriptor(
-    "stale",
-    "Datos potencialmente desactualizados",
-    "warning",
-    true,
-  ),
-  empty: descriptor("empty", "Sin datos disponibles", "neutral", false),
-  partial: descriptor("partial", "Datos parciales", "warning", true),
-  degraded: descriptor("degraded", "Servicio degradado", "warning", true),
-  error: descriptor(
-    "error",
-    "No se pudo completar la consulta",
-    "negative",
-    false,
-  ),
-  unauthorized: descriptor(
-    "unauthorized",
-    "Sesión requerida",
-    "warning",
-    false,
-  ),
-  forbidden: descriptor(
-    "forbidden",
-    "Acceso no permitido",
-    "negative",
-    false,
-  ),
-  offline: descriptor("offline", "Sin conexión", "warning", false),
-  reconnecting: descriptor(
-    "reconnecting",
-    "Reconectando",
-    "neutral",
-    false,
-  ),
-  success: descriptor("success", "Operación completada", "positive", true),
-};
-
-export const UI_STATE_DESCRIPTORS = descriptors;
+export const UI_STATE_DESCRIPTORS = Object.fromEntries(
+  descriptorEntries.map(([state, label, tone, allowsDataInteraction]) => [
+    state,
+    { state, label, tone, allowsDataInteraction },
+  ]),
+) as Record<UiState, UiStateDescriptor>;
