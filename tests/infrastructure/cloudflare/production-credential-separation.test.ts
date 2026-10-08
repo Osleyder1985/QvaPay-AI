@@ -12,14 +12,14 @@ const deployWorkflow = readFileSync(
 );
 
 describe("production credential separation", () => {
-  it("declares a dedicated smoke secret in the Worker environment", () => {
+  it("declara un secreto de smoke dedicado en el entorno del Worker", () => {
     expect(workerSource).toContain("PRODUCTION_SMOKE_TOKEN: string");
     expect(workerSource).toContain(
       "authorization !== \`Bearer \${env.PRODUCTION_SMOKE_TOKEN}\`",
     );
   });
 
-  it("keeps scanner bootstrap authority on scanner endpoints", () => {
+  it("mantiene la autoridad de bootstrap del scanner en sus endpoints", () => {
     expect(workerSource).toContain(
       "authorization !== \`Bearer \${env.SCANNER_BOOTSTRAP_TOKEN}\`",
     );
@@ -30,7 +30,7 @@ describe("production credential separation", () => {
     expect(smokeSection).not.toContain("SCANNER_BOOTSTRAP_TOKEN");
   });
 
-  it("provisions and uses separate production credentials in CI", () => {
+  it("provisiona y utiliza credenciales de producción separadas en CI", () => {
     expect(deployWorkflow).toContain("PRODUCTION_SMOKE_TOKEN=");
     expect(deployWorkflow).toContain(
       "secret put PRODUCTION_SMOKE_TOKEN",
