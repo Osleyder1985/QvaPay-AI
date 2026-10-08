@@ -1,3 +1,9 @@
+/**
+ * @archivo tests/application-shell-routing.test.ts
+ * @proposito Verifica las rutas independientes y la navegación del Application Shell.
+ * @responsabilidades Detectar regresiones en el catálogo de módulos, el estado accesible de navegación y el aislamiento visual.
+ */
+
 import { describe, expect, it } from "vitest";
 
 import {
