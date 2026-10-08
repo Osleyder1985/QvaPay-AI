@@ -36,7 +36,7 @@ describe("production credential separation", () => {
     const smokeLifecycle = deployWorkflow.slice(
       deployWorkflow.indexOf("cleanup_smoke_user()"),
       deployWorkflow.indexOf(
-        'echo "Authenticating smoke account against production..."'
+        'echo "Authenticating smoke account against production..."',
       ),
     );
     expect(smokeLifecycle).toContain(
