@@ -294,7 +294,7 @@ export class QvaPayAccountClient {
       method: "GET",
     });
 
-    const balanceUsd = balance.ok ? parseBalance(balance.payload) : null;
+    const primaryBalanceUsd = balance.ok ? parseBalance(balance.payload) : null;
     const application = info.ok ? parseApplication(info.payload) : null;
     const identity = user.ok ? parseAuthenticatedUser(user.payload) : null;
     const authorizedApplication = ownerApplication.ok
@@ -308,21 +308,32 @@ export class QvaPayAccountClient {
     const own = ownOffers.ok
       ? parseOwnOffers(ownOffers.payload)
       : { compatible: false, total: null };
+    const balanceUsd =
+      primaryBalanceUsd !== null
+        ? primaryBalanceUsd
+        : identity !== null && ownerCorrelationOk
+          ? identity.balance
+          : null;
+    const balanceEndpoint =
+      primaryBalanceUsd !== null
+        ? "/v2/balance"
+        : identity !== null && ownerCorrelationOk && identity.balance !== null
+          ? "/user"
+          : "/v2/balance";
     const balanceSource: QvaPayAccountSourceMetadata = {
-      endpoint: "/v2/balance",
-      retrievedAt: balance.retrievedAt,
-      httpStatus: balance.status,
-      status:
-        balanceUsd !== null
-          ? "verified"
-          : balance.ok
-            ? "unavailable"
-            : "failed",
+      endpoint: balanceEndpoint,
+      retrievedAt:
+        balanceEndpoint === "/user" ? user.retrievedAt : balance.retrievedAt,
+      httpStatus:
+        balanceEndpoint === "/user" ? user.status : balance.status,
+      status: balanceUsd !== null ? "verified" : balance.ok ? "unavailable" : "failed",
       error:
-        balance.ok && balanceUsd === null
-          ? "QvaPay returned an incompatible balance payload."
-          : balance.ok
+        balanceUsd !== null
+          ? primaryBalanceUsd !== null
             ? null
+            : "QvaPay /v2/balance did not provide a compatible value; balance was verified from the correlated authenticated owner profile."
+          : balance.ok
+            ? "QvaPay returned an incompatible balance payload and no correlated owner balance was available."
             : `QvaPay balance request failed with HTTP ${balance.status}.`,
     };
     const identityProvenance: QvaPayAccountSourceMetadata = {
@@ -395,10 +406,10 @@ export class QvaPayAccountClient {
       balanceHttpStatus: balance.status,
       balanceOk: balanceUsd !== null,
       balanceError:
-        balance.ok && balanceUsd === null
-          ? "QvaPay returned an incompatible balance payload."
+        balanceUsd !== null
+          ? null
           : balance.ok
-            ? null
+            ? "QvaPay returned an incompatible balance payload and no correlated owner balance was available."
             : `QvaPay balance request failed with HTTP ${balance.status}.`,
       identity,
       identityProvenance,
