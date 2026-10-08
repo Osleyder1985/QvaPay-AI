@@ -191,7 +191,9 @@ function compareDecimal(left: string, right: string): number {
   if (normalizedLeft.length !== normalizedRight.length) {
     return normalizedLeft.length > normalizedRight.length ? 1 : -1;
   }
-  if (normalizedLeft !== normalizedRight) return normalizedLeft > normalizedRight ? 1 : -1;
+  if (normalizedLeft !== normalizedRight) {
+    return normalizedLeft > normalizedRight ? 1 : -1;
+  }
   const length = Math.max(leftFraction.length, rightFraction.length);
   const a = leftFraction.padEnd(length, "0");
   const b = rightFraction.padEnd(length, "0");
