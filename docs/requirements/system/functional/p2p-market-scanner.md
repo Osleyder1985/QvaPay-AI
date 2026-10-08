@@ -81,8 +81,8 @@ La acción solicita confirmación y una clave de operación antes de llamar al e
 
 ## Límite de alcance
 
-La aplicación de una oferta P2P existe como capacidad explícita. Esto no autoriza creación de un motor de arbitraje ni ejecución automática de estrategias.
+La aplicación HTTP de una oferta P2P permanece bloqueada (`501`) aunque el cliente de infraestructura contiene la operación técnica. Esto no autoriza creación de un motor de arbitraje ni ejecución automática de estrategias.
 
 ## Requisitos futuros
 
-Webhook, SSE, reconciliación event-driven, D1 y arbitraje requieren requisitos específicos antes de considerarse implementados.
+Webhook, SSE, reconciliación event-driven y arbitraje requieren requisitos específicos antes de considerarse implementados. D1 ya está implementado para identidad, auditoría y snapshots de Cuenta; su verificación de producción requiere evidencia operacional.
