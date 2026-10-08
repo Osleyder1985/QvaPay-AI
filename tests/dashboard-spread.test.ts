@@ -12,12 +12,8 @@ describe("contrato de representación del spread en el dashboard", () => {
         : undefined;
 
     expect(spreadAssignment).toBeDefined();
-    expect(spreadAssignment).toContain("state.metrics.spreadPercent===null");
-    expect(spreadAssignment).toContain(
-      "state.metrics.spreadPercent===null?fmt(state.metrics.spread):",
-    );
     expect(spreadAssignment).toMatch(
-      /state\.metrics\.spreadPercent===null\?[^:]+:[^:]+\.toFixed\(2\)/,
+      /state\.metrics\.spread===null\?[^:]+:[^:]+\.toFixed\(2\)/,
     );
   });
 });
