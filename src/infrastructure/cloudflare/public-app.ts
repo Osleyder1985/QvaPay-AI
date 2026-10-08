@@ -232,7 +232,7 @@ export function toPublicScannerState(
   };
 }
 
-const HTML = `<!doctype html>
+const HTML = (moduleId: string) => `<!doctype html>
 <html lang="es">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -240,8 +240,8 @@ const HTML = `<!doctype html>
 <title>QvaPay-AI · Dashboard</title>
 ${DASHBOARD_STYLES}
 </head>
-${renderApplicationShellStart()}
-${renderApplicationShellHeader()}
+${renderApplicationShellStart(moduleId)}
+${renderApplicationShellHeader(moduleId)}
 ${renderApplicationShellModuleMountStart()}
 ${renderDashboardView()}
 ${renderApplicationShellModuleMountEnd()}
@@ -254,8 +254,8 @@ ${DASHBOARD_CLIENT_SCRIPT}
  * @responsabilidades Aplicar el contrato y las validaciones correspondientes a la integración.
  * @returns Resultado de la operación pública.
  */
-export function createPublicAppResponse(): Response {
-  return new Response(HTML, {
+export function createPublicAppResponse(moduleId = "inicio"): Response {
+  return new Response(HTML(moduleId), {
     status: 200,
     headers: {
       "content-type": "text/html; charset=UTF-8",
