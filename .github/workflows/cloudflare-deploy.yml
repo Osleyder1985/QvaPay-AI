@@ -210,7 +210,7 @@ jobs:
               --header "Authorization: Bearer $SCANNER_BOOTSTRAP_TOKEN" \
               --header "Accept: application/json" \
               --header "Content-Type: application/json" \
-              --data "{\\\"username\\\":\\\"$SMOKE_USERNAME\\\"}" \
+              --data "{\"username\":\"$SMOKE_USERNAME\"}" \
               "$WORKER_URL/internal/auth/smoke-user" || true
           }
           trap cleanup_smoke_user EXIT
@@ -220,9 +220,9 @@ jobs:
             --header "Authorization: Bearer $SCANNER_BOOTSTRAP_TOKEN" \
             --header "Accept: application/json" \
             --header "Content-Type: application/json" \
-            --data "{\\\"username\\\":\\\"$SMOKE_USERNAME\\\",\\\"password\\\":\\\"$SMOKE_PASSWORD\\\"}" \
+            --data "{\"username\":\"$SMOKE_USERNAME\",\"password\":\"$SMOKE_PASSWORD\"}" \
             "$WORKER_URL/internal/auth/smoke-user")"
-          printf '%s\\n' "$CREATE_SMOKE_RESPONSE" | node -e '
+          printf '%s\n' "$CREATE_SMOKE_RESPONSE" | node -e '
             let input = "";
             process.stdin.on("data", (chunk) => { input += chunk; });
             process.stdin.on("end", () => {
@@ -238,9 +238,9 @@ jobs:
             --header "Accept: application/json" \
             --header "Content-Type: application/json" \
             --cookie-jar /tmp/qvapay-account-smoke.cookies \
-            --data "{\\\"username\\\":\\\"$SMOKE_USERNAME\\\",\\\"password\\\":\\\"$SMOKE_PASSWORD\\\"}" \
+            --data "{\"username\":\"$SMOKE_USERNAME\",\"password\":\"$SMOKE_PASSWORD\"}" \
             "$WORKER_URL/api/auth/login")"
-          printf '%s\\n' "$LOGIN_RESPONSE" | node -e '
+          printf '%s\n' "$LOGIN_RESPONSE" | node -e '
             let input = "";
             process.stdin.on("data", (chunk) => { input += chunk; });
             process.stdin.on("end", () => {
@@ -256,7 +256,7 @@ jobs:
             --header "Accept: application/json" \
             --cookie /tmp/qvapay-account-smoke.cookies \
             "$WORKER_URL/api/account/sync")"
-          printf '%s\\n' "$SYNC_RESPONSE" | node -e '
+          printf '%s\n' "$SYNC_RESPONSE" | node -e '
             let input = "";
             process.stdin.on("data", (chunk) => { input += chunk; });
             process.stdin.on("end", () => {
@@ -287,7 +287,7 @@ jobs:
             --header "Accept: application/json" \
             --cookie /tmp/qvapay-account-smoke.cookies \
             "$WORKER_URL/api/account")"
-          printf '%s\\n' "$AUTH_ACCOUNT_RESPONSE" | node -e '
+          printf '%s\n' "$AUTH_ACCOUNT_RESPONSE" | node -e '
             let input = "";
             process.stdin.on("data", (chunk) => { input += chunk; });
             process.stdin.on("end", () => {
