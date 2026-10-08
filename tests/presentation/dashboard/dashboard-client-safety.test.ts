@@ -8,6 +8,7 @@ describe("seguridad y contratos del cliente Dashboard", () => {
     () => {
       expect(DASHBOARD_CLIENT_SCRIPT).not.toContain("payload.error||");
       expect(DASHBOARD_CLIENT_SCRIPT).toContain("safeError(");
+      expect(DASHBOARD_CLIENT_SCRIPT).toContain("La sesión ha expirado.");
     },
   );
 
