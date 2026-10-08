@@ -38,7 +38,7 @@ const descriptor = (
   allowsDataInteraction,
 });
 
-export const UI_STATE_DESCRIPTORS: Readonly<Record<UiState, UiStateDescriptor>> = {
+const descriptors: Record<UiState, UiStateDescriptor> = {
   loading: descriptor("loading", "Cargando", "neutral", false),
   ready: descriptor("ready", "Actualizado", "positive", true),
   stale: descriptor(
@@ -56,9 +56,28 @@ export const UI_STATE_DESCRIPTORS: Readonly<Record<UiState, UiStateDescriptor>> 
     "negative",
     false,
   ),
-  unauthorized: descriptor("unauthorized", "Sesión requerida", "warning", false),
-  forbidden: descriptor("forbidden", "Acceso no permitido", "negative", false),
+  unauthorized: descriptor(
+    "unauthorized",
+    "Sesión requerida",
+    "warning",
+    false,
+  ),
+  forbidden: descriptor(
+    "forbidden",
+    "Acceso no permitido",
+    "negative",
+    false,
+  ),
   offline: descriptor("offline", "Sin conexión", "warning", false),
-  reconnecting: descriptor("reconnecting", "Reconectando", "neutral", false),
+  reconnecting: descriptor(
+    "reconnecting",
+    "Reconectando",
+    "neutral",
+    false,
+  ),
   success: descriptor("success", "Operación completada", "positive", true),
 };
+
+export const UI_STATE_DESCRIPTORS: Readonly<
+  Record<UiState, UiStateDescriptor>
+> = descriptors;
