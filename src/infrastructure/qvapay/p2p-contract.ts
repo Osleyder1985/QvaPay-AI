@@ -205,9 +205,11 @@ function compareDecimal(left: string, right: string): number {
   return a.sign === 1 ? fractionComparison : -fractionComparison;
 }
 
-function normalizeDecimal(
-  value: string,
-): { sign: -1 | 1; integer: string; fraction: string } {
+function normalizeDecimal(value: string): {
+  sign: -1 | 1;
+  integer: string;
+  fraction: string;
+} {
   const negative = value.startsWith("-");
   const unsigned = negative ? value.slice(1) : value;
   const [integerPart = "0", fraction = ""] = unsigned.split(".");
