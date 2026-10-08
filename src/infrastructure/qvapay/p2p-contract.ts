@@ -56,13 +56,13 @@ function parseOffer(value: unknown): QvaPayP2POfferDto {
   const type = stringField(value.type, "type");
   const coin = stringField(value.coin, "coin");
   const amount = decimalString(value.amount, "amount");
-  assertPositiveDecimal(amount, "amount");
   const receive = decimalString(value.receive, "receive");
-  assertPositiveDecimal(receive, "receive");
   const availableAmount = decimalString(
     value.available_amount,
     "available_amount",
   );
+  assertPositiveDecimal(amount, "amount");
+  assertPositiveDecimal(receive, "receive");
   assertPositiveDecimal(availableAmount, "available_amount");
 
   if (type !== "buy" && type !== "sell") {
@@ -175,6 +175,31 @@ function decimalString(value: unknown, field: string): string {
     throw new QvaPayContractError(`Invalid QvaPay decimal: ${field}`);
   }
   return value;
+}
+
+function assertPositiveDecimal(value: string, field: string): void {
+  if (compareDecimal(value, "0") <= 0) {
+    throw new QvaPayContractError(
+      `QvaPay financial quantity must be positive: ${field}`,
+    );
+  }
+}
+
+function compareDecimal(left: string, right: string): number {
+  const [leftInteger = "0", leftFraction = ""] = left.split(".");
+  const [rightInteger = "0", rightFraction = ""] = right.split(".");
+  const normalizedLeft = leftInteger.replace(/^0+(?=\\d)/, "");
+  const normalizedRight = rightInteger.replace(/^0+(?=\\d)/, "");
+  if (normalizedLeft.length !== normalizedRight.length) {
+    return normalizedLeft.length > normalizedRight.length ? 1 : -1;
+  }
+  if (normalizedLeft !== normalizedRight) {
+    return normalizedLeft > normalizedRight ? 1 : -1;
+  }
+  const length = Math.max(leftFraction.length, rightFraction.length);
+  const a = leftFraction.padEnd(length, "0");
+  const b = rightFraction.padEnd(length, "0");
+  return a === b ? 0 : a > b ? 1 : -1;
 }
 
 function optionalDecimal(value: unknown, field: string): string | undefined {
