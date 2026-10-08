@@ -107,6 +107,7 @@ function optionalStatus(value: unknown): QvaPayP2POfferStatus {
   if (typeof value !== "string") {
     throw new QvaPayContractError("Invalid QvaPay P2P status");
   }
+
   const allowed: readonly QvaPayP2POfferStatus[] = [
     "open",
     "revision",
@@ -128,6 +129,7 @@ function optionalUser(
   if (!isRecord(value)) {
     throw new QvaPayContractError("Invalid QvaPay P2P user");
   }
+
   const username =
     value.username === undefined
       ? undefined
@@ -136,7 +138,9 @@ function optionalUser(
     value.name === undefined ? undefined : stringField(value.name, "User.name");
   const vip =
     value.vip === undefined ? undefined : booleanField(value.vip, "User.vip");
+
   if (username === undefined && name === undefined) return undefined;
+
   return {
     ...(username === undefined ? {} : { username }),
     ...(name === undefined ? {} : { name }),
@@ -151,10 +155,7 @@ function booleanField(value: unknown, field: string): boolean {
   return value;
 }
 
-function optionalBoolean(
-  value: unknown,
-  field: string,
-): boolean | undefined {
+function optionalBoolean(value: unknown, field: string): boolean | undefined {
   if (value === undefined || value === null) return undefined;
   return booleanField(value, field);
 }
@@ -171,7 +172,7 @@ function stringField(value: unknown, field: string): string {
 }
 
 function decimalString(value: unknown, field: string): string {
-  if (typeof value !== "string" || !/^-?\d+(?:\.\d+)?$/.test(value)) {
+  if (typeof value !== "string" || !/^-?\\d+(?:\\.\\d+)?$/.test(value)) {
     throw new QvaPayContractError(`Invalid QvaPay decimal: ${field}`);
   }
   return value;
@@ -241,6 +242,7 @@ function resolveLastPage(payload: Record<string, unknown>): number {
   if (payload.last_page !== undefined && payload.last_page !== null) {
     return positiveInteger(payload.last_page, "last_page");
   }
+
   const total = nonNegativeInteger(payload.total, "total");
   const perPage = positiveInteger(payload.per_page, "per_page");
   return Math.max(1, Math.ceil(total / perPage));
@@ -265,9 +267,10 @@ function nonNegativeInteger(value: unknown, field: string): number {
 function providerInteger(value: unknown, field: string): number {
   if (typeof value === "number") {
     if (Number.isSafeInteger(value)) return value;
-  } else if (typeof value === "string" && /^\d+$/.test(value)) {
+  } else if (typeof value === "string" && /^\\d+$/.test(value)) {
     const parsed = Number(value);
     if (Number.isSafeInteger(parsed)) return parsed;
   }
+
   throw new QvaPayContractError(`Invalid QvaPay integer: ${field}`);
 }
