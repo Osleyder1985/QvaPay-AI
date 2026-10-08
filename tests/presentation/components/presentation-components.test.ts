@@ -6,7 +6,9 @@ import { renderStatusPanel } from "../../../src/presentation/components/status-p
 
 describe("componentes de presentación", () => {
   it("escapa contenido dinámico de tarjetas y tablas", () => {
-    expect(renderMetricCard("<Métrica>", "<valor>", "ready")).not.toContain("<Métrica>");
+    expect(
+      renderMetricCard("<Métrica>", "<valor>", "ready"),
+    ).not.toContain("<Métrica>");
     expect(
       renderDataTable("Tabla", [{ key: "value", label: "Valor" }], [
         { id: "<row>", cells: { value: "<valor>" } },
