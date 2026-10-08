@@ -35,13 +35,12 @@ describe("QvaPayAccountClient", () => {
         }
         if (url.endsWith("/app/app-uuid")) {
           return response(200, {
-            data: [
-              {
-                uuid: "app-uuid",
-                name: "QvaPay AI",
-                description: "Cuenta",
-              },
-            ],
+            app: {
+              uuid: "app-uuid",
+              name: "QvaPay AI",
+              description: "Cuenta",
+            },
+            result: true,
           });
         }
         return response(200, { data: [], total: 0 });
