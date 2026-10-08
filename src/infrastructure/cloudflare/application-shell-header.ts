@@ -16,11 +16,13 @@ const MODULE_HEADERS: Readonly<
   },
   cuenta: {
     title: "Cuenta QvaPay",
-    description: "Identidad y datos financieros obtenidos de la API autenticada.",
+    description:
+      "Identidad y datos financieros obtenidos de la API autenticada.",
   },
   mercado: {
     title: "Mercado P2P",
-    description: "Lectura del mercado, ofertas y calidad del snapshot observado.",
+    description:
+      "Lectura del mercado, ofertas y calidad del snapshot observado.",
   },
   arbitraje: {
     title: "Arbitraje",
