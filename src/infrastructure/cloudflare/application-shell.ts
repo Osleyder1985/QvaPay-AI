@@ -37,19 +37,25 @@ export const APPLICATION_SHELL_VERSION = "1";
 /** Renderiza la navegación a partir del contrato central de módulos. */
 export function renderApplicationShellNavigation(): string {
   return APPLICATION_SHELL_MODULES.map(
-    ({ id, label, icon, href, administratorOnly }) =>
-      '<a class="navitem' +
-      (id === "inicio" ? " active" : "") +
-      '" href="' +
-      href +
-      '"' +
-      (administratorOnly
+    ({ id, label, icon, href, administratorOnly }) => {
+      const activeClass = id === "inicio" ? " active" : "";
+      const adminAttributes = administratorOnly
         ? ' id="adminNav" style="display:none"'
-        : "") +
-      '><span class="navicon" aria-hidden="true">' +
-      icon +
-      '</span><span>' +
-      label +
-      "</span></a>",
+        : "";
+
+      return (
+        '<a class="navitem' +
+        activeClass +
+        '" href="' +
+        href +
+        '"' +
+        adminAttributes +
+        '><span class="navicon" aria-hidden="true">' +
+        icon +
+        '</span><span>' +
+        label +
+        "</span></a>"
+      );
+    },
   ).join("\n");
 }
