@@ -36,3 +36,18 @@ El navegador no solicita, almacena ni transmite secretos operacionales.
 ## Límites
 
 El dashboard no sustituye auditorías formales, gestión documental ISO, gestión de riesgos, gestión de incidentes, revisión de accesos ni certificación externa. Estas capacidades requieren módulos y evidencias específicas.
+
+
+## Navegación modular y diseño visual — 2026-10
+
+La interfaz autenticada introduce rutas dedicadas bajo `/app/{module}`. El Worker valida sesión antes de servir cualquier ruta modular y exige el rol `ADMINISTRATION` para `/app/usuarios`; la autorización de las API sigue siendo obligatoria y no se delega al cliente.
+
+El shell conserva navegación, encabezado contextual, estado de sesión y el área de contenido. El contenido visible se limita al módulo activo. Los módulos funcionales aún no implementados se muestran explícitamente como pendientes, sin datos ficticios ni acciones simuladas.
+
+La dirección visual usa superficies coherentes, jerarquía tipográfica, navegación activa, paneles contextuales y estados de implementación. Las animaciones deben respetar `prefers-reduced-motion`; los emojis son apoyo visual, nunca sustituyen etiquetas accesibles. La alineación con ISO 9241-210, ISO/IEC 25010 y WCAG 2.2 AA es un objetivo de diseño y verificación, no una declaración de certificación.
+
+### Trazabilidad
+- Requisito funcional: #474.
+- Solution Card visual: #475.
+- Gobernanza de diseño: #270.
+- Verificación pendiente: Quality Gate, Security Gate, pruebas de rutas y roles, accesibilidad, responsive y smoke autenticado de producción.
