@@ -10,7 +10,6 @@ import type { Offer } from "../../domain/offer.js";
 import { compareDecimalStrings } from "../../domain/offer.js";
 import type { ScannerSchedulerRuntimeState } from "./scanner-scheduler-do.js";
 import {
-  APPLICATION_SHELL_VERSION,
   renderApplicationShellNavigation,
 } from "./application-shell.js";
 
