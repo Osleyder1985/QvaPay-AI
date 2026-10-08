@@ -78,6 +78,4 @@ const descriptors: Record<UiState, UiStateDescriptor> = {
   success: descriptor("success", "Operación completada", "positive", true),
 };
 
-export const UI_STATE_DESCRIPTORS: Readonly<
-  Record<UiState, UiStateDescriptor>
-> = descriptors;
+export const UI_STATE_DESCRIPTORS = descriptors;
