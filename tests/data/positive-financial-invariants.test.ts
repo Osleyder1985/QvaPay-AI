@@ -1,11 +1,13 @@
 import { describe, expect, it } from "vitest";
 
+import { describe, expect, it } from "vitest";
+
+import { createMarket } from "../../src/domain/market.js";
 import {
   parseP2PPage,
   QvaPayContractError,
 } from "../../src/infrastructure/qvapay/p2p-contract.js";
 import { mapQvaPayOffer } from "../../src/infrastructure/qvapay/p2p-mapper.js";
-import { createMarket } from "../../src/domain/market.js";
 
 const base = {
   uuid: "x",
