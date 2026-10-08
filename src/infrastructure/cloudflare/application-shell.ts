@@ -1,9 +1,11 @@
 /**
  * @archivo src/infrastructure/cloudflare/application-shell.ts
  * @proposito Define el contrato estructural del Application Shell público.
- * @responsabilidades Centralizar módulos de navegación y su renderizado sin introducir autoridad de negocio.
+ * @responsabilidades Centralizar los módulos navegables y generar enlaces de ruta sin introducir autoridad de negocio.
  * @ubicacion src/infrastructure/cloudflare dentro de la arquitectura de QvaPay-AI.
  */
+
+/** Contrato inmutable para un módulo de navegación. */
 export interface ApplicationShellModule {
   readonly id: string;
   readonly label: string;
@@ -11,6 +13,8 @@ export interface ApplicationShellModule {
   readonly href: string;
   readonly administratorOnly?: boolean;
 }
+
+/** Catálogo de módulos y rutas públicas de la aplicación autenticada. */
 export const APPLICATION_SHELL_MODULES: readonly ApplicationShellModule[] = [
   { id: "inicio", label: "Inicio", icon: "⌂", href: "/app/inicio" },
   { id: "cuenta", label: "Cuenta QvaPay", icon: "◎", href: "/app/cuenta" },
@@ -22,8 +26,15 @@ export const APPLICATION_SHELL_MODULES: readonly ApplicationShellModule[] = [
   { id: "monitor", label: "Monitor", icon: "◉", href: "/app/monitor" },
   { id: "configuracion", label: "Configuración", icon: "⚙", href: "/app/configuracion" },
 ];
+
+/** Versión del contrato estructural del Application Shell. */
 export const APPLICATION_SHELL_VERSION = "2";
-/** Renderiza navegación por rutas, marcando la página activa. */
+
+/**
+ * Renderiza enlaces accesibles a los módulos y marca la ruta activa.
+ * @param activeModuleId Identificador del módulo que corresponde a la página actual.
+ * @returns Fragmento HTML de navegación principal.
+ */
 export function renderApplicationShellNavigation(activeModuleId = "inicio"): string {
   return APPLICATION_SHELL_MODULES.map(({ id, label, icon, href, administratorOnly }) => {
     const attributes = [
