@@ -10,7 +10,7 @@ import type { Offer } from "../../domain/offer.js";
 import { compareDecimalStrings } from "../../domain/offer.js";
 import type { ScannerSchedulerRuntimeState } from "./scanner-scheduler-do.js";
 
-const MAX_VISIBLE_OFFERS = 10;
+const MAX_VISIBLE_OFFERS = 20;
 
 export interface PublicMarketOffer {
   readonly id: string;
