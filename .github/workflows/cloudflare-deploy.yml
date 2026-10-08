@@ -3,7 +3,7 @@ name: Despliegue de Cloudflare
 on:
   workflow_run:
     workflows:
-      - Control de Seguridad
+      - Security Gate
     types:
       - completed
     branches:
