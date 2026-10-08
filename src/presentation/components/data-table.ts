@@ -27,21 +27,23 @@ export function renderDataTable(
     .map((column) => "<th scope=\"col\">" + escapeHtml(column.label) + "</th>")
     .join("");
   const body = rows
-    .map(
-      (row) =>
+    .map((row) => {
+      const cells = columns
+        .map(
+          (column) =>
+            "<td>" +
+            escapeHtml(row.cells[column.key] ?? "—") +
+            "</td>",
+        )
+        .join("");
+      return (
         '<tr data-row-id="' +
         escapeHtml(row.id) +
         '">' +
-        columns
-          .map(
-            (column) =>
-              "<td>" +
-              escapeHtml(row.cells[column.key] ?? "—") +
-              "</td>",
-          )
-          .join("") +
-        "</tr>",
-    )
+        cells +
+        "</tr>"
+      );
+    })
     .join("");
   return (
     '<div class="qva-data-table-wrap"><table class="qva-data-table" aria-label="' +
