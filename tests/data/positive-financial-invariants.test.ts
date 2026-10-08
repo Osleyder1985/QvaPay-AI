@@ -1,7 +1,5 @@
 import { describe, expect, it } from "vitest";
 
-import { describe, expect, it } from "vitest";
-
 import { createMarket } from "../../src/domain/market.js";
 import {
   parseP2PPage,
