@@ -43,9 +43,9 @@ export function createMarket(coin: string, offers: readonly Offer[]): Market {
 }
 
 /**
- * @proposito API pública offersBySide: implementa el comportamiento expuesto por este módulo.
- * @responsabilidades Aplicar las validaciones y reglas de negocio definidas por el contrato del módulo.
- * @returns Resultado de la operación pública.
+ * @proposito API pública isActionableOffer: determina si una oferta puede participar en métricas de ejecución.
+ * @responsabilidades Exigir estado abierto y cantidad disponible positiva.
+ * @returns true cuando la oferta es accionable; false cuando debe conservarse solo para observación.
  */
 export function isActionableOffer(offer: Offer): boolean {
   return (
@@ -66,6 +66,11 @@ export function actionableOffersBySide(
   return offersBySide(market, side).filter(isActionableOffer);
 }
 
+/**
+ * @proposito API pública offersBySide: selecciona y ordena las ofertas de un lado del mercado.
+ * @responsabilidades Mantener BUY y SELL separados y aplicar su orden de tasa específico.
+ * @returns Ofertas del lado solicitado ordenadas por tasa según la semántica del mercado.
+ */
 export function offersBySide(
   market: Market,
   side: OfferSide,
