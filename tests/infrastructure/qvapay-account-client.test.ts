@@ -215,6 +215,45 @@ describe("QvaPayAccountClient", () => {
     expect(calls).toHaveLength(5);
   });
 
+  it("usa el balance del propietario autenticado como fallback cuando /v2/balance no es compatible", async () => {
+    const client = new QvaPayAccountClient({
+      baseUrl: "https://api.qvapay.com",
+      appId: "app-uuid",
+      appSecret: "test-app-secret",
+      userApiToken: "test-profile-token",
+      minimumRequestSpacingMs: 0,
+      fetcher: vi.fn(async (input) => {
+        const url = String(input);
+        if (url.endsWith("/v2/balance")) {
+          return response(200, { message: "OK", data: { balance: null } });
+        }
+        if (url.endsWith("/v2/info")) {
+          return response(200, { uuid: "app-uuid", name: "QvaPay AI" });
+        }
+        if (url.endsWith("/user")) {
+          return response(200, {
+            uuid: "owner-uuid",
+            username: "owner-user",
+            balance: 77.25,
+          });
+        }
+        if (url.endsWith("/app/app-uuid")) {
+          return response(200, { uuid: "app-uuid", name: "QvaPay AI" });
+        }
+        return response(200, { data: [], total: 0 });
+      }),
+    });
+
+    const snapshot = await client.fetchAccount();
+
+    expect(snapshot.balanceUsd).toBe(77.25);
+    expect(snapshot.balanceOk).toBe(true);
+    expect(snapshot.balanceSource.endpoint).toBe("/user");
+    expect(snapshot.balanceSource.status).toBe("verified");
+    expect(snapshot.balanceSource.error).toContain("correlated authenticated owner profile");
+    expect(snapshot.integrationStatus).toBe("verified");
+  });
+
   it("reintenta HTTP 429 usando Retry-After y devuelve el payload exitoso", async () => {
     let attempts = 0;
     const client = new QvaPayAccountClient({
