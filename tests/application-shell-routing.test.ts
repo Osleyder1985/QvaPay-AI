@@ -1,7 +1,7 @@
 /**
  * @archivo tests/application-shell-routing.test.ts
  * @proposito Verifica las rutas y la navegación del Application Shell.
- * @responsabilidades Detectar regresiones en rutas, navegación accesible y aislamiento visual.
+ * @responsabilidades Detectar regresiones en rutas y aislamiento visual accesible.
  */
 
 import { describe, expect, it } from "vitest";
@@ -10,7 +10,9 @@ import {
   APPLICATION_SHELL_MODULES,
   renderApplicationShellNavigation,
 } from "../src/infrastructure/cloudflare/application-shell.js";
-import { DASHBOARD_CLIENT_SCRIPT } from "../src/presentation/dashboard/dashboard-client.js";
+import {
+  DASHBOARD_CLIENT_SCRIPT,
+} from "../src/presentation/dashboard/dashboard-client.js";
 
 describe("rutas y navegación del Application Shell", () => {
   it("define las rutas de los módulos", () => {
@@ -39,7 +41,9 @@ describe("rutas y navegación del Application Shell", () => {
 
   it("documenta módulos funcionales pendientes", () => {
     expect(DASHBOARD_CLIENT_SCRIPT).toContain("initializeModulePage");
-    expect(DASHBOARD_CLIENT_SCRIPT).toContain('getElementById("contenido-principal")');
+    expect(DASHBOARD_CLIENT_SCRIPT).toContain(
+      'getElementById("contenido-principal")',
+    );
     expect(DASHBOARD_CLIENT_SCRIPT).toContain("visibleByModule");
     expect(DASHBOARD_CLIENT_SCRIPT).toContain(
       "Implementación funcional pendiente",
