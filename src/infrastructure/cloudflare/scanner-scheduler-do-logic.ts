@@ -7,6 +7,7 @@
 
 import type { MarketProvider } from "../../application/ports/market-provider.js";
 import { ScannerRuntime } from "../../application/scanner-runtime.js";
+import { actionableOffersBySide } from "../../domain/market.js";
 import type { Market } from "../../domain/market.js";
 import { CloudflareScannerScheduler } from "./scanner-scheduler.js";
 import {
@@ -109,12 +110,8 @@ export async function executeScannerAlarm(
       throw new Error("El scanner no devolvió un snapshot del mercado");
     }
 
-    const buyCount = market.offers.filter(
-      (offer) => offer.side === "BUY",
-    ).length;
-    const sellCount = market.offers.filter(
-      (offer) => offer.side === "SELL",
-    ).length;
+    const buyCount = actionableOffersBySide(market, "BUY").length;
+    const sellCount = actionableOffersBySide(market, "SELL").length;
 
     await storage.put<Market>(SCANNER_MARKET_SNAPSHOT_KEY, market);
     await storage.put<ScannerRuntimeExecutionState>(

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { mapQvaPayOffer } from "../../src/infrastructure/qvapay/p2p-mapper.js";
 
-describe("QvaPay P2P mapper", () => {
+describe("mapeador P2P de QvaPay", () => {
   it("calcula la proporción efectiva CUP por QUSD y conserva los detalles de la oferta", () => {
     const offer = mapQvaPayOffer(
       {
@@ -11,6 +11,9 @@ describe("QvaPay P2P mapper", () => {
         amount: "100",
         receive: "25000",
         available_amount: "80",
+        reserved_amount: "20",
+        order_min: "10",
+        order_max: "80",
         status: "processing",
         created_at: "2026-10-05T15:00:00.000Z",
         updated_at: "2026-10-05T15:01:00.000Z",
@@ -22,6 +25,9 @@ describe("QvaPay P2P mapper", () => {
     expect(offer.rate).toBe("250");
     expect(offer.amount).toBe("100");
     expect(offer.availableAmount).toBe("80");
+    expect(offer.reservedAmount).toBe("20");
+    expect(offer.orderMin).toBe("10");
+    expect(offer.orderMax).toBe("80");
     expect(offer.status).toBe("processing");
     expect(offer.fiatAmount).toBe("25000");
     expect(offer.createdAt).toBe("2026-10-05T15:00:00.000Z");
@@ -59,7 +65,7 @@ describe("QvaPay P2P mapper", () => {
   });
 });
 
-describe("QvaPay P2P mapper VIP metadata", () => {
+describe("mapeador P2P de QvaPay VIP metadata", () => {
   it("conserva la restricción VIP de la oferta y el estado VIP del creador", () => {
     const offer = mapQvaPayOffer(
       {

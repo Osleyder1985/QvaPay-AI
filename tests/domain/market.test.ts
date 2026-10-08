@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { createMarket, offersBySide } from "../../src/domain/market.js";
+import {
+  actionableOffersBySide,
+  createMarket,
+  offersBySide,
+} from "../../src/domain/market.js";
 import type { Offer } from "../../src/domain/offer.js";
 
 const offer = (
@@ -44,5 +48,27 @@ describe("market domain", () => {
     ).toThrow(
       "El mercado de la oferta no coincide con la identidad del mercado",
     );
+  });
+});
+
+describe("accionabilidad del mercado", () => {
+  it("excluye ofertas no abiertas y agotadas de las métricas de ejecución sin ocultarlas", () => {
+    const market = createMarket("BANK_CUP", [
+      offer("open", "BUY", "1000"),
+      { ...offer("processing", "BUY", "1200"), status: "processing" },
+      { ...offer("empty", "SELL", "900"), availableAmount: "0" },
+      offer("sell-open", "SELL", "950"),
+    ]);
+
+    expect(offersBySide(market, "BUY").map((item) => item.id)).toEqual([
+      "processing",
+      "open",
+    ]);
+    expect(
+      actionableOffersBySide(market, "BUY").map((item) => item.id),
+    ).toEqual(["open"]);
+    expect(
+      actionableOffersBySide(market, "SELL").map((item) => item.id),
+    ).toEqual(["sell-open"]);
   });
 });
