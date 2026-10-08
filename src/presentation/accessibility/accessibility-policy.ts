@@ -11,5 +11,5 @@ export const ACCESSIBILITY_POLICY = [
   ":where(button,a,input,select,textarea):focus-visible{",
   "outline:2px solid var(--qva-color-focus);",
   "outline-offset:3px;",
-  "}"
+  "}",
 ].join("");
