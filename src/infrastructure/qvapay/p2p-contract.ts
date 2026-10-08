@@ -172,7 +172,7 @@ function stringField(value: unknown, field: string): string {
 }
 
 function decimalString(value: unknown, field: string): string {
-  if (typeof value !== "string" || !/^-?\\d+(?:\\.\\d+)?$/.test(value)) {
+  if (typeof value !== "string" || !/^-?\d+(?:\.\d+)?$/.test(value)) {
     throw new QvaPayContractError(`Invalid QvaPay decimal: ${field}`);
   }
   return value;
@@ -267,7 +267,7 @@ function nonNegativeInteger(value: unknown, field: string): number {
 function providerInteger(value: unknown, field: string): number {
   if (typeof value === "number") {
     if (Number.isSafeInteger(value)) return value;
-  } else if (typeof value === "string" && /^\\d+$/.test(value)) {
+  } else if (typeof value === "string" && /^\d+$/.test(value)) {
     const parsed = Number(value);
     if (Number.isSafeInteger(parsed)) return parsed;
   }
