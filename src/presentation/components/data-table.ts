@@ -29,10 +29,7 @@ export function renderDataTable(
   const body = rows
     .map((row) => {
       const cells = columns
-        .map(
-          (column) =>
-            `<td>${escapeHtml(row.cells[column.key] ?? "—")}</td>`,
-        )
+        .map((column) => `<td>${escapeHtml(row.cells[column.key] ?? "—")}</td>`)
         .join("");
       return `<tr data-row-id="${escapeHtml(row.id)}">${cells}</tr>`;
     })
