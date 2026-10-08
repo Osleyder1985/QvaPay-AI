@@ -14,7 +14,7 @@ Relacionar requisitos con diseño, implementación, pruebas, evidencia de runtim
 | SYS-FR-004 | Libro BUY | Market + Public App | pruebas de dominio/API + smoke | Verified |
 | SYS-FR-005 | Centro de Cuenta protegido | QvaPayAccountClient + /api/account | pruebas de cliente/ruta | Implemented |
 | SYS-SEC-001 | No pedir secretos operacionales al navegador | Public App + Worker | Security Gate + dashboard smoke | Verified |
-| SYS-SEC-002 | Identidad de cuenta desde /user | QvaPayAccountClient | pruebas de cuenta | Verified* |
+| SYS-SEC-002 | Identidad de cuenta desde /user | QvaPayAccountClient | pruebas de cuenta; pendiente evidencia autenticada de producción | Blocked |
 
 ## Nuevos requisitos — Auditoría y Control
 
