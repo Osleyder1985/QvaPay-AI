@@ -58,7 +58,7 @@ const MODULE_HEADERS: Readonly<
  * @returns Fragmento HTML del encabezado.
  */
 export function renderApplicationShellHeader(moduleId = "inicio"): string {
-  const header =
+  const header: { title: string; description: string } =
     MODULE_HEADERS[moduleId] ?? {
       title: "Centro de mando",
       description:
