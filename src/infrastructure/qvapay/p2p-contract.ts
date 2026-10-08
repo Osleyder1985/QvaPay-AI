@@ -56,11 +56,14 @@ function parseOffer(value: unknown): QvaPayP2POfferDto {
   const type = stringField(value.type, "type");
   const coin = stringField(value.coin, "coin");
   const amount = decimalString(value.amount, "amount");
+  assertPositiveDecimal(amount, "amount");
   const receive = decimalString(value.receive, "receive");
+  assertPositiveDecimal(receive, "receive");
   const availableAmount = decimalString(
     value.available_amount,
     "available_amount",
   );
+  assertPositiveDecimal(availableAmount, "available_amount");
 
   if (type !== "buy" && type !== "sell") {
     throw new QvaPayContractError("Invalid QvaPay P2P offer type");
