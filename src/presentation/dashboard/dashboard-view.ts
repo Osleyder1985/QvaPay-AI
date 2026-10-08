@@ -26,7 +26,7 @@ export function renderDashboardView(): string {
 <div class="panel control"><div class="control-head"><h3>📐 ISO-alineado</h3><span class="status warn">◐ En evolución</span></div><p>La organización toma como referencia calidad, seguridad y continuidad. No se declara certificación.</p></div>
 </div></section>
 
-<section class="section" id="mercado"><div class="section-title"><div><h2>Mercado P2P</h2><p>Libros independientes por lado y por moneda.</p></div><span class="badge">Snapshot: <b id="snapshot">—</b></span></div><div class="tables">
+<section class="section" id="mercado"><div class="section-title"><div><h2>Mercado P2P</h2><p>Libros independientes por lado y por moneda.</p></div><span class="badge">Snapshot: <b id="snapshot">—</b></span></div><div id="marketIntegrity" class="market-integrity" role="status" aria-live="polite">Validando integridad del snapshot…</div><div class="tables">
 <div class="panel tablepanel"><div class="tablehead"><h2>🔴 SELL · acción Comprar</h2><span class="badge" id="sellCount">0 ofertas</span></div><div class="table-scroll" id="sellTable"></div></div>
 <div class="panel tablepanel"><div class="tablehead"><h2>🟢 BUY · acción Vender</h2><span class="badge" id="buyCount">0 ofertas</span></div><div class="table-scroll" id="buyTable"></div></div>
 </div></section>
