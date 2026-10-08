@@ -5,6 +5,13 @@
  * @ubicacion src/infrastructure/cloudflare dentro de la arquitectura de QvaPay-AI.
  */
 
+/** Metadatos por defecto cuando una ruta no tiene encabezado específico. */
+const DEFAULT_MODULE_HEADER = {
+  title: "Centro de mando",
+  description:
+    "Una vista clara del estado operativo y los indicadores esenciales.",
+};
+
 /** Metadatos contextuales del encabezado para cada módulo. */
 const MODULE_HEADERS: Readonly<
   Record<string, { title: string; description: string }>
@@ -58,8 +65,7 @@ const MODULE_HEADERS: Readonly<
  * @returns Fragmento HTML del encabezado.
  */
 export function renderApplicationShellHeader(moduleId = "inicio"): string {
-  const fallbackHeader = MODULE_HEADERS.inicio;
-  const header = MODULE_HEADERS[moduleId] ?? fallbackHeader;
+  const header = MODULE_HEADERS[moduleId] ?? DEFAULT_MODULE_HEADER;
   // prettier-ignore
   return `<header class="top" id="pageHeader" aria-labelledby="inicio-title"><div class="title"><h1 id="inicio-title">${header.title}</h1><p>${header.description}</p></div><div id="live" class="live"><i class="dot"></i><strong id="liveText">CONECTANDO</strong><span>·</span><span id="updated">—</span><button class="logout-button" id="logoutButton" type="button">Cerrar sesión</button></div></header>`;
 }
