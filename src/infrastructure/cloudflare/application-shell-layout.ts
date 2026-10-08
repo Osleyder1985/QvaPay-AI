@@ -9,13 +9,13 @@ import { renderApplicationShellNavigation } from "./application-shell.js";
 import { renderApplicationShellWorkAreaStart } from "./application-shell-work-area.js";
 
 /** Renderiza la apertura estructural del Application Shell. */
-export function renderApplicationShellStart(): string {
-  return `<body>
+export function renderApplicationShellStart(moduleId = "inicio"): string {
+  return `<body data-module="${moduleId}">
 <div class="shell">
 <aside class="sidebar">
 <div class="brand"><div class="logo">⚡</div><div><strong>QvaPay-AI</strong><span>Centro operativo</span></div></div>
 <nav aria-label="Navegación principal">
-${renderApplicationShellNavigation()}
+${renderApplicationShellNavigation(moduleId)}
 </nav>
 <div class="framework"><b>MARCO DE GESTIÓN</b><p>Calidad · seguridad · continuidad · trazabilidad. Alineación ISO no equivale a certificación.</p></div>
 </aside>
