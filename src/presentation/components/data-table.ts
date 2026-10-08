@@ -24,10 +24,7 @@ export function renderDataTable(
   rows: readonly DataTableRow[],
 ): string {
   const header = columns
-    .map(
-      (column) =>
-        `<th scope="col">${escapeHtml(column.label)}</th>`,
-    )
+    .map((column) => `<th scope="col">${escapeHtml(column.label)}</th>`)
     .join("");
   const body = rows
     .map((row) => {
