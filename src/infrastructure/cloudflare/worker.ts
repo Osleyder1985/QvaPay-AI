@@ -165,7 +165,7 @@ export default {
       if (moduleId === "usuarios" && session.user.role !== "ADMINISTRATION") {
         return new Response("Acceso denegado.", { status: 403, headers: { "cache-control": "no-store" } });
       }
-      return createPublicAppResponse();
+      return createPublicAppResponse(moduleId);
     }
 
     if (url.pathname === "/") {
