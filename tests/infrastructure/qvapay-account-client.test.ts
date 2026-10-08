@@ -239,8 +239,6 @@ describe("QvaPayAccountClient", () => {
     expect(snapshot.identitySource).toBe("/user");
     expect(snapshot.integrationStatus).toBe("degraded");
   });
-});
-
 
   it("rechaza la integración cuando la aplicación autorizada no coincide con la configurada", async () => {
     const client = new QvaPayAccountClient({
@@ -274,3 +272,5 @@ describe("QvaPayAccountClient", () => {
     expect(snapshot.ownerCorrelationProvenance.error).toContain("no coincide");
     expect(snapshot.integrationStatus).toBe("degraded");
   });
+
+});
