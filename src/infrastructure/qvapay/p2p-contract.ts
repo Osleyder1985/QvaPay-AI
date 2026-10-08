@@ -188,8 +188,8 @@ function assertPositiveDecimal(value: string, field: string): void {
 function compareDecimal(left: string, right: string): number {
   const [leftInteger = "0", leftFraction = ""] = left.split(".");
   const [rightInteger = "0", rightFraction = ""] = right.split(".");
-  const normalizedLeft = leftInteger.replace(/^0+(?=\\d)/, "");
-  const normalizedRight = rightInteger.replace(/^0+(?=\\d)/, "");
+  const normalizedLeft = leftInteger.replace(/^0+(?=\d)/, "");
+  const normalizedRight = rightInteger.replace(/^0+(?=\d)/, "");
   if (normalizedLeft.length !== normalizedRight.length) {
     return normalizedLeft.length > normalizedRight.length ? 1 : -1;
   }
