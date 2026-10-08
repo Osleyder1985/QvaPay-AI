@@ -1,7 +1,7 @@
 /**
  * @archivo tests/application-shell-routing.test.ts
- * @proposito Verifica las rutas independientes y la navegación del Application Shell.
- * @responsabilidades Detectar regresiones en el catálogo de módulos, el estado accesible de navegación y el aislamiento visual.
+ * @proposito Verifica las rutas y la navegación del Application Shell.
+ * @responsabilidades Detectar regresiones en rutas, navegación accesible y aislamiento visual.
  */
 
 import { describe, expect, it } from "vitest";
@@ -13,7 +13,7 @@ import {
 import { DASHBOARD_CLIENT_SCRIPT } from "../src/presentation/dashboard/dashboard-client.js";
 
 describe("rutas y navegación del Application Shell", () => {
-  it("define rutas independientes para los módulos acordados", () => {
+  it("define las rutas de los módulos", () => {
     expect(APPLICATION_SHELL_MODULES.map((module) => module.href)).toEqual([
       "/app/inicio",
       "/app/cuenta",
@@ -27,27 +27,21 @@ describe("rutas y navegación del Application Shell", () => {
     ]);
   });
 
-  it(
-    "marca semánticamente la página activa y restringe el enlace de usuarios",
-    () => {
-      const navigation = renderApplicationShellNavigation("cuenta");
+  it("marca la ruta activa y oculta Usuarios por defecto", () => {
+    const navigation = renderApplicationShellNavigation("cuenta");
 
-      expect(navigation).toContain('href="/app/cuenta"');
-      expect(navigation).toContain('aria-current="page"');
-      expect(navigation).toContain('href="/app/usuarios"');
-      expect(navigation).toContain('id="adminNav" hidden');
-      expect(navigation).not.toContain('href="#cuenta"');
-    },
-  );
+    expect(navigation).toContain('href="/app/cuenta"');
+    expect(navigation).toContain('aria-current="page"');
+    expect(navigation).toContain('href="/app/usuarios"');
+    expect(navigation).toContain('id="adminNav" hidden');
+    expect(navigation).not.toContain('href="#cuenta"');
+  });
 
-  it(
-    "mantiene una frontera de contenido visible por módulo y placeholders honestos",
-    () => {
-      expect(DASHBOARD_CLIENT_SCRIPT).toContain("initializeModulePage");
-      expect(DASHBOARD_CLIENT_SCRIPT).toContain("visibleByModule");
-      expect(DASHBOARD_CLIENT_SCRIPT).toContain(
-        "Implementación funcional pendiente",
-      );
-    },
-  );
+  it("documenta módulos funcionales pendientes", () => {
+    expect(DASHBOARD_CLIENT_SCRIPT).toContain("initializeModulePage");
+    expect(DASHBOARD_CLIENT_SCRIPT).toContain("visibleByModule");
+    expect(DASHBOARD_CLIENT_SCRIPT).toContain(
+      "Implementación funcional pendiente",
+    );
+  });
 });
