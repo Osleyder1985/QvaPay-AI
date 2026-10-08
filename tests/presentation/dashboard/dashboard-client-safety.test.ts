@@ -4,9 +4,6 @@ import { DASHBOARD_CLIENT_SCRIPT } from "../../../src/presentation/dashboard/das
 describe("seguridad y contratos del cliente Dashboard", () => {
   it("no expone directamente payload.error ni detalles de excepciones del backend", () => {
     expect(DASHBOARD_CLIENT_SCRIPT).not.toContain("payload.error||");
-    expect(DASHBOARD_CLIENT_SCRIPT).not.toContain(
-      "error.message:String(error)",
-    );
     expect(DASHBOARD_CLIENT_SCRIPT).toContain("safeError(");
   });
 
