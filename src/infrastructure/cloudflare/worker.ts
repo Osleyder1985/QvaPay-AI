@@ -38,6 +38,7 @@ export interface ScannerWorkerEnvironment {
   readonly SCANNER_COIN: string;
   readonly SCANNER_INTERVAL_SECONDS: string;
   readonly SCANNER_BOOTSTRAP_TOKEN: string;
+  readonly PRODUCTION_SMOKE_TOKEN: string;
   readonly ACCOUNT_AUTH_SECRET: string;
 }
 
@@ -118,7 +119,7 @@ export default {
 
     if (url.pathname === "/internal/auth/smoke-user") {
       const authorization = request.headers.get("authorization");
-      if (authorization !== `Bearer ${env.SCANNER_BOOTSTRAP_TOKEN}`) return new Response("Unauthorized", { status: 401 });
+      if (authorization !== `Bearer ${env.PRODUCTION_SMOKE_TOKEN}`) return new Response("Unauthorized", { status: 401 });
       const input = await body(request);
       const username = typeof input.username === "string" ? input.username.trim() : "";
       if (!/^ci-smoke-[a-zA-Z0-9-]{3,64}$/.test(username)) return jsonError("Smoke username inválido.", 400);
