@@ -7,6 +7,7 @@ describe("contratos JSON del Dashboard", () => {
     expect(DASHBOARD_CLIENT_SCRIPT).toContain("Respuesta de contrato no válida.");
     expect(DASHBOARD_CLIENT_SCRIPT).toContain("Array.isArray(payload)");
   });
+
   it("valida las formas mínimas antes de mutar el estado renderizado", () => {
     expect(DASHBOARD_CLIENT_SCRIPT).toContain("isScannerState(payload)");
     expect(DASHBOARD_CLIENT_SCRIPT).toContain("isAccountPayload(payload)");
