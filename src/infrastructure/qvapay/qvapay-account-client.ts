@@ -270,6 +270,13 @@ export class QvaPayAccountClient {
       "user",
     );
     await wait(spacingMs);
+    const ownerApplication = await request(
+      this.options,
+      `/app/${encodeURIComponent(this.options.appId)}`,
+      { method: "GET" },
+      "user",
+    );
+    await wait(spacingMs);
     const ownOffers = await request(this.options, "/p2p?my=1&take=1&page=1", {
       method: "GET",
     });
@@ -277,6 +284,14 @@ export class QvaPayAccountClient {
     const balanceUsd = balance.ok ? parseBalance(balance.payload) : null;
     const application = info.ok ? parseApplication(info.payload) : null;
     const identity = user.ok ? parseAuthenticatedUser(user.payload) : null;
+    const authorizedApplication = ownerApplication.ok
+      ? parseApplication(ownerApplication.payload)
+      : null;
+    const ownerCorrelationOk =
+      authorizedApplication !== null &&
+      authorizedApplication.uuid === this.options.appId &&
+      application !== null &&
+      application.uuid === this.options.appId;
     const own = ownOffers.ok
       ? parseOwnOffers(ownOffers.payload)
       : { compatible: false, total: null };
@@ -323,6 +338,25 @@ export class QvaPayAccountClient {
             ? null
             : `QvaPay application request failed with HTTP ${info.status}.`,
     };
+    const ownerCorrelationProvenance: QvaPayAccountSourceMetadata = {
+      endpoint: `/app/${this.options.appId}`,
+      retrievedAt: ownerApplication.retrievedAt,
+      httpStatus: ownerApplication.status,
+      status: ownerCorrelationOk
+        ? "verified"
+        : ownerApplication.ok
+          ? "unavailable"
+          : "failed",
+      error: ownerCorrelationOk
+        ? null
+        : ownerApplication.ok
+          ? authorizedApplication === null
+            ? "QvaPay devolvió un payload incompatible para la aplicación del usuario autenticado."
+            : authorizedApplication.uuid !== this.options.appId
+              ? "La aplicación devuelta por el usuario autenticado no coincide con la aplicación configurada."
+              : "No pudo demostrarse la correlación entre la aplicación autenticada y las credenciales configuradas."
+          : `La consulta de la aplicación del usuario autenticado falló con HTTP ${ownerApplication.status}.`,
+    };
     const ownOffersProvenance: QvaPayAccountSourceMetadata = {
       endpoint: "/p2p?my=1&take=1&page=1",
       retrievedAt: ownOffers.retrievedAt,
@@ -342,6 +376,7 @@ export class QvaPayAccountClient {
       balanceOk: balanceUsd !== null,
       identityOk: identity !== null,
       applicationOk: application !== null,
+      ownerCorrelationOk,
       p2pAccessible: own.compatible,
     });
 
@@ -371,6 +406,8 @@ export class QvaPayAccountClient {
       applicationProvenance,
       applicationHttpStatus: info.status,
       applicationOk: application !== null,
+      ownerCorrelationOk,
+      ownerCorrelationProvenance,
       p2pAccessible: own.compatible,
       ownOffersTotal: own.total,
       ownOffersProvenance,
