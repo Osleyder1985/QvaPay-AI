@@ -63,7 +63,6 @@ export interface QvaPayAccountSourceMetadata {
   readonly error: string | null;
 }
 
-
 export interface QvaPayAccountSnapshot {
   readonly balanceUsd: number | null;
   readonly balanceSource: QvaPayAccountSourceMetadata;
