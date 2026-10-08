@@ -409,7 +409,7 @@ export class QvaPayAccountClient {
         balanceUsd !== null
           ? null
           : balance.ok
-            ? "QvaPay returned an incompatible balance payload and no correlated owner balance was available."
+            ? "QvaPay devolvió un payload de balance incompatible y no había un balance correlacionado del propietario disponible."
             : `QvaPay balance request failed with HTTP ${balance.status}.`,
       identity,
       identityProvenance,
