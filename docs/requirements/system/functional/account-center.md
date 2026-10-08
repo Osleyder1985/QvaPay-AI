@@ -13,9 +13,23 @@ Este requisito amplía `SYS-FR-005` y no modifica requisitos previamente certifi
 | Área | Fuente | Uso |
 |---|---|---|
 | Identidad propietaria | `GET /user` con API Token QvaPay | Identidad de la cuenta conectada |
+| Relación usuario-aplicación | `GET /app/{uuid}` con el mismo Bearer Token de usuario | Demostrar que la aplicación configurada pertenece al usuario autenticado |
 | Balance | `POST /v2/balance` | Balance de la aplicación propietaria, en USD |
-| Aplicación | `POST /v2/info` | Identidad y estado de la aplicación QvaPay |
+| Aplicación | `POST /v2/info` | Identidad y estado de la aplicación QvaPay; su `uuid` debe coincidir con la aplicación configurada |
 | Ofertas propias | `GET /p2p?my=1` | Datos operativos propios de P2P; nunca identidad |
+
+## Correlación de propietario
+
+QvaPay no devuelve un campo `ownerUuid` en el detalle de aplicación. La relación propietaria se demuestra mediante el contexto de autorización:
+
+1. `GET /user` con el Bearer Token identifica al usuario autenticado.
+2. `GET /app/{uuid}` con ese mismo Bearer Token debe devolver la aplicación configurada.
+3. `POST /v2/info` con las credenciales de aplicación debe devolver el mismo `uuid` configurado.
+4. `POST /v2/balance` representa el balance del propietario de esa aplicación.
+
+La implementación deberá tratar como fallo de integridad cualquier `401`, `403`, `404`, payload incompatible o discrepancia del `uuid`. No podrá marcar la integración como `verified` cuando la relación propietario-aplicación no sea demostrable.
+
+**Hallazgo:** #196.
 
 ## Inventario contractual actual
 
