@@ -17,3 +17,4 @@ describe("seguridad y contratos del cliente Dashboard", () => {
     expect(DASHBOARD_CLIENT_SCRIPT).toContain("isUsersPayload");
   });
 });
+
