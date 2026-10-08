@@ -250,7 +250,9 @@ describe("QvaPayAccountClient", () => {
     expect(snapshot.balanceOk).toBe(true);
     expect(snapshot.balanceSource.endpoint).toBe("/user");
     expect(snapshot.balanceSource.status).toBe("verified");
-    expect(snapshot.balanceSource.error).toContain(\n      "correlated authenticated owner profile",\n    );
+    expect(snapshot.balanceSource.error).toContain(
+      "balance fue verificado desde el perfil autenticado y correlacionado del propietario",
+    );
     expect(snapshot.integrationStatus).toBe("verified");
   });
 
