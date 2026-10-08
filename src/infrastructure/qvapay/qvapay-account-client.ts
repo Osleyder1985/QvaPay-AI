@@ -77,20 +77,24 @@ function parseBalance(payload: unknown): number | null {
 
 function parseApplication(payload: unknown): QvaPayApplicationIdentity | null {
   const unwrapped = readPayload(payload);
-  const candidate = isRecord(unwrapped) && Array.isArray(unwrapped.data)
-    ? unwrapped.data.length === 1
-      ? unwrapped.data[0]
-      : null
-    : unwrapped;
-  const value = Array.isArray(candidate)
-    ? candidate.length === 1 && isRecord(candidate[0])
-      ? candidate[0]
-      : null
-    : isRecord(candidate)
-      ? isRecord(candidate.application)
-        ? candidate.application
-        : candidate
-      : null;
+  let value: Record<string, unknown> | null = null;
+
+  if (Array.isArray(unwrapped)) {
+    if (unwrapped.length === 1 && isRecord(unwrapped[0])) {
+      value = unwrapped[0];
+    }
+  } else if (isRecord(unwrapped)) {
+    if (Array.isArray(unwrapped.data)) {
+      if (unwrapped.data.length === 1 && isRecord(unwrapped.data[0])) {
+        value = unwrapped.data[0];
+      }
+    } else if (isRecord(unwrapped.application)) {
+      value = unwrapped.application;
+    } else {
+      value = unwrapped;
+    }
+  }
+
   if (!value) return null;
   const uuid = optionalString(value, "uuid");
   const name = optionalString(value, "name");
@@ -104,13 +108,6 @@ function parseApplication(payload: unknown): QvaPayApplicationIdentity | null {
     callback: optionalString(value, "callback"),
     successUrl: optionalString(value, "success_url"),
     cancelUrl: optionalString(value, "cancel_url"),
-    logo: optionalString(value, "logo"),
-    appPhotoUrl: optionalString(value, "app_photo_url"),
-    active: optionalBoolean(value, "active"),
-    enabled: optionalBoolean(value, "enabled"),
-    card: optionalBoolean(value, "card"),
-    createdAt: optionalString(value, "created_at"),
-    updatedAt: optionalString(value, "updated_at"),
   };
 }
 
