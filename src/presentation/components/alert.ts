@@ -10,14 +10,18 @@ import { escapeHtml } from "./escape-html.js";
 export type AlertTone = "info" | "positive" | "warning" | "negative";
 
 /** Genera una alerta de presentación con semántica accesible. */
-export function renderAlert(tone: AlertTone, title: string, detail: string): string {
+export function renderAlert(
+  tone: AlertTone,
+  title: string,
+  detail: string,
+): string {
   return (
     '<aside class="qva-alert qva-alert--' +
     tone +
     '" role="' +
     (tone === "negative" || tone === "warning" ? "alert" : "status") +
     '">' +
-    '<strong>' +
+    "<strong>" +
     escapeHtml(title) +
     "</strong>" +
     "<span>" +
