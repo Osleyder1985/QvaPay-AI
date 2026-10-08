@@ -79,6 +79,8 @@ export interface QvaPayAccountSnapshot {
   readonly applicationProvenance: QvaPayAccountSourceMetadata;
   readonly applicationHttpStatus: number;
   readonly applicationOk: boolean;
+  readonly ownerCorrelationOk: boolean;
+  readonly ownerCorrelationProvenance: QvaPayAccountSourceMetadata;
   readonly p2pAccessible: boolean;
   readonly ownOffersTotal: number | null;
   readonly ownOffersProvenance: QvaPayAccountSourceMetadata;
@@ -95,12 +97,14 @@ export function evaluateAccountIntegration(input: {
   readonly balanceOk: boolean;
   readonly identityOk: boolean;
   readonly applicationOk: boolean;
+  readonly ownerCorrelationOk: boolean;
   readonly p2pAccessible: boolean;
 }): QvaPayAccountIntegrationStatus {
   const critical = [
     input.balanceOk,
     input.identityOk,
     input.applicationOk,
+    input.ownerCorrelationOk,
     input.p2pAccessible,
   ];
   if (critical.every(Boolean)) return "verified";

@@ -89,6 +89,14 @@ function snapshot(
     },
     applicationHttpStatus: 200,
     applicationOk: true,
+    ownerCorrelationOk: true,
+    ownerCorrelationProvenance: {
+      endpoint: "/app/app-uuid",
+      retrievedAt: "2026-10-07T01:00:01.500Z",
+      httpStatus: 200,
+      status: "verified",
+      error: null,
+    },
     p2pAccessible: true,
     ownOffersTotal: 3,
     ownOffersProvenance: {
