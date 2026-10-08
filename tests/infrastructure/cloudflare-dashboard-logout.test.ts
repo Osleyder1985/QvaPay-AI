@@ -6,14 +6,14 @@ describe("logout autenticado del dashboard", () => {
   it(
     "expone un control accesible que invoca el endpoint server-side autorizado",
     async () => {
-    const html = await createPublicAppResponse().text();
+      const html = await createPublicAppResponse().text();
 
-    expect(html).toContain('id="logoutButton"');
-    expect(html).toContain('type="button">Cerrar sesión');
-    expect(html).toContain('fetch("/api/auth/logout"');
-    expect(html).toContain('method:"POST"');
-    expect(html).toContain('credentials:"same-origin"');
-    expect(html).toContain('response.status!==401');
+      expect(html).toContain('id="logoutButton"');
+      expect(html).toContain('type="button">Cerrar sesión');
+      expect(html).toContain('fetch("/api/auth/logout"');
+      expect(html).toContain('method:"POST"');
+      expect(html).toContain('credentials:"same-origin"');
+      expect(html).toContain('response.status!==401');
     },
   );
 
