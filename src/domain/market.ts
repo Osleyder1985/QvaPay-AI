@@ -40,8 +40,8 @@ export function createMarket(coin: string, offers: readonly Offer[]): Market {
     if (compareDecimalStrings(offer.amount, "0") <= 0) {
       throw new Error("La cantidad de la oferta debe ser positiva");
     }
-    if (compareDecimalStrings(offer.availableAmount, "0") <= 0) {
-      throw new Error("La cantidad disponible de la oferta debe ser positiva");
+    if (compareDecimalStrings(offer.availableAmount, "0") < 0) {
+      throw new Error("La cantidad disponible de la oferta no puede ser negativa");
     }
     if (
       offer.fiatAmount !== undefined &&
