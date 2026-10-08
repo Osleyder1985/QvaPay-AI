@@ -59,6 +59,12 @@ const MODULE_HEADERS: Readonly<
   },
 };
 
+const FALLBACK_HEADER: { title: string; description: string } = {
+  title: "Centro de mando",
+  description:
+    "Una vista clara del estado operativo y los indicadores esenciales.",
+};
+
 /**
  * Renderiza el encabezado contextual de la ruta activa.
  * @param moduleId Identificador de la ruta solicitada.
