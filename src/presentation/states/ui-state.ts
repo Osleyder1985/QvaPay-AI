@@ -1,7 +1,7 @@
 /**
  * @archivo src/presentation/states/ui-state.ts
  * @proposito Define estados visuales comunes para módulos operativos.
- * @responsabilidades Evitar que cada módulo invente su propio vocabulario de carga, disponibilidad, degradación y error.
+ * @responsabilidades Evitar vocabularios diferentes entre módulos.
  * @ubicacion src/presentation/states dentro de la arquitectura de presentación.
  */
 
@@ -26,77 +26,39 @@ export interface UiStateDescriptor {
   readonly allowsDataInteraction: boolean;
 }
 
+const descriptor = (
+  state: UiState,
+  label: string,
+  tone: UiStateDescriptor["tone"],
+  allowsDataInteraction: boolean,
+): UiStateDescriptor => ({
+  state,
+  label,
+  tone,
+  allowsDataInteraction,
+});
+
 export const UI_STATE_DESCRIPTORS: Readonly<Record<UiState, UiStateDescriptor>> = {
-  loading: {
-    state: "loading",
-    label: "Cargando",
-    tone: "neutral",
-    allowsDataInteraction: false,
-  },
-  ready: {
-    state: "ready",
-    label: "Actualizado",
-    tone: "positive",
-    allowsDataInteraction: true,
-  },
-  stale: {
-    state: "stale",
-    label: "Datos potencialmente desactualizados",
-    tone: "warning",
-    allowsDataInteraction: true,
-  },
-  empty: {
-    state: "empty",
-    label: "Sin datos disponibles",
-    tone: "neutral",
-    allowsDataInteraction: false,
-  },
-  partial: {
-    state: "partial",
-    label: "Datos parciales",
-    tone: "warning",
-    allowsDataInteraction: true,
-  },
-  degraded: {
-    state: "degraded",
-    label: "Servicio degradado",
-    tone: "warning",
-    allowsDataInteraction: true,
-  },
-  error: {
-    state: "error",
-    label: "No se pudo completar la consulta",
-    tone: "negative",
-    allowsDataInteraction: false,
-  },
-  unauthorized: {
-    state: "unauthorized",
-    label: "Sesión requerida",
-    tone: "warning",
-    allowsDataInteraction: false,
-  },
-  forbidden: {
-    state: "forbidden",
-    label: "Acceso no permitido",
-    tone: "negative",
-    allowsDataInteraction: false,
-  },
-  offline: {
-    state: "offline",
-    label: "Sin conexión",
-    tone: "warning",
-    allowsDataInteraction: false,
-  },
-  reconnecting: {
-    state: "reconnecting",
-    label: "Reconectando",
-    tone: "neutral",
-    allowsDataInteraction: false,
-  },
-  success: {
-    state: "success",
-    label: "Operación completada",
-    tone: "positive",
-    allowsDataInteraction: true,
-  },
+  loading: descriptor("loading", "Cargando", "neutral", false),
+  ready: descriptor("ready", "Actualizado", "positive", true),
+  stale: descriptor(
+    "stale",
+    "Datos potencialmente desactualizados",
+    "warning",
+    true,
+  ),
+  empty: descriptor("empty", "Sin datos disponibles", "neutral", false),
+  partial: descriptor("partial", "Datos parciales", "warning", true),
+  degraded: descriptor("degraded", "Servicio degradado", "warning", true),
+  error: descriptor(
+    "error",
+    "No se pudo completar la consulta",
+    "negative",
+    false,
+  ),
+  unauthorized: descriptor("unauthorized", "Sesión requerida", "warning", false),
+  forbidden: descriptor("forbidden", "Acceso no permitido", "negative", false),
+  offline: descriptor("offline", "Sin conexión", "warning", false),
+  reconnecting: descriptor("reconnecting", "Reconectando", "neutral", false),
+  success: descriptor("success", "Operación completada", "positive", true),
 };
