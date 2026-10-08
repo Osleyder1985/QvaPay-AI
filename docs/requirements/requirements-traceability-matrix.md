@@ -14,7 +14,7 @@ Relacionar requisitos con diseño, implementación, pruebas, evidencia de runtim
 | SYS-FR-004 | Libro BUY | Market + Public App | pruebas de dominio/API + smoke | Verified |
 | SYS-FR-005 | Centro de Cuenta protegido | QvaPayAccountClient + /api/account | pruebas de cliente/ruta | Implemented |
 | SYS-SEC-001 | No pedir secretos operacionales al navegador | Public App + Worker | Security Gate + dashboard smoke | Verified |
-| SYS-SEC-002 | Identidad de cuenta desde /user | QvaPayAccountClient | pruebas de cuenta; pendiente evidencia autenticada de producción | Blocked |
+| SYS-SEC-002 | Identidad de cuenta desde /user | QvaPayAccountClient | pruebas de cuenta + evidencia autenticada de producción del despliegue #115 | Verified |
 
 ## Nuevos requisitos — Auditoría y Control
 
@@ -63,6 +63,14 @@ Toda solución para SYS-AUD-* y SYS-ACC-* queda bloqueada por #270 hasta contar 
 Definido, Diseñado, Implementado, Probado, Verificado, Certificado, Fallido / Rechazado, Bloqueado.
 
 Estos estados no son intercambiables. Un despliegue exitoso no implica certificación.
+## Evidencia de producción de Account
+
+### SYS-SEC-002
+
+El despliegue #115, sobre el commit exacto `5638c7561e8535d7f11dc9195f9b034f528963fe`, obtuvo una sesión autenticada de producción y ejecutó `POST /api/account/sync` y `GET /api/account`.
+
+La evidencia observó la identidad QvaPay `Osleyder`, la aplicación `d97f998e-a76c-4998-b664-e1f4f19138ef`, balance con estado `unavailable`, P2P con estado `verified` e integración general `degraded`. Esta evidencia verifica el requisito de identidad desde `/user`, pero no certifica la correlación propietario-aplicación pendiente de #196.
+
 ## Inventario normativo de documentos de requisitos
 
 El Quality Gate considera normativo todo documento Markdown dentro de `docs/requirements`, excepto sus archivos `README.md`. Cada documento debe aparecer explícitamente en esta matriz para mantener trazabilidad documental completa.
