@@ -78,7 +78,8 @@ export function renderApplicationShellHeader(moduleId = "inicio"): string {
     '<strong id="liveText">CONECTANDO</strong>',
     "<span>·</span>",
     '<span id="updated">—</span>',
-    '<button class="logout-button" id="logoutButton" type="button">Cerrar sesión</button>',
+    '<button class="logout-button" id="logoutButton" type="button">' +
+      "Cerrar sesión</button>",
     "</div>",
     "</header>",
   ].join("");
