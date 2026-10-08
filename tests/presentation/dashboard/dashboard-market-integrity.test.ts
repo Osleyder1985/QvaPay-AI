@@ -1,10 +1,18 @@
 import { describe, expect, it } from "vitest";
-import { createPublicAppResponse } from "../../src/infrastructure/cloudflare/public-app.js";
+
+import { createPublicAppResponse } from "../../../src/infrastructure/cloudflare/public-app.js";
 
 describe("integridad de snapshot y affordances del mercado", () => {
   it("define explícitamente ready, stale, partial, degraded, offline y unavailable", async () => {
     const html = await createPublicAppResponse().text();
-    for (const state of ["ready", "stale", "partial", "degraded", "offline", "unavailable"]) {
+    for (const state of [
+      "ready",
+      "stale",
+      "partial",
+      "degraded",
+      "offline",
+      "unavailable",
+    ]) {
       expect(html).toContain('key:"' + state + '"');
     }
   });
