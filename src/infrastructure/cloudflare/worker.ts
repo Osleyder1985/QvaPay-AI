@@ -251,7 +251,6 @@ export default {
       if (request.method !== "GET") return new Response("Method not allowed", { status: 405 });
       const access = await requireRole(request, env.DB, env.ACCOUNT_AUTH_SECRET, ["ADMINISTRATION", "AUDITOR"]);
       if (access instanceof Response) return access;
-      await stub.ensureScheduled({ coin: env.SCANNER_COIN, intervalSeconds: Number(env.SCANNER_INTERVAL_SECONDS) });
       return createPublicScannerStateResponse(toPublicScannerState(await stub.getState()));
     }
 
