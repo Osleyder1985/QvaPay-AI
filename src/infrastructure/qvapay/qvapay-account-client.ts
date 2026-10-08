@@ -75,6 +75,16 @@ function parseBalance(payload: unknown): number | null {
     : null;
 }
 
+function describePayloadShape(payload: unknown): string {
+  if (Array.isArray(payload)) {
+    return `array(length=${payload.length})`;
+  }
+  if (!isRecord(payload)) {
+    return typeof payload;
+  }
+  return Object.keys(payload).sort().join(",");
+}
+
 function parseApplication(payload: unknown): QvaPayApplicationIdentity | null {
   const unwrapped = readPayload(payload);
   let value: Record<string, unknown> | null = null;
@@ -366,7 +376,7 @@ export class QvaPayAccountClient {
         ? null
         : ownerApplication.ok
           ? authorizedApplication === null
-            ? "QvaPay devolvió un payload incompatible para la aplicación del usuario autenticado."
+            ? `QvaPay devolvió un payload incompatible para la aplicación del usuario autenticado (forma: ${describePayloadShape(ownerApplication.payload)}).`
             : authorizedApplication.uuid !== this.options.appId
               ? "La aplicación devuelta por el usuario autenticado no coincide con la aplicación configurada."
               : "No pudo demostrarse la correlación entre la aplicación autenticada y las credenciales configuradas."
