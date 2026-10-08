@@ -17,11 +17,14 @@ describe("logout autenticado del dashboard", () => {
     },
   );
 
-  it("mantiene el control en estado pendiente durante la solicitud", async () => {
+  it(
+    "mantiene el control en estado pendiente durante la solicitud",
+    async () => {
     const html = await createPublicAppResponse().text();
 
     expect(html).toContain('button.setAttribute("aria-busy","true")');
     expect(html).toContain('button.disabled=false');
     expect(html).toContain('textContent="Cerrar sesión"');
-  });
+    },
+  );
 });
