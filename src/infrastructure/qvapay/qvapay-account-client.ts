@@ -326,7 +326,12 @@ export class QvaPayAccountClient {
         balanceEndpoint === "/user" ? user.retrievedAt : balance.retrievedAt,
       httpStatus:
         balanceEndpoint === "/user" ? user.status : balance.status,
-      status:\n        balanceUsd !== null\n          ? "verified"\n          : balance.ok\n            ? "unavailable"\n            : "failed",
+      status:
+        balanceUsd !== null
+          ? "verified"
+          : balance.ok
+            ? "unavailable"
+            : "failed",
       error:
         balanceUsd !== null
           ? primaryBalanceUsd !== null
