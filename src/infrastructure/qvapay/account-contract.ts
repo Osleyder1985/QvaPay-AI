@@ -63,6 +63,11 @@ export interface QvaPayAccountSourceMetadata {
   readonly error: string | null;
 }
 
+export type QvaPayAccountOwnerCorrelationStatus =
+  | "verified"
+  | "unavailable"
+  | "failed";
+
 export interface QvaPayAccountSnapshot {
   readonly balanceUsd: number | null;
   readonly balanceSource: QvaPayAccountSourceMetadata;
@@ -79,6 +84,8 @@ export interface QvaPayAccountSnapshot {
   readonly applicationProvenance: QvaPayAccountSourceMetadata;
   readonly applicationHttpStatus: number;
   readonly applicationOk: boolean;
+  readonly ownerCorrelationOk: boolean;
+  readonly ownerCorrelationProvenance: QvaPayAccountSourceMetadata;
   readonly p2pAccessible: boolean;
   readonly ownOffersTotal: number | null;
   readonly ownOffersProvenance: QvaPayAccountSourceMetadata;
