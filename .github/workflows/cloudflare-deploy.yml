@@ -198,8 +198,113 @@ jobs:
           console.log(`Protected login HTML assertions passed (${required.length}).`);
           NODE
 
-          echo "Production authentication smoke account creation is disabled. Authentication uses the persistent Administration account created through /setup."
-          
+          echo "Creating ephemeral production authentication smoke account..."
+          SMOKE_USERNAME="ci-smoke-account-$(date +%s)-$RANDOM"
+          SMOKE_PASSWORD="$(node -e "console.log(require('crypto').randomBytes(24).toString('base64url'))")"
+          echo "::add-mask::$SMOKE_USERNAME"
+          echo "::add-mask::$SMOKE_PASSWORD"
+
+          cleanup_smoke_user() {
+            curl --silent --show-error --output /dev/null --max-time 15 \
+              --request DELETE \
+              --header "Authorization: Bearer $SCANNER_BOOTSTRAP_TOKEN" \
+              --header "Accept: application/json" \
+              --header "Content-Type: application/json" \
+              --data "{\"username\":\"$SMOKE_USERNAME\"}" \
+              "$WORKER_URL/internal/auth/smoke-user" || true
+          }
+          trap cleanup_smoke_user EXIT
+
+          CREATE_SMOKE_RESPONSE="$(curl --fail-with-body --silent --show-error --max-time 15 \
+            --request POST \
+            --header "Authorization: Bearer $SCANNER_BOOTSTRAP_TOKEN" \
+            --header "Accept: application/json" \
+            --header "Content-Type: application/json" \
+            --data "{\"username\":\"$SMOKE_USERNAME\",\"password\":\"$SMOKE_PASSWORD\"}" \
+            "$WORKER_URL/internal/auth/smoke-user")"
+          printf '%s\n' "$CREATE_SMOKE_RESPONSE" | node -e '
+            let input = "";
+            process.stdin.on("data", (chunk) => { input += chunk; });
+            process.stdin.on("end", () => {
+              const body = JSON.parse(input);
+              if (!body.user || body.user.role !== "ADMINISTRATION") process.exit(1);
+              console.log("Ephemeral production smoke account created with ADMINISTRATION role.");
+            });
+          '
+
+          echo "Authenticating smoke account against production..."
+          LOGIN_RESPONSE="$(curl --fail-with-body --silent --show-error --max-time 15 \
+            --request POST \
+            --header "Accept: application/json" \
+            --header "Content-Type: application/json" \
+            --cookie-jar /tmp/qvapay-account-smoke.cookies \
+            --data "{\"username\":\"$SMOKE_USERNAME\",\"password\":\"$SMOKE_PASSWORD\"}" \
+            "$WORKER_URL/api/auth/login")"
+          printf '%s\n' "$LOGIN_RESPONSE" | node -e '
+            let input = "";
+            process.stdin.on("data", (chunk) => { input += chunk; });
+            process.stdin.on("end", () => {
+              const body = JSON.parse(input);
+              if (body.authenticated !== true || body.user?.role !== "ADMINISTRATION") process.exit(1);
+              console.log("Authenticated production session established for smoke account.");
+            });
+          '
+
+          echo "Synchronizing QvaPay Account through the authenticated production boundary..."
+          SYNC_RESPONSE="$(curl --fail-with-body --silent --show-error --max-time 90 \
+            --request POST \
+            --header "Accept: application/json" \
+            --cookie /tmp/qvapay-account-smoke.cookies \
+            "$WORKER_URL/api/account/sync")"
+          printf '%s\n' "$SYNC_RESPONSE" | node -e '
+            let input = "";
+            process.stdin.on("data", (chunk) => { input += chunk; });
+            process.stdin.on("end", () => {
+              const body = JSON.parse(input);
+              const account = body.account;
+              if (!account || !account.identity || !account.application) {
+                console.error("Authenticated Account sync did not return both identity and application data.");
+                process.exit(1);
+              }
+              const username = account.identity.username;
+              const applicationUuid = account.application.uuid;
+              if (typeof username !== "string" || !username || typeof applicationUuid !== "string" || !applicationUuid) {
+                console.error("Authenticated Account sync returned incomplete identity/application provenance.");
+                process.exit(1);
+              }
+              console.log("Authenticated Account sync passed.");
+              console.log(`Observed QvaPay identity username: ${username}`);
+              console.log(`Observed QvaPay application UUID: ${applicationUuid}`);
+              console.log(`Balance source status: ${account.balanceSource?.status ?? "unknown"}`);
+              console.log(`P2P source status: ${account.ownOffersProvenance?.status ?? "unknown"}`);
+              console.log(`Integration status reported by current contract: ${account.integrationStatus ?? "unknown"}`);
+            });
+          '
+
+          echo "Reading Account through the authenticated production GET boundary..."
+          AUTH_ACCOUNT_RESPONSE="$(curl --fail-with-body --silent --show-error --max-time 30 \
+            --request GET \
+            --header "Accept: application/json" \
+            --cookie /tmp/qvapay-account-smoke.cookies \
+            "$WORKER_URL/api/account")"
+          printf '%s\n' "$AUTH_ACCOUNT_RESPONSE" | node -e '
+            let input = "";
+            process.stdin.on("data", (chunk) => { input += chunk; });
+            process.stdin.on("end", () => {
+              const body = JSON.parse(input);
+              if (!body.account || !body.account.identity || !body.account.application) {
+                console.error("Authenticated /api/account did not return the persisted connected-account identity and application.");
+                process.exit(1);
+              }
+              console.log("Authenticated production /api/account evidence passed.");
+              console.log(`Authenticated identity: ${body.account.identity.username}`);
+              console.log(`Application UUID: ${body.account.application.uuid}`);
+              console.log(`Snapshot captured at: ${body.snapshot?.capturedAt ?? "unknown"}`);
+            });
+          '
+
+          echo "Authenticated production Account evidence established. This proves the session-protected identity read and persisted Account snapshot; it does not certify app-owner identity correlation from #196."
+
           START_RESPONSE=""
           for attempt in $(seq 1 7); do
             if START_RESPONSE="$(curl --fail-with-body --silent --show-error \
