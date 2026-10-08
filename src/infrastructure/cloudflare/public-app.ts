@@ -232,7 +232,6 @@ export function toPublicScannerState(
   };
 }
 
-// prettier-ignore
 const HTML = `<!doctype html>
 <html lang="es">
 <head>
