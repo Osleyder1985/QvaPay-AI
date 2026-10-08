@@ -360,7 +360,7 @@ export class QvaPayAccountClient {
         ? null
         : ownerApplication.ok
           ? authorizedApplication === null
-            ? `QvaPay devolvió un payload incompatible para la aplicación del usuario autenticado (forma: ${describePayloadShape(ownerApplication.payload)}).`
+            ? "QvaPay devolvió un payload incompatible para la aplicación del usuario autenticado."
             : authorizedApplication.uuid !== this.options.appId
               ? "La aplicación devuelta por el usuario autenticado no coincide con la aplicación configurada."
               : "No pudo demostrarse la correlación entre la aplicación autenticada y las credenciales configuradas."
