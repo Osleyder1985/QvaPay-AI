@@ -30,20 +30,20 @@ describe("rutas y navegación del Application Shell", () => {
   it(
     "marca semánticamente la página activa y restringe el enlace de usuarios",
     () => {
-    const navigation = renderApplicationShellNavigation("cuenta");
+      const navigation = renderApplicationShellNavigation("cuenta");
 
-    expect(navigation).toContain('href="/app/cuenta"');
+        expect(navigation).toContain('href="/app/cuenta"');
     expect(navigation).toContain('aria-current="page"');
     expect(navigation).toContain('href="/app/usuarios"');
     expect(navigation).toContain('id="adminNav" hidden');
-    expect(navigation).not.toContain('href="#cuenta"');
+      expect(navigation).not.toContain('href="#cuenta"');
     },
   );
 
   it(
     "mantiene una frontera de contenido visible por módulo y placeholders honestos",
     () => {
-    expect(DASHBOARD_CLIENT_SCRIPT).toContain("initializeModulePage");
+      expect(DASHBOARD_CLIENT_SCRIPT).toContain("initializeModulePage");
     expect(DASHBOARD_CLIENT_SCRIPT).toContain('visibleByModule');
     expect(DASHBOARD_CLIENT_SCRIPT).toContain("Implementación funcional pendiente");
     },
