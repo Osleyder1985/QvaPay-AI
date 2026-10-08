@@ -282,13 +282,45 @@ jobs:
               }
               const username = account.identity.username;
               const applicationUuid = account.application.uuid;
+              const configuredApplicationUuid = account.application.uuid;
+              const ownerCorrelationOk = account.ownerCorrelationOk;
+              const ownerCorrelationProvenance = account.ownerCorrelationProvenance;
+              const ownerEndpoint = ownerCorrelationProvenance?.endpoint;
+              const ownerStatus = ownerCorrelationProvenance?.status;
+              const ownerError = ownerCorrelationProvenance?.error ?? null;
               if (typeof username !== "string" || !username || typeof applicationUuid !== "string" || !applicationUuid) {
                 console.error("Authenticated Account sync returned incomplete identity/application provenance.");
+                process.exit(1);
+              }
+              if (ownerCorrelationOk !== true) {
+                console.error("Production owner/application correlation assertion failed: ownerCorrelationOk must be true.");
+                console.error(JSON.stringify({ ownerCorrelationOk, ownerCorrelationProvenance }));
+                process.exit(1);
+              }
+              if (applicationUuid !== configuredApplicationUuid) {
+                console.error("Production owner/application correlation assertion failed: application UUID mismatch.");
+                process.exit(1);
+              }
+              if (ownerEndpoint !== "/app/" + applicationUuid || ownerStatus !== "verified" || ownerError !== null) {
+                console.error("Production owner/application provenance assertion failed.");
+                console.error(JSON.stringify({ ownerCorrelationProvenance }));
+                process.exit(1);
+              }
+              if (account.integrationStatus === "verified" && ownerCorrelationOk !== true) {
+                console.error("Fail-closed assertion failed: verified integration without owner correlation.");
+                process.exit(1);
+              }
+              const serialized = JSON.stringify(account);
+              if (serialized.includes("QVAPAY_APP_SECRET") || serialized.includes("QVAPAY_USER_API_TOKEN") || serialized.includes("app-secret")) {
+                console.error("Authenticated Account response contains an operational secret marker.");
                 process.exit(1);
               }
               console.log("Authenticated Account sync passed.");
               console.log(`Observed QvaPay identity username: ${username}`);
               console.log(`Observed QvaPay application UUID: ${applicationUuid}`);
+              console.log(`Owner correlation: ${ownerCorrelationOk}`);
+              console.log(`Owner correlation endpoint: ${ownerEndpoint}`);
+              console.log(`Owner correlation status: ${ownerStatus}`);
               console.log(`Balance source status: ${account.balanceSource?.status ?? "unknown"}`);
               console.log(`P2P source status: ${account.ownOffersProvenance?.status ?? "unknown"}`);
               console.log(`Integration status reported by current contract: ${account.integrationStatus ?? "unknown"}`);
@@ -317,7 +349,7 @@ jobs:
             });
           '
 
-          echo "Authenticated production Account evidence established. This proves the session-protected identity read and persisted Account snapshot; it does not certify app-owner identity correlation from #196."
+          echo "Authenticated production Account evidence established, including owner/application correlation for #196."
 
           START_RESPONSE=""
           for attempt in $(seq 1 7); do
