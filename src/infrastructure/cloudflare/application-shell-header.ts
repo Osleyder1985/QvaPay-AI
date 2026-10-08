@@ -25,5 +25,5 @@ export const APPLICATION_SHELL_HEADER: ApplicationShellHeader = {
 /** Renderiza el encabezado contextual sin crear estado operativo nuevo. */
 export function renderApplicationShellHeader(): string {
   const header = APPLICATION_SHELL_HEADER;
-  return `<header class="top" id="inicio"><div class="title"><h1>${header.title}</h1><p>${header.description}</p></div><div id="live" class="live"><i class="dot"></i><strong id="${header.liveTextId}">CONECTANDO</strong><span>·</span><span id="${header.updatedId}">—</span></div></header>`;
+  return `<header class="top" id="inicio"><div class="title"><h1>${header.title}</h1><p>${header.description}</p></div><div class="header-actions"><div id="live" class="live"><i class="dot"></i><strong id="${header.liveTextId}">CONECTANDO</strong><span>·</span><span id="${header.updatedId}">—</span></div><button class="button logout" id="logoutButton" type="button">Cerrar sesión</button><span id="logoutMessage" class="small" role="status" aria-live="polite"></span></div></header>`;
 }
