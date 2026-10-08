@@ -92,15 +92,20 @@ La mejor fila tiene heartbeat dorado.
 
 ## Operaciones P2P
 
-La aplicación también expone una frontera server-side protegida para aplicar a una oferta. Requiere `P2P_ACTION_TOKEN` y las credenciales de aplicación de QvaPay.
+El cliente QvaPay contiene la operación técnica para aplicar una oferta, pero la frontera HTTP pública permanece bloqueada. Actualmente `POST /api/p2p/:uuid/apply` responde `501` y no ejecuta una operación financiera real.
 
-Esta capacidad es distinta del análisis de mercado y no autoriza por sí sola automatización de arbitraje.
+Esta capacidad es distinta del análisis de mercado. Su activación requiere autorización específica y los controles de gobernanza, seguridad, confiabilidad, conciliación e idempotencia aplicables.
+
+## Cuenta y persistencia
+
+La Cuenta utiliza D1 para persistir identidad, auditoría y snapshots. `GET /api/account` es observacional y no sincroniza con QvaPay; `POST /api/account/sync` realiza la sincronización explícita con autorización de Administración y persiste el snapshot.
 
 ## Capacidades futuras
 
 Los siguientes elementos permanecen fuera de la implementación actual:
 
-- D1;
+- aplicación HTTP P2P;
+
 - webhook P2P;
 - stream SSE;
 - ingestión event-driven;

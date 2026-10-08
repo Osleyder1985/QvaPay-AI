@@ -2,7 +2,15 @@
 
 ## Propósito
 
-Este documento identifica el estado verificable de los componentes presentes en el repositorio actual. No confunde arquitectura futura con implementación existente.
+Este documento identifica el estado verificable de los componentes presentes en el repositorio actual. No confunde arquitectura futura con implementación existente ni implementación local con evidencia de producción.
+
+## Política de estados
+
+Los estados se interpretan en esta secuencia:
+
+**Defined → Designed → Implemented → Tested → Verified → Certified**
+
+`Implemented` indica presencia de implementación en el código. `Tested` requiere pruebas automatizadas pertinentes. `Verified` requiere evidencia operacional suficiente. `Certified` requiere evidencia de producción y el cumplimiento de los controles aplicables.
 
 ## Componentes implementados
 
@@ -17,13 +25,13 @@ Este documento identifica el estado verificable de los componentes presentes en 
 | DTO QvaPay | `src/infrastructure/qvapay/p2p-types.ts` | Implemented |
 | Mapper QvaPay | `src/infrastructure/qvapay/p2p-mapper.ts` | Tested |
 | Cliente QvaPay | `src/infrastructure/qvapay/qvapay-p2p-client.ts` | Tested |
-| Aplicación P2P | `QvaPayP2PClient.applyOffer()` | Implemented |
+| Aplicación P2P en el cliente | `QvaPayP2PClient.applyOffer()` | Implemented |
 | Worker Cloudflare | `src/infrastructure/cloudflare/worker.ts` | Tested |
 | Durable Object | `src/infrastructure/cloudflare/scanner-scheduler-do.ts` | Tested |
 | Lógica del scheduler | `src/infrastructure/cloudflare/scanner-scheduler-do-logic.ts` | Tested |
 | Dashboard público | `src/infrastructure/cloudflare/public-app.ts` | Tested |
 | Estado público | `GET /api/scanner/status` | Tested |
-| Aplicación de oferta | `POST /api/p2p/:uuid/apply` | Implemented |
+| Aplicación HTTP de oferta | `POST /api/p2p/:uuid/apply` | Blocked |
 | Configuración Wrangler | `wrangler.toml` | Implemented |
 | CI/CD | `.github/workflows/*.yml` | Tested |
 
@@ -39,7 +47,29 @@ El Durable Object mantiene:
 - último error;
 - snapshot de mercado utilizado por el dashboard.
 
-La persistencia es almacenamiento del Durable Object. **D1 todavía no está implementado en el repositorio actual.**
+Cloudflare D1 se utiliza actualmente para identidad, auditoría de seguridad y snapshots de Cuenta. El repositorio de snapshots de Cuenta está implementado en `src/infrastructure/cloudflare/qvapay-account-snapshot-store.ts`.
+
+La existencia de la implementación D1 no implica por sí sola evidencia de producción ni certificación.
+
+## Cuenta
+
+La lectura observacional y la sincronización externa están separadas:
+
+```text
+GET /api/account
+      │
+      └── lee el snapshot persistido más reciente
+          sin llamar a QvaPay ni mutar D1
+
+POST /api/account/sync
+      │
+      ├── autenticación de Administración
+      ├── consulta QvaPay
+      ├── persiste el snapshot
+      └── registra el evento de auditoría
+```
+
+La lectura de Cuenta está autorizada para los roles Administración y Observador. La sincronización explícita requiere el rol Administración.
 
 ## Dashboard actual
 
@@ -68,12 +98,11 @@ Las mejores ofertas reciben un heartbeat dorado y la acción semántica es:
 - oferta **SELL** → **Comprar** → verde;
 - oferta **BUY** → **Vender** → rojo.
 
-## Elementos todavía no implementados
+## Elementos todavía no implementados o bloqueados
 
-No deben presentarse como capacidades actuales:
+No deben presentarse como capacidades productivas certificadas:
 
-- Cloudflare D1;
-- repositorio D1 de snapshots;
+- aplicación HTTP de ofertas P2P;
 - webhook P2P;
 - stream SSE;
 - Event Ingestion Boundary;
