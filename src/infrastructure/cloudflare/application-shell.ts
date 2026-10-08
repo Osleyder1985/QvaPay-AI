@@ -14,6 +14,7 @@ export interface ApplicationShellModule {
   readonly administratorOnly?: boolean;
 }
 
+/** Módulos de navegación disponibles en el Application Shell. */
 export const APPLICATION_SHELL_MODULES: readonly ApplicationShellModule[] = [
   { id: "inicio", label: "Inicio", icon: "⌂", href: "#inicio" },
   { id: "cuenta", label: "Cuenta", icon: "◎", href: "#cuenta" },
@@ -30,8 +31,10 @@ export const APPLICATION_SHELL_MODULES: readonly ApplicationShellModule[] = [
   { id: "auditoria", label: "Auditoría", icon: "✓", href: "#auditoria" },
 ];
 
+/** Versión estructural del Application Shell. */
 export const APPLICATION_SHELL_VERSION = "1";
 
+/** Renderiza la navegación a partir del contrato central de módulos. */
 export function renderApplicationShellNavigation(): string {
   return APPLICATION_SHELL_MODULES.map(
     ({ id, label, icon, href, administratorOnly }) =>
