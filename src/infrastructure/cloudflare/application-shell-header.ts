@@ -79,5 +79,5 @@ export function renderApplicationShellHeader(moduleId = "inicio"): string {
 <span id="updated">—</span>
 <button class="logout-button" id="logoutButton" type="button">Cerrar sesión</button>
 </div>
-</header>`;;
+</header>`;
 }
