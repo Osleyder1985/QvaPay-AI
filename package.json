@@ -7,7 +7,7 @@
     "build": "tsc --noEmit",
     "test": "vitest run",
     "lint": "eslint .",
-    "format:check": "prettier --write \"src/infrastructure/qvapay/qvapay-account-client.ts\" && git diff -- src/infrastructure/qvapay/qvapay-account-client.ts && git diff --exit-code -- src/infrastructure/qvapay/qvapay-account-client.ts",
+    "format:check": "prettier --check \"src/**/*.ts\" \"tests/**/*.ts\" \"scripts/**/*.mjs\" \"config/**/*.json\" \"*.json\" \"*.js\" \"*.ts\"",
     "format": "prettier --write .",
     "check:docs-language": "node scripts/check-documentation-language.mjs",
     "cf:types": "wrangler types",
@@ -21,7 +21,6 @@
     "eslint": "^9.39.0",
     "prettier": "3.9.0",
     "typescript": "^5.9.3",
-    "vitest": "^3.2.4",
     "typescript-eslint": "^8.44.0",
     "wrangler": "4.146.0"
   }
