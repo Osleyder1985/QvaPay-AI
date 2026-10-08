@@ -55,7 +55,8 @@ const MODULE_HEADERS: Readonly<
   },
   configuracion: {
     title: "Configuración",
-    description: "Preferencias y parámetros disponibles para esta aplicación.",
+    description:
+      "Preferencias y parámetros disponibles para esta aplicación.",
   },
 };
 
