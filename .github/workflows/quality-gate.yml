@@ -90,6 +90,30 @@ jobs:
           print(f"Normative requirements inventory passed: {len(normative)} documents represented.")
           PY
 
+      - name: Validar consistencia entre estado y evidencia de requisitos
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import pathlib
+          import re
+          import sys
+          matrix = pathlib.Path("docs/requirements/requirements-traceability-matrix.md")
+          failures = []
+          for line_number, line in enumerate(matrix.read_text(encoding="utf-8").splitlines(), start=1):
+              if not line.startswith("|") or line.count("|") < 5:
+                  continue
+              cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
+              if len(cells) < 5 or cells[0] == "ID" or cells[0].startswith("---"):
+                  continue
+              status, evidence = cells[-1], cells[-2]
+              if status in {"Verified", "Certified"} and re.search(r"pendiente|bloquead|sin evidencia|evidencia no disponible|requiere evidencia", evidence, re.IGNORECASE):
+                  failures.append(f"Contradicción estado/evidencia en {cells[0]} (línea {line_number}): estado={status!r}, evidencia={evidence!r}")
+          if failures:
+              print("\n".join(failures)); sys.exit(1)
+          print("Consistencia estado/evidencia de requisitos: PASS")
+          PY
+
       - name: Validar la estructura Markdown
         shell: bash
         run: |
