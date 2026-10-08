@@ -9,11 +9,13 @@ describe("componentes de presentación", () => {
     expect(
       renderMetricCard("<Métrica>", "<valor>", "ready"),
     ).not.toContain("<Métrica>");
-    expect(
-      renderDataTable("Tabla", [{ key: "value", label: "Valor" }], [
-        { id: "<row>", cells: { value: "<valor>" } },
-      ]),
-    ).not.toContain("<row>");
+
+    const table = renderDataTable(
+      "Tabla",
+      [{ key: "value", label: "Valor" }],
+      [{ id: "<row>", cells: { value: "<valor>" } }],
+    );
+    expect(table).not.toContain("<row>");
   });
 
   it("expone el estado y sus límites de interacción", () => {
