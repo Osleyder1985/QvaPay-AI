@@ -94,7 +94,8 @@ function parseApplication(payload: unknown): QvaPayApplicationIdentity | null {
     uuid,
     name,
     url: optionalString(value, "url"),
-    description: optionalString(value, "description") ?? optionalString(value, "desc"),
+    description:
+      optionalString(value, "description") ?? optionalString(value, "desc"),
     callback: optionalString(value, "callback"),
     successUrl: optionalString(value, "success_url"),
     cancelUrl: optionalString(value, "cancel_url"),
