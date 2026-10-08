@@ -13,5 +13,5 @@ export const PRESENTATION_PRIMITIVES_STYLES = [
   ".qva-status--error,.qva-status--forbidden{color:var(--qva-color-negative)}",
   ".qva-data-value{display:inline-flex;align-items:baseline;gap:6px;font-family:var(--qva-font-data);font-variant-numeric:tabular-nums}",
   ".qva-data-value__unit{font-family:var(--qva-font-ui);color:var(--qva-color-text-muted);font-size:.8em}",
-  "</style>"
+  "</style>",
 ].join("");
