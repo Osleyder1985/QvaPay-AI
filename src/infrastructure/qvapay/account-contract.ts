@@ -63,10 +63,6 @@ export interface QvaPayAccountSourceMetadata {
   readonly error: string | null;
 }
 
-export type QvaPayAccountOwnerCorrelationStatus =
-  | "verified"
-  | "unavailable"
-  | "failed";
 
 export interface QvaPayAccountSnapshot {
   readonly balanceUsd: number | null;
