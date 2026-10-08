@@ -156,14 +156,38 @@ export default {
 
     const moduleRoute = url.pathname.match(/^\/app\/([a-z-]+)$/);
     if (moduleRoute) {
-      if (request.method !== "GET") return new Response("Method not allowed", { status: 405 });
+      if (request.method !== "GET") {
+        return new Response("Method not allowed", { status: 405 });
+      }
       const moduleId = moduleRoute[1] ?? "";
-      const allowedModules = ["inicio", "cuenta", "mercado", "arbitraje", "operaciones", "usuarios", "seguridad", "monitor", "configuracion"];
-      if (!allowedModules.includes(moduleId)) return new Response("Módulo no encontrado.", { status: 404 });
-      const session = await getSession(request, env.DB, env.ACCOUNT_AUTH_SECRET);
+      const allowedModules = [
+        "inicio",
+        "cuenta",
+        "mercado",
+        "arbitraje",
+        "operaciones",
+        "usuarios",
+        "seguridad",
+        "monitor",
+        "configuracion",
+      ];
+      if (!allowedModules.includes(moduleId)) {
+        return new Response("Módulo no encontrado.", { status: 404 });
+      }
+      const session = await getSession(
+        request,
+        env.DB,
+        env.ACCOUNT_AUTH_SECRET,
+      );
       if (!session) return createLoginAppResponse();
-      if (moduleId === "usuarios" && session.user.role !== "ADMINISTRATION") {
-        return new Response("Acceso denegado.", { status: 403, headers: { "cache-control": "no-store" } });
+      if (
+        moduleId === "usuarios" &&
+        session.user.role !== "ADMINISTRATION"
+      ) {
+        return new Response("Acceso denegado.", {
+          status: 403,
+          headers: { "cache-control": "no-store" },
+        });
       }
       return createPublicAppResponse(moduleId);
     }
