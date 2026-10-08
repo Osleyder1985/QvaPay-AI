@@ -35,7 +35,9 @@ export function renderDataTable(
         columns
           .map(
             (column) =>
-              "<td>" + escapeHtml(row.cells[column.key] ?? "—") + "</td>",
+              "<td>" +
+              escapeHtml(row.cells[column.key] ?? "—") +
+              "</td>",
           )
           .join("") +
         "</tr>",
