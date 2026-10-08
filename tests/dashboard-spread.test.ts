@@ -14,7 +14,7 @@ describe("dashboard spread rendering contract", () => {
     );
   });
 
-  it("does not contain the previously unsafe unconditional spreadPercent access", () => {
+  it("no conserva el acceso incondicional inseguro a spreadPercent", () => {
     expect(DASHBOARD_CLIENT_SCRIPT).not.toContain(
       'state.metrics.spreadPercent.toFixed(2)',
     );
