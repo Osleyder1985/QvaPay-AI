@@ -21,7 +21,7 @@ export function renderStatusBadge(state: UiState): string {
     forbidden: "Acceso denegado",
     offline: "Sin conexión",
     reconnecting: "Reconectando",
-    success: "Completado"
+    success: "Completado",
   };
 
   return `<span class="qva-status qva-status--${state}" role="status" aria-live="polite">${labels[state]}</span>`;
