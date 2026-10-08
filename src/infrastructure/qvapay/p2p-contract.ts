@@ -179,7 +179,9 @@ function decimalString(value: unknown, field: string): string {
 
 function assertPositiveDecimal(value: string, field: string): void {
   if (compareDecimal(value, "0") <= 0) {
-    throw new QvaPayContractError(`QvaPay financial quantity must be positive: ${field}`);
+    throw new QvaPayContractError(
+      `QvaPay financial quantity must be positive: ${field}`,
+    );
   }
 }
 
