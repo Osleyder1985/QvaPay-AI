@@ -18,7 +18,8 @@ function calculateRate(amount: string, receive: string): string {
   if (
     !Number.isFinite(qUsdAmount) ||
     qUsdAmount <= 0 ||
-    !Number.isFinite(fiatAmount)
+    !Number.isFinite(fiatAmount) ||
+    fiatAmount <= 0
   ) {
     throw new Error(
       "Las cantidades QvaPay P2P no son válidas para calcular la tasa",

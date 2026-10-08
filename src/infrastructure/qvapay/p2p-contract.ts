@@ -61,6 +61,9 @@ function parseOffer(value: unknown): QvaPayP2POfferDto {
     value.available_amount,
     "available_amount",
   );
+  assertPositiveDecimal(amount, "amount");
+  assertPositiveDecimal(receive, "receive");
+  assertPositiveDecimal(availableAmount, "available_amount");
 
   if (type !== "buy" && type !== "sell") {
     throw new QvaPayContractError("Invalid QvaPay P2P offer type");
@@ -172,6 +175,55 @@ function decimalString(value: unknown, field: string): string {
     throw new QvaPayContractError(`Invalid QvaPay decimal: ${field}`);
   }
   return value;
+}
+
+function assertPositiveDecimal(value: string, field: string): void {
+  if (compareDecimal(value, "0") <= 0) {
+    throw new QvaPayContractError(
+      `QvaPay financial quantity must be positive: ${field}`,
+    );
+  }
+}
+
+function compareDecimal(left: string, right: string): number {
+  const a = normalizeDecimal(left);
+  const b = normalizeDecimal(right);
+
+  if (a.sign !== b.sign) return a.sign > b.sign ? 1 : -1;
+
+  const integerComparison = compareUnsignedIntegers(a.integer, b.integer);
+  if (integerComparison !== 0) {
+    return a.sign === 1 ? integerComparison : -integerComparison;
+  }
+
+  const length = Math.max(a.fraction.length, b.fraction.length);
+  const leftFraction = a.fraction.padEnd(length, "0");
+  const rightFraction = b.fraction.padEnd(length, "0");
+  if (leftFraction === rightFraction) return 0;
+
+  const fractionComparison = leftFraction > rightFraction ? 1 : -1;
+  return a.sign === 1 ? fractionComparison : -fractionComparison;
+}
+
+function normalizeDecimal(value: string): {
+  sign: -1 | 1;
+  integer: string;
+  fraction: string;
+} {
+  const negative = value.startsWith("-");
+  const unsigned = negative ? value.slice(1) : value;
+  const [integerPart = "0", fraction = ""] = unsigned.split(".");
+  return {
+    sign: negative ? -1 : 1,
+    integer: integerPart.replace(/^0+(?=\d)/, ""),
+    fraction,
+  };
+}
+
+function compareUnsignedIntegers(left: string, right: string): number {
+  if (left.length !== right.length) return left.length > right.length ? 1 : -1;
+  if (left === right) return 0;
+  return left > right ? 1 : -1;
 }
 
 function optionalDecimal(value: unknown, field: string): string | undefined {

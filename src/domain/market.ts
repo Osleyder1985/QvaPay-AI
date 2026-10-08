@@ -34,6 +34,23 @@ export function createMarket(coin: string, offers: readonly Offer[]): Market {
         "El mercado de la oferta no coincide con la identidad del mercado",
       );
     }
+    if (compareDecimalStrings(offer.rate, "0") <= 0) {
+      throw new Error("La tasa de la oferta debe ser positiva");
+    }
+    if (compareDecimalStrings(offer.amount, "0") <= 0) {
+      throw new Error("La cantidad de la oferta debe ser positiva");
+    }
+    if (compareDecimalStrings(offer.availableAmount, "0") < 0) {
+      throw new Error(
+        "La cantidad disponible de la oferta no puede ser negativa",
+      );
+    }
+    if (
+      offer.fiatAmount !== undefined &&
+      compareDecimalStrings(offer.fiatAmount, "0") <= 0
+    ) {
+      throw new Error("El importe fiat de la oferta debe ser positivo");
+    }
   }
 
   return {
