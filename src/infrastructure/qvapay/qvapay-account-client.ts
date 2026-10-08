@@ -77,14 +77,19 @@ function parseBalance(payload: unknown): number | null {
 
 function parseApplication(payload: unknown): QvaPayApplicationIdentity | null {
   const unwrapped = readPayload(payload);
-  const value = Array.isArray(unwrapped)
-    ? unwrapped.length === 1 && isRecord(unwrapped[0])
-      ? unwrapped[0]
+  const candidate = isRecord(unwrapped) && Array.isArray(unwrapped.data)
+    ? unwrapped.data.length === 1
+      ? unwrapped.data[0]
       : null
-    : isRecord(unwrapped)
-      ? isRecord(unwrapped.application)
-        ? unwrapped.application
-        : unwrapped
+    : unwrapped;
+  const value = Array.isArray(candidate)
+    ? candidate.length === 1 && isRecord(candidate[0])
+      ? candidate[0]
+      : null
+    : isRecord(candidate)
+      ? isRecord(candidate.application)
+        ? candidate.application
+        : candidate
       : null;
   if (!value) return null;
   const uuid = optionalString(value, "uuid");
