@@ -11,7 +11,7 @@ import { escapeHtml } from "./escape-html.js";
 export function renderEmptyState(title: string, detail: string): string {
   return (
     '<section class="qva-empty-state" role="status">' +
-    '<h3>' +
+    "<h3>" +
     escapeHtml(title) +
     "</h3>" +
     "<p>" +
