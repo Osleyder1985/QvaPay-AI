@@ -11,6 +11,7 @@ import {
   renderApplicationShellNavigation,
 } from "../src/infrastructure/cloudflare/application-shell.js";
 import { DASHBOARD_CLIENT_SCRIPT } from "../src/presentation/dashboard/dashboard-client.js";
+import { renderApplicationShellHeader } from "../src/infrastructure/cloudflare/application-shell-header.js";
 
 describe("rutas y navegación del Application Shell", () => {
   it("define las rutas de los módulos", () => {
@@ -35,6 +36,13 @@ describe("rutas y navegación del Application Shell", () => {
     expect(navigation).toContain('href="/app/usuarios"');
     expect(navigation).toContain('id="adminNav" hidden');
     expect(navigation).not.toContain('href="#cuenta"');
+  });
+
+  it("expone un encabezado accesible y contextual por ruta", () => {
+    const header = renderApplicationShellHeader("mercado");
+
+    expect(header).toContain("aria-labelledby=\\\"page-title\\\"");
+    expect(header).toContain("<h1 id=\\\"page-title\\\">Mercado P2P</h1>");
   });
 
   it("documenta módulos funcionales pendientes", () => {
