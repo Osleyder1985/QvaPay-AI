@@ -10,7 +10,9 @@ import {
   APPLICATION_SHELL_MODULES,
   renderApplicationShellNavigation,
 } from "../src/infrastructure/cloudflare/application-shell.js";
-import { DASHBOARD_CLIENT_SCRIPT } from "../src/presentation/dashboard/dashboard-client.js";
+import {
+  DASHBOARD_CLIENT_SCRIPT,
+} from "../src/presentation/dashboard/dashboard-client.js";
 
 describe("rutas y navegación del Application Shell", () => {
   it("define rutas independientes para los módulos acordados", () => {
@@ -45,7 +47,9 @@ describe("rutas y navegación del Application Shell", () => {
     () => {
       expect(DASHBOARD_CLIENT_SCRIPT).toContain("initializeModulePage");
       expect(DASHBOARD_CLIENT_SCRIPT).toContain("visibleByModule");
-      expect(DASHBOARD_CLIENT_SCRIPT).toContain("Implementación funcional pendiente");
+      expect(DASHBOARD_CLIENT_SCRIPT).toContain(
+        "Implementación funcional pendiente",
+      );
     },
   );
 });
