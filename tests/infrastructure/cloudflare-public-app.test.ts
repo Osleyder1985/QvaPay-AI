@@ -4,9 +4,7 @@ import {
   createPublicScannerStateResponse,
   toPublicScannerState,
 } from "../../src/infrastructure/cloudflare/public-app.js";
-import type {
-  ScannerSchedulerRuntimeState,
-} from "../../src/infrastructure/cloudflare/scanner-scheduler-do.js";
+import type { ScannerSchedulerRuntimeState } from "../../src/infrastructure/cloudflare/scanner-scheduler-do.js";
 
 const marketState: ScannerSchedulerRuntimeState = {
   configured: true,
@@ -89,7 +87,9 @@ const marketState: ScannerSchedulerRuntimeState = {
 };
 
 describe("public production dashboard", () => {
-  it("sirve la ruta inicial sin credenciales ni contenido funcional de otros módulos", async () => {
+  it(
+    "sirve la ruta inicial sin credenciales ni contenido funcional de otros módulos",
+    async () => {
     const response = createPublicAppResponse();
     const body = await response.text();
 
@@ -118,7 +118,8 @@ describe("public production dashboard", () => {
     expect(body).toContain("ISO/IEC 27001");
     expect(body).not.toContain("SCANNER_BOOTSTRAP_TOKEN");
     expect(body).not.toContain("Server-Side Monitoring");
-  });
+    },
+  );
 
   it("ships a syntactically valid dashboard client script", async () => {
     const body = await createPublicAppResponse().text();
