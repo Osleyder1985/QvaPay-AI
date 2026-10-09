@@ -1,8 +1,6 @@
 name: Temporary Prettier diagnosis
 on:
   pull_request:
-    branches:
-      - feat/premium-modular-ui-foundation
 permissions:
   contents: read
 jobs:
