@@ -1,0 +1,71 @@
+import { expect, test } from "@playwright/test";
+
+const protectedRoutes = [
+  "/app/inicio",
+  "/app/cuenta",
+  "/app/mercado",
+  "/app/arbitraje",
+  "/app/operaciones",
+  "/app/usuarios",
+  "/app/seguridad",
+  "/app/monitor",
+  "/app/configuracion",
+];
+
+test("unauthenticated module routes render login instead of private module data", async ({
+  page,
+}) => {
+  for (const route of protectedRoutes) {
+    const response = await page.goto(route);
+
+    expect(response?.status(), route).toBe(200);
+    await expect(page.getByRole("button", { name: "Iniciar sesión" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "QvaPay-AI" })).toBeVisible();
+    await expect(page.locator("#accountBalance")).toHaveCount(0);
+    await expect(page.locator("#coin")).toHaveCount(0);
+  }
+});
+
+test("unknown module and unsupported method are rejected", async ({ request }) => {
+  const unknown = await request.get("/app/no-existe");
+  expect(unknown.status()).toBe(404);
+
+  const unsupportedMethod = await request.post("/app/inicio");
+  expect(unsupportedMethod.status()).toBe(405);
+});
+
+for (const viewport of [
+  { name: "mobile", width: 360, height: 800 },
+  { name: "tablet", width: 768, height: 1024 },
+  { name: "desktop", width: 1440, height: 900 },
+]) {
+  test(`login view has no horizontal overflow at ${viewport.name} width`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: viewport.width, height: viewport.height });
+    await page.goto("/");
+
+    await expect(page.getByRole("button", { name: "Iniciar sesión" })).toBeVisible();
+    const dimensions = await page.evaluate(() => ({
+      viewport: document.documentElement.clientWidth,
+      document: document.documentElement.scrollWidth,
+    }));
+    expect(dimensions.document, JSON.stringify(dimensions)).toBeLessThanOrEqual(
+      dimensions.viewport,
+    );
+  });
+}
+
+test("login form is keyboard reachable and reports authentication status", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await page.keyboard.press("Tab");
+  await expect(page.locator("#username")).toBeFocused();
+
+  await page.keyboard.press("Tab");
+  await expect(page.locator("#password")).toBeFocused();
+
+  await page.keyboard.press("Tab");
+  await expect(page.getByRole("button", { name: "Iniciar sesión" })).toBeFocused();
+});
