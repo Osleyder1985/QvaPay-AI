@@ -1,5 +1,7 @@
-import AxeBuilder from "@axe-core/playwright";
+import * as AxeBuilderModule from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
+
+const AxeBuilder = AxeBuilderModule.default;
 
 const protectedRoutes = [
   "/app/inicio",
