@@ -16,6 +16,7 @@ export const DESIGN_TOKENS = [
   "--qva-color-accent:#7c9cff;",
   "--qva-color-positive:#55e39a;",
   "--qva-color-warning:#f4c95d;",
+  "--qva-color-highlight:#ffd746;",
   "--qva-color-negative:#ff7188;",
   "--qva-color-buy:#47d7a0;",
   "--qva-color-sell:#ff7890;",
