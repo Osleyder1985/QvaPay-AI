@@ -16,7 +16,7 @@ const DEFAULT_MODULE_HEADER = {
 type ModuleHeader = { title: string; description: string };
 
 /** Metadatos contextuales del encabezado para cada módulo. */
-const MODULE_HEADERS: Readonly<Record<string, ModuleHeader>> = {
+const MODULE_HEADERS: Record<string, ModuleHeader> = {
   inicio: {
     title: "Centro de mando",
     description:
