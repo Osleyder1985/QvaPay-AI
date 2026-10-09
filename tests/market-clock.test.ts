@@ -16,7 +16,7 @@ describe("reloj del servidor para frescura del mercado", () => {
     ).toBe(1_005_000);
   });
 
-  it("calcula la antigüedad usando el tiempo transcurrido desde la recepción", () => {
+  it("calcula la antigüedad del snapshot", () => {
     expect(
       snapshotAgeMs(
         "1970-01-01T00:16:39.000Z",
@@ -38,7 +38,7 @@ describe("reloj del servidor para frescura del mercado", () => {
     ).toBe(0);
   });
 
-  it("marca fechas inválidas o relojes inconsistentes como no verificables", () => {
+  it("rechaza fechas y relojes inválidos", () => {
     expect(snapshotAgeMs(null, 1_000, 2_000, 2_100)).toBe(Infinity);
     expect(
       snapshotAgeMs("fecha-invalida", 1_000, 2_000, 2_100),
@@ -62,7 +62,7 @@ describe("integración del reloj y sondeo del mercado", () => {
     expect(DASHBOARD_CLIENT_SCRIPT).toContain("if(refreshInFlight)return");
   });
 
-  it("conserva el snapshot y marca desconexión si falla la actualización", () => {
+  it("conserva el snapshot cuando falla la actualización", () => {
     expect(DASHBOARD_CLIENT_SCRIPT).toContain(
       "state={...state,__offline:true};render()",
     );
