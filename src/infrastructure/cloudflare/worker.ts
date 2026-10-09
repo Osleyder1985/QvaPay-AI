@@ -52,10 +52,12 @@ function jsonError(message: string, status: number): Response {
 
 /**
  * @proposito validateSameOriginMutation: protege las mutaciones autenticadas frente a CSRF.
- * @responsabilidades Exigir un encabezado Origin exacto cuando la solicitud lleva la cookie de sesión.
+ * @responsabilidades Exigir un encabezado Origin exacto cuando la solicitud lleva
+ * la cookie de sesión.
  * @param request Solicitud HTTP entrante.
  * @param url URL ya normalizada de la solicitud.
- * @returns Respuesta 403 si el origen falta o no coincide; null si la validación no aplica o es válida.
+ * @returns Respuesta 403 si el origen falta o no coincide; null si la validación
+ * no aplica o es válida.
  */
 function validateSameOriginMutation(request: Request, url: URL): Response | null {
   if (!["POST", "PUT", "PATCH", "DELETE"].includes(request.method.toUpperCase())) return null;
