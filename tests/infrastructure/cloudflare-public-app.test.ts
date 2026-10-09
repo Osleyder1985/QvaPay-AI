@@ -273,12 +273,15 @@ describe("public production dashboard", () => {
       {
         module: "monitor",
         required: [
-          'id="module-placeholder"',
-          "Implementación funcional pendiente",
-          "<h2>Monitor y observabilidad</h2>",
+          'id="monitor-module"',
+          'id="health"',
+          'id="countdown"',
+          'id="eventCompleted"',
+          "<h2 id=\"monitor-title\">Monitor y observabilidad</h2>",
         ],
         forbidden: [
           'id="overview"',
+          'id="module-placeholder"',
           'id="cuenta"',
           'id="mercado"',
           'id="operaciones"',
