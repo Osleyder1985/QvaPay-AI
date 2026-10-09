@@ -183,7 +183,8 @@ test("el shell autenticado mantiene rutas, recarga, diseño adaptable y movimien
             return {
               element: element.tagName.toLowerCase(),
               id: element.id,
-              className: typeof element.className === "string" ? element.className : "",
+              className:
+                typeof element.className === "string" ? element.className : "",
               left: Math.round(rect.left),
               right: Math.round(rect.right),
               width: Math.round(rect.width),
