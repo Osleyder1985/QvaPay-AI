@@ -6,6 +6,7 @@
  */
 
 export function renderDashboardView(): string {
+  // prettier-ignore
   return String.raw`
 
 <section class="hero">
@@ -24,7 +25,7 @@ export function renderDashboardView(): string {
 <div class="panel control"><div class="control-head"><h3>🧭 Trazabilidad</h3><span class="status">● Registrada</span></div><p>El snapshot conserva observación, ejecución y programación del siguiente ciclo para facilitar verificación.</p></div>
 <div class="panel control"><div class="control-head"><h3>🛡️ Exposición</h3><span class="status">● Protegida</span></div><p>La respuesta pública se limita al contrato de lectura y las rutas internas requieren autorización.</p></div>
 <div class="panel control"><div class="control-head"><h3>📐 ISO-alineado</h3><span class="status warn">◐ En evolución</span></div><p>La organización toma como referencia calidad, seguridad y continuidad. No se declara certificación.</p></div>
-</div></section>
+</div></section></section>
 
 <section class="section" id="mercado" aria-labelledby="mercado-title"><div class="section-title"><div><h2 id="mercado-title">Mercado P2P</h2><p>Libros independientes por lado y por moneda.</p></div><span class="badge">Snapshot: <b id="snapshot">—</b></span></div><div id="marketIntegrity" class="market-integrity" role="status" aria-live="polite">Esperando validación de integridad del snapshot.</div><div class="tables">
 <div class="panel tablepanel"><div class="tablehead"><h2>🔴 SELL · acción Comprar</h2><span class="badge" id="sellCount">0 ofertas</span></div><div class="table-scroll" id="sellTable"></div></div>
@@ -44,4 +45,113 @@ export function renderDashboardView(): string {
 
 <footer class="footer"><div class="tags"><span class="tag">ISO 9001 · calidad</span><span class="tag">ISO/IEC 27001 · seguridad</span><span class="tag">ISO 22301 · continuidad</span><span class="tag">Server-side 24/7</span></div><div>Actualización automática · intervalo: <strong id="intervalLabelFooter">10</strong>s</div></footer>
 `;
+}
+
+/**
+ * Renderiza un estado pendiente sin exponer controles ni datos ficticios.
+ */
+function renderPendingModulePlaceholder(
+  icon: string,
+  title: string,
+  description: string,
+): string {
+  return `<section
+    id="module-placeholder"
+    class="module-placeholder panel"
+    aria-live="polite"
+  >
+    <div class="placeholder-icon" aria-hidden="true">${icon}</div>
+    <p class="eyebrow">MÓDULO INDEPENDIENTE</p>
+    <h2>${title}</h2>
+    <p>${description}</p>
+    <span class="status warn">Implementación funcional pendiente</span>
+  </section>`;
+}
+
+/**
+ * Extrae una sección HTML completa respetando secciones anidadas.
+ * El contenido procede de la plantilla interna y no de entrada del usuario.
+ */
+function extractSection(markup: string, id: string): string {
+  const openingPattern = new RegExp(
+    `<section\\b(?=[^>]*\\bid=["']${id}["'])[^>]*>`,
+  );
+  const opening = openingPattern.exec(markup);
+  if (!opening || opening.index === undefined) return "";
+
+  const tokenPattern = /<section\b[^>]*>|<\/section\s*>/g;
+  tokenPattern.lastIndex = opening.index;
+  let depth = 0;
+  let token: RegExpExecArray | null;
+
+  while ((token = tokenPattern.exec(markup)) !== null) {
+    if (token[0].startsWith("</")) {
+      depth -= 1;
+      if (depth === 0) {
+        return markup.slice(opening.index, tokenPattern.lastIndex);
+      }
+    } else {
+      depth += 1;
+    }
+  }
+
+  return "";
+}
+
+/**
+ * Renderiza el monitor usando exclusivamente el contrato persistido del scanner.
+ * No crea datos ni ejecuta órdenes desde el navegador.
+ */
+function renderMonitorModuleView(): string {
+  return `<section class="section monitor-view" id="monitor-module" aria-labelledby="monitor-title">
+<div class="section-title"><div><h2 id="monitor-title">Monitor y observabilidad</h2><p>Estado persistido del scanner server-side, frescura del snapshot y salud del runtime.</p></div><span class="badge">Moneda: <b id="coin">—</b></span></div>
+<div class="grid3">
+<div class="panel control"><div class="control-head"><h3><span id="healthIcon" aria-hidden="true">●</span> Estado del scanner</h3><span class="status" id="quality">—</span></div><p id="health" role="status" aria-live="polite">Esperando el estado del servidor.</p><div class="eyebrow">Próxima ejecución</div><div class="countdown" id="countdown">— <small>segundos</small></div></div>
+<div class="panel control"><div class="control-head"><h3>Último snapshot</h3><span class="status" id="auditSnapshot">—</span></div><div class="account-grid"><div><span>Liquidez disponible</span><b id="liquidity">—</b></div><div><span>Ofertas observadas</span><b id="offers">—</b></div><div><span>Spread</span><b id="spread">—</b></div><div><span>Mejor BUY</span><b id="bestBuy">—</b></div><div><span>Mejor SELL</span><b id="bestSell">—</b></div></div></div>
+<div class="panel control"><div class="control-head"><h3>Programación y errores</h3><span class="status">Solo lectura</span></div><div class="trace-row"><span>Inicio del último ciclo</span><b id="eventStarted">—</b></div><div class="trace-row"><span>Fin del último ciclo</span><b id="eventCompleted">—</b></div><div class="trace-row"><span>Próximo ciclo</span><b id="eventNext">—</b></div><div class="trace-row"><span>Intervalo</span><b><span id="intervalLabel">—</span> s</b></div><div class="trace-row"><span>Moneda</span><b id="auditCoin">—</b></div><div class="trace-row"><span>Último error</span><b id="auditError" role="status" aria-live="polite">—</b></div></div>
+</div>
+</section>`;
+}
+
+/**
+ * Renderiza exclusivamente el contenido asignado a una ruta modular.
+ * Las secciones funcionales de otros módulos no se envían al navegador.
+ */
+export function renderDashboardModuleView(moduleId: string): string {
+  const markup = renderDashboardView();
+  const hero =
+    markup.match(/<section class="hero">[\s\S]*?<\/section>/)?.[0] ?? "";
+  const footer =
+    markup.match(/<footer class="footer">[\s\S]*?<\/footer>/)?.[0] ?? "";
+  const accountSecurity = extractSection(markup, "seguridad-cuenta");
+  const controls = extractSection(markup, "controles");
+  const accountSecurityWithoutControls = accountSecurity.replace(controls, "");
+
+  const pendingModules = {
+    arbitraje: renderPendingModulePlaceholder(
+      "⇄",
+      "Arbitraje",
+      "El espacio de análisis está preparado. La vista operativa se habilitará cuando su contrato de datos y sus pruebas estén integrados.",
+    ),
+    configuracion: renderPendingModulePlaceholder(
+      "⚙",
+      "Configuración",
+      "Los parámetros editables aparecerán aquí cuando sus contratos y controles de autorización estén disponibles.",
+    ),
+  };
+
+  const sectionsByModule: Record<string, string> = {
+    inicio: hero + footer,
+    cuenta:
+      extractSection(markup, "cuenta") + accountSecurityWithoutControls,
+    mercado: hero + extractSection(markup, "mercado") + footer,
+    operaciones: extractSection(markup, "operaciones"),
+    usuarios: extractSection(markup, "administracion"),
+    seguridad: controls + extractSection(markup, "auditoria"),
+    arbitraje: pendingModules.arbitraje,
+    monitor: renderMonitorModuleView(),
+    configuracion: pendingModules.configuracion,
+  };
+
+  return sectionsByModule[moduleId] ?? "";
 }

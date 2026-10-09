@@ -1,29 +1,88 @@
 /**
  * @archivo src/infrastructure/cloudflare/application-shell-header.ts
- * @proposito Define la composición del encabezado contextual del Application Shell.
- * @responsabilidades Mantener separada la presentación del contexto de navegación respecto de los módulos.
- * @ubicacion src/infrastructure/cloudflare dentro de la arquitectura de QvaPay-AI.
+ * @proposito Define el encabezado contextual del Application Shell.
+ * @responsabilidades Separar navegación y presentación contextual de módulos.
+ * @ubicacion Capa de infraestructura Cloudflare de QvaPay-AI.
  */
 
-/** Contrato de datos para el encabezado contextual del Application Shell. */
-export interface ApplicationShellHeader {
-  readonly title: string;
-  readonly description: string;
-  readonly liveTextId: string;
-  readonly updatedId: string;
-}
-
-/** Configuración actual del encabezado contextual del Dashboard. */
-export const APPLICATION_SHELL_HEADER: ApplicationShellHeader = {
-  title: "Dashboard operativo",
+/** Metadatos por defecto cuando una ruta no tiene encabezado específico. */
+const DEFAULT_MODULE_HEADER = {
+  title: "Centro de mando",
   description:
-    "Observabilidad, control y trazabilidad del mercado P2P en un único centro.",
-  liveTextId: "liveText",
-  updatedId: "updated",
+    "Una vista clara del estado operativo y los indicadores esenciales.",
 };
 
-/** Renderiza el encabezado contextual sin crear estado operativo nuevo. */
-export function renderApplicationShellHeader(): string {
-  const header = APPLICATION_SHELL_HEADER;
-  return `<header class="top" id="inicio" aria-labelledby="inicio-title"><div class="title"><h1 id="inicio-title">${header.title}</h1><p>${header.description}</p></div><div id="live" class="live"><i class="dot"></i><strong id="${header.liveTextId}">CONECTANDO</strong><span>·</span><span id="${header.updatedId}">—</span><button class="logout-button" id="logoutButton" type="button">Cerrar sesión</button></div></header>`;
+/** Estructura de los metadatos contextuales de cada módulo. */
+type ModuleHeader = {
+  title: string;
+  description: string;
+};
+
+/** Metadatos contextuales del encabezado para cada módulo. */
+const MODULE_HEADERS: Record<string, ModuleHeader> = {
+  inicio: {
+    title: "Centro de mando",
+    description:
+      "Una vista clara del estado operativo y los indicadores esenciales.",
+  },
+  cuenta: {
+    title: "Cuenta QvaPay",
+    description:
+      "Identidad y datos financieros obtenidos de la API autenticada.",
+  },
+  mercado: {
+    title: "Mercado P2P",
+    description:
+      "Lectura del mercado, ofertas y calidad del snapshot observado.",
+  },
+  arbitraje: {
+    title: "Arbitraje",
+    description: "Análisis por moneda y mercado, sin enviar órdenes.",
+  },
+  operaciones: {
+    title: "Operaciones",
+    description: "Seguimiento de las operaciones disponibles para tu sesión.",
+  },
+  usuarios: {
+    title: "Usuarios y acceso",
+    description:
+      "Administración de usuarios y permisos para roles autorizados.",
+  },
+  seguridad: {
+    title: "Seguridad y auditoría",
+    description: "Controles de seguridad, auditoría y trazabilidad operativa.",
+  },
+  monitor: {
+    title: "Monitor y observabilidad",
+    description: "Estado del runtime, escaneos, frescura de datos y errores.",
+  },
+  configuracion: {
+    title: "Configuración",
+    description: "Preferencias y parámetros disponibles para esta aplicación.",
+  },
+};
+
+/**
+ * Renderiza el encabezado contextual de la ruta activa.
+ * @param moduleId Identificador de la ruta solicitada.
+ * @returns Fragmento HTML del encabezado.
+ */
+export function renderApplicationShellHeader(moduleId = "inicio"): string {
+  const header = MODULE_HEADERS[moduleId] ?? DEFAULT_MODULE_HEADER;
+
+  return [
+    '<header class="top" id="pageHeader" aria-labelledby="page-title">',
+    '  <div class="title">',
+    '    <h1 id="page-title">' + header.title + "</h1>",
+    "    <p>" + header.description + "</p>",
+    "  </div>",
+    '  <div id="live" class="live">',
+    '    <i class="dot"></i>',
+    '    <strong id="liveText">CONECTANDO</strong>',
+    "    <span>·</span>",
+    '    <span id="updated">—</span>',
+    '    <button class="logout-button" id="logoutButton" type="button">Cerrar sesión</button>',
+    "  </div>",
+    "</header>",
+  ].join("\n");
 }

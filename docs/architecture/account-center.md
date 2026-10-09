@@ -6,12 +6,12 @@ El módulo **Cuenta** presenta información separada y trazable de la cuenta pro
 
 ## Fuentes de verdad
 
-| Información | Fuente |
-|---|---|
-| Balance | `POST /v2/balance` |
-| Aplicación | `POST /v2/info` |
+| Información           | Fuente                                                    |
+| --------------------- | --------------------------------------------------------- |
+| Balance               | `POST /v2/balance`                                        |
+| Aplicación            | `POST /v2/info`                                           |
 | Identidad autenticada | `GET /user` con API Token QvaPay de alcance mínimo `read` |
-| Ofertas propias | `GET /p2p?my=1` |
+| Ofertas propias       | `GET /p2p?my=1`                                           |
 
 La identidad de la cuenta **no** se obtiene de una oferta P2P ni de su participante. Los participantes de P2P son datos de mercado.
 
@@ -62,7 +62,6 @@ Con una sesión autenticada, Cuenta puede mostrar balance, identidad autenticada
 ## Regla de evolución
 
 Cada nuevo campo de Cuenta debe identificar su fuente QvaPay, pasar por normalización contractual, registrar su estado de lectura y tener prueba cuando sea contractual. Nunca se debe sustituir una fuente por datos de mercado ni exponer payloads upstream completos.
-
 
 ## Separación de lectura y sincronización
 

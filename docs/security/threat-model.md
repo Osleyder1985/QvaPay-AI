@@ -12,17 +12,17 @@
 
 ## Amenazas y controles
 
-| Amenaza | Impacto | Control |
-|---|---|---|
-| Exposición de credenciales | Alto | Cloudflare Secrets |
-| Acceso al control del scanner | Alto | Bearer token |
-| Aplicación P2P no autorizada | Alto | `P2P_ACTION_TOKEN` + credenciales server-side |
-| Respuesta QvaPay inválida | Alto | Validación de contrato |
-| BUY/SELL mezclados | Alto | Invariantes de dominio |
-| Mercado equivocado | Alto | Identidad por `coin` |
-| Rate limiting | Medio/Alto | Backoff acotado |
-| Reintentos duplicados | Medio | límites de reintento y control de ejecución |
-| Información sensible en logs | Alto | Sanitización |
+| Amenaza                       | Impacto    | Control                                       |
+| ----------------------------- | ---------- | --------------------------------------------- |
+| Exposición de credenciales    | Alto       | Cloudflare Secrets                            |
+| Acceso al control del scanner | Alto       | Bearer token                                  |
+| Aplicación P2P no autorizada  | Alto       | `P2P_ACTION_TOKEN` + credenciales server-side |
+| Respuesta QvaPay inválida     | Alto       | Validación de contrato                        |
+| BUY/SELL mezclados            | Alto       | Invariantes de dominio                        |
+| Mercado equivocado            | Alto       | Identidad por `coin`                          |
+| Rate limiting                 | Medio/Alto | Backoff acotado                               |
+| Reintentos duplicados         | Medio      | límites de reintento y control de ejecución   |
+| Información sensible en logs  | Alto       | Sanitización                                  |
 
 ## Riesgo operativo
 

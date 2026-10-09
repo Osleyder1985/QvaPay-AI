@@ -14,26 +14,26 @@ Los estados se interpretan en esta secuencia:
 
 ## Componentes implementados
 
-| Área | Implementación | Estado |
-|---|---|---|
-| Dominio | `src/domain/market.ts`, `src/domain/offer.ts` | Tested |
-| Caso de uso | `src/application/use-cases/scan-market.ts` | Tested |
-| Runtime | `src/application/scanner-runtime.ts` | Tested |
-| Puerto de mercado | `src/application/ports/market-provider.ts` | Implemented |
-| Puerto de scheduler | `src/application/ports/scanner-scheduler.ts` | Implemented |
-| Contrato QvaPay | `src/infrastructure/qvapay/p2p-contract.ts` | Tested |
-| DTO QvaPay | `src/infrastructure/qvapay/p2p-types.ts` | Implemented |
-| Mapper QvaPay | `src/infrastructure/qvapay/p2p-mapper.ts` | Tested |
-| Cliente QvaPay | `src/infrastructure/qvapay/qvapay-p2p-client.ts` | Tested |
-| Aplicación P2P en el cliente | `QvaPayP2PClient.applyOffer()` | Implemented |
-| Worker Cloudflare | `src/infrastructure/cloudflare/worker.ts` | Tested |
-| Durable Object | `src/infrastructure/cloudflare/scanner-scheduler-do.ts` | Tested |
-| Lógica del scheduler | `src/infrastructure/cloudflare/scanner-scheduler-do-logic.ts` | Tested |
-| Dashboard público | `src/infrastructure/cloudflare/public-app.ts` | Tested |
-| Estado público | `GET /api/scanner/status` | Tested |
-| Aplicación HTTP de oferta | `POST /api/p2p/:uuid/apply` | Blocked |
-| Configuración Wrangler | `wrangler.toml` | Implemented |
-| CI/CD | `.github/workflows/*.yml` | Tested |
+| Área                         | Implementación                                                | Estado      |
+| ---------------------------- | ------------------------------------------------------------- | ----------- |
+| Dominio                      | `src/domain/market.ts`, `src/domain/offer.ts`                 | Tested      |
+| Caso de uso                  | `src/application/use-cases/scan-market.ts`                    | Tested      |
+| Runtime                      | `src/application/scanner-runtime.ts`                          | Tested      |
+| Puerto de mercado            | `src/application/ports/market-provider.ts`                    | Implemented |
+| Puerto de scheduler          | `src/application/ports/scanner-scheduler.ts`                  | Implemented |
+| Contrato QvaPay              | `src/infrastructure/qvapay/p2p-contract.ts`                   | Tested      |
+| DTO QvaPay                   | `src/infrastructure/qvapay/p2p-types.ts`                      | Implemented |
+| Mapper QvaPay                | `src/infrastructure/qvapay/p2p-mapper.ts`                     | Tested      |
+| Cliente QvaPay               | `src/infrastructure/qvapay/qvapay-p2p-client.ts`              | Tested      |
+| Aplicación P2P en el cliente | `QvaPayP2PClient.applyOffer()`                                | Implemented |
+| Worker Cloudflare            | `src/infrastructure/cloudflare/worker.ts`                     | Tested      |
+| Durable Object               | `src/infrastructure/cloudflare/scanner-scheduler-do.ts`       | Tested      |
+| Lógica del scheduler         | `src/infrastructure/cloudflare/scanner-scheduler-do-logic.ts` | Tested      |
+| Dashboard público            | `src/infrastructure/cloudflare/public-app.ts`                 | Tested      |
+| Estado público               | `GET /api/scanner/status`                                     | Tested      |
+| Aplicación HTTP de oferta    | `POST /api/p2p/:uuid/apply`                                   | Blocked     |
+| Configuración Wrangler       | `wrangler.toml`                                               | Implemented |
+| CI/CD                        | `.github/workflows/*.yml`                                     | Tested      |
 
 ## Datos y comportamiento actualmente persistidos
 

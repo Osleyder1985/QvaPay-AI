@@ -61,7 +61,7 @@ export default {
     const url = new URL(request.url);
     const stub = env.SCANNER_SCHEDULER.getByName(OBJECT_NAME);
 
-    if (url.pathname === "/" || url.pathname.startsWith("/api/")) {
+    if (url.pathname === "/" || url.pathname.startsWith("/app/") || url.pathname.startsWith("/api/")) {
       await ensureSecuritySchema(env.DB);
     }
 
@@ -152,6 +152,44 @@ export default {
     if (url.pathname === "/api/auth/logout") {
       if (request.method !== "POST") return new Response("Method not allowed", { status: 405 });
       return logout(request, env.DB, env.ACCOUNT_AUTH_SECRET);
+    }
+
+    const moduleRoute = url.pathname.match(/^\/app\/([a-z-]+)$/);
+    if (moduleRoute) {
+      if (request.method !== "GET") {
+        return new Response("Method not allowed", { status: 405 });
+      }
+      const moduleId = moduleRoute[1] ?? "";
+      const allowedModules = [
+        "inicio",
+        "cuenta",
+        "mercado",
+        "arbitraje",
+        "operaciones",
+        "usuarios",
+        "seguridad",
+        "monitor",
+        "configuracion",
+      ];
+      if (!allowedModules.includes(moduleId)) {
+        return new Response("Módulo no encontrado.", { status: 404 });
+      }
+      const session = await getSession(
+        request,
+        env.DB,
+        env.ACCOUNT_AUTH_SECRET,
+      );
+      if (!session) return createLoginAppResponse();
+      if (
+        moduleId === "usuarios" &&
+        session.user.role !== "ADMINISTRATION"
+      ) {
+        return new Response("Acceso denegado.", {
+          status: 403,
+          headers: { "cache-control": "no-store" },
+        });
+      }
+      return createPublicAppResponse(moduleId);
     }
 
     if (url.pathname === "/") {

@@ -9,7 +9,7 @@ import type { Market } from "../../domain/market.js";
 import type { Offer } from "../../domain/offer.js";
 import { compareDecimalStrings } from "../../domain/offer.js";
 import type { ScannerSchedulerRuntimeState } from "./scanner-scheduler-do.js";
-import { renderDashboardView } from "../../presentation/dashboard/dashboard-view.js";
+import { renderDashboardModuleView } from "../../presentation/dashboard/dashboard-view.js";
 import { DASHBOARD_STYLES } from "../../presentation/dashboard/dashboard-styles.js";
 import { DASHBOARD_CLIENT_SCRIPT } from "../../presentation/dashboard/dashboard-client.js";
 
@@ -232,7 +232,7 @@ export function toPublicScannerState(
   };
 }
 
-const HTML = `<!doctype html>
+const HTML = (moduleId: string) => `<!doctype html>
 <html lang="es">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -240,10 +240,10 @@ const HTML = `<!doctype html>
 <title>QvaPay-AI · Dashboard</title>
 ${DASHBOARD_STYLES}
 </head>
-${renderApplicationShellStart()}
-${renderApplicationShellHeader()}
+${renderApplicationShellStart(moduleId)}
+${renderApplicationShellHeader(moduleId)}
 ${renderApplicationShellModuleMountStart()}
-${renderDashboardView()}
+${renderDashboardModuleView(moduleId)}
 ${renderApplicationShellModuleMountEnd()}
 ${renderApplicationShellEnd()}
 ${DASHBOARD_CLIENT_SCRIPT}
@@ -254,8 +254,8 @@ ${DASHBOARD_CLIENT_SCRIPT}
  * @responsabilidades Aplicar el contrato y las validaciones correspondientes a la integración.
  * @returns Resultado de la operación pública.
  */
-export function createPublicAppResponse(): Response {
-  return new Response(HTML, {
+export function createPublicAppResponse(moduleId = "inicio"): Response {
+  return new Response(HTML(moduleId), {
     status: 200,
     headers: {
       "content-type": "text/html; charset=UTF-8",

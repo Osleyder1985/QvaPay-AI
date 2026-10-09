@@ -27,19 +27,19 @@ La interfaz pública actual está concentrada en un único módulo de infraestru
 
 ## 2. Mapa funcional observado
 
-| Área actual | Evidencia observada | Estado |
-|---|---|---|
-| Dashboard | Vista principal con métricas y estado del scanner | Implementada |
-| Scanner/Monitor | Estado, cuenta regresiva y refresco del snapshot | Implementada |
-| Mercado P2P | Tablas BUY/SELL y métricas | Implementada |
-| Cuenta QvaPay | Datos de identidad, integración, aplicación y balance | Implementada |
-| Cambio de contraseña | Formulario autenticado | Implementada |
-| Administración | Listado, creación y activación/desactivación de usuarios | Implementada |
-| Auditoría | Último ciclo, próximo ciclo y estado del snapshot | Parcial |
-| Operaciones | Representación de Comprar/Vender | Presentación; ejecución no disponible |
-| Arbitraje | No existe un Workbench independiente en la estructura observada | Brecha |
-| Configuración | No existe una superficie dedicada completa en la estructura observada | Brecha |
-| Seguridad | Se representa estado general, pero no existe un Security Center independiente | Brecha |
+| Área actual          | Evidencia observada                                                           | Estado                                |
+| -------------------- | ----------------------------------------------------------------------------- | ------------------------------------- |
+| Dashboard            | Vista principal con métricas y estado del scanner                             | Implementada                          |
+| Scanner/Monitor      | Estado, cuenta regresiva y refresco del snapshot                              | Implementada                          |
+| Mercado P2P          | Tablas BUY/SELL y métricas                                                    | Implementada                          |
+| Cuenta QvaPay        | Datos de identidad, integración, aplicación y balance                         | Implementada                          |
+| Cambio de contraseña | Formulario autenticado                                                        | Implementada                          |
+| Administración       | Listado, creación y activación/desactivación de usuarios                      | Implementada                          |
+| Auditoría            | Último ciclo, próximo ciclo y estado del snapshot                             | Parcial                               |
+| Operaciones          | Representación de Comprar/Vender                                              | Presentación; ejecución no disponible |
+| Arbitraje            | No existe un Workbench independiente en la estructura observada               | Brecha                                |
+| Configuración        | No existe una superficie dedicada completa en la estructura observada         | Brecha                                |
+| Seguridad            | Se representa estado general, pero no existe un Security Center independiente | Brecha                                |
 
 ## 3. Capacidades y rutas observadas
 

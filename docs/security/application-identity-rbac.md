@@ -10,10 +10,10 @@ La alineación con ISO/IEC 27001, ISO 9001 y principios de segregación de funci
 
 ## Roles
 
-| Rol | Consulta | Operaciones | Administración de usuarios |
-|---|---:|---:|---:|
-| Administration | Sí | Sí, según contrato existente | Sí |
-| Auditor | Sí | No | No |
+| Rol            | Consulta | Operaciones                  | Administración de usuarios |
+| -------------- | -------- | ---------------------------- | -------------------------- |
+| Administration | Sí       | Sí, según contrato existente | Sí                         |
+| Auditor        | Sí       | No                           | No                         |
 
 El navegador no puede elegir ni elevar su rol. La autorización se verifica en backend para cada frontera protegida.
 
@@ -47,7 +47,6 @@ Cuando D1 no contiene usuarios, `/setup` permite iniciar la configuración inici
 6. Administration puede crear y desactivar usuarios.
 7. Auditor puede consultar pero recibe 403 ante mutaciones.
 8. Scanner 24/7 mantiene sus ciclos después del cambio de control de acceso.
-
 
 ## Smoke de autenticación en producción
 
