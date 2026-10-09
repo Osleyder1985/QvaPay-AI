@@ -45,6 +45,33 @@ describe("rutas y navegación del Application Shell", () => {
     expect(header).toContain('<h1 id="page-title">Mercado P2P</h1>');
   });
 
+  it("renderiza encabezados específicos para las nueve rutas", () => {
+    const expected = [
+      ["inicio", "Centro de mando"],
+      ["cuenta", "Cuenta QvaPay"],
+      ["mercado", "Mercado P2P"],
+      ["arbitraje", "Arbitraje"],
+      ["operaciones", "Operaciones"],
+      ["usuarios", "Usuarios y acceso"],
+      ["seguridad", "Seguridad y auditoría"],
+      ["monitor", "Monitor y observabilidad"],
+      ["configuracion", "Configuración"],
+    ] as const;
+
+    for (const [moduleId, title] of expected) {
+      const header = renderApplicationShellHeader(moduleId);
+      expect(header).toContain(`<h1 id="page-title">${title}</h1>`);
+      expect(header).toContain('id="logoutButton"');
+      expect(header).toContain('aria-labelledby="page-title"');
+    }
+  });
+
+  it("usa un encabezado seguro por defecto para identificadores desconocidos", () => {
+    expect(renderApplicationShellHeader("unknown")).toContain(
+      '<h1 id="page-title">Centro de mando</h1>',
+    );
+  });
+
   it("documenta módulos funcionales pendientes", () => {
     expect(DASHBOARD_CLIENT_SCRIPT).toContain("initializeModulePage");
     expect(DASHBOARD_CLIENT_SCRIPT).toContain(
