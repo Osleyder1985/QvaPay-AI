@@ -8,13 +8,13 @@ La estructura toma como referencia prácticas de **ISO 9001**, **ISO/IEC 27001**
 
 ## Organización funcional
 
-| Área | Propósito | Evidencia actual |
-|---|---|---|
-| Inicio | Estado general del runtime | Estado público del scanner |
-| Mercado P2P | Observación separada de BUY y SELL | Snapshot persistido |
-| Operaciones | Acciones P2P | Frontera de operación aún bloqueada en el dashboard público |
-| Controles | Seguridad, calidad y continuidad | CI/CD + controles documentados |
-| Auditoría | Trazabilidad operacional | Inicio, finalización, error y siguiente Alarm |
+| Área        | Propósito                          | Evidencia actual                                            |
+| ----------- | ---------------------------------- | ----------------------------------------------------------- |
+| Inicio      | Estado general del runtime         | Estado público del scanner                                  |
+| Mercado P2P | Observación separada de BUY y SELL | Snapshot persistido                                         |
+| Operaciones | Acciones P2P                       | Frontera de operación aún bloqueada en el dashboard público |
+| Controles   | Seguridad, calidad y continuidad   | CI/CD + controles documentados                              |
+| Auditoría   | Trazabilidad operacional           | Inicio, finalización, error y siguiente Alarm               |
 
 ## Principios
 
@@ -36,7 +36,6 @@ El navegador no solicita, almacena ni transmite secretos operacionales.
 ## Límites
 
 El dashboard no sustituye auditorías formales, gestión documental ISO, gestión de riesgos, gestión de incidentes, revisión de accesos ni certificación externa. Estas capacidades requieren módulos y evidencias específicas.
-
 
 ## Navegación modular y diseño visual — 2026-10
 
