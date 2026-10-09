@@ -311,20 +311,20 @@ describe("public production dashboard", () => {
           ],
         },
       ] as const;
-  
+
       for (const testCase of cases) {
         const response = createPublicAppResponse(testCase.module);
         const body = await response.text();
-  
+
         expect(body).toContain(`<body data-module="${testCase.module}">`);
-  
+
         for (const marker of testCase.required) {
           expect(
             body,
             `${testCase.module} must render ${marker}`,
           ).toContain(marker);
         }
-  
+
         for (const marker of testCase.forbidden) {
           expect(
             body,
