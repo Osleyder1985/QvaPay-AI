@@ -94,7 +94,7 @@ describe("Cloudflare Worker: autorización de rutas modulares", () => {
 
       expect(response.status).toBe(200);
       expect(html).not.toContain('id="coin"');
-      expect(html).not.toContain('id="accountSnapshot"');
+      expect(html).not.toContain('id="accountBalance"');
       expect(html).toContain("Iniciar sesión");
     }
   });
@@ -105,6 +105,7 @@ describe("Cloudflare Worker: autorización de rutas modulares", () => {
 
     const allowed = await requestModule("/app/cuenta", env);
     expect(allowed.status).toBe(200);
+    expect(allowed.headers.get("cache-control")).toBe("no-store");
     expect(await allowed.text()).toContain("Cuenta QvaPay");
 
     const denied = await requestModule("/app/usuarios", env);
@@ -122,7 +123,7 @@ describe("Cloudflare Worker: autorización de rutas modulares", () => {
 
     expect(response.status).toBe(200);
     expect(html).toContain("Usuarios y acceso");
-    expect(html).toContain('id="administration"');
+    expect(html).toContain('id="administracion"');
   });
 
   it("rechaza identificadores desconocidos y métodos distintos de GET", async () => {
