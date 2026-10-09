@@ -99,6 +99,21 @@ function extractSection(markup: string, id: string): string {
 }
 
 /**
+ * Renderiza el monitor usando exclusivamente el contrato persistido del scanner.
+ * No crea datos ni ejecuta órdenes desde el navegador.
+ */
+function renderMonitorModuleView(): string {
+  return `<section class="section monitor-view" id="monitor-module" aria-labelledby="monitor-title">
+<div class="section-title"><div><h2 id="monitor-title">Monitor y observabilidad</h2><p>Estado persistido del scanner server-side, frescura del snapshot y salud del runtime.</p></div><span class="badge">Moneda: <b id="coin">—</b></span></div>
+<div class="grid3">
+<div class="panel control"><div class="control-head"><h3><span id="healthIcon" aria-hidden="true">●</span> Estado del scanner</h3><span class="status" id="quality">—</span></div><p id="health" role="status" aria-live="polite">Esperando el estado del servidor.</p><div class="eyebrow">Próxima ejecución</div><div class="countdown" id="countdown">— <small>segundos</small></div></div>
+<div class="panel control"><div class="control-head"><h3>Último snapshot</h3><span class="status" id="auditSnapshot">—</span></div><div class="account-grid"><div><span>Liquidez disponible</span><b id="liquidity">—</b></div><div><span>Ofertas observadas</span><b id="offers">—</b></div><div><span>Spread</span><b id="spread">—</b></div><div><span>Mejor BUY</span><b id="bestBuy">—</b></div><div><span>Mejor SELL</span><b id="bestSell">—</b></div></div></div>
+<div class="panel control"><div class="control-head"><h3>Programación y errores</h3><span class="status">Solo lectura</span></div><div class="trace-row"><span>Inicio del último ciclo</span><b id="eventStarted">—</b></div><div class="trace-row"><span>Fin del último ciclo</span><b id="eventCompleted">—</b></div><div class="trace-row"><span>Próximo ciclo</span><b id="eventNext">—</b></div><div class="trace-row"><span>Intervalo</span><b><span id="intervalLabel">—</span> s</b></div><div class="trace-row"><span>Moneda</span><b id="auditCoin">—</b></div><div class="trace-row"><span>Último error</span><b id="auditError" role="status" aria-live="polite">—</b></div></div>
+</div>
+</section>`;
+}
+
+/**
  * Renderiza exclusivamente el contenido asignado a una ruta modular.
  * Las secciones funcionales de otros módulos no se envían al navegador.
  */
@@ -118,11 +133,6 @@ export function renderDashboardModuleView(moduleId: string): string {
       "Arbitraje",
       "El espacio de análisis está preparado. La vista operativa se habilitará cuando su contrato de datos y sus pruebas estén integrados.",
     ),
-    monitor: renderPendingModulePlaceholder(
-      "◉",
-      "Monitor y observabilidad",
-      "Aquí se concentrarán la salud del runtime, la última ejecución, la próxima ejecución y los errores del scanner.",
-    ),
     configuracion: renderPendingModulePlaceholder(
       "⚙",
       "Configuración",
@@ -139,7 +149,7 @@ export function renderDashboardModuleView(moduleId: string): string {
     usuarios: extractSection(markup, "administracion"),
     seguridad: controls + extractSection(markup, "auditoria"),
     arbitraje: pendingModules.arbitraje,
-    monitor: pendingModules.monitor,
+    monitor: renderMonitorModuleView(),
     configuracion: pendingModules.configuracion,
   };
 
