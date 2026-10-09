@@ -1,7 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  DASHBOARD_CLIENT_SCRIPT,
-} from "../src/presentation/dashboard/dashboard-client.js";
+import { DASHBOARD_CLIENT_SCRIPT } from "../src/presentation/dashboard/dashboard-client.js";
 import {
   estimateServerNow,
   snapshotAgeMs,
@@ -43,9 +41,7 @@ describe("reloj del servidor para frescura del mercado", () => {
   });
 
   it("rechaza fechas y relojes inválidos", () => {
-    expect(
-      snapshotAgeMs(null, 1_000, 2_000, 2_100),
-    ).toBe(Infinity);
+    expect(snapshotAgeMs(null, 1_000, 2_000, 2_100)).toBe(Infinity);
     expect(
       snapshotAgeMs("fecha-invalida", 1_000, 2_000, 2_100),
     ).toBe(Infinity);
