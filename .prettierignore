@@ -1,4 +1,2 @@
 src/infrastructure/cloudflare/public-app.ts
 src/infrastructure/cloudflare/scanner-scheduler-do.ts
-src/presentation/dashboard/dashboard-view.ts
-src/infrastructure/cloudflare/application-shell-header.ts
