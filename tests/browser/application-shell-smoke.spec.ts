@@ -98,7 +98,9 @@ test("el formulario de acceso es navegable con teclado", async ({ page }) => {
   ).toBeFocused();
 });
 
-test("la pantalla de acceso cumple el análisis automatizado WCAG", async ({ page }) => {
+test("la pantalla de acceso cumple el análisis automatizado WCAG", async ({
+  page,
+}) => {
   await page.goto("/");
   const audit = await new AxeBuilder({ page })
     .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
