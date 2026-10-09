@@ -22,13 +22,23 @@ describe("reloj del servidor", () => {
 
   it("calcula la antigüedad del snapshot", () => {
     expect(
-      snapshotAgeMs("1970-01-01T00:16:39.000Z", 1_000_000, 9_000_000, 9_005_000),
+      snapshotAgeMs(
+        "1970-01-01T00:16:39.000Z",
+        1_000_000,
+        9_000_000,
+        9_005_000,
+      ),
     ).toBe(6_000);
   });
 
   it("no asigna edad negativa a una marca futura", () => {
     expect(
-      snapshotAgeMs("1970-01-01T00:16:50.000Z", 1_000_000, 9_000_000, 9_005_000),
+      snapshotAgeMs(
+        "1970-01-01T00:16:50.000Z",
+        1_000_000,
+        9_000_000,
+        9_005_000,
+      ),
     ).toBe(0);
   });
 
