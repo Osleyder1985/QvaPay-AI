@@ -276,7 +276,10 @@ test("el shell autenticado mantiene rutas, recarga, diseño adaptable y movimien
     }
   } finally {
     const removed = await page.request.delete("/internal/auth/smoke-user", {
-      headers: smokeHeaders,
+      headers: {
+        ...smokeHeaders,
+        origin: "http://127.0.0.1:8787",
+      },
       data: { username },
     });
     expect(removed.status()).toBe(204);
