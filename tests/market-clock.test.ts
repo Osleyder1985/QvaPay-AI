@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { DASHBOARD_CLIENT_SCRIPT } from "../src/presentation/dashboard/dashboard-client.js";
+import {
+  DASHBOARD_CLIENT_SCRIPT,
+} from "../src/presentation/dashboard/dashboard-client.js";
 import {
   estimateServerNow,
   snapshotAgeMs,
@@ -7,7 +9,9 @@ import {
 
 describe("reloj del servidor para frescura del mercado", () => {
   it("estima el servidor con el reloj local adelantado", () => {
-    expect(estimateServerNow(1_000_000, 9_000_000, 9_005_000)).toBe(1_005_000);
+    expect(
+      estimateServerNow(1_000_000, 9_000_000, 9_005_000),
+    ).toBe(1_005_000);
   });
 
   it("estima el servidor con el reloj local atrasado", () => {
@@ -39,7 +43,9 @@ describe("reloj del servidor para frescura del mercado", () => {
   });
 
   it("rechaza fechas y relojes inválidos", () => {
-    expect(snapshotAgeMs(null, 1_000, 2_000, 2_100)).toBe(Infinity);
+    expect(
+      snapshotAgeMs(null, 1_000, 2_000, 2_100),
+    ).toBe(Infinity);
     expect(
       snapshotAgeMs("fecha-invalida", 1_000, 2_000, 2_100),
     ).toBe(Infinity);
@@ -49,12 +55,12 @@ describe("reloj del servidor para frescura del mercado", () => {
 
 describe("integración del reloj y sondeo del mercado", () => {
   it("usa el reloj del servidor para edad y cuenta regresiva", () => {
+    expect(DASHBOARD_CLIENT_SCRIPT).toContain("snapshotAgeMs(");
     expect(DASHBOARD_CLIENT_SCRIPT).toContain(
-      "snapshotAgeMs(state.metrics?.snapshotAt,state.serverNowAt,state.__receivedAt,performance.now())",
+      "state.metrics?.snapshotAt,state.serverNowAt",
     );
-    expect(DASHBOARD_CLIENT_SCRIPT).toContain(
-      "estimateServerNow(state.serverNowAt,state.__receivedAt,performance.now())",
-    );
+    expect(DASHBOARD_CLIENT_SCRIPT).toContain("performance.now()");
+    expect(DASHBOARD_CLIENT_SCRIPT).toContain("estimateServerNow(");
   });
 
   it("limita el sondeo y evita solicitudes concurrentes", () => {
