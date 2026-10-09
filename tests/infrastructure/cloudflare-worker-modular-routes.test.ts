@@ -99,7 +99,7 @@ describe("Cloudflare Worker: autorización de rutas modulares", () => {
     }
   });
 
-  it("permite módulos ordinarios al rol AUDITOR y deniega Usuarios", async () => {
+  it("permite AUDITOR y deniega Usuarios", async () => {
     const env = createEnvironment();
     authMocks.getSession.mockResolvedValue(auditorSession);
 
@@ -126,7 +126,7 @@ describe("Cloudflare Worker: autorización de rutas modulares", () => {
     expect(html).toContain('id="administracion"');
   });
 
-  it("rechaza identificadores desconocidos y métodos distintos de GET", async () => {
+  it("rechaza rutas desconocidas y métodos no GET", async () => {
     const env = createEnvironment();
     authMocks.getSession.mockResolvedValue(administratorSession);
 
