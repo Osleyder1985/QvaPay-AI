@@ -60,7 +60,7 @@ function jsonError(message: string, status: number): Response {
 function validateSameOriginMutation(request: Request, url: URL): Response | null {
   if (!["POST", "PUT", "PATCH", "DELETE"].includes(request.method.toUpperCase())) return null;
   const cookie = request.headers.get("cookie") ?? "";
-  if (!/(?:^|;\\s*)qvapay_ai_session=/.test(cookie)) return null;
+  if (!/(?:^|;\s*)qvapay_ai_session=/.test(cookie)) return null;
   const origin = request.headers.get("origin");
   if (!origin || origin !== url.origin) {
     return jsonError("Origen de solicitud no válido.", 403);
