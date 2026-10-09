@@ -10,13 +10,13 @@ Este requisito amplía `SYS-FR-005` y no modifica requisitos previamente certifi
 
 ## Fuentes de verdad
 
-| Área | Fuente | Uso |
-|---|---|---|
-| Identidad propietaria | `GET /user` con API Token QvaPay | Identidad de la cuenta conectada |
-| Relación usuario-aplicación | `GET /app/{uuid}` con el mismo Bearer Token de usuario | Demostrar que la aplicación configurada pertenece al usuario autenticado |
-| Balance | `POST /v2/balance` | Balance de la aplicación propietaria, en USD |
-| Aplicación | `POST /v2/info` | Identidad y estado de la aplicación QvaPay; su `uuid` debe coincidir con la aplicación configurada |
-| Ofertas propias | `GET /p2p?my=1` | Datos operativos propios de P2P; nunca identidad |
+| Área                        | Fuente                                                 | Uso                                                                                                |
+| --------------------------- | ------------------------------------------------------ | -------------------------------------------------------------------------------------------------- |
+| Identidad propietaria       | `GET /user` con API Token QvaPay                       | Identidad de la cuenta conectada                                                                   |
+| Relación usuario-aplicación | `GET /app/{uuid}` con el mismo Bearer Token de usuario | Demostrar que la aplicación configurada pertenece al usuario autenticado                           |
+| Balance                     | `POST /v2/balance`                                     | Balance de la aplicación propietaria, en USD                                                       |
+| Aplicación                  | `POST /v2/info`                                        | Identidad y estado de la aplicación QvaPay; su `uuid` debe coincidir con la aplicación configurada |
+| Ofertas propias             | `GET /p2p?my=1`                                        | Datos operativos propios de P2P; nunca identidad                                                   |
 
 ## Correlación de propietario
 
