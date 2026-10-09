@@ -64,7 +64,7 @@ function createEnvironment(): ScannerWorkerEnvironment {
     QVAPAY_USER_API_TOKEN: "test-user-token",
     SCANNER_COIN: "BANK_CUP",
     SCANNER_INTERVAL_SECONDS: "10",
-    SCANNER_BOOTSTRAP_TOKEN: "test-bootstrap-token",
+    SCANNER_BOOTSTRAP_TOKEN: "boot-test",
     PRODUCTION_SMOKE_TOKEN: "test-smoke-token",
     ACCOUNT_AUTH_SECRET: "test-session-secret",
   };
