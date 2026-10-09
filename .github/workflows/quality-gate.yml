@@ -219,12 +219,8 @@ jobs:
       - name: Validar el paquete de despliegue de Cloudflare
         run: npx wrangler deploy --dry-run
 
-      - name: Diagnosticar formato con Prettier 3.9.9
-        shell: bash
-        run: |
-          set -euo pipefail
-          npx prettier@3.9.9 --write docs/architecture/dashboard-governance.md docs/requirements/requirements-traceability-matrix.md src/infrastructure/cloudflare/application-shell-header.ts
-          git diff -- docs/architecture/dashboard-governance.md docs/requirements/requirements-traceability-matrix.md src/infrastructure/cloudflare/application-shell-header.ts
+      - name: Comprobar formato
+        run: npm run format:check
 
       - name: Pruebas unitarias
         run: npm test

@@ -50,8 +50,7 @@ const MODULE_HEADERS: Record<string, ModuleHeader> = {
   },
   seguridad: {
     title: "Seguridad y auditoría",
-    description:
-      "Controles de seguridad, auditoría y trazabilidad operativa.",
+    description: "Controles de seguridad, auditoría y trazabilidad operativa.",
   },
   monitor: {
     title: "Monitor y observabilidad",
@@ -59,8 +58,7 @@ const MODULE_HEADERS: Record<string, ModuleHeader> = {
   },
   configuracion: {
     title: "Configuración",
-    description:
-      "Preferencias y parámetros disponibles para esta aplicación.",
+    description: "Preferencias y parámetros disponibles para esta aplicación.",
   },
 };
 

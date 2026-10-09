@@ -63,6 +63,7 @@ Toda solución para SYS-AUD-* y SYS-ACC-* queda bloqueada por #270 hasta contar 
 Definido, Diseñado, Implementado, Probado, Verificado, Certificado, Fallido / Rechazado, Bloqueado.
 
 Estos estados no son intercambiables. Un despliegue exitoso no implica certificación.
+
 ## Evidencia de producción de Account
 
 ### SYS-SEC-002

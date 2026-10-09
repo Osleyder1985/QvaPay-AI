@@ -46,6 +46,7 @@ El shell conserva navegación, encabezado contextual, estado de sesión y el ár
 La dirección visual usa superficies coherentes, jerarquía tipográfica, navegación activa, paneles contextuales y estados de implementación. Las animaciones deben respetar `prefers-reduced-motion`; los emojis son apoyo visual, nunca sustituyen etiquetas accesibles. La alineación con ISO 9241-210, ISO/IEC 25010 y WCAG 2.2 AA es un objetivo de diseño y verificación, no una declaración de certificación.
 
 ### Trazabilidad
+
 - Requisito funcional: #474.
 - Solution Card visual: #475.
 - Gobernanza de diseño: #270.
