@@ -219,8 +219,26 @@ jobs:
       - name: Validar el paquete de despliegue de Cloudflare
         run: npx wrangler deploy --dry-run
 
-      - name: Comprobar formato
-        run: npm run format:check
+      - name: Verificación de formato con diagnóstico automático
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if npm run format:check; then
+            exit 0
+          fi
+
+          echo "::error::Prettier detectó diferencias de formato. Se generará el diff esperado sin ocultar el fallo."
+          npm run format:fix
+
+          echo "===== Archivos modificados por Prettier ====="
+          git diff --stat
+
+          echo "===== Diff exacto propuesto por Prettier ====="
+          git diff -- .
+
+          echo "::error::El formato original no cumplía. Revisa el diff, aplica la reparación en la rama de trabajo y vuelve a ejecutar los controles."
+          exit 1
 
       - name: Pruebas unitarias
         run: npm test
