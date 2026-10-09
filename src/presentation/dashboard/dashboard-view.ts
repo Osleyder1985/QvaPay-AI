@@ -81,8 +81,10 @@ function extractSection(markup: string, id: string): string {
  */
 export function renderDashboardModuleView(moduleId: string): string {
   const markup = renderDashboardView();
-  const hero = markup.match(/<section class="hero">[\s\S]*?<\/section>/)?.[0] ?? "";
-  const footer = markup.match(/<footer class="footer">[\s\S]*?<\/footer>/)?.[0] ?? "";
+  const hero =
+    markup.match(/<section class="hero">[\s\S]*?<\/section>/)?.[0] ?? "";
+  const footer =
+    markup.match(/<footer class="footer">[\s\S]*?<\/footer>/)?.[0] ?? "";
   const accountSecurity = extractSection(markup, "seguridad-cuenta");
   const controls = extractSection(markup, "controles");
   const accountSecurityWithoutControls = accountSecurity.replace(controls, "");
