@@ -284,7 +284,7 @@ describe("public production dashboard", () => {
             'id="health"',
             'id="countdown"',
             'id="eventCompleted"',
-            String.raw`<h2 id="monitor-title">Monitor y observabilidad</h2>`,
+            '<h2 id="monitor-title">Monitor y observabilidad</h2>',
           ],
           forbidden: [
             'id="overview"',
