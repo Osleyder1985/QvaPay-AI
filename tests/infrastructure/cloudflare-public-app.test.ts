@@ -100,9 +100,9 @@ describe("public production dashboard", () => {
     expect(body).toContain("MEJOR BUY");
     expect(body).toContain("MEJOR SELL");
     expect(body).toContain("10");
-    expect(body).toContain("Dashboard operativo");
-    expect(body).toContain("state.serverNowAt-Date.now()");
-    expect(body).toContain("setInterval(refresh,1000)");
+    expect(body).toContain("Centro de mando");
+    expect(body).toContain("performance.now()");
+    expect(body).toContain("setInterval(refresh,5000)");
     expect(body).not.toContain('id="auditoria"');
     expect(body).not.toContain('id="cuenta"');
     expect(body).not.toContain('id="mercado"');
