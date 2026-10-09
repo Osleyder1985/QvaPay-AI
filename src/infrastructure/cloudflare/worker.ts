@@ -50,6 +50,24 @@ function jsonError(message: string, status: number): Response {
   return Response.json({ error: message }, { status, headers: { "cache-control": "no-store" } });
 }
 
+/**
+ * @proposito validateSameOriginMutation: protege las mutaciones autenticadas frente a CSRF.
+ * @responsabilidades Exigir un encabezado Origin exacto cuando la solicitud lleva la cookie de sesión.
+ * @param request Solicitud HTTP entrante.
+ * @param url URL ya normalizada de la solicitud.
+ * @returns Respuesta 403 si el origen falta o no coincide; null si la validación no aplica o es válida.
+ */
+function validateSameOriginMutation(request: Request, url: URL): Response | null {
+  if (!["POST", "PUT", "PATCH", "DELETE"].includes(request.method.toUpperCase())) return null;
+  const cookie = request.headers.get("cookie") ?? "";
+  if (!/(?:^|;\\s*)qvapay_ai_session=/.test(cookie)) return null;
+  const origin = request.headers.get("origin");
+  if (!origin || origin !== url.origin) {
+    return jsonError("Origen de solicitud no válido.", 403);
+  }
+  return null;
+}
+
 // prettier-ignore
 async function body(request: Request): Promise<Record<string, unknown>> {
   return (await request.json().catch(() => null)) as Record<string, unknown> | null ?? {};
@@ -59,6 +77,8 @@ async function body(request: Request): Promise<Record<string, unknown>> {
 export default {
   async fetch(request: Request, env: ScannerWorkerEnvironment): Promise<Response> {
     const url = new URL(request.url);
+    const csrfResponse = validateSameOriginMutation(request, url);
+    if (csrfResponse) return csrfResponse;
     const stub = env.SCANNER_SCHEDULER.getByName(OBJECT_NAME);
 
     if (url.pathname === "/" || url.pathname.startsWith("/app/") || url.pathname.startsWith("/api/")) {
