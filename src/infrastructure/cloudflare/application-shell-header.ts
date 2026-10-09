@@ -13,9 +13,7 @@ const DEFAULT_MODULE_HEADER = {
 };
 
 /** Metadatos contextuales del encabezado para cada módulo. */
-const MODULE_HEADERS: Readonly<
-  Record<string, { title: string; description: string }>
-> = {
+const MODULE_HEADERS: Readonly<Record<string, { title: string; description: string }>> = {
   inicio: {
     title: "Centro de mando",
     description:
