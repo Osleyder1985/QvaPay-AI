@@ -144,7 +144,19 @@ test("el shell autenticado mantiene rutas, recarga, diseño adaptable y movimien
     await expect(page.locator("body")).toHaveAttribute("data-module", "cuenta");
 
     await page.goto("/app/inicio");
+    const skipLink = page.getByRole("link", {
+      name: "Saltar al contenido principal",
+    });
+    await page.keyboard.press("Tab");
+    await expect(skipLink).toBeFocused();
+    await expect(skipLink).toBeVisible();
+    await expect(skipLink).toHaveAttribute("href", "#contenido-principal");
+    await page.keyboard.press("Enter");
+    await expect(page.locator("#contenido-principal")).toBeFocused();
+
+    await page.goto("/app/inicio");
     const firstNavigationLink = page.locator('nav a[href="/app/inicio"]');
+    await page.keyboard.press("Tab");
     await page.keyboard.press("Tab");
     await expect(firstNavigationLink).toBeFocused();
     const focusOutline = await firstNavigationLink.evaluate(
