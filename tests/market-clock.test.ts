@@ -38,7 +38,9 @@ describe("reloj del servidor para frescura del mercado", () => {
 
   it("clasifica marcas ausentes, inválidas o relojes inconsistentes como no verificables", () => {
     expect(snapshotAgeMs(null, 1_000, 2_000, 2_100)).toBe(Infinity);
-    expect(snapshotAgeMs("fecha-invalida", 1_000, 2_000, 2_100)).toBe(Infinity);
+    expect(
+      snapshotAgeMs("fecha-invalida", 1_000, 2_000, 2_100),
+    ).toBe(Infinity);
     expect(estimateServerNow(1_000, 2_000, 1_999)).toBeNaN();
   });
 });
@@ -54,8 +56,12 @@ describe("integración del reloj y sondeo del mercado", () => {
   });
 
   it("limita el sondeo a cinco segundos y evita solicitudes concurrentes", () => {
-    expect(DASHBOARD_CLIENT_SCRIPT).toContain("setInterval(refresh,5000)");
-    expect(DASHBOARD_CLIENT_SCRIPT).toContain("if(refreshInFlight)return");
+    expect(DASHBOARD_CLIENT_SCRIPT).toContain(
+      "setInterval(refresh,5000)",
+    );
+    expect(DASHBOARD_CLIENT_SCRIPT).toContain(
+      "if(refreshInFlight)return",
+    );
   });
 
   it("conserva y marca como desconectado el último snapshot si falla la actualización", () => {
