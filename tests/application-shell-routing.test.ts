@@ -85,6 +85,11 @@ describe("rutas y navegación del Application Shell", () => {
   });
 
   it("envía únicamente el contenido funcional del módulo solicitado", () => {
+    const home = renderDashboardModuleView("inicio");
+    expect(home).toContain('id="coin"');
+    expect(home).not.toContain('id="mercado"');
+    expect(home).not.toContain('id="cuenta"');
+
     const account = renderDashboardModuleView("cuenta");
     expect(account).toContain('id="cuenta"');
     expect(account).toContain('id="seguridad-cuenta"');
@@ -103,6 +108,11 @@ describe("rutas y navegación del Application Shell", () => {
     expect(security).toContain('id="auditoria"');
     expect(security).not.toContain('id="cuenta"');
     expect(security).not.toContain('id="administracion"');
+
+    const operations = renderDashboardModuleView("operaciones");
+    expect(operations).toContain('id="operaciones"');
+    expect(operations).not.toContain('id="mercado"');
+    expect(operations).not.toContain('id="cuenta"');
 
     const users = renderDashboardModuleView("usuarios");
     expect(users).toContain('id="administracion"');
