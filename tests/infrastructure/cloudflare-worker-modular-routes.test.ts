@@ -131,9 +131,7 @@ describe("Cloudflare Worker: autorización de rutas modulares", () => {
     expect(html).toContain('id="administracion"');
   });
 
-  it(
-    "rechaza mutaciones con cookie de sesión si falta Origin o es de otro origen",
-    async () => {
+  it("rechaza mutaciones con sesión si falta Origin o es cruzado", async () => {
       const env = createEnvironment();
       const cases = [
         {
@@ -181,9 +179,7 @@ describe("Cloudflare Worker: autorización de rutas modulares", () => {
     },
   );
 
-  it(
-    "permite una mutación autenticada con Origin exactamente igual al origen de la aplicación",
-    async () => {
+  it("permite mutación autenticada con Origin del mismo origen", async () => {
       const env = createEnvironment();
       authMocks.requireRole.mockResolvedValue(administratorSession);
       authMocks.changeUserPassword.mockResolvedValue(administratorSession.user);
