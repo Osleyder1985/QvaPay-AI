@@ -59,8 +59,15 @@ function jsonError(message: string, status: number): Response {
  * @returns Respuesta 403 si el origen falta o no coincide; null si la validación
  * no aplica o es válida.
  */
-function validateSameOriginMutation(request: Request, url: URL): Response | null {
-  if (!["POST", "PUT", "PATCH", "DELETE"].includes(request.method.toUpperCase())) return null;
+function validateSameOriginMutation(
+  request: Request,
+  url: URL,
+): Response | null {
+  if (
+    !["POST", "PUT", "PATCH", "DELETE"].includes(request.method.toUpperCase())
+  ) {
+    return null;
+  }
   const cookie = request.headers.get("cookie") ?? "";
   if (!/(?:^|;\s*)qvapay_ai_session=/.test(cookie)) return null;
   const origin = request.headers.get("origin");
