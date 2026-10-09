@@ -18,6 +18,10 @@ vi.mock("../../src/infrastructure/cloudflare/auth-rbac.js", () => ({
   changeUserPassword: vi.fn(),
 }));
 
+vi.mock("../../src/infrastructure/cloudflare/scanner-scheduler-do.js", () => ({
+  ScannerSchedulerDurableObject: class ScannerSchedulerDurableObject {},
+}));
+
 import worker from "../../src/infrastructure/cloudflare/worker.js";
 import type { ScannerWorkerEnvironment } from "../../src/infrastructure/cloudflare/worker.js";
 
