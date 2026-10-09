@@ -118,7 +118,7 @@ test("el shell autenticado mantiene rutas, recarga, diseño adaptable y movimien
     ]);
 
     for (const route of protectedRoutes) {
-      const moduleId = route.split("/").at(-1);
+      const moduleId = route.slice("/app/".length);
       const response = await page.goto(route);
       expect(response?.status(), route).toBe(200);
       await expect(page.locator("#page-title")).toBeVisible();
