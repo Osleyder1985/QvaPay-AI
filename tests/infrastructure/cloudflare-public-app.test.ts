@@ -322,5 +322,4 @@ describe("public production dashboard", () => {
       }
     }
   });
-
 });
