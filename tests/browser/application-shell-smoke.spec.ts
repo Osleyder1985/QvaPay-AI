@@ -26,7 +26,7 @@ test("unauthenticated module routes render login instead of private module data"
   }
 });
 
-test("unknown module and unsupported method are rejected", async ({ request }) => {
+test("se rechazan módulos desconocidos y métodos no admitidos", async ({ request }) => {
   const unknown = await request.get("/app/no-existe");
   expect(unknown.status()).toBe(404);
 
@@ -56,7 +56,7 @@ for (const viewport of [
   });
 }
 
-test("login form is keyboard reachable and reports authentication status", async ({
+test("el formulario de acceso es navegable con teclado", async ({
   page,
 }) => {
   await page.goto("/");
