@@ -7,51 +7,41 @@ import {
   snapshotAgeMs,
 } from "../src/presentation/dashboard/market-clock.js";
 
-describe("reloj del servidor para frescura del mercado", () => {
-  it("estima el servidor con el reloj local adelantado", () => {
-    expect(
-      estimateServerNow(1_000_000, 9_000_000, 9_005_000),
-    ).toBe(1_005_000);
+describe("reloj del servidor", () => {
+  it("estima un reloj local adelantado", () => {
+    expect(estimateServerNow(1_000_000, 9_000_000, 9_005_000)).toBe(
+      1_005_000,
+    );
   });
 
-  it("estima el servidor con el reloj local atrasado", () => {
-    expect(
-      estimateServerNow(1_000_000, -9_000_000, -8_995_000),
-    ).toBe(1_005_000);
+  it("estima un reloj local atrasado", () => {
+    expect(estimateServerNow(1_000_000, -9_000_000, -8_995_000)).toBe(
+      1_005_000,
+    );
   });
 
   it("calcula la antigüedad del snapshot", () => {
     expect(
-      snapshotAgeMs(
-        "1970-01-01T00:16:39.000Z",
-        1_000_000,
-        9_000_000,
-        9_005_000,
-      ),
+      snapshotAgeMs("1970-01-01T00:16:39.000Z", 1_000_000, 9_000_000, 9_005_000),
     ).toBe(6_000);
   });
 
-  it("no devuelve antigüedad negativa para una marca futura", () => {
+  it("no asigna edad negativa a una marca futura", () => {
     expect(
-      snapshotAgeMs(
-        "1970-01-01T00:16:50.000Z",
-        1_000_000,
-        9_000_000,
-        9_005_000,
-      ),
+      snapshotAgeMs("1970-01-01T00:16:50.000Z", 1_000_000, 9_000_000, 9_005_000),
     ).toBe(0);
   });
 
   it("rechaza fechas y relojes inválidos", () => {
     expect(snapshotAgeMs(null, 1_000, 2_000, 2_100)).toBe(Infinity);
-    expect(
-      snapshotAgeMs("fecha-invalida", 1_000, 2_000, 2_100),
-    ).toBe(Infinity);
+    expect(snapshotAgeMs("fecha-invalida", 1_000, 2_000, 2_100)).toBe(
+      Infinity,
+    );
     expect(estimateServerNow(1_000, 2_000, 1_999)).toBeNaN();
   });
 });
 
-describe("integración del reloj y sondeo del mercado", () => {
+describe("integración del reloj y sondeo", () => {
   it("usa el reloj del servidor para edad y cuenta regresiva", () => {
     expect(DASHBOARD_CLIENT_SCRIPT).toContain("snapshotAgeMs(");
     expect(DASHBOARD_CLIENT_SCRIPT).toContain(
@@ -66,7 +56,7 @@ describe("integración del reloj y sondeo del mercado", () => {
     expect(DASHBOARD_CLIENT_SCRIPT).toContain("if(refreshInFlight)return");
   });
 
-  it("conserva el snapshot cuando falla la actualización", () => {
+  it("conserva el snapshot si falla la actualización", () => {
     expect(DASHBOARD_CLIENT_SCRIPT).toContain(
       "state={...state,__offline:true};render()",
     );
