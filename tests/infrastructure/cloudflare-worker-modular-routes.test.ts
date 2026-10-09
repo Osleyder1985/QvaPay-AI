@@ -132,65 +132,35 @@ describe("Cloudflare Worker: autorización de rutas modulares", () => {
   });
 
   it("rechaza mutaciones con sesión si falta Origin o es cruzado", async () => {
-      const env = createEnvironment();
-      const cases = [
-        {
-          headers: { cookie: "qvapay_ai_session=session-value" },
-          label: "sin Origin",
+    const env = createEnvironment();
+    const cases = [
+      {
+        headers: { cookie: "qvapay_ai_session=session-value" },
+        label: "sin Origin",
+      },
+      {
+        headers: {
+          cookie: "qvapay_ai_session=session-value",
+          origin: "https://attacker.example",
         },
-        {
-          headers: {
-            cookie: "qvapay_ai_session=session-value",
-            origin: "https://attacker.example",
-          },
-          label: "origen cruzado",
+        label: "origen cruzado",
+      },
+      {
+        headers: {
+          cookie: "qvapay_ai_session=session-value",
+          origin: "null",
         },
-        {
-          headers: {
-            cookie: "qvapay_ai_session=session-value",
-            origin: "null",
-          },
-          label: "origen opaco",
-        },
-      ];
+        label: "origen opaco",
+      },
+    ];
 
-      for (const testCase of cases) {
-        const response = await worker.fetch(
-          new Request("https://qvapay-ai.test/api/account/password", {
-            method: "POST",
-            headers: {
-              "content-type": "application/json",
-              ...testCase.headers,
-            },
-            body: JSON.stringify({
-              password: "safe-password",
-              confirmation: "safe-password",
-            }),
-          }),
-          env,
-        );
-        expect(response.status, testCase.label).toBe(403);
-        expect(await response.json()).toEqual({
-          error: "Origen de solicitud no válido.",
-        });
-      }
-
-      expect(authMocks.requireRole).not.toHaveBeenCalled();
-    },
-  );
-
-  it("permite mutación autenticada con Origin del mismo origen", async () => {
-      const env = createEnvironment();
-      authMocks.requireRole.mockResolvedValue(administratorSession);
-      authMocks.changeUserPassword.mockResolvedValue(administratorSession.user);
-
+    for (const testCase of cases) {
       const response = await worker.fetch(
         new Request("https://qvapay-ai.test/api/account/password", {
           method: "POST",
           headers: {
-            cookie: "qvapay_ai_session=session-value",
-            origin: "https://qvapay-ai.test",
             "content-type": "application/json",
+            ...testCase.headers,
           },
           body: JSON.stringify({
             password: "safe-password",
@@ -199,12 +169,42 @@ describe("Cloudflare Worker: autorización de rutas modulares", () => {
         }),
         env,
       );
+      expect(response.status, testCase.label).toBe(403);
+      expect(await response.json()).toEqual({
+        error: "Origen de solicitud no válido.",
+      });
+    }
 
-      expect(response.status).toBe(200);
-      expect(authMocks.requireRole).toHaveBeenCalledOnce();
-      expect(authMocks.changeUserPassword).toHaveBeenCalledOnce();
-    },
-  );
+    expect(authMocks.requireRole).not.toHaveBeenCalled();
+  },
+);
+
+  it("permite mutación autenticada con Origin del mismo origen", async () => {
+    const env = createEnvironment();
+    authMocks.requireRole.mockResolvedValue(administratorSession);
+    authMocks.changeUserPassword.mockResolvedValue(administratorSession.user);
+
+    const response = await worker.fetch(
+      new Request("https://qvapay-ai.test/api/account/password", {
+        method: "POST",
+        headers: {
+          cookie: "qvapay_ai_session=session-value",
+          origin: "https://qvapay-ai.test",
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({
+          password: "safe-password",
+          confirmation: "safe-password",
+        }),
+      }),
+      env,
+    );
+
+    expect(response.status).toBe(200);
+    expect(authMocks.requireRole).toHaveBeenCalledOnce();
+    expect(authMocks.changeUserPassword).toHaveBeenCalledOnce();
+  },
+);
 
   it("rechaza rutas desconocidas y métodos no GET", async () => {
     const env = createEnvironment();
