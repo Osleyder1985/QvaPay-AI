@@ -6,6 +6,7 @@
  */
 
 export function renderDashboardView(): string {
+  // prettier-ignore
   return String.raw`
 
 <section class="hero">
