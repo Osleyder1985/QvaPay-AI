@@ -255,8 +255,20 @@ jobs:
             --header "Accept: application/json" \
             --header "Content-Type: application/json" \
             --cookie-jar /tmp/qvapay-account-smoke.cookies \
+            --dump-header /tmp/qvapay-login.headers \
             --data "{\"username\":\"$SMOKE_USERNAME\",\"password\":\"$SMOKE_PASSWORD\"}" \
             "$WORKER_URL/api/auth/login")"
+          node <<'NODE'
+          const fs = require("node:fs");
+          const headers = fs.readFileSync("/tmp/qvapay-login.headers", "utf8");
+          const cookieLines = headers.split(/\r?\n/).filter((line) => /^set-cookie:/i.test(line));
+          const sessionCookie = cookieLines.find((line) => /(?:^|;\s*)HttpOnly(?:;|$)/i.test(line));
+          if (!sessionCookie || !/(?:^|;\s*)Secure(?:;|$)/i.test(sessionCookie) || !/(?:^|;\s*)SameSite=Strict(?:;|$)/i.test(sessionCookie)) {
+            console.error("Production session-cookie assertion failed: Set-Cookie must include HttpOnly, Secure and SameSite=Strict.");
+            process.exit(1);
+          }
+          console.log("Production session-cookie security attributes passed: HttpOnly, Secure and SameSite=Strict (cookie value not logged).");
+          NODE
           printf '%s\n' "$LOGIN_RESPONSE" | node -e '
             let input = "";
             process.stdin.on("data", (chunk) => { input += chunk; });
