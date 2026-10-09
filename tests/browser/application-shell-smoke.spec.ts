@@ -1,7 +1,23 @@
 import * as AxeBuilderModule from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
-const AxeBuilder = AxeBuilderModule.default;
+type AxeAudit = {
+  violations: Array<{
+    id: string;
+    impact?: string | null;
+    help: string;
+    nodes: Array<{ target: string[] }>;
+  }>;
+};
+
+type AxeBuilderInstance = {
+  withTags(tags: string[]): AxeBuilderInstance;
+  analyze(): Promise<AxeAudit>;
+};
+
+const AxeBuilder = AxeBuilderModule.default as unknown as new (options: {
+  page: unknown;
+}) => AxeBuilderInstance;
 
 const protectedRoutes = [
   "/app/inicio",
