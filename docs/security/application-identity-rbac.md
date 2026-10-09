@@ -11,7 +11,7 @@ La alineación con ISO/IEC 27001, ISO 9001 y principios de segregación de funci
 ## Roles
 
 | Rol            | Consulta | Operaciones                  | Administración de usuarios |
-| -------------- | -------: | ---------------------------: | -------------------------: |
+| -------------- | -------- | ---------------------------- | -------------------------- |
 | Administration | Sí       | Sí, según contrato existente | Sí                         |
 | Auditor        | Sí       | No                           | No                         |
 
