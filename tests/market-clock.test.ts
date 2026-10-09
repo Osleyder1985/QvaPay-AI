@@ -40,9 +40,7 @@ describe("reloj del servidor", () => {
 
   it("rechaza fechas y relojes inválidos", () => {
     expect(snapshotAgeMs(null, 1_000, 2_000, 2_100)).toBe(Infinity);
-    expect(snapshotAgeMs("fecha-invalida", 1_000, 2_000, 2_100)).toBe(
-      Infinity,
-    );
+    expect(snapshotAgeMs("fecha-invalida", 1_000, 2_000, 2_100)).toBe(Infinity);
     expect(estimateServerNow(1_000, 2_000, 1_999)).toBeNaN();
   });
 });
