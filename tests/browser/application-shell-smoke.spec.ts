@@ -136,6 +136,22 @@ test("el shell autenticado mantiene rutas, recarga, diseño adaptable y movimien
       );
     }
 
+    await page.goto("/app/inicio");
+    await page.goto("/app/cuenta");
+    await page.goBack();
+    await expect(page.locator("body")).toHaveAttribute("data-module", "inicio");
+    await page.goForward();
+    await expect(page.locator("body")).toHaveAttribute("data-module", "cuenta");
+
+    await page.goto("/app/inicio");
+    const firstNavigationLink = page.locator('nav a[href="/app/inicio"]');
+    await page.keyboard.press("Tab");
+    await expect(firstNavigationLink).toBeFocused();
+    const focusOutline = await firstNavigationLink.evaluate(
+      (element) => getComputedStyle(element).outlineStyle,
+    );
+    expect(focusOutline).not.toBe("none");
+
     await page.emulateMedia({ reducedMotion: "reduce" });
     for (const viewport of [
       { name: "móvil", width: 360, height: 800 },
