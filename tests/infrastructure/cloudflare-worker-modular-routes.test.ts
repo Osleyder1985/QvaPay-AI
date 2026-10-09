@@ -19,9 +19,7 @@ vi.mock("../../src/infrastructure/cloudflare/auth-rbac.js", () => ({
 }));
 
 import worker from "../../src/infrastructure/cloudflare/worker.js";
-import type {
-  ScannerWorkerEnvironment,
-} from "../../src/infrastructure/cloudflare/worker.js";
+import type { ScannerWorkerEnvironment } from "../../src/infrastructure/cloudflare/worker.js";
 
 const auditorSession = {
   user: {
@@ -132,9 +130,7 @@ describe("Cloudflare Worker: autorización de rutas modulares", () => {
     authMocks.getSession.mockResolvedValue(administratorSession);
 
     expect((await requestModule("/app/no-existe", env)).status).toBe(404);
-    expect((await requestModule("/app/inicio", env, "POST")).status).toBe(
-      405,
-    );
+    expect((await requestModule("/app/inicio", env, "POST")).status).toBe(405);
     expect(authMocks.getSession).not.toHaveBeenCalled();
   });
 });
