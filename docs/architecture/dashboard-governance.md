@@ -42,7 +42,7 @@ El dashboard no sustituye auditorías formales, gestión documental ISO, gestió
 
 La interfaz autenticada introduce rutas dedicadas bajo `/app/{module}`. El Worker valida sesión antes de servir cualquier ruta modular y exige el rol `ADMINISTRATION` para `/app/usuarios`; la autorización de las API sigue siendo obligatoria y no se delega al cliente.
 
-El shell conserva navegación, encabezado contextual, estado de sesión y el área de contenido. El contenido visible se limita al módulo activo. Los módulos funcionales aún no implementados se muestran explícitamente como pendientes, sin datos ficticios ni acciones simuladas.
+El shell conserva navegación, encabezado contextual, estado de sesión y el área de contenido. La versión actual oculta en el navegador las secciones que no corresponden a la ruta, pero todavía envía el markup compartido del dashboard en todas las páginas; por tanto, el aislamiento de contenido en el servidor sigue pendiente y esta base no debe promocionarse como implementación modular completa. Arbitraje, Monitor y Configuración se muestran explícitamente como pendientes, sin datos ficticios ni acciones simuladas.
 
 La dirección visual usa superficies coherentes, jerarquía tipográfica, navegación activa, paneles contextuales y estados de implementación. Las animaciones deben respetar `prefers-reduced-motion`; los emojis son apoyo visual, nunca sustituyen etiquetas accesibles. La alineación con ISO 9241-210, ISO/IEC 25010 y WCAG 2.2 AA es un objetivo de diseño y verificación, no una declaración de certificación.
 
@@ -50,4 +50,4 @@ La dirección visual usa superficies coherentes, jerarquía tipográfica, navega
 - Requisito funcional: #474.
 - Solution Card visual: #475.
 - Gobernanza de diseño: #270.
-- Verificación pendiente: Quality Gate, Security Gate, pruebas de rutas y roles, accesibilidad, responsive y smoke autenticado de producción.
+- Verificación pendiente: renderizado de contenido aislado por módulo en el servidor, Quality Gate, Security Gate, pruebas de rutas y roles, accesibilidad, responsive y smoke autenticado de producción.
