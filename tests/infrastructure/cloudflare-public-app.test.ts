@@ -190,4 +190,137 @@ describe("public production dashboard", () => {
     expect(body).toContain('"createdAt"');
     expect(body).toContain('"creatorUsername"');
   });
+
+  it("renders only the server-side content assigned to each module route", async () => {
+    const cases = [
+      {
+        module: "inicio",
+        required: ['id="overview"'],
+        forbidden: [
+          'id="cuenta"',
+          'id="mercado"',
+          'id="operaciones"',
+          'id="administracion"',
+          'id="auditoria"',
+          'id="controles"',
+        ],
+      },
+      {
+        module: "cuenta",
+        required: ['id="cuenta"', 'id="seguridad-cuenta"'],
+        forbidden: [
+          'id="mercado"',
+          'id="operaciones"',
+          'id="administracion"',
+          'id="auditoria"',
+        ],
+      },
+      {
+        module: "mercado",
+        required: ['id="overview"', 'id="mercado"'],
+        forbidden: [
+          'id="cuenta"',
+          'id="operaciones"',
+          'id="administracion"',
+          'id="auditoria"',
+        ],
+      },
+      {
+        module: "arbitraje",
+        required: [
+          'id="module-placeholder"',
+          "Implementación funcional pendiente",
+          "<h2>Arbitraje</h2>",
+        ],
+        forbidden: [
+          'id="overview"',
+          'id="cuenta"',
+          'id="mercado"',
+          'id="operaciones"',
+          'id="administracion"',
+        ],
+      },
+      {
+        module: "operaciones",
+        required: ['id="operaciones"'],
+        forbidden: [
+          'id="cuenta"',
+          'id="mercado"',
+          'id="administracion"',
+          'id="auditoria"',
+        ],
+      },
+      {
+        module: "usuarios",
+        required: ['id="administracion"'],
+        forbidden: [
+          'id="cuenta"',
+          'id="mercado"',
+          'id="operaciones"',
+          'id="auditoria"',
+        ],
+      },
+      {
+        module: "seguridad",
+        required: ['id="controles"', 'id="auditoria"'],
+        forbidden: [
+          'id="cuenta"',
+          'id="mercado"',
+          'id="operaciones"',
+          'id="administracion"',
+        ],
+      },
+      {
+        module: "monitor",
+        required: [
+          'id="module-placeholder"',
+          "Implementación funcional pendiente",
+          "<h2>Monitor y observabilidad</h2>",
+        ],
+        forbidden: [
+          'id="overview"',
+          'id="cuenta"',
+          'id="mercado"',
+          'id="operaciones"',
+          'id="administracion"',
+        ],
+      },
+      {
+        module: "configuracion",
+        required: [
+          'id="module-placeholder"',
+          "Implementación funcional pendiente",
+          "<h2>Configuración</h2>",
+        ],
+        forbidden: [
+          'id="overview"',
+          'id="cuenta"',
+          'id="mercado"',
+          'id="operaciones"',
+          'id="administracion"',
+        ],
+      },
+    ] as const;
+
+    for (const testCase of cases) {
+      const response = createPublicAppResponse(testCase.module);
+      const body = await response.text();
+
+      expect(body).toContain(`<body data-module="${testCase.module}">`);
+
+      for (const marker of testCase.required) {
+        expect(body, `${testCase.module} must render ${marker}`).toContain(
+          marker,
+        );
+      }
+
+      for (const marker of testCase.forbidden) {
+        expect(
+          body,
+          `${testCase.module} must not render ${marker}`,
+        ).not.toContain(marker);
+      }
+    }
+  });
+
 });
