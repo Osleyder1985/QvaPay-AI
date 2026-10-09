@@ -32,6 +32,10 @@ Evitar correcciones manuales repetitivas cuando Prettier detecta diferencias de 
 
 La CI debe mostrar que `npm run format:check` pasa después de la reparación y que los controles de compilación/pruebas afectados también pasan. La existencia del comando, por sí sola, no certifica una ejecución correcta.
 
+## Prohibición verificable de exclusiones
+
+Los workflows de calidad y seguridad ejecutan `npm run check:prettier-exclusions`. El control falla si encuentra un archivo `.prettierignore` o una directiva `prettier-ignore` en archivos de código compatibles. Este control complementa `format:check`: el primero impide exclusiones deliberadas y el segundo exige que el formato sea correcto en el alcance configurado.
+
 ## Diagnóstico permanente en CI
 
 El flujo `.github/workflows/security-gate.yml` debe conservar un paso permanente de diagnóstico de Prettier. Si `npm run format:check` falla, el mismo paso debe:
