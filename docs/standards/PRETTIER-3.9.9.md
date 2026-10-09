@@ -42,11 +42,9 @@ El comando `npm run format` ejecuta `prettier --write .` y puede cambiar muchos 
 
 La configuración actual de `.prettierrc.json` declara expresamente estas opciones:
 
-| Opción          | Valor efectivo | Aplicación                                                                                                                      |
-| --------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| `semi`          | `true`         | Usar punto y coma al final de las sentencias cuando corresponda.                                                                |
-| `singleQuote`   | `false`        | Preferir comillas dobles en cadenas JavaScript/TypeScript; la elección puede variar cuando otra clase de comilla evita escapes. |
-| `trailingComma` | `"all"`        | Añadir comas finales donde la sintaxis lo permita, incluidos parámetros y argumentos multilínea.                                |
+- **Opción:** `semi`; **Valor efectivo:** `true`; **Aplicación:** Usar punto y coma al final de las sentencias cuando corresponda.
+- **Opción:** `singleQuote`; **Valor efectivo:** `false`; **Aplicación:** Preferir comillas dobles en cadenas JavaScript/TypeScript; la elección puede variar cuando otra clase de comilla evita escapes.
+- **Opción:** `trailingComma`; **Valor efectivo:** `"all"`; **Aplicación:** Añadir comas finales donde la sintaxis lo permita, incluidos parámetros y argumentos multilínea.
 
 Las opciones no declaradas se rigen por los valores predeterminados de Prettier 3.9.9, salvo que una configuración aplicable de editor, una regla `overrides` o una opción de ejecución las sustituya. La configuración local del repositorio es la referencia principal: no inventar reglas adicionales ni asumir que las preferencias personales reemplazan esta configuración.
 
@@ -65,62 +63,52 @@ Esta sección resume las opciones públicas de configuración más relevantes de
 
 ### 3.1. Ancho, indentación y estructura
 
-| Opción                   | Predeterminado | Regla                                                                                                                              |
-| ------------------------ | -------------: | ---------------------------------------------------------------------------------------------------------------------------------- |
-| `printWidth`             | `80`           | Ancho objetivo de línea; no es un límite rígido. Prettier puede superar el ancho cuando la sintaxis o la legibilidad lo requieren. |
-| `tabWidth`               | `2`            | Número de espacios por nivel de indentación.                                                                                       |
-| `useTabs`                | `false`        | Usar espacios, no tabuladores, para indentar.                                                                                      |
-| `semi`                   | `true`         | Añadir punto y coma al final de sentencias cuando corresponda. **El repositorio lo fija en `true`.**                               |
-| `trailingComma`          | `"all"`        | Comas finales en estructuras multilínea donde la sintaxis las admite. **El repositorio lo fija en `"all"`.**                       |
-| `bracketSpacing`         | `true`         | Espacios dentro de llaves de objetos: `{ clave: valor }`.                                                                          |
-| `bracketSameLine`        | `false`        | Mantener el cierre de etiquetas JSX/HTML multilínea en su propia línea cuando corresponda.                                         |
-| `objectWrap`             | `"preserve"`   | Conservar el salto de línea inicial de un literal de objeto cuando exista; `"collapse"` permite compactarlo si cabe.               |
-| `singleAttributePerLine` | `false`        | No forzar por defecto un atributo por línea en HTML, Vue y JSX.                                                                    |
-| `arrowParens`            | `"always"`     | Mantener paréntesis alrededor del parámetro de una función flecha, por ejemplo `(x) => x`.                                         |
+- **Opción:** `printWidth`; **Predeterminado:** `80`; **Regla:** Ancho objetivo de línea; no es un límite rígido. Prettier puede superar el ancho cuando la sintaxis o la legibilidad lo requieren.
+- **Opción:** `tabWidth`; **Predeterminado:** `2`; **Regla:** Número de espacios por nivel de indentación.
+- **Opción:** `useTabs`; **Predeterminado:** `false`; **Regla:** Usar espacios, no tabuladores, para indentar.
+- **Opción:** `semi`; **Predeterminado:** `true`; **Regla:** Añadir punto y coma al final de sentencias cuando corresponda. **El repositorio lo fija en `true`.**
+- **Opción:** `trailingComma`; **Predeterminado:** `"all"`; **Regla:** Comas finales en estructuras multilínea donde la sintaxis las admite. **El repositorio lo fija en `"all"`.**
+- **Opción:** `bracketSpacing`; **Predeterminado:** `true`; **Regla:** Espacios dentro de llaves de objetos: `{ clave: valor }`.
+- **Opción:** `bracketSameLine`; **Predeterminado:** `false`; **Regla:** Mantener el cierre de etiquetas JSX/HTML multilínea en su propia línea cuando corresponda.
+- **Opción:** `objectWrap`; **Predeterminado:** `"preserve"`; **Regla:** Conservar el salto de línea inicial de un literal de objeto cuando exista; `"collapse"` permite compactarlo si cabe.
+- **Opción:** `singleAttributePerLine`; **Predeterminado:** `false`; **Regla:** No forzar por defecto un atributo por línea en HTML, Vue y JSX.
+- **Opción:** `arrowParens`; **Predeterminado:** `"always"`; **Regla:** Mantener paréntesis alrededor del parámetro de una función flecha, por ejemplo `(x) => x`.
 
 ### 3.2. Comillas y propiedades
 
-| Opción           | Predeterminado | Regla                                                                                                         |
-| ---------------- | -------------- | ------------------------------------------------------------------------------------------------------------- |
-| `singleQuote`    | `false`        | Preferir comillas dobles en JavaScript/TypeScript. **El repositorio lo fija en `false`.**                     |
-| `jsxSingleQuote` | `false`        | Preferir comillas dobles en atributos JSX.                                                                    |
-| `quoteProps`     | `"as-needed"`  | Entrecomillar nombres de propiedades solo cuando sea necesario. También admite `"consistent"` y `"preserve"`. |
+- **Opción:** `singleQuote`; **Predeterminado:** `false`; **Regla:** Preferir comillas dobles en JavaScript/TypeScript. **El repositorio lo fija en `false`.**
+- **Opción:** `jsxSingleQuote`; **Predeterminado:** `false`; **Regla:** Preferir comillas dobles en atributos JSX.
+- **Opción:** `quoteProps`; **Predeterminado:** `"as-needed"`; **Regla:** Entrecomillar nombres de propiedades solo cuando sea necesario. También admite `"consistent"` y `"preserve"`.
 
 La elección de comillas no debe hacerse mediante sustituciones de texto ciegas: las comillas pueden tener significado dentro de cadenas, expresiones regulares, HTML, JSX y plantillas.
 
 ### 3.3. Selección de archivos y análisis sintáctico
 
-| Opción                          | Predeterminado         | Regla                                                                                                                                                                                        |
-| ------------------------------- | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `parser`                        | Inferido por extensión | No establecerlo globalmente; Prettier debe detectar el analizador por el tipo de archivo. Si un archivo necesita un analizador especial, configurarlo de forma acotada mediante `overrides`. |
-| `filepath` / `--stdin-filepath` | Ninguno                | En entradas por stdin, indicar la ruta real para que Prettier infiera el analizador correcto. Es una opción de CLI/API, no una regla general del archivo de configuración.                   |
-| `rangeStart`                    | `0`                    | Inicio del rango opcional que se desea formatear.                                                                                                                                            |
-| `rangeEnd`                      | `Infinity`             | Fin del rango opcional. En el flujo normal del repositorio se formatea el archivo completo, no un rango parcial.                                                                             |
-| `requirePragma`                 | `false`                | No exigir un comentario `@prettier` o `@format` para procesar un archivo.                                                                                                                    |
-| `insertPragma`                  | `false`                | No insertar automáticamente un marcador `@format`.                                                                                                                                           |
-| `checkIgnorePragma`             | `false`                | No excluir automáticamente archivos por comentarios `@noprettier` o `@noformat`, salvo que se active expresamente.                                                                           |
-| `plugins`                       | Ninguno adicional      | No agregar plugins sin justificar su necesidad y fijar su dependencia/versionado. Los plugins pueden cambiar los analizadores y el resultado del formato.                                    |
+- **Opción:** `parser`; **Predeterminado:** Inferido por extensión; **Regla:** No establecerlo globalmente; Prettier debe detectar el analizador por el tipo de archivo. Si un archivo necesita un analizador especial, configurarlo de forma acotada mediante `overrides`.
+- **Opción:** `filepath` / `--stdin-filepath`; **Predeterminado:** Ninguno; **Regla:** En entradas por stdin, indicar la ruta real para que Prettier infiera el analizador correcto. Es una opción de CLI/API, no una regla general del archivo de configuración.
+- **Opción:** `rangeStart`; **Predeterminado:** `0`; **Regla:** Inicio del rango opcional que se desea formatear.
+- **Opción:** `rangeEnd`; **Predeterminado:** `Infinity`; **Regla:** Fin del rango opcional. En el flujo normal del repositorio se formatea el archivo completo, no un rango parcial.
+- **Opción:** `requirePragma`; **Predeterminado:** `false`; **Regla:** No exigir un comentario `@prettier` o `@format` para procesar un archivo.
+- **Opción:** `insertPragma`; **Predeterminado:** `false`; **Regla:** No insertar automáticamente un marcador `@format`.
+- **Opción:** `checkIgnorePragma`; **Predeterminado:** `false`; **Regla:** No excluir automáticamente archivos por comentarios `@noprettier` o `@noformat`, salvo que se active expresamente.
+- **Opción:** `plugins`; **Predeterminado:** Ninguno adicional; **Regla:** No agregar plugins sin justificar su necesidad y fijar su dependencia/versionado. Los plugins pueden cambiar los analizadores y el resultado del formato.
 
 Prettier elige automáticamente el analizador para los tipos de archivo que reconoce. No se debe fijar `parser` globalmente porque eso puede hacer que archivos de otros tipos se interpreten incorrectamente.
 
 ### 3.4. Texto, Markdown y documentos
 
-| Opción                       | Predeterminado | Regla                                                                                                                |
-| ---------------------------- | -------------- | -------------------------------------------------------------------------------------------------------------------- |
-| `proseWrap`                  | `"preserve"`   | En prosa, conservar el ajuste de línea existente por defecto. También admite `"always"` y `"never"`.                 |
-| `embeddedLanguageFormatting` | `"auto"`       | Formatear automáticamente código embebido cuando Prettier pueda identificarlo.                                       |
-| `endOfLine`                  | `"lf"`         | Usar finales de línea LF. Puede verse afectado por una configuración `.editorconfig` aplicable.                      |
-| `htmlWhitespaceSensitivity`  | `"css"`        | Respetar la sensibilidad de espacios en blanco de HTML según las reglas CSS. También admite `"strict"` y `"ignore"`. |
-| `vueIndentScriptAndStyle`    | `false`        | No indentar adicionalmente por defecto el contenido de las etiquetas `<script>` y `<style>` en archivos Vue.         |
+- **Opción:** `proseWrap`; **Predeterminado:** `"preserve"`; **Regla:** En prosa, conservar el ajuste de línea existente por defecto. También admite `"always"` y `"never"`.
+- **Opción:** `embeddedLanguageFormatting`; **Predeterminado:** `"auto"`; **Regla:** Formatear automáticamente código embebido cuando Prettier pueda identificarlo.
+- **Opción:** `endOfLine`; **Predeterminado:** `"lf"`; **Regla:** Usar finales de línea LF. Puede verse afectado por una configuración `.editorconfig` aplicable.
+- **Opción:** `htmlWhitespaceSensitivity`; **Predeterminado:** `"css"`; **Regla:** Respetar la sensibilidad de espacios en blanco de HTML según las reglas CSS. También admite `"strict"` y `"ignore"`.
+- **Opción:** `vueIndentScriptAndStyle`; **Predeterminado:** `false`; **Regla:** No indentar adicionalmente por defecto el contenido de las etiquetas `<script>` y `<style>` en archivos Vue.
 
 En Markdown, conservar la estructura semántica: encabezados, listas, tablas, enlaces, bloques de código y front matter cuando exista. El formateo no autoriza a cambiar el significado de la documentación, los requisitos, las decisiones arquitectónicas ni los comentarios normativos.
 
 ### 3.5. Opciones experimentales
 
-| Opción                         | Predeterminado | Regla                                                                                                                 |
-| ------------------------------ | -------------- | --------------------------------------------------------------------------------------------------------------------- |
-| `experimentalTernaries`        | `false`        | No activar el formato experimental de ternarios sin una decisión de proyecto.                                         |
-| `experimentalOperatorPosition` | `"end"`        | En expresiones multilínea, mantener el comportamiento predeterminado de los operadores al final de la línea anterior. |
+- **Opción:** `experimentalTernaries`; **Predeterminado:** `false`; **Regla:** No activar el formato experimental de ternarios sin una decisión de proyecto.
+- **Opción:** `experimentalOperatorPosition`; **Predeterminado:** `"end"`; **Regla:** En expresiones multilínea, mantener el comportamiento predeterminado de los operadores al final de la línea anterior.
 
 No activar opciones experimentales de forma incidental. Un cambio de estilo global requiere revisar el impacto en el repositorio, documentar el motivo y validar el diff completo.
 
