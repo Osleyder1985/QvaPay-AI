@@ -3,6 +3,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const authMocks = vi.hoisted(() => ({
   ensureSecuritySchema: vi.fn(),
   getSession: vi.fn(),
+  requireRole: authMocks.requireRole,
+  changeUserPassword: authMocks.changeUserPassword,
 }));
 
 vi.mock("../../src/infrastructure/cloudflare/auth-rbac.js", () => ({
@@ -127,6 +129,53 @@ describe("Cloudflare Worker: autorización de rutas modulares", () => {
     expect(response.status).toBe(200);
     expect(html).toContain("Usuarios y acceso");
     expect(html).toContain('id="administracion"');
+  });
+
+  it("rechaza mutaciones con cookie de sesión si falta Origin o es de otro origen", async () => {
+    const env = createEnvironment();
+    const cases = [
+      { headers: { cookie: "qvapay_ai_session=session-value" }, label: "sin Origin" },
+      { headers: { cookie: "qvapay_ai_session=session-value", origin: "https://attacker.example" }, label: "origen cruzado" },
+      { headers: { cookie: "qvapay_ai_session=session-value", origin: "null" }, label: "origen opaco" },
+    ];
+
+    for (const testCase of cases) {
+      const response = await worker.fetch(
+        new Request("https://qvapay-ai.test/api/account/password", {
+          method: "POST",
+          headers: { "content-type": "application/json", ...testCase.headers },
+          body: JSON.stringify({ password: "safe-password", confirmation: "safe-password" }),
+        }),
+        env,
+      );
+      expect(response.status, testCase.label).toBe(403);
+      expect(await response.json()).toEqual({ error: "Origen de solicitud no válido." });
+    }
+
+    expect(authMocks.requireRole).not.toHaveBeenCalled();
+  });
+
+  it("permite una mutación autenticada con Origin exactamente igual al origen de la aplicación", async () => {
+    const env = createEnvironment();
+    authMocks.requireRole.mockResolvedValue(administratorSession);
+    authMocks.changeUserPassword.mockResolvedValue(administratorSession.user);
+
+    const response = await worker.fetch(
+      new Request("https://qvapay-ai.test/api/account/password", {
+        method: "POST",
+        headers: {
+          cookie: "qvapay_ai_session=session-value",
+          origin: "https://qvapay-ai.test",
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({ password: "safe-password", confirmation: "safe-password" }),
+      }),
+      env,
+    );
+
+    expect(response.status).toBe(200);
+    expect(authMocks.requireRole).toHaveBeenCalledOnce();
+    expect(authMocks.changeUserPassword).toHaveBeenCalledOnce();
   });
 
   it("rechaza rutas desconocidas y métodos no GET", async () => {
