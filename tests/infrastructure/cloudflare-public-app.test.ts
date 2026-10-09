@@ -90,33 +90,33 @@ describe("public production dashboard", () => {
   it(
     "sirve la ruta inicial sin credenciales ni contenido funcional de otros módulos",
     async () => {
-    const response = createPublicAppResponse();
-    const body = await response.text();
+      const response = createPublicAppResponse();
+      const body = await response.text();
 
-    expect(response.status).toBe(200);
-    expect(response.headers.get("content-type")).toContain("text/html");
-    expect(response.headers.get("content-security-policy")).toContain(
-      "connect-src 'self'",
-    );
-    expect(body).toContain("QvaPay-AI");
-    expect(body).toContain("MEJOR BUY");
-    expect(body).toContain("MEJOR SELL");
-    expect(body).toContain("10");
-    expect(body).toContain("Dashboard operativo");
-    expect(body).toContain("state.serverNowAt-Date.now()");
-    expect(body).toContain("setInterval(refresh,1000)");
-    expect(body).not.toContain('id="auditoria"');
-    expect(body).not.toContain('id="cuenta"');
-    expect(body).not.toContain('id="mercado"');
-    expect(body).not.toContain("/internal/scanner/start");
-    expect(body).not.toContain("setAlarm(");
-    expect(body).toContain("/api/account");
-    expect(body).not.toContain("x-p2p-action-token");
-    expect(body).not.toContain("P2P_ACTION_TOKEN");
-    expect(body).not.toContain("Introduce tu clave de operación P2P");
-    expect(body).not.toContain("QVAPAY_APP_SECRET");
-    expect(body).toContain("ISO/IEC 27001");
-    expect(body).not.toContain("SCANNER_BOOTSTRAP_TOKEN");
+      expect(response.status).toBe(200);
+      expect(response.headers.get("content-type")).toContain("text/html");
+      expect(response.headers.get("content-security-policy")).toContain(
+        "connect-src 'self'",
+      );
+      expect(body).toContain("QvaPay-AI");
+      expect(body).toContain("MEJOR BUY");
+      expect(body).toContain("MEJOR SELL");
+      expect(body).toContain("10");
+      expect(body).toContain("Dashboard operativo");
+      expect(body).toContain("state.serverNowAt-Date.now()");
+      expect(body).toContain("setInterval(refresh,1000)");
+      expect(body).not.toContain('id="auditoria"');
+      expect(body).not.toContain('id="cuenta"');
+      expect(body).not.toContain('id="mercado"');
+      expect(body).not.toContain("/internal/scanner/start");
+      expect(body).not.toContain("setAlarm(");
+      expect(body).toContain("/api/account");
+      expect(body).not.toContain("x-p2p-action-token");
+      expect(body).not.toContain("P2P_ACTION_TOKEN");
+      expect(body).not.toContain("Introduce tu clave de operación P2P");
+      expect(body).not.toContain("QVAPAY_APP_SECRET");
+      expect(body).toContain("ISO/IEC 27001");
+      expect(body).not.toContain("SCANNER_BOOTSTRAP_TOKEN");
     expect(body).not.toContain("Server-Side Monitoring");
     },
   );
