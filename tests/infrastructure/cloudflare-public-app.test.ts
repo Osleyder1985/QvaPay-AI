@@ -4,7 +4,9 @@ import {
   createPublicScannerStateResponse,
   toPublicScannerState,
 } from "../../src/infrastructure/cloudflare/public-app.js";
-import type { ScannerSchedulerRuntimeState } from "../../src/infrastructure/cloudflare/scanner-scheduler-do.js";
+import type {
+  ScannerSchedulerRuntimeState,
+} from "../../src/infrastructure/cloudflare/scanner-scheduler-do.js";
 
 const marketState: ScannerSchedulerRuntimeState = {
   configured: true,
@@ -194,7 +196,9 @@ describe("public production dashboard", () => {
     expect(body).toContain('"creatorUsername"');
   });
 
-  it("renderiza solo el contenido asignado a cada ruta modular en el servidor", async () => {
+  it(
+    "renderiza solo el contenido asignado a cada ruta modular en el servidor",
+    async () => {
     const cases = [
       {
         module: "inicio",
