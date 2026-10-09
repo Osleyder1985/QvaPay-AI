@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-import { createPublicAppResponse } from "../../../src/infrastructure/cloudflare/public-app.js";
+import { renderDashboardView } from "../../../src/presentation/dashboard/dashboard-view.js";
+import { DASHBOARD_CLIENT_SCRIPT } from "../../../src/presentation/dashboard/dashboard-client.js";
 
 describe("integridad de snapshot y affordances del mercado", () => {
-  it("define explícitamente ready, stale, partial, degraded, offline y unavailable", async () => {
-    const html = await createPublicAppResponse().text();
+  it("define explícitamente ready, stale, partial, degraded, offline y unavailable", () => {
     for (const state of [
       "ready",
       "stale",
@@ -13,21 +13,20 @@ describe("integridad de snapshot y affordances del mercado", () => {
       "offline",
       "unavailable",
     ]) {
-      expect(html).toContain('key:"' + state + '"');
+      expect(DASHBOARD_CLIENT_SCRIPT).toContain('key:"' + state + '"');
     }
   });
 
-  it("impide presentar acciones de mercado como disponibles cuando el snapshot no es confiable", async () => {
-    const html = await createPublicAppResponse().text();
-    expect(html).toContain('class="action-disabled"');
-    expect(html).toContain("no es accionable");
-    expect(html).toContain("solo lectura");
+  it("impide presentar acciones de mercado como disponibles cuando el snapshot no es confiable", () => {
+    expect(renderDashboardView()).toContain('class="action-disabled"');
+    expect(DASHBOARD_CLIENT_SCRIPT).toContain("no es accionable");
+    expect(DASHBOARD_CLIENT_SCRIPT).toContain("solo lectura");
   });
 
-  it("expone estado y edad de integridad junto al dataset", async () => {
-    const html = await createPublicAppResponse().text();
+  it("expone estado y edad de integridad junto al dataset", () => {
+    const html = renderDashboardView();
     expect(html).toContain('id="marketIntegrity"');
-    expect(html).toContain("Edad:");
+    expect(DASHBOARD_CLIENT_SCRIPT).toContain("Edad:");
     expect(html).toContain('role="status"');
   });
 });
