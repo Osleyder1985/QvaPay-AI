@@ -62,10 +62,9 @@ for (const viewport of [
         viewport: document.documentElement.clientWidth,
         document: document.documentElement.scrollWidth,
       }));
-      expect(
-        dimensions.document,
-        JSON.stringify(dimensions),
-      ).toBeLessThanOrEqual(dimensions.viewport);
+      expect(dimensions.document, JSON.stringify(dimensions)).toBeLessThanOrEqual(
+        dimensions.viewport,
+      );
     },
   );
 }
