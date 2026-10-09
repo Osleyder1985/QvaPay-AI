@@ -1,7 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import {
-  DASHBOARD_CLIENT_SCRIPT,
-} from "../src/presentation/dashboard/dashboard-client.js";
+import { DASHBOARD_CLIENT_SCRIPT } from "../src/presentation/dashboard/dashboard-client.js";
 import {
   estimateServerNow,
   snapshotAgeMs,
