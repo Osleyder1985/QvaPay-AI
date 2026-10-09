@@ -69,7 +69,6 @@ const MODULE_HEADERS: Record<string, ModuleHeader> = {
  * @param moduleId Identificador de la ruta solicitada.
  * @returns Fragmento HTML del encabezado.
  */
-// prettier-ignore
 export function renderApplicationShellHeader(moduleId = "inicio"): string {
   const header = MODULE_HEADERS[moduleId] ?? DEFAULT_MODULE_HEADER;
 
