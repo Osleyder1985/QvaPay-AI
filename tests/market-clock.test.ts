@@ -1,5 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
-import { DASHBOARD_CLIENT_SCRIPT } from "../src/presentation/dashboard/dashboard-client.js";
+import {
+  DASHBOARD_CLIENT_SCRIPT,
+} from "../src/presentation/dashboard/dashboard-client.js";
 import {
   estimateServerNow,
   snapshotAgeMs,
@@ -140,7 +142,7 @@ describe("integración ejecutable del sondeo", () => {
   );
 
   it(
-    "conserva el último snapshot y lo marca sin conexión al fallar la siguiente solicitud",
+    "conserva el snapshot y lo marca offline si falla la siguiente solicitud",
     async () => {
       const fetchMock = vi
         .fn<typeof fetch>()
