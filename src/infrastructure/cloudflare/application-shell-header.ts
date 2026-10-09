@@ -71,6 +71,7 @@ const MODULE_HEADERS: Record<string, ModuleHeader> = {
  */
 export function renderApplicationShellHeader(moduleId = "inicio"): string {
   const header = MODULE_HEADERS[moduleId] ?? DEFAULT_MODULE_HEADER;
+  // prettier-ignore
   return [
     '<header class="top" id="pageHeader" aria-labelledby="page-title">',
     '<div class="title">',
