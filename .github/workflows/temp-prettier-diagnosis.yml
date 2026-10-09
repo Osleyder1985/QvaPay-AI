@@ -1,6 +1,6 @@
 name: Temporary Prettier diagnosis
 on:
-  push:
+  pull_request:
     branches:
       - feat/premium-modular-ui-foundation
 permissions:
