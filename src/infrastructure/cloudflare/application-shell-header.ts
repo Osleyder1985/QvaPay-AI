@@ -13,10 +13,7 @@ const DEFAULT_MODULE_HEADER = {
 };
 
 /** Estructura de los metadatos contextuales de cada módulo. */
-type ModuleHeader = {
-  title: string;
-  description: string;
-};
+type ModuleHeader = { title: string; description: string };
 
 /** Metadatos contextuales del encabezado para cada módulo. */
 const MODULE_HEADERS: Record<string, ModuleHeader> = {
