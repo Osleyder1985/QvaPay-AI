@@ -90,11 +90,11 @@ const marketState: ScannerSchedulerRuntimeState = {
 
 describe("public production dashboard", () => {
   it(
-      "sirve la ruta inicial sin credenciales ni contenido funcional de otros módulos",
+    "sirve la ruta inicial sin credenciales ni contenido funcional de otros módulos",
     async () => {
       const response = createPublicAppResponse();
       const body = await response.text();
-  
+
       expect(response.status).toBe(200);
       expect(response.headers.get("content-type")).toContain("text/html");
       expect(response.headers.get("content-security-policy")).toContain(
@@ -197,7 +197,7 @@ describe("public production dashboard", () => {
   });
 
   it(
-      "renderiza solo el contenido asignado a cada ruta modular en el servidor",
+    "renderiza solo el contenido asignado a cada ruta modular en el servidor",
     async () => {
       const cases = [
         {
@@ -311,19 +311,19 @@ describe("public production dashboard", () => {
           ],
         },
       ] as const;
-  
+
       for (const testCase of cases) {
         const response = createPublicAppResponse(testCase.module);
         const body = await response.text();
-  
+
         expect(body).toContain(`<body data-module="${testCase.module}">`);
-  
+
         for (const marker of testCase.required) {
           expect(body, `${testCase.module} must render ${marker}`).toContain(
             marker,
           );
         }
-  
+
         for (const marker of testCase.forbidden) {
           expect(
             body,
