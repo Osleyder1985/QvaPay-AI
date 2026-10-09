@@ -50,4 +50,6 @@ La dirección visual usa superficies coherentes, jerarquía tipográfica, navega
 - Requisito funcional: #474.
 - Solution Card visual: #475.
 - Gobernanza de diseño: #270.
-- Verificación pendiente: pruebas automatizadas del aislamiento server-side, Quality Gate, Security Gate, autorización por ruta/rol, accesibilidad, responsive y smoke autenticado de producción.
+- Pruebas de aislamiento HTML por ruta: `tests/infrastructure/cloudflare-public-app.test.ts`; comprueba los nueve módulos y la ausencia de secciones ajenas en el HTML servido.
+- Verificación del cambio actual: Quality Gate y Security Gate en ejecución; el resultado se registrará tras completar CI.
+- Verificación aún pendiente para promoción: revisión manual de accesibilidad con lector de pantalla y zoom, y smoke autenticado de producción después de un despliegue autorizado.
