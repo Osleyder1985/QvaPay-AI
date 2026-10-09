@@ -74,16 +74,15 @@ describe("rutas y navegación del Application Shell", () => {
   });
 
   it("delega el enrutamiento al servidor", () => {
-      expect(DASHBOARD_CLIENT_SCRIPT).not.toContain("initializeModulePage");
-      expect(DASHBOARD_CLIENT_SCRIPT).not.toContain("visibleByModule");
-      expect(DASHBOARD_CLIENT_SCRIPT).toContain(
-        'if(moduleId==="cuenta")refreshAccount()',
-      );
-      expect(DASHBOARD_CLIENT_SCRIPT).toContain(
-        "Implementación funcional pendiente",
-      );
+    expect(DASHBOARD_CLIENT_SCRIPT).not.toContain("initializeModulePage");
+    expect(DASHBOARD_CLIENT_SCRIPT).not.toContain("visibleByModule");
+    expect(DASHBOARD_CLIENT_SCRIPT).toContain(
+      'if(moduleId==="cuenta")refreshAccount()',
+    );
+    expect(DASHBOARD_CLIENT_SCRIPT).toContain(
+      "Implementación funcional pendiente",
+    );
   });
-
   it("envía únicamente el contenido funcional del módulo solicitado", () => {
     const home = renderDashboardModuleView("inicio");
     expect(home).toContain('id="coin"');
