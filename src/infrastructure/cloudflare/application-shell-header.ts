@@ -12,10 +12,11 @@ const DEFAULT_MODULE_HEADER = {
     "Una vista clara del estado operativo y los indicadores esenciales.",
 };
 
+/** Estructura de los metadatos contextuales de cada módulo. */
+type ModuleHeader = { title: string; description: string };
+
 /** Metadatos contextuales del encabezado para cada módulo. */
-const MODULE_HEADERS: Readonly<
-  Record<string, { title: string; description: string }>
-> = {
+const MODULE_HEADERS: Readonly<Record<string, ModuleHeader>> = {
   inicio: {
     title: "Centro de mando",
     description:
