@@ -315,9 +315,10 @@ describe("public production dashboard", () => {
       expect(body).toContain(`<body data-module="${testCase.module}">`);
 
       for (const marker of testCase.required) {
-        expect(body, `${testCase.module} must render ${marker}`).toContain(
-          marker,
-        );
+        expect(
+          body,
+          `${testCase.module} must render ${marker}`,
+        ).toContain(marker);
       }
 
       for (const marker of testCase.forbidden) {
