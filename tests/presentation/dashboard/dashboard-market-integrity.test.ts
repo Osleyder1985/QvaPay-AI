@@ -18,7 +18,7 @@ describe("integridad de snapshot y affordances del mercado", () => {
   });
 
   it("impide presentar acciones de mercado como disponibles cuando el snapshot no es confiable", () => {
-    expect(renderDashboardView()).toContain('class="action-disabled"');
+    expect(DASHBOARD_CLIENT_SCRIPT).toContain('class="action-disabled"');
     expect(DASHBOARD_CLIENT_SCRIPT).toContain("no es accionable");
     expect(DASHBOARD_CLIENT_SCRIPT).toContain("solo lectura");
   });
