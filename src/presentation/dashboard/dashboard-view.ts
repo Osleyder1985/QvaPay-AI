@@ -48,6 +48,27 @@ export function renderDashboardView(): string {
 
 
 /**
+ * Renderiza un estado pendiente sin exponer controles ni datos ficticios.
+ */
+function renderPendingModulePlaceholder(
+  icon: string,
+  title: string,
+  description: string,
+): string {
+  return `<section
+    id="module-placeholder"
+    class="module-placeholder panel"
+    aria-live="polite"
+  >
+    <div class="placeholder-icon" aria-hidden="true">${icon}</div>
+    <p class="eyebrow">MÓDULO INDEPENDIENTE</p>
+    <h2>${title}</h2>
+    <p>${description}</p>
+    <span class="status warn">Implementación funcional pendiente</span>
+  </section>`;
+}
+
+/**
  * Extrae una sección HTML completa respetando secciones anidadas.
  * El contenido procede de la plantilla interna y no de entrada del usuario.
  */
@@ -66,7 +87,9 @@ function extractSection(markup: string, id: string): string {
   while ((token = tokenPattern.exec(markup)) !== null) {
     if (token[0].startsWith("</")) {
       depth -= 1;
-      if (depth === 0) return markup.slice(opening.index, tokenPattern.lastIndex);
+      if (depth === 0) {
+        return markup.slice(opening.index, tokenPattern.lastIndex);
+      }
     } else {
       depth += 1;
     }
@@ -90,9 +113,21 @@ export function renderDashboardModuleView(moduleId: string): string {
   const accountSecurityWithoutControls = accountSecurity.replace(controls, "");
 
   const pendingModules = {
-    arbitraje: '<section id="module-placeholder" class="module-placeholder panel" aria-live="polite"><div class="placeholder-icon" aria-hidden="true">⇄</div><p class="eyebrow">MÓDULO INDEPENDIENTE</p><h2>Arbitraje</h2><p>El espacio de análisis está preparado. La vista operativa se habilitará cuando su contrato de datos y sus pruebas estén integrados.</p><span class="status warn">Implementación funcional pendiente</span></section>',
-    monitor: '<section id="module-placeholder" class="module-placeholder panel" aria-live="polite"><div class="placeholder-icon" aria-hidden="true">◉</div><p class="eyebrow">MÓDULO INDEPENDIENTE</p><h2>Monitor y observabilidad</h2><p>Aquí se concentrarán la salud del runtime, la última ejecución, la próxima ejecución y los errores del scanner.</p><span class="status warn">Implementación funcional pendiente</span></section>',
-    configuracion: '<section id="module-placeholder" class="module-placeholder panel" aria-live="polite"><div class="placeholder-icon" aria-hidden="true">⚙</div><p class="eyebrow">MÓDULO INDEPENDIENTE</p><h2>Configuración</h2><p>Los parámetros editables aparecerán aquí cuando sus contratos y controles de autorización estén disponibles.</p><span class="status warn">Implementación funcional pendiente</span></section>',
+    arbitraje: renderPendingModulePlaceholder(
+      "⇄",
+      "Arbitraje",
+      "El espacio de análisis está preparado. La vista operativa se habilitará cuando su contrato de datos y sus pruebas estén integrados.",
+    ),
+    monitor: renderPendingModulePlaceholder(
+      "◉",
+      "Monitor y observabilidad",
+      "Aquí se concentrarán la salud del runtime, la última ejecución, la próxima ejecución y los errores del scanner.",
+    ),
+    configuracion: renderPendingModulePlaceholder(
+      "⚙",
+      "Configuración",
+      "Los parámetros editables aparecerán aquí cuando sus contratos y controles de autorización estén disponibles.",
+    ),
   };
 
   const sectionsByModule: Record<string, string> = {
