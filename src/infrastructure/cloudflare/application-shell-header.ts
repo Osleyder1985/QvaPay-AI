@@ -64,6 +64,7 @@ const MODULE_HEADERS: Record<string, ModuleHeader> = {
   },
 };
 
+// prettier-ignore
 /**
  * Renderiza el encabezado contextual de la ruta activa.
  * @param moduleId Identificador de la ruta solicitada.
