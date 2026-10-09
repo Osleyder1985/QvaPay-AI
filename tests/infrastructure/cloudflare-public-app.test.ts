@@ -117,7 +117,7 @@ describe("public production dashboard", () => {
       expect(body).not.toContain("QVAPAY_APP_SECRET");
       expect(body).toContain("ISO/IEC 27001");
       expect(body).not.toContain("SCANNER_BOOTSTRAP_TOKEN");
-    expect(body).not.toContain("Server-Side Monitoring");
+      expect(body).not.toContain("Server-Side Monitoring");
     },
   );
 
