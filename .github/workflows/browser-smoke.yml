@@ -24,6 +24,9 @@ jobs:
       - name: Install dependencies
         run: npm install --no-audit --no-fund
 
+      - name: Diagnose Prettier formatting
+        run: npx prettier tests/browser/application-shell-smoke.spec.ts
+
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
 
