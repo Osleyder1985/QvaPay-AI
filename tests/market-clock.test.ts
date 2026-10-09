@@ -1,7 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  DASHBOARD_CLIENT_SCRIPT,
-} from "../src/presentation/dashboard/dashboard-client.js";
+import { DASHBOARD_CLIENT_SCRIPT } from "../src/presentation/dashboard/dashboard-client.js";
 import {
   estimateServerNow,
   snapshotAgeMs,
@@ -9,9 +7,7 @@ import {
 
 describe("reloj del servidor", () => {
   it("estima un reloj local adelantado", () => {
-    expect(estimateServerNow(1_000_000, 9_000_000, 9_005_000)).toBe(
-      1_005_000,
-    );
+    expect(estimateServerNow(1_000_000, 9_000_000, 9_005_000)).toBe(1_005_000);
   });
 
   it("estima un reloj local atrasado", () => {
