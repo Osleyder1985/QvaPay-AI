@@ -89,7 +89,7 @@ export function renderDashboardModuleView(moduleId: string): string {
   const controls = extractSection(markup, "controles");
   const accountSecurityWithoutControls = accountSecurity.replace(controls, "");
 
-  const pendingModules: Record<string, string> = {
+  const pendingModules = {
     arbitraje: '<section id="module-placeholder" class="module-placeholder panel" aria-live="polite"><div class="placeholder-icon" aria-hidden="true">⇄</div><p class="eyebrow">MÓDULO INDEPENDIENTE</p><h2>Arbitraje</h2><p>El espacio de análisis está preparado. La vista operativa se habilitará cuando su contrato de datos y sus pruebas estén integrados.</p><span class="status warn">Implementación funcional pendiente</span></section>',
     monitor: '<section id="module-placeholder" class="module-placeholder panel" aria-live="polite"><div class="placeholder-icon" aria-hidden="true">◉</div><p class="eyebrow">MÓDULO INDEPENDIENTE</p><h2>Monitor y observabilidad</h2><p>Aquí se concentrarán la salud del runtime, la última ejecución, la próxima ejecución y los errores del scanner.</p><span class="status warn">Implementación funcional pendiente</span></section>',
     configuracion: '<section id="module-placeholder" class="module-placeholder panel" aria-live="polite"><div class="placeholder-icon" aria-hidden="true">⚙</div><p class="eyebrow">MÓDULO INDEPENDIENTE</p><h2>Configuración</h2><p>Los parámetros editables aparecerán aquí cuando sus contratos y controles de autorización estén disponibles.</p><span class="status warn">Implementación funcional pendiente</span></section>',
