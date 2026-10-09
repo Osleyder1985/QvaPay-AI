@@ -31,7 +31,7 @@ La CI debe mostrar que `npm run format:check` pasa después de la reparación y 
 
 ## Diagnóstico permanente en CI
 
-El flujo `.github/workflows/security-gate.yml` debe conservar un paso permanente de diagnóstico de Prettier. Si `npm run format:check` falla, el mismo paso debe:
+Los flujos `.github/workflows/security-gate.yml` y `.github/workflows/quality-gate.yml` deben conservar el mismo paso permanente de diagnóstico de Prettier para que ambos controles principales produzcan evidencia equivalente. Si `npm run format:check` falla, el mismo paso debe:
 
 1. Ejecutar `npm run format:fix` en el entorno temporal de CI.
 2. Mostrar los archivos afectados y el diff exacto generado por Prettier.
