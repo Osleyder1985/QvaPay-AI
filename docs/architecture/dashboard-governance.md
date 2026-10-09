@@ -42,7 +42,7 @@ El dashboard no sustituye auditorías formales, gestión documental ISO, gestió
 
 La interfaz autenticada introduce rutas dedicadas bajo `/app/{module}`. El Worker valida sesión antes de servir cualquier ruta modular y exige el rol `ADMINISTRATION` para `/app/usuarios`; la autorización de las API sigue siendo obligatoria y no se delega al cliente.
 
-El shell conserva navegación, encabezado contextual, estado de sesión y el área de contenido. La implementación incorpora un renderer de presentación que selecciona en el servidor las secciones funcionales correspondientes a cada ruta; el navegador ya no necesita recibir las vistas funcionales de los otros módulos. Las rutas Arbitraje, Monitor y Configuración continúan como espacios pendientes sin datos ficticios ni acciones simuladas. Esta mejora requiere superar las pruebas de aislamiento, los controles de CI, la revisión de autorización y las comprobaciones de interfaz antes de promoverse.
+El shell conserva navegación, encabezado contextual, estado de sesión y el área de contenido. La implementación incorpora un renderer de presentación que selecciona en el servidor las secciones funcionales correspondientes a cada ruta; el navegador ya no necesita recibir las vistas funcionales de los otros módulos. El módulo Monitor ya muestra el estado persistido del scanner, la última ejecución, la siguiente alarma, la frescura y el último error en modo de solo lectura. Arbitraje y Configuración continúan como espacios pendientes sin datos ficticios ni acciones simuladas. Esta mejora requiere superar las pruebas de aislamiento, los controles de CI, la revisión de autorización y las comprobaciones de interfaz antes de promoverse.
 
 La dirección visual usa superficies coherentes, jerarquía tipográfica, navegación activa, paneles contextuales y estados de implementación. Las animaciones deben respetar `prefers-reduced-motion`; los emojis son apoyo visual, nunca sustituyen etiquetas accesibles. La alineación con ISO 9241-210, ISO/IEC 25010 y WCAG 2.2 AA es un objetivo de diseño y verificación, no una declaración de certificación.
 
@@ -51,5 +51,6 @@ La dirección visual usa superficies coherentes, jerarquía tipográfica, navega
 - Solution Card visual: #475.
 - Gobernanza de diseño: #270.
 - Pruebas de aislamiento HTML por ruta: `tests/infrastructure/cloudflare-public-app.test.ts`; comprueba los nueve módulos y la ausencia de secciones ajenas en el HTML servido.
+- Pruebas del Monitor: `tests/application-shell-routing.test.ts`; verifica que la página use los identificadores del contrato del scanner y no el marcador de posición.
 - Verificación del cambio actual: Quality Gate y Security Gate en ejecución; el resultado se registrará tras completar CI.
 - Verificación aún pendiente para promoción: revisión manual de accesibilidad con lector de pantalla y zoom, y smoke autenticado de producción después de un despliegue autorizado.
