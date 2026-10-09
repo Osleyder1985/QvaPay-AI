@@ -45,8 +45,8 @@ describe("reloj del servidor para frescura del mercado", () => {
 
 describe("integración del reloj y sondeo del mercado", () => {
   it("usa el reloj estimado del servidor para edad y cuenta regresiva", () => {
-    expect(DASHBOARD_CLIENT_SCRIPT).toContain("snapshotAgeMs(state.metrics?.snapshotAt,state.serverNowAt,state.__receivedAt,Date.now())");
-    expect(DASHBOARD_CLIENT_SCRIPT).toContain("estimateServerNow(state.serverNowAt,state.__receivedAt,Date.now())");
+    expect(DASHBOARD_CLIENT_SCRIPT).toContain("snapshotAgeMs(state.metrics?.snapshotAt,state.serverNowAt,state.__receivedAt,performance.now())");
+    expect(DASHBOARD_CLIENT_SCRIPT).toContain("estimateServerNow(state.serverNowAt,state.__receivedAt,performance.now())");
   });
 
   it("limita el sondeo a cinco segundos y evita solicitudes concurrentes", () => {
