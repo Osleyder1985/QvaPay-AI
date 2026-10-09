@@ -175,10 +175,35 @@ test("el shell autenticado mantiene rutas, recarga, diseño adaptable y movimien
 
       // Comprueba el reflujo estrecho en cada módulo, no solo en Inicio.
       await page.setViewportSize({ width: 320, height: 800 });
-      const narrowDimensions = await page.evaluate(() => ({
-        viewport: document.documentElement.clientWidth,
-        document: document.documentElement.scrollWidth,
-      }));
+      const narrowDimensions = await page.evaluate(() => {
+        const viewport = document.documentElement.clientWidth;
+        const offenders = Array.from(document.body.querySelectorAll("*"))
+          .map((element) => {
+            const rect = element.getBoundingClientRect();
+            return {
+              element: element.tagName.toLowerCase(),
+              id: element.id,
+              className: typeof element.className === "string" ? element.className : "",
+              left: Math.round(rect.left),
+              right: Math.round(rect.right),
+              width: Math.round(rect.width),
+              clientWidth: element.clientWidth,
+              scrollWidth: element.scrollWidth,
+            };
+          })
+          .filter(
+            (element) =>
+              element.right > viewport + 1 ||
+              element.left < -1 ||
+              element.scrollWidth > element.clientWidth + 1,
+          )
+          .slice(0, 20);
+        return {
+          viewport,
+          document: document.documentElement.scrollWidth,
+          offenders,
+        };
+      });
       expect(
         narrowDimensions.document,
         `${route} a 320 px: ${JSON.stringify(narrowDimensions)}`,
