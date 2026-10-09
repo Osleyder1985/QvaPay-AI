@@ -35,11 +35,11 @@ test("se rechazan módulos desconocidos y métodos no admitidos", async ({ reque
 });
 
 for (const viewport of [
-  { name: "mobile", de ancho: 360, height: 800 },
-  { name: "tablet", width: 768, height: 1024 },
-  { name: "desktop", width: 1440, height: 900 },
+  { name: "móvil", width: 360, height: 800 },
+  { name: "tableta", width: 768, height: 1024 },
+  { name: "escritorio", width: 1440, height: 900 },
 ]) {
-  test(`la vista de acceso no se desborda horizontalmente en ${viewport.name} width`, async ({
+  test(`la vista de acceso no se desborda horizontalmente en ${viewport.name}`, async ({
     page,
   }) => {
     await page.setViewportSize({ width: viewport.width, height: viewport.height });
