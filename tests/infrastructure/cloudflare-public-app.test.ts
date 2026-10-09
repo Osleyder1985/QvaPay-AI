@@ -4,7 +4,9 @@ import {
   createPublicScannerStateResponse,
   toPublicScannerState,
 } from "../../src/infrastructure/cloudflare/public-app.js";
-import type { ScannerSchedulerRuntimeState } from "../../src/infrastructure/cloudflare/scanner-scheduler-do.js";
+import type {
+  ScannerSchedulerRuntimeState,
+} from "../../src/infrastructure/cloudflare/scanner-scheduler-do.js";
 
 const marketState: ScannerSchedulerRuntimeState = {
   configured: true,
@@ -87,7 +89,9 @@ const marketState: ScannerSchedulerRuntimeState = {
 };
 
 describe("public production dashboard", () => {
-  it("sirve la ruta inicial sin credenciales ni contenido funcional de otros módulos", async () => {
+  it(
+    "sirve la ruta inicial sin credenciales ni contenido funcional de otros módulos",
+    async () => {
     const response = createPublicAppResponse();
     const body = await response.text();
 
@@ -191,7 +195,9 @@ describe("public production dashboard", () => {
     expect(body).toContain('"creatorUsername"');
   });
 
-  it("renderiza solo el contenido asignado a cada ruta modular en el servidor", async () => {
+  it(
+    "renderiza solo el contenido asignado a cada ruta modular en el servidor",
+    async () => {
     const cases = [
       {
         module: "inicio",
