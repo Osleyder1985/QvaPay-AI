@@ -4,7 +4,9 @@ import {
   createPublicScannerStateResponse,
   toPublicScannerState,
 } from "../../src/infrastructure/cloudflare/public-app.js";
-import type { ScannerSchedulerRuntimeState } from "../../src/infrastructure/cloudflare/scanner-scheduler-do.js";
+import type {
+  ScannerSchedulerRuntimeState,
+} from "../../src/infrastructure/cloudflare/scanner-scheduler-do.js";
 
 const marketState: ScannerSchedulerRuntimeState = {
   configured: true,
