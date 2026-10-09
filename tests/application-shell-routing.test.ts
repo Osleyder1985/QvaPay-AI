@@ -116,8 +116,22 @@ describe("rutas y navegación del Application Shell", () => {
     expect(users).not.toContain('id="mercado"');
   });
 
+  it("renderiza el monitor con el contrato persistido del scanner", () => {
+    const monitor = renderDashboardModuleView("monitor");
+
+    expect(monitor).toContain('id="monitor-module"');
+    expect(monitor).toContain('id="health"');
+    expect(monitor).toContain('id="countdown"');
+    expect(monitor).toContain('id="eventCompleted"');
+    expect(monitor).toContain('id="auditError"');
+    expect(monitor).not.toContain('id="module-placeholder"');
+    expect(monitor).not.toContain('id="cuenta"');
+    expect(monitor).not.toContain('id="mercado"');
+    expect(monitor).not.toContain('id="administracion"');
+  });
+
   it("renderiza placeholders honestos en el servidor para módulos pendientes", () => {
-    for (const moduleId of ["arbitraje", "monitor", "configuracion"]) {
+    for (const moduleId of ["arbitraje", "configuracion"]) {
       const view = renderDashboardModuleView(moduleId);
       expect(view).toContain('id="module-placeholder"');
       expect(view).toContain("Implementación funcional pendiente");
