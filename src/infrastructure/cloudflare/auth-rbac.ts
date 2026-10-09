@@ -29,30 +29,22 @@ const SESSION_COOKIE = "qvapay_ai_session";
 const SESSION_TTL_SECONDS = 60 * 60 * 8;
 const PBKDF2_ITERATIONS = 100_000;
 const SALT_BYTES = 16;
-
-// prettier-ignore
 function b64(bytes: Uint8Array): string {
   let binary = "";
   for (const byte of bytes) binary += String.fromCharCode(byte);
   return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
 }
-
-// prettier-ignore
 function unb64(value: string): Uint8Array {
   const normalized = value.replace(/-/g, "+").replace(/_/g, "/") + "===".slice((value.length + 3) % 4);
   const binary = atob(normalized);
   return Uint8Array.from(binary, (c) => c.charCodeAt(0));
 }
-
-// prettier-ignore
 function equalBytes(a: Uint8Array, b: Uint8Array): boolean {
   if (a.length !== b.length) return false;
   let result = 0;
   for (let i = 0; i < a.length; i += 1) result |= (a[i] ?? 0) ^ (b[i] ?? 0);
   return result === 0;
 }
-
-// prettier-ignore
 async function derivePasswordHash(
   password: string,
   salt: Uint8Array,
@@ -79,8 +71,6 @@ async function derivePasswordHash(
   );
   return new Uint8Array(bits);
 }
-
-// prettier-ignore
 async function hmac(secret: string, value: string): Promise<string> {
   const key = await crypto.subtle.importKey(
     "raw",
@@ -91,14 +81,10 @@ async function hmac(secret: string, value: string): Promise<string> {
   );
   return b64(new Uint8Array(await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(value))));
 }
-
-// prettier-ignore
 function cookieFromRequest(request: Request): string | null {
   return request.headers.get("cookie")?.split(";").map((part) => part.trim())
     .find((part) => part.startsWith(SESSION_COOKIE + "="))?.slice(SESSION_COOKIE.length + 1) ?? null;
 }
-
-// prettier-ignore
 async function writeAudit(
   db: D1Database,
   eventType: string,
@@ -114,8 +100,6 @@ async function writeAudit(
     eventType, outcome, target?.id ?? null, target?.username ?? null, JSON.stringify(metadata),
   ).run();
 }
-
-// prettier-ignore
 function rowToUser(row: Record<string, unknown>): AppUser {
   return {
     id: String(row.id), username: String(row.username), role: String(row.role) as AppRole,
@@ -123,16 +107,10 @@ function rowToUser(row: Record<string, unknown>): AppUser {
     updatedAt: String(row.updated_at), lastLoginAt: row.last_login_at ? String(row.last_login_at) : null,
   };
 }
-
-// prettier-ignore
-
 // El arranque del runtime es idempotente y mantiene el inicio de producción independiente de
 // los permisos de D1 del plano de control de Wrangler. La migración versionada sigue siendo el
 // canonical schema artifact for controlled database administration.
 let schemaReady: Promise<void> | null = null;
-
-// prettier-ignore
-// prettier-ignore
 /**
  * @proposito API pública ensureSecuritySchema: implementa el comportamiento expuesto por este módulo.
  * @responsabilidades Aplicar las validaciones y reglas de negocio definidas por el contrato del módulo.
@@ -190,8 +168,6 @@ export async function ensureSecuritySchema(db: D1Database): Promise<void> {
     });
   return schemaReady;
 }
-
-// prettier-ignore
 /**
  * @proposito API pública createPasswordVerifier: implementa el comportamiento expuesto por este módulo.
  * @responsabilidades Aplicar las validaciones y reglas de negocio definidas por el contrato del módulo.
@@ -203,14 +179,10 @@ export async function createPasswordVerifier(password: string): Promise<{ salt: 
   const hash = await derivePasswordHash(password, salt);
   return { salt: b64(salt), hash: b64(hash), iterations: PBKDF2_ITERATIONS };
 }
-
-// prettier-ignore
 async function verifyPassword(password: string, salt: string, expected: string, iterations: number): Promise<boolean> {
   const actual = await derivePasswordHash(password, unb64(salt), iterations);
   return equalBytes(actual, unb64(expected));
 }
-
-// prettier-ignore
 /**
  * @proposito API pública findUserByUsername: implementa el comportamiento expuesto por este módulo.
  * @responsabilidades Aplicar las validaciones y reglas de negocio definidas por el contrato del módulo.
@@ -221,8 +193,6 @@ export async function findUserByUsername(db: D1Database, username: string): Prom
     .bind(username.trim()).first<Record<string, unknown>>();
   return row ? rowToUser(row) : null;
 }
-
-// prettier-ignore
 /**
  * @proposito API pública listUsers: implementa el comportamiento expuesto por este módulo.
  * @responsabilidades Aplicar las validaciones y reglas de negocio definidas por el contrato del módulo.
@@ -232,8 +202,6 @@ export async function listUsers(db: D1Database): Promise<AppUser[]> {
   const result = await db.prepare("SELECT id, username, role, active, created_at, updated_at, last_login_at FROM app_users ORDER BY username COLLATE NOCASE").all<Record<string, unknown>>();
   return result.results.map(rowToUser);
 }
-
-// prettier-ignore
 /**
  * @proposito API pública createUser: implementa el comportamiento expuesto por este módulo.
  * @responsabilidades Aplicar las validaciones y reglas de negocio definidas por el contrato del módulo.
@@ -253,8 +221,6 @@ export async function createUser(db: D1Database, username: string, password: str
   if (!user) throw new Error("No se pudo crear el usuario.");
   return user;
 }
-
-// prettier-ignore
 async function sessionForUser(request: Request, db: D1Database, secret: string): Promise<AuthSession | null> {
   if (!secret) return null;
   const token = cookieFromRequest(request);
@@ -272,8 +238,6 @@ async function sessionForUser(request: Request, db: D1Database, secret: string):
   const user = rowToUser(row);
   return user.active ? { user } : null;
 }
-
-// prettier-ignore
 /**
  * @proposito API pública authenticate: implementa el comportamiento expuesto por este módulo.
  * @responsabilidades Aplicar las validaciones y reglas de negocio definidas por el contrato del módulo.
@@ -308,8 +272,6 @@ export async function authenticate(
     sessionCookie: `${SESSION_COOKIE}=${payload}.${signature}; Max-Age=${SESSION_TTL_SECONDS}; Path=/; HttpOnly; Secure; SameSite=Strict`,
   };
 }
-
-// prettier-ignore
 /**
  * @proposito API pública getSession: implementa el comportamiento expuesto por este módulo.
  * @responsabilidades Aplicar las validaciones y reglas de negocio definidas por el contrato del módulo.
@@ -322,8 +284,6 @@ export async function getSession(request: Request, db: D1Database, secret: strin
   }
   return session;
 }
-
-// prettier-ignore
 /**
  * @proposito API pública requireRole: implementa el comportamiento expuesto por este módulo.
  * @responsabilidades Aplicar las validaciones y reglas de negocio definidas por el contrato del módulo.
@@ -338,8 +298,6 @@ export async function requireRole(request: Request, db: D1Database, secret: stri
   }
   return session;
 }
-
-// prettier-ignore
 /**
  * @proposito API pública logout: implementa el comportamiento expuesto por este módulo.
  * @responsabilidades Aplicar las validaciones y reglas de negocio definidas por el contrato del módulo.
@@ -359,8 +317,6 @@ export async function logout(request: Request, db: D1Database, secret: string): 
 export function clearSessionCookie(): string {
   return `${SESSION_COOKIE}=; Max-Age=0; Path=/; HttpOnly; Secure; SameSite=Strict`;
 }
-
-// prettier-ignore
 /**
  * @proposito API pública setUserActive: implementa el comportamiento expuesto por este módulo.
  * @responsabilidades Aplicar las validaciones y reglas de negocio definidas por el contrato del módulo.
@@ -378,8 +334,6 @@ export async function setUserActive(db: D1Database, actor: AppUser, userId: stri
   await writeAudit(db, active ? "user_enabled" : "user_disabled", "SUCCESS", actor, updated);
   return updated;
 }
-
-// prettier-ignore
 /**
  * @proposito API pública changeUserPassword: implementa el comportamiento expuesto por este módulo.
  * @responsabilidades Aplicar las validaciones y reglas de negocio definidas por el contrato del módulo.
@@ -398,8 +352,6 @@ export async function changeUserPassword(db: D1Database, actor: AppUser, userId:
   await writeAudit(db, "password_changed", "SUCCESS", actor, updated);
   return updated;
 }
-
-// prettier-ignore
 /**
  * @proposito API pública deleteUserByUsername: implementa el comportamiento expuesto por este módulo.
  * @responsabilidades Aplicar las validaciones y reglas de negocio definidas por el contrato del módulo.
