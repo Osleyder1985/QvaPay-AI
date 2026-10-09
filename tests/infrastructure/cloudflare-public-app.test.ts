@@ -90,37 +90,38 @@ const marketState: ScannerSchedulerRuntimeState = {
 
 describe("public production dashboard", () => {
   it(
-    "sirve la ruta inicial sin credenciales ni contenido funcional de otros módulos",
+      "sirve la ruta inicial sin credenciales ni contenido funcional de otros módulos",
     async () => {
-    const response = createPublicAppResponse();
-    const body = await response.text();
-
-    expect(response.status).toBe(200);
-    expect(response.headers.get("content-type")).toContain("text/html");
-    expect(response.headers.get("content-security-policy")).toContain(
-      "connect-src 'self'",
-    );
-    expect(body).toContain("QvaPay-AI");
-    expect(body).toContain("MEJOR BUY");
-    expect(body).toContain("MEJOR SELL");
-    expect(body).toContain("10");
-    expect(body).toContain("Dashboard operativo");
-    expect(body).toContain("state.serverNowAt-Date.now()");
-    expect(body).toContain("setInterval(refresh,1000)");
-    expect(body).not.toContain('id="auditoria"');
-    expect(body).not.toContain('id="cuenta"');
-    expect(body).not.toContain('id="mercado"');
-    expect(body).not.toContain("/internal/scanner/start");
-    expect(body).not.toContain("setAlarm(");
-    expect(body).toContain("/api/account");
-    expect(body).not.toContain("x-p2p-action-token");
-    expect(body).not.toContain("P2P_ACTION_TOKEN");
-    expect(body).not.toContain("Introduce tu clave de operación P2P");
-    expect(body).not.toContain("QVAPAY_APP_SECRET");
-    expect(body).toContain("ISO/IEC 27001");
-    expect(body).not.toContain("SCANNER_BOOTSTRAP_TOKEN");
-    expect(body).not.toContain("Server-Side Monitoring");
-  });
+      const response = createPublicAppResponse();
+      const body = await response.text();
+  
+      expect(response.status).toBe(200);
+      expect(response.headers.get("content-type")).toContain("text/html");
+      expect(response.headers.get("content-security-policy")).toContain(
+        "connect-src 'self'",
+      );
+      expect(body).toContain("QvaPay-AI");
+      expect(body).toContain("MEJOR BUY");
+      expect(body).toContain("MEJOR SELL");
+      expect(body).toContain("10");
+      expect(body).toContain("Dashboard operativo");
+      expect(body).toContain("state.serverNowAt-Date.now()");
+      expect(body).toContain("setInterval(refresh,1000)");
+      expect(body).not.toContain('id="auditoria"');
+      expect(body).not.toContain('id="cuenta"');
+      expect(body).not.toContain('id="mercado"');
+      expect(body).not.toContain("/internal/scanner/start");
+      expect(body).not.toContain("setAlarm(");
+      expect(body).toContain("/api/account");
+      expect(body).not.toContain("x-p2p-action-token");
+      expect(body).not.toContain("P2P_ACTION_TOKEN");
+      expect(body).not.toContain("Introduce tu clave de operación P2P");
+      expect(body).not.toContain("QVAPAY_APP_SECRET");
+      expect(body).toContain("ISO/IEC 27001");
+      expect(body).not.toContain("SCANNER_BOOTSTRAP_TOKEN");
+      expect(body).not.toContain("Server-Side Monitoring");
+    },
+  );
 
   it("ships a syntactically valid dashboard client script", async () => {
     const body = await createPublicAppResponse().text();
@@ -196,139 +197,140 @@ describe("public production dashboard", () => {
   });
 
   it(
-    "renderiza solo el contenido asignado a cada ruta modular en el servidor",
+      "renderiza solo el contenido asignado a cada ruta modular en el servidor",
     async () => {
-    const cases = [
-      {
-        module: "inicio",
-        required: ['id="overview"'],
-        forbidden: [
-          'id="cuenta"',
-          'id="mercado"',
-          'id="operaciones"',
-          'id="administracion"',
-          'id="auditoria"',
-          'id="controles"',
-        ],
-      },
-      {
-        module: "cuenta",
-        required: ['id="cuenta"', 'id="seguridad-cuenta"'],
-        forbidden: [
-          'id="mercado"',
-          'id="operaciones"',
-          'id="administracion"',
-          'id="auditoria"',
-        ],
-      },
-      {
-        module: "mercado",
-        required: ['id="overview"', 'id="mercado"'],
-        forbidden: [
-          'id="cuenta"',
-          'id="operaciones"',
-          'id="administracion"',
-          'id="auditoria"',
-        ],
-      },
-      {
-        module: "arbitraje",
-        required: [
-          'id="module-placeholder"',
-          "Implementación funcional pendiente",
-          "<h2>Arbitraje</h2>",
-        ],
-        forbidden: [
-          'id="overview"',
-          'id="cuenta"',
-          'id="mercado"',
-          'id="operaciones"',
-          'id="administracion"',
-        ],
-      },
-      {
-        module: "operaciones",
-        required: ['id="operaciones"'],
-        forbidden: [
-          'id="cuenta"',
-          'id="mercado"',
-          'id="administracion"',
-          'id="auditoria"',
-        ],
-      },
-      {
-        module: "usuarios",
-        required: ['id="administracion"'],
-        forbidden: [
-          'id="cuenta"',
-          'id="mercado"',
-          'id="operaciones"',
-          'id="auditoria"',
-        ],
-      },
-      {
-        module: "seguridad",
-        required: ['id="controles"', 'id="auditoria"'],
-        forbidden: [
-          'id="cuenta"',
-          'id="mercado"',
-          'id="operaciones"',
-          'id="administracion"',
-        ],
-      },
-      {
-        module: "monitor",
-        required: [
-          'id="monitor-module"',
-          'id="health"',
-          'id="countdown"',
-          'id="eventCompleted"',
-          "<h2 id=\"monitor-title\">Monitor y observabilidad</h2>",
-        ],
-        forbidden: [
-          'id="overview"',
-          'id="module-placeholder"',
-          'id="cuenta"',
-          'id="mercado"',
-          'id="operaciones"',
-          'id="administracion"',
-        ],
-      },
-      {
-        module: "configuracion",
-        required: [
-          'id="module-placeholder"',
-          "Implementación funcional pendiente",
-          "<h2>Configuración</h2>",
-        ],
-        forbidden: [
-          'id="overview"',
-          'id="cuenta"',
-          'id="mercado"',
-          'id="operaciones"',
-          'id="administracion"',
-        ],
-      },
-    ] as const;
-
-    for (const testCase of cases) {
-      const response = createPublicAppResponse(testCase.module);
-      const body = await response.text();
-
-      expect(body).toContain(`<body data-module="${testCase.module}">`);
-
-      for (const marker of testCase.required) {
-        expect(body, `${testCase.module} must render ${marker}`).toContain(
-          marker,
-        );
+      const cases = [
+        {
+          module: "inicio",
+          required: ['id="overview"'],
+          forbidden: [
+            'id="cuenta"',
+            'id="mercado"',
+            'id="operaciones"',
+            'id="administracion"',
+            'id="auditoria"',
+            'id="controles"',
+          ],
+        },
+        {
+          module: "cuenta",
+          required: ['id="cuenta"', 'id="seguridad-cuenta"'],
+          forbidden: [
+            'id="mercado"',
+            'id="operaciones"',
+            'id="administracion"',
+            'id="auditoria"',
+          ],
+        },
+        {
+          module: "mercado",
+          required: ['id="overview"', 'id="mercado"'],
+          forbidden: [
+            'id="cuenta"',
+            'id="operaciones"',
+            'id="administracion"',
+            'id="auditoria"',
+          ],
+        },
+        {
+          module: "arbitraje",
+          required: [
+            'id="module-placeholder"',
+            "Implementación funcional pendiente",
+            "<h2>Arbitraje</h2>",
+          ],
+          forbidden: [
+            'id="overview"',
+            'id="cuenta"',
+            'id="mercado"',
+            'id="operaciones"',
+            'id="administracion"',
+          ],
+        },
+        {
+          module: "operaciones",
+          required: ['id="operaciones"'],
+          forbidden: [
+            'id="cuenta"',
+            'id="mercado"',
+            'id="administracion"',
+            'id="auditoria"',
+          ],
+        },
+        {
+          module: "usuarios",
+          required: ['id="administracion"'],
+          forbidden: [
+            'id="cuenta"',
+            'id="mercado"',
+            'id="operaciones"',
+            'id="auditoria"',
+          ],
+        },
+        {
+          module: "seguridad",
+          required: ['id="controles"', 'id="auditoria"'],
+          forbidden: [
+            'id="cuenta"',
+            'id="mercado"',
+            'id="operaciones"',
+            'id="administracion"',
+          ],
+        },
+        {
+          module: "monitor",
+          required: [
+            'id="monitor-module"',
+            'id="health"',
+            'id="countdown"',
+            'id="eventCompleted"',
+            "<h2 id=\"monitor-title\">Monitor y observabilidad</h2>",
+          ],
+          forbidden: [
+            'id="overview"',
+            'id="module-placeholder"',
+            'id="cuenta"',
+            'id="mercado"',
+            'id="operaciones"',
+            'id="administracion"',
+          ],
+        },
+        {
+          module: "configuracion",
+          required: [
+            'id="module-placeholder"',
+            "Implementación funcional pendiente",
+            "<h2>Configuración</h2>",
+          ],
+          forbidden: [
+            'id="overview"',
+            'id="cuenta"',
+            'id="mercado"',
+            'id="operaciones"',
+            'id="administracion"',
+          ],
+        },
+      ] as const;
+  
+      for (const testCase of cases) {
+        const response = createPublicAppResponse(testCase.module);
+        const body = await response.text();
+  
+        expect(body).toContain(`<body data-module="${testCase.module}">`);
+  
+        for (const marker of testCase.required) {
+          expect(body, `${testCase.module} must render ${marker}`).toContain(
+            marker,
+          );
+        }
+  
+        for (const marker of testCase.forbidden) {
+          expect(
+            body,
+            `${testCase.module} must not render ${marker}`,
+          ).not.toContain(marker);
+        }
       }
-
-      for (const marker of testCase.forbidden) {
-        expect(
-          body,
-          `${testCase.module} must not render ${marker}`,
-        ).not.toContain(marker);
-      }
-    }
-  });
+    },
+  );
 });
