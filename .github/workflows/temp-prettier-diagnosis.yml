@@ -1,0 +1,21 @@
+name: Temporary Prettier diagnosis
+on:
+  push:
+    branches:
+      - feat/premium-modular-ui-foundation
+permissions:
+  contents: read
+jobs:
+  format-diagnosis:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Format target and print exact diff
+        run: |
+          npx prettier@3.9.0 tests/infrastructure/cloudflare-public-app.test.ts --write
+          git --no-pager diff -- tests/infrastructure/cloudflare-public-app.test.ts
