@@ -46,7 +46,6 @@ export function renderDashboardView(): string {
 `;
 }
 
-
 /**
  * Renderiza un estado pendiente sin exponer controles ni datos ficticios.
  */
