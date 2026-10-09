@@ -50,4 +50,4 @@ La dirección visual usa superficies coherentes, jerarquía tipográfica, navega
 - Requisito funcional: #474.
 - Solution Card visual: #475.
 - Gobernanza de diseño: #270.
-- Verificación pendiente: renderizado de contenido aislado por módulo en el servidor, Quality Gate, Security Gate, pruebas de rutas y roles, accesibilidad, responsive y smoke autenticado de producción.
+- Verificación pendiente: pruebas automatizadas del aislamiento server-side, Quality Gate, Security Gate, autorización por ruta/rol, accesibilidad, responsive y smoke autenticado de producción.
