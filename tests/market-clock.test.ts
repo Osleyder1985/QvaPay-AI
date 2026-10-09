@@ -40,9 +40,7 @@ describe("reloj del servidor", () => {
 
   it("rechaza fechas y relojes inválidos", () => {
     expect(snapshotAgeMs(null, 1_000, 2_000, 2_100)).toBe(Infinity);
-    expect(
-      snapshotAgeMs("fecha-invalida", 1_000, 2_000, 2_100),
-    ).toBe(Infinity);
+    expect(snapshotAgeMs("fecha-invalida", 1_000, 2_000, 2_100)).toBe(Infinity);
     expect(estimateServerNow(1_000, 2_000, 1_999)).toBeNaN();
   });
 });
@@ -112,61 +110,55 @@ const scannerSnapshot = {
 };
 
 describe("integración ejecutable del sondeo", () => {
-  it(
-    "no inicia una segunda solicitud mientras la primera sigue pendiente",
-    async () => {
-      let finishRequest: ((response: Response) => void) | undefined;
-      const fetchMock = vi.fn(
-        () =>
-          new Promise<Response>((resolve) => {
-            finishRequest = resolve;
-          }),
-      );
-      const harness = createRefreshHarness(fetchMock);
+  it("no inicia una segunda solicitud mientras la primera sigue pendiente", async () => {
+    let finishRequest: ((response: Response) => void) | undefined;
+    const fetchMock = vi.fn(
+      () =>
+        new Promise<Response>((resolve) => {
+          finishRequest = resolve;
+        }),
+    );
+    const harness = createRefreshHarness(fetchMock);
 
-      const firstRequest = harness.refresh();
-      await harness.refresh();
+    const firstRequest = harness.refresh();
+    await harness.refresh();
 
-      expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
 
-      finishRequest?.({
+    finishRequest?.({
+      ok: true,
+      json: async () => scannerSnapshot,
+    } as Response);
+    await firstRequest;
+
+    expect(harness.getState()).toMatchObject({ __offline: false });
+  });
+
+  it("conserva el snapshot y lo marca offline si falla la siguiente solicitud", async () => {
+    const fetchMock = vi
+      .fn<typeof fetch>()
+      .mockResolvedValueOnce({
         ok: true,
         json: async () => scannerSnapshot,
-      } as Response);
-      await firstRequest;
+      } as Response)
+      .mockRejectedValueOnce(new Error("network unavailable"));
+    const harness = createRefreshHarness(fetchMock);
 
-      expect(harness.getState()).toMatchObject({ __offline: false });
-    },
-  );
+    await harness.refresh();
+    const previousState = harness.getState();
+    expect(previousState).toMatchObject({
+      snapshotStatus: "READY",
+      __offline: false,
+    });
 
-  it(
-    "conserva el snapshot y lo marca offline si falla la siguiente solicitud",
-    async () => {
-      const fetchMock = vi
-        .fn<typeof fetch>()
-        .mockResolvedValueOnce({
-          ok: true,
-          json: async () => scannerSnapshot,
-        } as Response)
-        .mockRejectedValueOnce(new Error("network unavailable"));
-      const harness = createRefreshHarness(fetchMock);
+    await harness.refresh();
 
-      await harness.refresh();
-      const previousState = harness.getState();
-      expect(previousState).toMatchObject({
-        snapshotStatus: "READY",
-        __offline: false,
-      });
-
-      await harness.refresh();
-
-      expect(harness.getState()).toMatchObject({
-        snapshotStatus: "READY",
-        __offline: true,
-      });
-      expect(harness.getState()?.metrics).toEqual(previousState?.metrics);
-    },
-  );
+    expect(harness.getState()).toMatchObject({
+      snapshotStatus: "READY",
+      __offline: true,
+    });
+    expect(harness.getState()?.metrics).toEqual(previousState?.metrics);
+  });
 });
 
 describe("contrato de temporización del dashboard", () => {
