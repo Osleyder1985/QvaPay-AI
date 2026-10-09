@@ -4,30 +4,19 @@
  * @responsabilidades Implementar y proteger las reglas propias de este módulo sin mezclar responsabilidades de otras capas.
  * @ubicacion src/infrastructure/cloudflare dentro de la arquitectura de QvaPay-AI.
  */
-
-// prettier-ignore
 import type { DurableObjectNamespace, D1Database } from "@cloudflare/workers-types";
-// prettier-ignore
 import { ScannerSchedulerDurableObject } from "./scanner-scheduler-do.js";
-// prettier-ignore
 import { authenticate, createUser, deleteUserByUsername, ensureSecuritySchema, getSession, listUsers, logout, requireRole, setUserActive, changeUserPassword } from "./auth-rbac.js";
-// prettier-ignore
 import { QvaPayAccountClient } from "../qvapay/qvapay-account-client.js";
 import {
   getCurrentQvaPayAccountSnapshot,
   getLastSuccessfulQvaPayAccountSnapshot,
   persistQvaPayAccountSnapshot,
 } from "./qvapay-account-snapshot-store.js";
-// prettier-ignore
 import { createLoginAppResponse } from "./login-app.js";
-// prettier-ignore
 import { bootstrapInitialAdmin } from "./initial-admin-setup.js";
-// prettier-ignore
 import { createInitialAdminSetupCompletedResponse, createInitialAdminSetupResponse } from "./initial-admin-setup-app.js";
-// prettier-ignore
 import { createPublicAppResponse, createPublicScannerStateResponse, toPublicScannerState } from "./public-app.js";
-
-// prettier-ignore
 export interface ScannerWorkerEnvironment {
   readonly SCANNER_SCHEDULER: DurableObjectNamespace<ScannerSchedulerDurableObject>;
   readonly DB: D1Database;
@@ -41,11 +30,7 @@ export interface ScannerWorkerEnvironment {
   readonly PRODUCTION_SMOKE_TOKEN: string;
   readonly ACCOUNT_AUTH_SECRET: string;
 }
-
-// prettier-ignore
 const OBJECT_NAME = "default";
-
-// prettier-ignore
 function jsonError(message: string, status: number): Response {
   return Response.json({ error: message }, { status, headers: { "cache-control": "no-store" } });
 }
@@ -76,13 +61,9 @@ function validateSameOriginMutation(
   }
   return null;
 }
-
-// prettier-ignore
 async function body(request: Request): Promise<Record<string, unknown>> {
   return (await request.json().catch(() => null)) as Record<string, unknown> | null ?? {};
 }
-
-// prettier-ignore
 export default {
   async fetch(request: Request, env: ScannerWorkerEnvironment): Promise<Response> {
     const url = new URL(request.url);
@@ -392,6 +373,4 @@ export default {
     return Response.json(state);
   },
 };
-
-// prettier-ignore
 export { ScannerSchedulerDurableObject };
