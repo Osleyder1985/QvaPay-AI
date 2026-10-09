@@ -62,9 +62,8 @@ for (const viewport of [
         viewport: document.documentElement.clientWidth,
         document: document.documentElement.scrollWidth,
       }));
-      expect(dimensions.document, JSON.stringify(dimensions)).toBeLessThanOrEqual(
-        dimensions.viewport,
-      );
+      const hasHorizontalOverflow = dimensions.document > dimensions.viewport;
+      expect(hasHorizontalOverflow, JSON.stringify(dimensions)).toBe(false);
     },
   );
 }
