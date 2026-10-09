@@ -78,3 +78,91 @@ test("el formulario de acceso es navegable con teclado", async ({ page }) => {
     page.getByRole("button", { name: "Iniciar sesión" }),
   ).toBeFocused();
 });
+
+
+test("el shell autenticado mantiene rutas, recarga, diseño adaptable y movimiento reducido", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const username = `ci-smoke-${crypto.randomUUID()}`;
+  const password = "BrowserSmoke-Pass-2026!";
+  const smokeHeaders = {
+    authorization: "Bearer local-browser-test-smoke",
+  };
+
+  const created = await page.request.post("/internal/auth/smoke-user", {
+    headers: smokeHeaders,
+    data: { username, password },
+  });
+  expect(created.status()).toBe(200);
+
+  try {
+    const login = await page.request.post("/api/auth/login", {
+      data: { username, password },
+    });
+    expect(login.status()).toBe(200);
+    const setCookie = login.headers()["set-cookie"] ?? "";
+    expect(setCookie).toContain("HttpOnly");
+    expect(setCookie).toContain("Secure");
+    expect(setCookie).toContain("SameSite=Strict");
+    const cookieValue = setCookie.match(/qvapay_ai_session=([^;]+)/)?.[1];
+    expect(cookieValue).toBeTruthy();
+    await page.context().addCookies([
+      {
+        name: "qvapay_ai_session",
+        value: cookieValue!,
+        url: "http://127.0.0.1:8787",
+        httpOnly: true,
+        sameSite: "Strict",
+      },
+    ]);
+
+    for (const route of protectedRoutes) {
+      const moduleId = route.split("/").at(-1);
+      const response = await page.goto(route);
+      expect(response?.status(), route).toBe(200);
+      await expect(page.locator("#page-title")).toBeVisible();
+      await expect(page.locator(`nav a[href="${route}"]`)).toHaveAttribute(
+        "aria-current",
+        "page",
+      );
+      await expect(page.locator("body")).toHaveAttribute("data-module", moduleId);
+      await page.reload();
+      await expect(page.locator("body")).toHaveAttribute("data-module", moduleId);
+    }
+
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    for (const viewport of [
+      { name: "móvil", width: 360, height: 800 },
+      { name: "tableta", width: 768, height: 1024 },
+      { name: "escritorio", width: 1440, height: 900 },
+    ]) {
+      await page.setViewportSize({
+        width: viewport.width,
+        height: viewport.height,
+      });
+      await page.goto("/app/inicio");
+      const dimensions = await page.evaluate(() => ({
+        viewport: document.documentElement.clientWidth,
+        document: document.documentElement.scrollWidth,
+      }));
+      const hasHorizontalOverflow = dimensions.document > dimensions.viewport;
+      expect(
+        hasHorizontalOverflow,
+        `${viewport.name}: ${JSON.stringify(dimensions)}`,
+      ).toBe(false);
+      const motion = await page.evaluate(() => ({
+        reduced: matchMedia("(prefers-reduced-motion: reduce)").matches,
+        duration: getComputedStyle(document.querySelector(".dot")!).animationDuration,
+      }));
+      expect(motion.reduced).toBe(true);
+      expect(Number.parseFloat(motion.duration)).toBeLessThanOrEqual(0.00001);
+    }
+  } finally {
+    const removed = await page.request.delete("/internal/auth/smoke-user", {
+      headers: smokeHeaders,
+      data: { username },
+    });
+    expect(removed.status()).toBe(204);
+  }
+});
