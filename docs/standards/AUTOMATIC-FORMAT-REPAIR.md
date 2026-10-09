@@ -28,3 +28,14 @@ Evitar correcciones manuales repetitivas cuando Prettier detecta diferencias de 
 ## Evidencia de cumplimiento
 
 La CI debe mostrar que `npm run format:check` pasa después de la reparación y que los controles de compilación/pruebas afectados también pasan. La existencia del comando, por sí sola, no certifica una ejecución correcta.
+
+## Diagnóstico permanente en CI
+
+El flujo `.github/workflows/security-gate.yml` debe conservar un paso permanente de diagnóstico de Prettier. Si `npm run format:check` falla, el mismo paso debe:
+
+1. Ejecutar `npm run format:fix` en el entorno temporal de CI.
+2. Mostrar los archivos afectados y el diff exacto generado por Prettier.
+3. Terminar en estado fallido aunque la reparación temporal haya dejado el directorio formateado. Así, el diagnóstico no convierte una rama incorrecta en una verificación aprobada ni oculta el cambio requerido.
+4. Permitir que la corrección se aplique y confirme en la rama del PR; después se vuelve a ejecutar toda la CI.
+
+El diff se usa como evidencia diagnóstica, no se confirma ni se publica automáticamente desde el job. La reparación permanente del código se realiza en la rama de trabajo y continúa sujeta a revisión, compilación, pruebas y controles de seguridad.
