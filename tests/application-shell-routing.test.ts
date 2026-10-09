@@ -110,12 +110,14 @@ describe("rutas y navegación del Application Shell", () => {
     expect(users).not.toContain('id="mercado"');
   });
 
-  it("no incluye vistas funcionales inventadas en módulos pendientes", () => {
+  it("renderiza placeholders honestos en el servidor para módulos pendientes", () => {
     for (const moduleId of ["arbitraje", "monitor", "configuracion"]) {
       const view = renderDashboardModuleView(moduleId);
-      expect(view).toBe("");
+      expect(view).toContain('id="module-placeholder"');
+      expect(view).toContain("Implementación funcional pendiente");
       expect(view).not.toContain('id="mercado"');
       expect(view).not.toContain('id="operaciones"');
+      expect(view).not.toContain('id="administracion"');
     }
   });
 });
