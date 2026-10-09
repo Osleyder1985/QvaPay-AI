@@ -35,8 +35,11 @@ jobs:
       - name: Lint
         run: npm run lint
 
-      - name: Verificación de formato
-        run: npm run format:check
+      - name: Diagnóstico temporal de formato
+        run: |
+          npx prettier --write tests/market-clock.test.ts
+          git diff -- tests/market-clock.test.ts
+          npm run format:check
 
       - name: Verificación lingüística de la documentación
         run: npm run check:docs-language
