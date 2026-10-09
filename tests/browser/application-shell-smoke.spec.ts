@@ -12,7 +12,7 @@ const protectedRoutes = [
   "/app/configuracion",
 ];
 
-test("unauthenticated module routes render login instead of private module data", async ({
+test("las rutas modulares sin sesión muestran el acceso y no datos privados", async ({
   page,
 }) => {
   for (const route of protectedRoutes) {
@@ -35,11 +35,11 @@ test("se rechazan módulos desconocidos y métodos no admitidos", async ({ reque
 });
 
 for (const viewport of [
-  { name: "mobile", width: 360, height: 800 },
+  { name: "mobile", de ancho: 360, height: 800 },
   { name: "tablet", width: 768, height: 1024 },
   { name: "desktop", width: 1440, height: 900 },
 ]) {
-  test(`login view has no horizontal overflow at ${viewport.name} width`, async ({
+  test(`la vista de acceso no se desborda horizontalmente en ${viewport.name} width`, async ({
     page,
   }) => {
     await page.setViewportSize({ width: viewport.width, height: viewport.height });
