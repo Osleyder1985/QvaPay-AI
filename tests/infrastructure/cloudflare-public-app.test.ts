@@ -87,7 +87,7 @@ const marketState: ScannerSchedulerRuntimeState = {
 };
 
 describe("public production dashboard", () => {
-  it("sirve la aplicación sin credenciales", async () => {
+  it("sirve la ruta inicial sin credenciales ni contenido funcional de otros módulos", async () => {
     const response = createPublicAppResponse();
     const body = await response.text();
 
@@ -101,10 +101,11 @@ describe("public production dashboard", () => {
     expect(body).toContain("MEJOR SELL");
     expect(body).toContain("10");
     expect(body).toContain("Dashboard operativo");
-    expect(body).toContain("Auditoría y trazabilidad");
-    expect(body).toContain("Cuenta");
     expect(body).toContain("state.serverNowAt-Date.now()");
     expect(body).toContain("setInterval(refresh,1000)");
+    expect(body).not.toContain('id="auditoria"');
+    expect(body).not.toContain('id="cuenta"');
+    expect(body).not.toContain('id="mercado"');
     expect(body).not.toContain("/internal/scanner/start");
     expect(body).not.toContain("setAlarm(");
     expect(body).toContain("/api/account");
@@ -113,7 +114,6 @@ describe("public production dashboard", () => {
     expect(body).not.toContain("Introduce tu clave de operación P2P");
     expect(body).not.toContain("QVAPAY_APP_SECRET");
     expect(body).toContain("ISO/IEC 27001");
-    expect(body).not.toContain("QVAPAY_APP_SECRET");
     expect(body).not.toContain("SCANNER_BOOTSTRAP_TOKEN");
     expect(body).not.toContain("Server-Side Monitoring");
   });
