@@ -76,6 +76,9 @@ describe("rutas y navegación del Application Shell", () => {
   it("documenta módulos funcionales pendientes", () => {
     expect(DASHBOARD_CLIENT_SCRIPT).toContain("initializeModulePage");
     expect(DASHBOARD_CLIENT_SCRIPT).toContain(
+      'getElementById("modulos-aplicacion")',
+    );
+    expect(DASHBOARD_CLIENT_SCRIPT).toContain(
       'getElementById("contenido-principal")',
     );
     expect(DASHBOARD_CLIENT_SCRIPT).toContain("visibleByModule");
