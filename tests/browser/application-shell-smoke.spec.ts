@@ -172,6 +172,17 @@ test("el shell autenticado mantiene rutas, recarga, diseño adaptable y movimien
     }
 
     await page.goto("/app/inicio");
+    const shellAudit = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
+      .analyze();
+    const shellViolations = shellAudit.violations.map((violation) => ({
+      id: violation.id,
+      impact: violation.impact,
+      help: violation.help,
+      targets: violation.nodes.map((node) => node.target),
+    }));
+    expect(shellViolations).toEqual([]);
+
     await page.goto("/app/cuenta");
     await page.goBack();
     await expect(page.locator("body")).toHaveAttribute("data-module", "inicio");
