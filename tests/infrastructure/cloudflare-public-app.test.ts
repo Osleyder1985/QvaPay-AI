@@ -331,7 +331,7 @@ describe("public production dashboard", () => {
           `${testCase.module} must not render ${marker}`,
         ).not.toContain(marker);
       }
-      }
+    }
     },
   );
 });
