@@ -112,7 +112,9 @@ const scannerSnapshot = {
 };
 
 describe("integración ejecutable del sondeo", () => {
-  it("no inicia una segunda solicitud mientras la primera sigue pendiente", async () => {
+  it(
+    "no inicia una segunda solicitud mientras la primera sigue pendiente",
+    async () => {
     let finishRequest: ((response: Response) => void) | undefined;
     const fetchMock = vi.fn(
       () =>
@@ -134,9 +136,12 @@ describe("integración ejecutable del sondeo", () => {
     await firstRequest;
 
     expect(harness.getState()).toMatchObject({ __offline: false });
-  });
+    },
+  );
 
-  it("conserva el último snapshot y lo marca sin conexión al fallar la siguiente solicitud", async () => {
+  it(
+    "conserva el último snapshot y lo marca sin conexión al fallar la siguiente solicitud",
+    async () => {
     const fetchMock = vi
       .fn<typeof fetch>()
       .mockResolvedValueOnce({
@@ -160,7 +165,8 @@ describe("integración ejecutable del sondeo", () => {
       __offline: true,
     });
     expect(harness.getState()?.metrics).toEqual(previousState?.metrics);
-  });
+    },
+  );
 });
 
 describe("contrato de temporización del dashboard", () => {
