@@ -3,8 +3,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const authMocks = vi.hoisted(() => ({
   ensureSecuritySchema: vi.fn(),
   getSession: vi.fn(),
-  requireRole: authMocks.requireRole,
-  changeUserPassword: authMocks.changeUserPassword,
+  requireRole: vi.fn(),
+  changeUserPassword: vi.fn(),
 }));
 
 vi.mock("../../src/infrastructure/cloudflare/auth-rbac.js", () => ({
@@ -15,9 +15,9 @@ vi.mock("../../src/infrastructure/cloudflare/auth-rbac.js", () => ({
   getSession: authMocks.getSession,
   listUsers: vi.fn(),
   logout: vi.fn(),
-  requireRole: vi.fn(),
+  requireRole: authMocks.requireRole,
   setUserActive: vi.fn(),
-  changeUserPassword: vi.fn(),
+  changeUserPassword: authMocks.changeUserPassword,
 }));
 
 vi.mock("../../src/infrastructure/cloudflare/scanner-scheduler-do.js", () => ({
