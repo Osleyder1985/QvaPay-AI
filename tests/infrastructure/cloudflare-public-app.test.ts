@@ -191,7 +191,7 @@ describe("public production dashboard", () => {
     expect(body).toContain('"creatorUsername"');
   });
 
-  it("renders only the server-side content assigned to each module route", async () => {
+  it("renderiza solo el contenido asignado a cada ruta modular en el servidor", async () => {
     const cases = [
       {
         module: "inicio",
