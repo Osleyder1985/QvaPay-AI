@@ -79,9 +79,6 @@ describe("rutas y navegación del Application Shell", () => {
     expect(DASHBOARD_CLIENT_SCRIPT).toContain(
       'if(moduleId==="cuenta")refreshAccount()',
     );
-    expect(DASHBOARD_CLIENT_SCRIPT).toContain(
-      "Implementación funcional pendiente",
-    );
   });
   it("envía únicamente el contenido funcional del módulo solicitado", () => {
     const home = renderDashboardModuleView("inicio");
