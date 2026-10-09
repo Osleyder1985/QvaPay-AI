@@ -40,7 +40,9 @@ describe("reloj del servidor", () => {
 
   it("rechaza fechas y relojes inválidos", () => {
     expect(snapshotAgeMs(null, 1_000, 2_000, 2_100)).toBe(Infinity);
-    expect(snapshotAgeMs("fecha-invalida", 1_000, 2_000, 2_100)).toBe(Infinity);
+    expect(
+      snapshotAgeMs("fecha-invalida", 1_000, 2_000, 2_100),
+    ).toBe(Infinity);
     expect(estimateServerNow(1_000, 2_000, 1_999)).toBeNaN();
   });
 });
@@ -74,7 +76,10 @@ function createRefreshHarness(fetchImplementation: typeof fetch) {
     render: () => void,
     selector: (id: string) => { className: string; textContent: string },
     performance: { now: () => number },
-  ) => { refresh: () => Promise<void>; getState: () => Record<string, unknown> | null };
+  ) => {
+    refresh: () => Promise<void>;
+    getState: () => Record<string, unknown> | null;
+  };
 
   return factory(
     fetchImplementation,
@@ -82,7 +87,8 @@ function createRefreshHarness(fetchImplementation: typeof fetch) {
     (value) =>
       !!value &&
       typeof value === "object" &&
-      typeof (value as { snapshotStatus?: unknown }).snapshotStatus === "string" &&
+      typeof (value as { snapshotStatus?: unknown }).snapshotStatus ===
+        "string" &&
       typeof (value as { metrics?: unknown }).metrics === "object" &&
       Array.isArray((value as { buyOffers?: unknown }).buyOffers) &&
       Array.isArray((value as { sellOffers?: unknown }).sellOffers),
@@ -142,7 +148,10 @@ describe("integración ejecutable del sondeo", () => {
 
     await harness.refresh();
     const previousState = harness.getState();
-    expect(previousState).toMatchObject({ snapshotStatus: "READY", __offline: false });
+    expect(previousState).toMatchObject({
+      snapshotStatus: "READY",
+      __offline: false,
+    });
 
     await harness.refresh();
 
