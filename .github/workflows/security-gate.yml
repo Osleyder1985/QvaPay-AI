@@ -35,6 +35,9 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      - name: Diagnóstico temporal de formato del test de reloj
+        run: npx prettier tests/market-clock.test.ts | diff -u tests/market-clock.test.ts - || true
+
       - name: Verificación de formato
         run: npm run format:check
 
