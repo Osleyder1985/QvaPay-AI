@@ -11,6 +11,7 @@ import { renderApplicationShellWorkAreaStart } from "./application-shell-work-ar
 /** Renderiza la apertura estructural del Application Shell. */
 export function renderApplicationShellStart(moduleId = "inicio"): string {
   return `<body data-module="${moduleId}">
+<a class="skip-link" href="#contenido-principal">Saltar al contenido principal</a>
 <div class="shell">
 <aside class="sidebar">
 <div class="brand"><div class="logo">⚡</div><div><strong>QvaPay-AI</strong><span>Centro operativo</span></div></div>
