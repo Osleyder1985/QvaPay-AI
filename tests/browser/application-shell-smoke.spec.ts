@@ -172,6 +172,19 @@ test("el shell autenticado mantiene rutas, recarga, diseño adaptable y movimien
         moduleId,
       );
       await expectNoAccessibilityViolations(page, route);
+
+      // Comprueba el reflujo estrecho en cada módulo, no solo en Inicio.
+      await page.setViewportSize({ width: 320, height: 800 });
+      const narrowDimensions = await page.evaluate(() => ({
+        viewport: document.documentElement.clientWidth,
+        document: document.documentElement.scrollWidth,
+      }));
+      expect(
+        narrowDimensions.document,
+        `${route} a 320 px: ${JSON.stringify(narrowDimensions)}`,
+      ).toBeLessThanOrEqual(narrowDimensions.viewport);
+      await page.setViewportSize({ width: 1440, height: 900 });
+
       await page.reload();
       await expect(page.locator("body")).toHaveAttribute(
         "data-module",
