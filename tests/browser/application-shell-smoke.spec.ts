@@ -126,9 +126,15 @@ test("el shell autenticado mantiene rutas, recarga, diseño adaptable y movimien
         "aria-current",
         "page",
       );
-      await expect(page.locator("body")).toHaveAttribute("data-module", moduleId);
+      await expect(page.locator("body")).toHaveAttribute(
+        "data-module",
+        moduleId,
+      );
       await page.reload();
-      await expect(page.locator("body")).toHaveAttribute("data-module", moduleId);
+      await expect(page.locator("body")).toHaveAttribute(
+        "data-module",
+        moduleId,
+      );
     }
 
     await page.emulateMedia({ reducedMotion: "reduce" });
@@ -153,7 +159,8 @@ test("el shell autenticado mantiene rutas, recarga, diseño adaptable y movimien
       ).toBe(false);
       const motion = await page.evaluate(() => ({
         reduced: matchMedia("(prefers-reduced-motion: reduce)").matches,
-        duration: getComputedStyle(document.querySelector(".dot")!).animationDuration,
+        duration: getComputedStyle(document.querySelector(".dot")!)
+          .animationDuration,
       }));
       expect(motion.reduced).toBe(true);
       expect(Number.parseFloat(motion.duration)).toBeLessThanOrEqual(0.00001);
