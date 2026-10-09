@@ -45,3 +45,60 @@ export function renderDashboardView(): string {
 <footer class="footer"><div class="tags"><span class="tag">ISO 9001 · calidad</span><span class="tag">ISO/IEC 27001 · seguridad</span><span class="tag">ISO 22301 · continuidad</span><span class="tag">Server-side 24/7</span></div><div>Actualización automática · intervalo: <strong id="intervalLabelFooter">10</strong>s</div></footer>
 `;
 }
+
+
+/**
+ * Extrae una sección HTML completa respetando secciones anidadas.
+ * El contenido procede de la plantilla interna y no de entrada del usuario.
+ */
+function extractSection(markup: string, id: string): string {
+  const openingPattern = new RegExp(
+    `<section\\b(?=[^>]*\\bid=["']${id}["'])[^>]*>`,
+  );
+  const opening = openingPattern.exec(markup);
+  if (!opening || opening.index === undefined) return "";
+
+  const tokenPattern = /<section\\b[^>]*>|<\\/section\\s*>/g;
+  tokenPattern.lastIndex = opening.index;
+  let depth = 0;
+  let token: RegExpExecArray | null;
+
+  while ((token = tokenPattern.exec(markup)) !== null) {
+    if (token[0].startsWith("</")) {
+      depth -= 1;
+      if (depth === 0) return markup.slice(opening.index, tokenPattern.lastIndex);
+    } else {
+      depth += 1;
+    }
+  }
+
+  return "";
+}
+
+/**
+ * Renderiza exclusivamente el contenido asignado a una ruta modular.
+ * Las secciones funcionales de otros módulos no se envían al navegador.
+ */
+export function renderDashboardModuleView(moduleId: string): string {
+  const markup = renderDashboardView();
+  const hero = markup.match(/<section class="hero">[\\s\\S]*?<\\/section>/)?.[0] ?? "";
+  const footer = markup.match(/<footer class="footer">[\\s\\S]*?<\\/footer>/)?.[0] ?? "";
+  const accountSecurity = extractSection(markup, "seguridad-cuenta");
+  const controls = extractSection(markup, "controles");
+  const accountSecurityWithoutControls = accountSecurity.replace(controls, "");
+
+  const sectionsByModule: Record<string, string> = {
+    inicio: hero + footer,
+    cuenta:
+      extractSection(markup, "cuenta") + accountSecurityWithoutControls,
+    mercado: hero + extractSection(markup, "mercado") + footer,
+    operaciones: extractSection(markup, "operaciones"),
+    usuarios: extractSection(markup, "administracion"),
+    seguridad: controls + extractSection(markup, "auditoria"),
+    arbitraje: "",
+    monitor: "",
+    configuracion: "",
+  };
+
+  return sectionsByModule[moduleId] ?? "";
+}
