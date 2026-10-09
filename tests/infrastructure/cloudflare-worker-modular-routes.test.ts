@@ -18,9 +18,7 @@ vi.mock("../../src/infrastructure/cloudflare/auth-rbac.js", () => ({
   changeUserPassword: vi.fn(),
 }));
 
-import worker, {
-  type ScannerWorkerEnvironment,
-} from "../../src/infrastructure/cloudflare/worker.js";
+import worker, { type ScannerWorkerEnvironment } from "../../src/infrastructure/cloudflare/worker.js";
 
 const auditorSession = {
   user: {
