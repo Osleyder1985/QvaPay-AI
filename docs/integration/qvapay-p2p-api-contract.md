@@ -13,14 +13,14 @@ Documentar el contrato que utiliza el adaptador de QvaPay-AI para consultar el m
 
 ## Parámetros utilizados
 
-| Parámetro | Valor |
-|---|---|
-| `type` | `buy` o `sell` |
-| `coin` | mercado configurado, actualmente `BANK_CUP` |
-| `page` | página actual |
-| `take` | hasta 100 |
-| `orderBy` | `updated_at` |
-| `orderType` | `desc` |
+| Parámetro   | Valor                                       |
+| ----------- | ------------------------------------------- |
+| `type`      | `buy` o `sell`                              |
+| `coin`      | mercado configurado, actualmente `BANK_CUP` |
+| `page`      | página actual                               |
+| `take`      | hasta 100                                   |
+| `orderBy`   | `updated_at`                                |
+| `orderType` | `desc`                                      |
 
 ## Modelo interno
 

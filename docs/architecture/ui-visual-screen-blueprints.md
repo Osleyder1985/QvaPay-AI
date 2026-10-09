@@ -80,18 +80,18 @@ Foco visible; orden lógico de teclado; objetivos táctiles adecuados; etiquetas
 
 ## 15. Matriz de trazabilidad
 
-| Pantalla | Contrato | Componentes | Estados | Evidencia |
-|---|---|---|---|---|
-| Dashboard | Inicio | métricas, alertas, tarjetas | loading/degraded/stale/failed | estado agregado |
-| Cuenta | Cuenta | identidad, integración, balance | verified/degraded/failed | snapshot |
-| Market Feed | Mercado | filtros, tabla, frescura | ready/stale/partial/failed | snapshot |
-| Arbitrage | Análisis | escenario, margen, riesgos | calculable/blocked/degraded | evidencia de mercado |
-| Scanner | Monitor | estado, contador, historial | running/idle/failed | ejecución persistida |
-| Operations | Operacional | timeline, detalle | pending/confirmed/ambiguous/reconciled | operación |
-| Audit | Evidencia | tabla, detalle | complete/partial | eventos |
-| Security | Seguridad | capacidades, controles | secure/degraded/blocked | eventos |
-| Administration | Administrativo | usuarios, acciones | authorized/blocked/pending | auditoría |
-| Configuration | Configuración | formularios, historial | valid/invalid/pending | configuración persistida |
+| Pantalla       | Contrato       | Componentes                     | Estados                                | Evidencia                |
+| -------------- | -------------- | ------------------------------- | -------------------------------------- | ------------------------ |
+| Dashboard      | Inicio         | métricas, alertas, tarjetas     | loading/degraded/stale/failed          | estado agregado          |
+| Cuenta         | Cuenta         | identidad, integración, balance | verified/degraded/failed               | snapshot                 |
+| Market Feed    | Mercado        | filtros, tabla, frescura        | ready/stale/partial/failed             | snapshot                 |
+| Arbitrage      | Análisis       | escenario, margen, riesgos      | calculable/blocked/degraded            | evidencia de mercado     |
+| Scanner        | Monitor        | estado, contador, historial     | running/idle/failed                    | ejecución persistida     |
+| Operations     | Operacional    | timeline, detalle               | pending/confirmed/ambiguous/reconciled | operación                |
+| Audit          | Evidencia      | tabla, detalle                  | complete/partial                       | eventos                  |
+| Security       | Seguridad      | capacidades, controles          | secure/degraded/blocked                | eventos                  |
+| Administration | Administrativo | usuarios, acciones              | authorized/blocked/pending             | auditoría                |
+| Configuration  | Configuración  | formularios, historial          | valid/invalid/pending                  | configuración persistida |
 
 ## 16. Criterios de salida
 
