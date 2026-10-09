@@ -1,3 +1,4 @@
+import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
 const protectedRoutes = [
@@ -77,6 +78,20 @@ test("el formulario de acceso es navegable con teclado", async ({ page }) => {
   await expect(
     page.getByRole("button", { name: "Iniciar sesión" }),
   ).toBeFocused();
+});
+
+test("la pantalla de acceso cumple el análisis automatizado WCAG", async ({ page }) => {
+  await page.goto("/");
+  const audit = await new AxeBuilder({ page })
+    .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
+    .analyze();
+  const violations = audit.violations.map((violation) => ({
+    id: violation.id,
+    impact: violation.impact,
+    help: violation.help,
+    targets: violation.nodes.map((node) => node.target),
+  }));
+  expect(violations).toEqual([]);
 });
 
 test("el shell autenticado mantiene rutas, recarga, diseño adaptable y movimiento reducido", async ({
