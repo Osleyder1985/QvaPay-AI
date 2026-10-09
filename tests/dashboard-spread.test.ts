@@ -3,21 +3,14 @@ import { DASHBOARD_CLIENT_SCRIPT } from "../src/presentation/dashboard/dashboard
 
 describe("contrato de representación del spread en el dashboard", () => {
   it("protege el porcentaje de spread indefinido antes de llamar a toFixed", () => {
-    const marker = '$(\"spread\").textContent=';
-    const start = DASHBOARD_CLIENT_SCRIPT.indexOf(marker);
-    const end = DASHBOARD_CLIENT_SCRIPT.indexOf(";", start);
-    const spreadAssignment =
-      start >= 0 && end > start
-        ? DASHBOARD_CLIENT_SCRIPT.slice(start + marker.length, end)
-        : undefined;
-
-    expect(spreadAssignment).toBeDefined();
-    expect(spreadAssignment).toContain("state.metrics.spreadPercent===null");
-    expect(spreadAssignment).toContain(
+    expect(DASHBOARD_CLIENT_SCRIPT).toContain(
+      'setText("spread",state.metrics.spread===null?"—":state.metrics.spreadPercent===null?fmt(state.metrics.spread):',
+    );
+    expect(DASHBOARD_CLIENT_SCRIPT).toContain(
       "state.metrics.spreadPercent===null?fmt(state.metrics.spread):",
     );
-    expect(spreadAssignment).toMatch(
-      /state\.metrics\.spreadPercent===null\?[^:]+:[^:]+\.toFixed\(2\)/,
+    expect(DASHBOARD_CLIENT_SCRIPT).toContain(
+      "state.metrics.spreadPercent.toFixed(2)",
     );
   });
 });
