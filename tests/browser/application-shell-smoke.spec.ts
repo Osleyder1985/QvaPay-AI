@@ -19,8 +19,11 @@ test("las rutas modulares sin sesión muestran el acceso y no datos privados", a
     const response = await page.goto(route);
 
     expect(response?.status(), route).toBe(200);
-    await expect(page.getByRole("button", { name: "Iniciar sesión" })).toBeVisible();
-    await expect(page.getByRole("heading", { name: "QvaPay-AI" })).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Iniciar sesión" }),
+    ).toBeVisible();
+    await expect(page.locator("#username")).toBeVisible();
+    await expect(page.locator("#password")).toBeVisible();
     await expect(page.locator("#accountBalance")).toHaveCount(0);
     await expect(page.locator("#coin")).toHaveCount(0);
   }
