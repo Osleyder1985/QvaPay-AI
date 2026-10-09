@@ -9,7 +9,7 @@ import type { Market } from "../../domain/market.js";
 import type { Offer } from "../../domain/offer.js";
 import { compareDecimalStrings } from "../../domain/offer.js";
 import type { ScannerSchedulerRuntimeState } from "./scanner-scheduler-do.js";
-import { renderDashboardView } from "../../presentation/dashboard/dashboard-view.js";
+import { renderDashboardModuleView } from "../../presentation/dashboard/dashboard-view.js";
 import { DASHBOARD_STYLES } from "../../presentation/dashboard/dashboard-styles.js";
 import { DASHBOARD_CLIENT_SCRIPT } from "../../presentation/dashboard/dashboard-client.js";
 
@@ -243,7 +243,7 @@ ${DASHBOARD_STYLES}
 ${renderApplicationShellStart(moduleId)}
 ${renderApplicationShellHeader(moduleId)}
 ${renderApplicationShellModuleMountStart()}
-${renderDashboardView()}
+${renderDashboardModuleView(moduleId)}
 ${renderApplicationShellModuleMountEnd()}
 ${renderApplicationShellEnd()}
 ${DASHBOARD_CLIENT_SCRIPT}
