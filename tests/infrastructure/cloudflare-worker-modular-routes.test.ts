@@ -176,8 +176,7 @@ describe("Cloudflare Worker: autorización de rutas modulares", () => {
     }
 
     expect(authMocks.requireRole).not.toHaveBeenCalled();
-  },
-);
+  });
 
   it("permite mutación autenticada con Origin del mismo origen", async () => {
     const env = createEnvironment();
@@ -203,8 +202,7 @@ describe("Cloudflare Worker: autorización de rutas modulares", () => {
     expect(response.status).toBe(200);
     expect(authMocks.requireRole).toHaveBeenCalledOnce();
     expect(authMocks.changeUserPassword).toHaveBeenCalledOnce();
-  },
-);
+  });
 
   it("rechaza rutas desconocidas y métodos no GET", async () => {
     const env = createEnvironment();
