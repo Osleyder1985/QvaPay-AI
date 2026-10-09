@@ -79,7 +79,6 @@ test("el formulario de acceso es navegable con teclado", async ({ page }) => {
   ).toBeFocused();
 });
 
-
 test("el shell autenticado mantiene rutas, recarga, diseño adaptable y movimiento reducido", async ({
   page,
 }) => {
