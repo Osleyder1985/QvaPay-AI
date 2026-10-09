@@ -68,7 +68,7 @@ function createRefreshHarness(fetchImplementation: typeof fetch) {
     "performance",
     `${refreshSource}; return { refresh, getState: () => state };`,
   ) as (
-    fetch: typeof fetch,
+    fetchImplementation: typeof globalThis.fetch,
     readJsonObject: (response: Response) => Promise<unknown>,
     isScannerState: (value: unknown) => boolean,
     render: () => void,
