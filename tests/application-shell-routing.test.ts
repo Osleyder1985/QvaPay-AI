@@ -11,6 +11,7 @@ import {
   renderApplicationShellNavigation,
 } from "../src/infrastructure/cloudflare/application-shell.js";
 import { DASHBOARD_CLIENT_SCRIPT } from "../src/presentation/dashboard/dashboard-client.js";
+import { renderDashboardModuleView } from "../src/presentation/dashboard/dashboard-view.js";
 import { renderApplicationShellHeader } from "../src/infrastructure/cloudflare/application-shell-header.js";
 
 describe("rutas y navegación del Application Shell", () => {
@@ -81,5 +82,40 @@ describe("rutas y navegación del Application Shell", () => {
     expect(DASHBOARD_CLIENT_SCRIPT).toContain(
       "Implementación funcional pendiente",
     );
+  });
+
+  it("envía únicamente el contenido funcional del módulo solicitado", () => {
+    const account = renderDashboardModuleView("cuenta");
+    expect(account).toContain('id="cuenta"');
+    expect(account).toContain('id="seguridad-cuenta"');
+    expect(account).not.toContain('id="administracion"');
+    expect(account).not.toContain('id="mercado"');
+    expect(account).not.toContain('id="controles"');
+
+    const market = renderDashboardModuleView("mercado");
+    expect(market).toContain('id="mercado"');
+    expect(market).toContain('id="coin"');
+    expect(market).not.toContain('id="cuenta"');
+    expect(market).not.toContain('id="administracion"');
+
+    const security = renderDashboardModuleView("seguridad");
+    expect(security).toContain('id="controles"');
+    expect(security).toContain('id="auditoria"');
+    expect(security).not.toContain('id="cuenta"');
+    expect(security).not.toContain('id="administracion"');
+
+    const users = renderDashboardModuleView("usuarios");
+    expect(users).toContain('id="administracion"');
+    expect(users).not.toContain('id="cuenta"');
+    expect(users).not.toContain('id="mercado"');
+  });
+
+  it("no incluye vistas funcionales inventadas en módulos pendientes", () => {
+    for (const moduleId of ["arbitraje", "monitor", "configuracion"]) {
+      const view = renderDashboardModuleView(moduleId);
+      expect(view).toBe("");
+      expect(view).not.toContain('id="mercado"');
+      expect(view).not.toContain('id="operaciones"');
+    }
   });
 });
