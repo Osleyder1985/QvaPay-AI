@@ -70,18 +70,21 @@ El cálculo de la tasa se realiza actualmente mediante representación numérica
 
 La operación `POST /p2p/:uuid/apply` existe como capacidad independiente de lectura y requiere token de acción más credenciales server-side.
 
-## Etiquetas monetarias de la tabla
+## Alcance de la validación monetaria por fases
 
-La tabla utiliza el mercado activo comunicado por el snapshot del scanner. La tasa del contrato P2P es `ratio = receive / amount`, es decir, unidades de la moneda seleccionada por QUSD. Los ticks `BANK_CUP`, `BANK_MLC` y `BANK_EUR` tienen respaldo en la documentación pública del proveedor y se presentan respectivamente como `CUP/QUSD`, `MLC/QUSD` y `EUR/QUSD`. El encabezado de cantidad del activo se mantiene como QUSD.
+La fase actual valida exclusivamente el mercado configurado `BANK_CUP`. En este mercado, el contrato P2P define `ratio = receive / amount`; `amount` representa QUSD y `receive` representa la moneda seleccionada. Por ello, la tabla rotula la tasa como `CUP/QUSD`, la cantidad base como QUSD y el importe recibido/pagado como CUP.
 
-El mapeo de etiquetas debe limitarse a ticks documentados explícitamente. Cuando el identificador de mercado no tenga una unidad validada en el contrato disponible, la interfaz debe mostrar una etiqueta genérica basada en la semántica `receive / amount`, conservar visible el mercado activo y no reutilizar CUP por defecto. No se realizan conversiones ni cambios de cálculo por formato de presentación.
+La identificación de otros mercados y la validación de sus unidades quedan expresamente fuera de esta fase y se abordarán después, mercado por mercado, usando el catálogo y la documentación oficial de QvaPay. No debe interpretarse que esos mercados sean desconocidos para QvaPay. Mientras no se haya validado su contrato, la interfaz evita atribuirles CUP u otra unidad por defecto y utiliza una etiqueta genérica segura.
 
-Fuentes contractuales consultadas: [listado P2P y semántica de ratio](https://www.qvapay.com/docs/p2p/list), [promedios por moneda, incluidos BANK_MLC](https://www.qvapay.com/docs/p2p/averages) y [ficha pública BANK_EUR](https://www.qvapay.com/coins/BANK_EUR).
+No se realizan conversiones ni cambios de cálculo, ordenación o fórmula de spread en esta fase.
+
+Fuentes oficiales para la fase BANK_CUP: [listado P2P y semántica de ratio](https://www.qvapay.com/docs/p2p/list) y [promedios por moneda, incluido BANK_CUP](https://www.qvapay.com/docs/p2p/averages).
 
 ## Justificación normativa
 
 - ISO/IEC 25012: exactitud y consistencia de unidades frente al contrato de origen.
-- ISO 9241-110: autodescriptividad de las etiquetas para evitar ambigüedad en la lectura de datos financieros.
+- ISO 9241-110: autodescriptividad de etiquetas financieras y prevención de ambigüedad.
+- ISO/IEC/IEEE 29119: regresión automatizada de la unidad validada en esta fase.
 
 ## Fuente externa
 
