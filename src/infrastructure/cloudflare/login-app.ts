@@ -13,4 +13,15 @@ const form=document.getElementById("login"),button=document.getElementById("subm
  * @responsabilidades Aplicar el contrato y las validaciones correspondientes a la integración.
  * @returns Resultado de la operación pública.
  */
-export function createLoginAppResponse(): Response { return new Response(HTML,{status:200,headers:{"content-type":"text/html; charset=UTF-8","cache-control":"no-store","x-content-type-options":"nosniff","content-security-policy":"default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src 'self'; base-uri 'none'; frame-ancestors 'none'"}}); }
+export function createLoginAppResponse(): Response {
+  return new Response(HTML, {
+    status: 200,
+    headers: {
+      "content-type": "text/html; charset=UTF-8",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "content-security-policy":
+        "default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src 'self'; base-uri 'none'; frame-ancestors 'none'",
+    },
+  });
+}
