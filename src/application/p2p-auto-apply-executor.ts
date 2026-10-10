@@ -24,7 +24,12 @@ export interface AutoApplyStrategy {
 export interface AutoApplyReservation {
   readonly operationId: string;
   readonly created: boolean;
-  readonly status: "RESERVED" | "APPLYING" | "CONFIRMED" | "REJECTED" | "AMBIGUOUS";
+  readonly status:
+    | "RESERVED"
+    | "APPLYING"
+    | "CONFIRMED"
+    | "REJECTED"
+    | "AMBIGUOUS";
 }
 
 /** Puertos obligatorios: la implementación concreta no puede ocultar persistencia ni llamadas remotas. */
@@ -39,8 +44,18 @@ export interface AutoApplyExecutionPorts {
     readonly operationId: string | null;
   }): Promise<void>;
   claim(operationId: string): Promise<boolean>;
-  applyOnce(offerUuid: string): Promise<{ readonly status: "CONFIRMED" } | { readonly status: "REJECTED"; readonly httpStatus: number } | { readonly status: "AMBIGUOUS"; readonly httpStatus: number | null }>;
-  recordOutcome(operationId: string, status: "CONFIRMED" | "REJECTED" | "AMBIGUOUS", httpStatus: number | null): Promise<void>;
+  applyOnce(
+    offerUuid: string,
+  ): Promise<
+    | { readonly status: "CONFIRMED" }
+    | { readonly status: "REJECTED"; readonly httpStatus: number }
+    | { readonly status: "AMBIGUOUS"; readonly httpStatus: number | null }
+  >;
+  recordOutcome(
+    operationId: string,
+    status: "CONFIRMED" | "REJECTED" | "AMBIGUOUS",
+    httpStatus: number | null,
+  ): Promise<void>;
   releaseUnclaimed(operationId: string): Promise<void>;
 }
 
@@ -110,7 +125,9 @@ export async function executeAutoApplyCandidate(
       });
     } catch {
       if (reservation?.created && reservation.status === "RESERVED") {
-        await ports.releaseUnclaimed(reservation.operationId).catch(() => undefined);
+        await ports
+          .releaseUnclaimed(reservation.operationId)
+          .catch(() => undefined);
       }
       skipped += 1;
       continue;
