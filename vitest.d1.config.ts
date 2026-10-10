@@ -16,6 +16,9 @@ export default defineConfig({
       wrangler: {
         configPath: "./wrangler.toml",
       },
+      miniflare: {
+        compatibilityDate: "2026-08-27",
+      },
     }),
   ],
   test: {
