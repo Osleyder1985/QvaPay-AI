@@ -26,6 +26,6 @@ Las pruebas deterministas cubren relojes locales adelantados y atrasados, antig�
 
 ## Regresión de la ruta de mercado
 
-La suite `tests/browser/market-route.spec.ts` valida la ruta autenticada `/app/mercado` con un contrato de scanner sintético: ambos libros, formato numérico `0,000.00`, encabezados y captions de tabla, solo lectura, estado explícito cuando no existe snapshot y ausencia de desbordamiento horizontal a 320 px. Las respuestas sintéticas evitan depender de cuentas, credenciales o datos financieros reales.
+La suite `tests/browser/market-route.spec.ts` valida la ruta autenticada `/app/mercado` con un contrato de scanner sintético: ambos libros, formato numérico `0,000.00`, encabezados y captions de tabla, solo lectura, estado explícito cuando no existe snapshot y ausencia de desbordamiento horizontal a 320 px. Las respuestas sintéticas evitan depender de cuentas, credenciales o datos financieros reales. Cada usuario temporal creado por la prueba se elimina en el hook `afterEach`, incluso cuando una aserción del caso falla, para evitar residuos entre ejecuciones.
 
 Esta cobertura comprueba la interfaz y el contrato observado; no demuestra disponibilidad del proveedor, ejecución de operaciones, certificación WCAG ni frescura real de producción. La accesibilidad manual y la verificación del Worker desplegado siguen siendo controles independientes.
