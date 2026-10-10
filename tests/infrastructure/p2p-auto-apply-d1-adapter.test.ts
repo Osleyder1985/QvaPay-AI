@@ -119,8 +119,9 @@ describe("createD1AutoApplyExecutionPorts", () => {
       bind: vi.fn().mockReturnThis(),
       run: vi.fn(async () => ({ meta: { changes: 1 } })),
     };
+    const prepare = vi.fn(() => statement);
     const db = {
-      prepare: vi.fn(() => statement),
+      prepare,
       batch: vi.fn(async () => []),
     } as unknown as D1Database;
     const applyOffer = vi.fn(async () => ({ success: true }));
@@ -143,7 +144,7 @@ describe("createD1AutoApplyExecutionPorts", () => {
     expect(getVerifiedAccountUuid).toHaveBeenCalledTimes(1);
     expect(applyOffer).not.toHaveBeenCalled();
     expect(statement.run).toHaveBeenCalledTimes(1);
-    expect(String(db.prepare.mock.calls.at(-1)?.[0])).toContain(
+    expect(String(prepare.mock.calls.at(-1)?.[0])).toContain(
       "apply_status IN ('APPLYING', 'AMBIGUOUS')",
     );
   });
