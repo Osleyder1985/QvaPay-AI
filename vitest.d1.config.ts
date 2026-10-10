@@ -14,11 +14,9 @@ export default defineConfig({
   plugins: [
     cloudflareTest({
       wrangler: {
-        configPath: "./wrangler.toml",
+        configPath: "./wrangler.d1-test.toml",
       },
-      miniflare: {
-        compatibilityDate: "2026-08-27",
-      },
+
     }),
   ],
   test: {
