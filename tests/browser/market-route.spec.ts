@@ -123,7 +123,8 @@ test("el mercado autenticado muestra los dos libros en modo de solo lectura", as
   await expect(page.locator("#sellTable")).toContainText("1,001.00");
   await expect(page.locator("#buyTable")).toContainText("1,000.00");
   await expect(page.getByRole("button", { name: /Comprar|Vender/ })).toHaveCount(0);
-  await expect(page.locator("#sellTable table caption")).toHaveCount(0);
+  await expect(page.locator("#sellTable table caption")).toHaveText("Ofertas SELL · Comprar");
+  await expect(page.locator("#buyTable table caption")).toHaveText("Ofertas BUY · Vender");
 });
 
 test("el mercado identifica explícitamente un snapshot no disponible", async ({
