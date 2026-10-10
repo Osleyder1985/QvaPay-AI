@@ -4,9 +4,23 @@
  * @responsabilidades Implementar y proteger las reglas propias de este módulo sin mezclar responsabilidades de otras capas.
  * @ubicacion src/infrastructure/cloudflare dentro de la arquitectura de QvaPay-AI.
  */
-import type { DurableObjectNamespace, D1Database } from "@cloudflare/workers-types";
+import type {
+  DurableObjectNamespace,
+  D1Database,
+} from "@cloudflare/workers-types";
 import { ScannerSchedulerDurableObject } from "./scanner-scheduler-do.js";
-import { authenticate, createUser, deleteUserByUsername, ensureSecuritySchema, getSession, listUsers, logout, requireRole, setUserActive, changeUserPassword } from "./auth-rbac.js";
+import {
+  authenticate,
+  createUser,
+  deleteUserByUsername,
+  ensureSecuritySchema,
+  getSession,
+  listUsers,
+  logout,
+  requireRole,
+  setUserActive,
+  changeUserPassword,
+} from "./auth-rbac.js";
 import { QvaPayAccountClient } from "../qvapay/qvapay-account-client.js";
 import {
   getCurrentQvaPayAccountSnapshot,
@@ -32,7 +46,10 @@ export interface ScannerWorkerEnvironment {
 }
 const OBJECT_NAME = "default";
 function jsonError(message: string, status: number): Response {
-  return Response.json({ error: message }, { status, headers: { "cache-control": "no-store" } });
+  return Response.json(
+    { error: message },
+    { status, headers: { "cache-control": "no-store" } },
+  );
 }
 
 /**
@@ -160,7 +177,8 @@ export default {
     }
 
     if (url.pathname === "/api/auth/logout") {
-      if (request.method !== "POST") return new Response("Method not allowed", { status: 405 });
+      if (request.method !== "POST")
+        return new Response("Method not allowed", { status: 405 });
       return logout(request, env.DB, env.ACCOUNT_AUTH_SECRET);
     }
 
@@ -203,21 +221,40 @@ export default {
     }
 
     if (url.pathname === "/") {
-      if (request.method !== "GET") return new Response("Method not allowed", { status: 405 });
-      const session = await getSession(request, env.DB, env.ACCOUNT_AUTH_SECRET);
+      if (request.method !== "GET")
+        return new Response("Method not allowed", { status: 405 });
+      const session = await getSession(
+        request,
+        env.DB,
+        env.ACCOUNT_AUTH_SECRET,
+      );
       return session ? createPublicAppResponse() : createLoginAppResponse();
     }
 
     if (url.pathname === "/api/session") {
-      if (request.method !== "GET") return new Response("Method not allowed", { status: 405 });
-      const session = await getSession(request, env.DB, env.ACCOUNT_AUTH_SECRET);
+      if (request.method !== "GET")
+        return new Response("Method not allowed", { status: 405 });
+      const session = await getSession(
+        request,
+        env.DB,
+        env.ACCOUNT_AUTH_SECRET,
+      );
       if (!session) return jsonError("Autenticación requerida.", 401);
-      return Response.json({ authenticated: true, user: session.user }, { headers: { "cache-control": "no-store" } });
+      return Response.json(
+        { authenticated: true, user: session.user },
+        { headers: { "cache-control": "no-store" } },
+      );
     }
 
     if (url.pathname === "/api/account/snapshot") {
-      if (request.method !== "GET") return new Response("Method not allowed", { status: 405 });
-      const access = await requireRole(request, env.DB, env.ACCOUNT_AUTH_SECRET, ["ADMINISTRATION", "AUDITOR"]);
+      if (request.method !== "GET")
+        return new Response("Method not allowed", { status: 405 });
+      const access = await requireRole(
+        request,
+        env.DB,
+        env.ACCOUNT_AUTH_SECRET,
+        ["ADMINISTRATION", "AUDITOR"],
+      );
       if (access instanceof Response) return access;
       const [current, lastSuccessful] = await Promise.all([
         getCurrentQvaPayAccountSnapshot(env.DB),
@@ -261,8 +298,14 @@ export default {
     }
 
     if (url.pathname === "/api/account/sync") {
-      if (request.method !== "POST") return new Response("Method not allowed", { status: 405 });
-      const access = await requireRole(request, env.DB, env.ACCOUNT_AUTH_SECRET, ["ADMINISTRATION"]);
+      if (request.method !== "POST")
+        return new Response("Method not allowed", { status: 405 });
+      const access = await requireRole(
+        request,
+        env.DB,
+        env.ACCOUNT_AUTH_SECRET,
+        ["ADMINISTRATION"],
+      );
       if (access instanceof Response) return access;
       try {
         const client = new QvaPayAccountClient({
@@ -339,37 +382,72 @@ export default {
         try {
           const session = access;
           if (userMatch[2] === "enable" || userMatch[2] === "disable") {
-            if (request.method !== "POST") return new Response("Method not allowed", { status: 405 });
-            const user = await setUserActive(env.DB, session.user, userId, userMatch[2] === "enable");
-            return Response.json({ user }, { headers: { "cache-control": "no-store" } });
+            if (request.method !== "POST")
+              return new Response("Method not allowed", { status: 405 });
+            const user = await setUserActive(
+              env.DB,
+              session.user,
+              userId,
+              userMatch[2] === "enable",
+            );
+            return Response.json(
+              { user },
+              { headers: { "cache-control": "no-store" } },
+            );
           }
-          if (request.method !== "POST") return new Response("Method not allowed", { status: 405 });
-          const password = typeof input.password === "string" ? input.password : "";
-          const user = await changeUserPassword(env.DB, session.user, userId, password);
-          return Response.json({ user }, { headers: { "cache-control": "no-store" } });
+          if (request.method !== "POST")
+            return new Response("Method not allowed", { status: 405 });
+          const password =
+            typeof input.password === "string" ? input.password : "";
+          const user = await changeUserPassword(
+            env.DB,
+            session.user,
+            userId,
+            password,
+          );
+          return Response.json(
+            { user },
+            { headers: { "cache-control": "no-store" } },
+          );
         } catch (error) {
-          return jsonError(error instanceof Error ? error.message : "No se pudo actualizar el usuario.", 400);
+          return jsonError(
+            error instanceof Error
+              ? error.message
+              : "No se pudo actualizar el usuario.",
+            400,
+          );
         }
       }
       return jsonError("Ruta administrativa no encontrada.", 404);
     }
 
-    if (url.pathname !== "/internal/scanner/start" && url.pathname !== "/internal/scanner/state") {
-      if (url.pathname.startsWith("/api/")) return jsonError("Autenticación requerida.", 401);
+    if (
+      url.pathname !== "/internal/scanner/start" &&
+      url.pathname !== "/internal/scanner/state"
+    ) {
+      if (url.pathname.startsWith("/api/"))
+        return jsonError("Autenticación requerida.", 401);
       return new Response("Not found", { status: 404 });
     }
 
-    if (request.method !== "POST" && request.method !== "GET") return new Response("Method not allowed", { status: 405 });
+    if (request.method !== "POST" && request.method !== "GET")
+      return new Response("Method not allowed", { status: 405 });
     const authorization = request.headers.get("authorization");
-    if (authorization !== `Bearer ${env.SCANNER_BOOTSTRAP_TOKEN}`) return new Response("Unauthorized", { status: 401 });
+    if (authorization !== `Bearer ${env.SCANNER_BOOTSTRAP_TOKEN}`)
+      return new Response("Unauthorized", { status: 401 });
 
     if (url.pathname === "/internal/scanner/state") {
-      if (request.method !== "GET") return new Response("Method not allowed", { status: 405 });
+      if (request.method !== "GET")
+        return new Response("Method not allowed", { status: 405 });
       return Response.json(await stub.getState());
     }
 
-    if (request.method !== "POST") return new Response("Method not allowed", { status: 405 });
-    const state = await stub.ensureScheduled({ coin: env.SCANNER_COIN, intervalSeconds: Number(env.SCANNER_INTERVAL_SECONDS) });
+    if (request.method !== "POST")
+      return new Response("Method not allowed", { status: 405 });
+    const state = await stub.ensureScheduled({
+      coin: env.SCANNER_COIN,
+      intervalSeconds: Number(env.SCANNER_INTERVAL_SECONDS),
+    });
     return Response.json(state);
   },
 };
