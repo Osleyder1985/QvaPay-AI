@@ -245,7 +245,7 @@ ${renderDashboardModuleView(moduleId)}
 ${renderApplicationShellModuleMountEnd()}
 ${renderApplicationShellEnd()}
 ${DASHBOARD_CLIENT_SCRIPT}
-</body></html>`
+</body></html>`;
 
 /**
  * @proposito API pública createPublicAppResponse: implementa el comportamiento expuesto por este módulo.
