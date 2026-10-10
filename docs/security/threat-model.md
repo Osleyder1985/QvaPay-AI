@@ -26,7 +26,6 @@
 
 ## Integridad de operaciones P2P
 
-
 | Amenaza                                                       | Impacto | Control requerido                                                                   |
 | ------------------------------------------------------------- | ------- | ----------------------------------------------------------------------------------- |
 | Aplicación manual y Auto Apply concurrentes a la misma oferta | Crítico | Reserva D1 única por `offer_uuid` y reclamación condicional                         |
