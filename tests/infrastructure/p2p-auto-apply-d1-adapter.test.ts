@@ -22,7 +22,10 @@ describe("createD1AutoApplyExecutionPorts", () => {
   it("falla cerrado sin estrategia y no toca D1 ni al proveedor", async () => {
     const applyOffer = vi.fn(async () => ({}));
     const db = unusedDatabase();
-    const ports = createD1AutoApplyExecutionPorts({ db, provider: { applyOffer } });
+    const ports = createD1AutoApplyExecutionPorts({
+      db,
+      provider: { applyOffer },
+    });
 
     await expect(executeAutoApplyCandidate(ports)).resolves.toEqual({
       examined: 0,
