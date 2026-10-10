@@ -46,7 +46,9 @@ describe("evaluateAutoApplyDecision", () => {
       reason: "BUY_RATE_NOT_BELOW_THRESHOLD",
     });
     expect(
-      evaluateAutoApplyDecision(input({ offer: offer({ fiatAmount: "4001" }) })),
+      evaluateAutoApplyDecision(
+        input({ offer: offer({ fiatAmount: "4001" }) }),
+      ),
     ).toMatchObject({
       eligible: false,
       reason: "BUY_CUP_LIMIT_EXCEEDED",
@@ -190,7 +192,9 @@ describe("evaluateAutoApplyDecision", () => {
       reason: "MARKET_MISMATCH",
     });
     expect(
-      evaluateAutoApplyDecision(input({ offer: offer({ status: "processing" }) })),
+      evaluateAutoApplyDecision(
+        input({ offer: offer({ status: "processing" }) }),
+      ),
     ).toMatchObject({
       eligible: false,
       reason: "OFFER_NOT_OPEN",
