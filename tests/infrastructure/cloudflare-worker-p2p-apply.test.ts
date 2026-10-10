@@ -307,6 +307,35 @@ describe("Cloudflare Worker: aplicación P2P protegida", () => {
     expect(mocks.fetchOfferDetail).toHaveBeenCalledOnce();
   });
 
+  it("conserva CONFIRMED si falla la persistencia del detalle al reconciliar", async () => {
+    mocks.reserveOperation.mockResolvedValue({
+      created: false,
+      operation: { ...reservation().operation, applyStatus: "APPLYING" },
+    });
+    mocks.recordDetailOutcome.mockRejectedValueOnce(
+      new Error("synthetic detail D1 outage"),
+    );
+    mocks.fetchOfferDetail.mockReset().mockResolvedValue({
+      ...confirmedOfferDetail,
+      coin: "BANK_CUP",
+      side: "sell",
+      status: "processing",
+      onlyVip: false,
+      onlyKyc: false,
+    });
+
+    const response = await applyRequest(createEnvironment());
+
+    expect(response.status).toBe(202);
+    await expect(response.json()).resolves.toMatchObject({
+      applyStatus: "CONFIRMED",
+      detailStatus: "PENDING",
+      reconciled: true,
+    });
+    expect(mocks.applyOffer).not.toHaveBeenCalled();
+    expect(mocks.recordApplyOutcome).toHaveBeenCalledOnce();
+  });
+
   it("no confirma APPLYING cuando Peer.uuid no coincide con la cuenta verificada", async () => {
     mocks.reserveOperation.mockResolvedValue({
       created: false,
