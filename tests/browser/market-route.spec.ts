@@ -58,7 +58,7 @@ function scannerState(overrides: Record<string, unknown> = {}) {
   };
   return {
     configured: true,
-    coin: "QUSD",
+    coin: "BANK_CUP",
     intervalSeconds: 10,
     nextAlarmAt: now + 10_000,
     serverNowAt: now,
@@ -147,10 +147,10 @@ test("el mercado autenticado muestra los dos libros en modo de solo lectura", as
     page.getByRole("button", { name: /Comprar|Vender/ }),
   ).toHaveCount(0);
   await expect(page.locator("#sellTable table caption")).toHaveText(
-    "Ofertas SELL · Comprar",
+    "Ofertas SELL · Comprar · Mercado BANK_CUP",
   );
   await expect(page.locator("#buyTable table caption")).toHaveText(
-    "Ofertas BUY · Vender",
+    "Ofertas BUY · Vender · Mercado BANK_CUP",
   );
 });
 
