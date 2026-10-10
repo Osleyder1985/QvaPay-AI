@@ -160,6 +160,90 @@ describe("createD1AutoApplyExecutionPorts", () => {
     expect(prepare).toHaveBeenCalled();
   });
 
+  it("rechaza reconciliar una oferta que no pertenece al operationId indicado", async () => {
+    const statement = {
+      bind: vi.fn().mockReturnThis(),
+      run: vi.fn(async () => ({ meta: { changes: 1 } })),
+      first: vi.fn(async () => ({
+        id: "operation-1",
+        offer_uuid: "different-offer",
+        source: "AUTO_APPLY",
+        actor_user_id: null,
+        actor_username: null,
+        apply_status: "AMBIGUOUS",
+        detail_status: "NOT_REQUESTED",
+        provider_http_status: null,
+        detail_error_code: null,
+        created_at: "2026-10-10T12:00:00.000Z",
+        updated_at: "2026-10-10T12:00:00.000Z",
+      })),
+    };
+    const db = {
+      prepare: vi.fn(() => statement),
+      batch: vi.fn(async () => []),
+    } as unknown as D1Database;
+    const fetchOfferDetail = vi.fn();
+    const getVerifiedAccountUuid = vi.fn();
+    const applyOffer = vi.fn();
+    const ports = createD1AutoApplyExecutionPorts({
+      db,
+      provider: { applyOffer, fetchOfferDetail, getVerifiedAccountUuid },
+    });
+
+    await expect(ports.reconcileOnce("operation-1", "offer-1")).resolves.toBe(
+      "AMBIGUOUS",
+    );
+    expect(fetchOfferDetail).not.toHaveBeenCalled();
+    expect(getVerifiedAccountUuid).not.toHaveBeenCalled();
+    expect(applyOffer).not.toHaveBeenCalled();
+    expect(statement.run).not.toHaveBeenCalled();
+  });
+
+  it("recupera un estado APPLYING tras fallo de persistencia sin repetir el POST", async () => {
+    const statement = {
+      bind: vi.fn().mockReturnThis(),
+      run: vi.fn(async () => ({ meta: { changes: 1 } })),
+      first: vi.fn(async () => ({
+        id: "operation-crash",
+        offer_uuid: "offer-crash",
+        source: "AUTO_APPLY",
+        actor_user_id: null,
+        actor_username: null,
+        apply_status: "APPLYING",
+        detail_status: "NOT_REQUESTED",
+        provider_http_status: null,
+        detail_error_code: null,
+        created_at: "2026-10-10T12:00:00.000Z",
+        updated_at: "2026-10-10T12:00:00.000Z",
+      })),
+    };
+    const db = {
+      prepare: vi.fn(() => statement),
+      batch: vi.fn(async () => []),
+    } as unknown as D1Database;
+    const applyOffer = vi.fn();
+    const fetchOfferDetail = vi.fn(async () => ({
+      uuid: "offer-crash",
+      status: "processing",
+      peerUuid: "verified-account-crash",
+    }));
+    const getVerifiedAccountUuid = vi.fn(async () => "verified-account-crash");
+    const ports = createD1AutoApplyExecutionPorts({
+      db,
+      provider: { applyOffer, fetchOfferDetail, getVerifiedAccountUuid },
+      now: () => "2026-10-10T12:01:00.000Z",
+    });
+
+    // APPLYING representa un proceso interrumpido antes de guardar el resultado del POST.
+    await expect(
+      ports.reconcileOnce("operation-crash", "offer-crash"),
+    ).resolves.toBe("CONFIRMED");
+    expect(fetchOfferDetail).toHaveBeenCalledWith("offer-crash");
+    expect(getVerifiedAccountUuid).toHaveBeenCalledTimes(1);
+    expect(applyOffer).not.toHaveBeenCalled();
+    expect(statement.run).toHaveBeenCalledTimes(1);
+  });
+
   it("mantiene ambigua la operación cuando la reconciliación no confirma la identidad", async () => {
     const statement = {
       bind: vi.fn().mockReturnThis(),
