@@ -35,7 +35,7 @@ describe("evaluateAutoApplyDecision", () => {
     expect(evaluateAutoApplyDecision(input({ rateThreshold: "no-numero" }))).toMatchObject({
       eligible: false, reason: "INVALID_CONFIGURATION",
     });
-    expect(evaluateAutoApplyDecision(input({ offer: offer({ observedAt: "2026-10-10T12:00:01.000Z" }) })).toMatchObject({
+    expect(evaluateAutoApplyDecision(input({ offer: offer({ observedAt: "2026-10-10T12:00:01.000Z" }) }))).toMatchObject({
       eligible: false, reason: "SNAPSHOT_STALE",
     });
     expect(evaluateAutoApplyDecision(input({ maxSnapshotAgeMs: 0 })).toMatchObject({
@@ -60,6 +60,6 @@ describe("evaluateAutoApplyDecision", () => {
   it("rechaza moneda, estado y elegibilidad VIP incompatibles", () => {
     expect(evaluateAutoApplyDecision(input({ offer: offer({ market: "OTHER" }) }))).toMatchObject({ eligible: false, reason: "MARKET_MISMATCH" });
     expect(evaluateAutoApplyDecision(input({ offer: offer({ status: "processing" }) }))).toMatchObject({ eligible: false, reason: "OFFER_NOT_OPEN" });
-    expect(evaluateAutoApplyDecision(input({ accountVipVerified: false, offer: offer({ onlyVip: true, creatorVip: true }) })).toMatchObject({ eligible: false, reason: "VIP_REQUIRED" });
+    expect(evaluateAutoApplyDecision(input({ accountVipVerified: false, offer: offer({ onlyVip: true, creatorVip: true }) }))).toMatchObject({ eligible: false, reason: "VIP_REQUIRED" });
   });
 });
