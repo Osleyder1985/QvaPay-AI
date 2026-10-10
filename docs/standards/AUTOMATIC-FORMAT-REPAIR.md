@@ -15,6 +15,8 @@ Evitar correcciones manuales repetitivas cuando Prettier detecta diferencias de 
 
 ## Alcance y límites
 
+- No se permiten archivos ni bloques excluidos mediante `.prettierignore` o `prettier-ignore`; los archivos del proyecto deben estar cubiertos por la comprobación y la reparación globales.
+- Si un formato generado o una plantilla necesita conservar contenido literal, debe estructurarse de forma compatible con Prettier, sin desactivar el control para el archivo completo.
 - `format:fix` aplica Prettier a los archivos cubiertos por la configuración del repositorio.
 - `format:check` sigue siendo el control de integración obligatorio; no se sustituye por una ejecución de escritura que oculte diferencias.
 - Prettier solo corrige formato. No repara errores de TypeScript, pruebas, lógica, seguridad ni documentación semántica.
