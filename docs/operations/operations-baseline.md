@@ -78,7 +78,6 @@ La ruta no acepta credenciales desde el navegador. La credencial de cuenta se us
 
 El estado del código no sustituye la evidencia de producción. La certificación requiere evidencia reproducible del deployment y de una ejecución real.
 
-
 ## Recuperación de aplicaciones P2P confirmadas
 
 Una operación con estado de aplicación `CONFIRMED` y detalle `PENDING` o `FAILED` debe recuperar el detalle remoto antes de ejecutar las validaciones destinadas a una aplicación nueva. El estado remoto puede haber pasado de `open` a `processing` después de que QvaPay confirmara la aplicación.
