@@ -330,6 +330,10 @@ describe("QvaPay P2P apply", () => {
         p2p: {
           uuid: "offer-123",
           status: "processing",
+          coin: "BANK_CUP",
+          type: "sell",
+          only_vip: false,
+          only_kyc: true,
           User: { uuid: "owner-123" },
           Peer: { uuid: "peer-456" },
         },
@@ -345,6 +349,10 @@ describe("QvaPay P2P apply", () => {
     await expect(client.fetchOfferDetail("offer-123")).resolves.toEqual({
       uuid: "offer-123",
       status: "processing",
+      coin: "BANK_CUP",
+      side: "sell",
+      onlyVip: false,
+      onlyKyc: true,
       ownerUuid: "owner-123",
       peerUuid: "peer-456",
     });
