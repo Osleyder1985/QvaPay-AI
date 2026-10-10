@@ -583,6 +583,141 @@ export default {
           );
         }
       }
+      // Una escritura D1 fallida después del POST puede dejar APPLYING. Reconciliar
+      // únicamente con identidad de cuenta verificada + Peer.uuid y estado remoto processing;
+      // nunca volver a enviar el POST desde esta ruta.
+      if (
+        !reservation.created &&
+        reservation.operation.applyStatus === "APPLYING"
+      ) {
+        if (!env.QVAPAY_USER_API_TOKEN) {
+          return Response.json(
+            {
+              operationId: reservation.operation.id,
+              applyStatus: "APPLYING",
+              detailStatus: reservation.operation.detailStatus,
+              message:
+                "La operación requiere reconciliación; falta la credencial de cuenta. No repitas la aplicación.",
+            },
+            { status: 202, headers: { "cache-control": "no-store" } },
+          );
+        }
+        try {
+          const accountClient = new QvaPayAccountClient({
+            baseUrl: env.QVAPAY_API_BASE_URL,
+            appId: env.QVAPAY_APP_ID,
+            appSecret: env.QVAPAY_APP_SECRET,
+            userApiToken: env.QVAPAY_USER_API_TOKEN,
+          });
+          const accountSnapshot = await accountClient.fetchAccount();
+          const identity = accountSnapshot.identity;
+          if (
+            accountSnapshot.integrationStatus !== "verified" ||
+            !accountSnapshot.ownerCorrelationOk ||
+            !identity?.uuid
+          ) {
+            return Response.json(
+              {
+                operationId: reservation.operation.id,
+                applyStatus: "APPLYING",
+                detailStatus: reservation.operation.detailStatus,
+                message:
+                  "No se pudo verificar la identidad para reconciliar la operación. No repitas la aplicación.",
+              },
+              { status: 202, headers: { "cache-control": "no-store" } },
+            );
+          }
+          const recoveryClient = new QvaPayP2PClient({
+            baseUrl: env.QVAPAY_API_BASE_URL,
+            appId: env.QVAPAY_APP_ID,
+            appSecret: env.QVAPAY_APP_SECRET,
+            userApiToken: env.QVAPAY_USER_API_TOKEN,
+          });
+          const detail = await recoveryClient.fetchOfferDetail(offerUuid);
+          if (
+            detail.status !== "processing" ||
+            detail.peerUuid !== identity.uuid
+          ) {
+            return Response.json(
+              {
+                operationId: reservation.operation.id,
+                applyStatus: "APPLYING",
+                detailStatus: reservation.operation.detailStatus,
+                message:
+                  "QvaPay no aporta evidencia suficiente para confirmar la aplicación. La operación sigue bloqueada; no repitas el POST.",
+              },
+              { status: 202, headers: { "cache-control": "no-store" } },
+            );
+          }
+          const reconciled = await recordP2PApplyOutcome(
+            env.DB,
+            reservation.operation.id,
+            "CONFIRMED",
+            null,
+          );
+          if (!reconciled) {
+            return Response.json(
+              {
+                operationId: reservation.operation.id,
+                applyStatus: "APPLYING",
+                detailStatus: reservation.operation.detailStatus,
+                message:
+                  "La evidencia remota coincide, pero no se pudo persistir la reconciliación. No repitas la aplicación.",
+              },
+              { status: 202, headers: { "cache-control": "no-store" } },
+            );
+          }
+          // La aplicación ya está confirmada en D1. Un fallo separado al guardar
+          // el detalle no debe degradarla ni presentarla como APPLYING.
+          let detailPersisted = false;
+          try {
+            detailPersisted = await recordP2PDetailOutcome(
+              env.DB,
+              reservation.operation.id,
+              { available: true },
+            );
+          } catch {
+            // Mantener CONFIRMED; el detalle se puede recuperar sin repetir el POST.
+          }
+          if (!detailPersisted) {
+            return Response.json(
+              {
+                operationId: reservation.operation.id,
+                applyStatus: "CONFIRMED",
+                detailStatus: "PENDING",
+                message:
+                  "La aplicación está confirmada, pero no se pudo persistir el detalle. Puede recuperarse sin repetir la aplicación.",
+                alreadyApplied: true,
+                reconciled: true,
+              },
+              { status: 202, headers: { "cache-control": "no-store" } },
+            );
+          }
+          return Response.json(
+            {
+              operationId: reservation.operation.id,
+              applyStatus: "CONFIRMED",
+              detailStatus: "AVAILABLE",
+              offer: detail,
+              alreadyApplied: true,
+              reconciled: true,
+            },
+            { status: 200, headers: { "cache-control": "no-store" } },
+          );
+        } catch {
+          return Response.json(
+            {
+              operationId: reservation.operation.id,
+              applyStatus: "APPLYING",
+              detailStatus: reservation.operation.detailStatus,
+              message:
+                "No se pudo completar la reconciliación remota. La operación permanece bloqueada; no repitas la aplicación.",
+            },
+            { status: 202, headers: { "cache-control": "no-store" } },
+          );
+        }
+      }
+
       if (!reservation.created) {
         return Response.json(
           {
@@ -863,12 +998,30 @@ export default {
         );
       }
 
-      await recordP2PApplyOutcome(
-        env.DB,
-        reservation.operation.id,
-        "CONFIRMED",
-        null,
-      );
+      let applyOutcomePersisted = false;
+      try {
+        applyOutcomePersisted = await recordP2PApplyOutcome(
+          env.DB,
+          reservation.operation.id,
+          "CONFIRMED",
+          null,
+        );
+      } catch {
+        // El proveedor pudo aceptar el POST. Mantener APPLYING y reconciliar en la
+        // siguiente solicitud; nunca repetir la mutación por un fallo de persistencia.
+      }
+      if (!applyOutcomePersisted) {
+        return Response.json(
+          {
+            operationId: reservation.operation.id,
+            applyStatus: "APPLYING",
+            detailStatus: "NOT_REQUESTED",
+            message:
+              "QvaPay pudo aceptar la aplicación, pero no se pudo confirmar su persistencia. La operación queda bloqueada para reconciliación; no repitas el POST.",
+          },
+          { status: 202, headers: { "cache-control": "no-store" } },
+        );
+      }
       let auditStatus: "RECORDED" | "FAILED" = "RECORDED";
       try {
         await recordP2POperationAudit(env.DB, {
