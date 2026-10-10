@@ -161,11 +161,11 @@ test("el mercado autenticado muestra los dos libros en modo de solo lectura", as
   );
   await expect(page.locator("#buyTable thead")).toContainText("CUP a recibir");
   for (const selector of ["#sellTable table", "#buyTable table"]) {
-    await expect(page.locator(`${selector} thead th`)).toHaveCount(8);
-    await expect(page.locator(`${selector} thead th`)).toHaveAttribute(
-      "scope",
-      "col",
-    );
+    const headers = page.locator(`${selector} thead th`);
+    await expect(headers).toHaveCount(8);
+    for (let index = 0; index < 8; index += 1) {
+      await expect(headers.nth(index)).toHaveAttribute("scope", "col");
+    }
   }
 });
 
