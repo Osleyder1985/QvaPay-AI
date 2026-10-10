@@ -154,7 +154,10 @@ export class QvaPayP2PClient {
     return this.withTimeout(
       async (signal) => {
         const response = await this.fetcher(
-          new URL("/p2p/" + encodeURIComponent(uuid) + "/apply", this.options.baseUrl),
+          new URL(
+            "/p2p/" + encodeURIComponent(uuid) + "/apply",
+            this.options.baseUrl,
+          ),
           {
             method: "POST",
             headers: {
@@ -169,7 +172,9 @@ export class QvaPayP2PClient {
           if (response.status >= 500) {
             throw new QvaPayAmbiguousOperationError(
               uuid,
-              "QvaPay respondió HTTP " + response.status + " a la aplicación; el resultado requiere reconciliación.",
+              "QvaPay respondió HTTP " +
+                response.status +
+                " a la aplicación; el resultado requiere reconciliación.",
             );
           }
           const body = await response.text();
