@@ -116,8 +116,11 @@ export function createD1AutoApplyExecutionPorts(
 
     async applyOnce(offerUuid) {
       try {
+        // Un HTTP exitoso solo acredita que la solicitud fue aceptada por el transporte.
+        // Sin reconciliación del detalle y comparación con la identidad verificada de la
+        // cuenta, no existe evidencia suficiente para marcar la operación como CONFIRMED.
         await options.provider.applyOffer(offerUuid);
-        return { status: "CONFIRMED" as const };
+        return { status: "AMBIGUOUS" as const, httpStatus: null };
       } catch (error) {
         if (error instanceof QvaPayAmbiguousOperationError) {
           return { status: "AMBIGUOUS" as const, httpStatus: null };
