@@ -169,9 +169,7 @@ function buildMarketView(market: Market | null, completedAt: string | null) {
           .replace(/\.$/, "")
       : null;
   const spreadPercent =
-    bestBuyNumber !== null &&
-    bestBuyNumber !== 0 &&
-    bestSellNumber !== null
+    bestBuyNumber !== null && bestBuyNumber !== 0 && bestSellNumber !== null
       ? ((bestSellNumber - bestBuyNumber) / bestBuyNumber) * 100
       : null;
 
