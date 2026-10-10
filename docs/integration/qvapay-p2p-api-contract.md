@@ -13,14 +13,14 @@ Documentar el contrato que utiliza el adaptador de QvaPay-AI para consultar el m
 
 ## Parámetros utilizados
 
-| Parámetro | Valor |
-| --- | --- |
-| `type` | `buy` o `sell` |
-| `coin` | Mercado configurado, actualmente `BANK_CUP` |
-| `page` | Página actual |
-| `take` | Hasta 100 |
-| `orderBy` | `updated_at` |
-| `orderType` | `desc` |
+| Parámetro   | Valor                                       |
+| ----------- | ------------------------------------------- |
+| `type`      | `buy` o `sell`                              |
+| `coin`      | Mercado configurado, actualmente `BANK_CUP` |
+| `page`      | Página actual                               |
+| `take`      | Hasta 100                                   |
+| `orderBy`   | `updated_at`                                |
+| `orderType` | `desc`                                      |
 
 ## Modelo interno y unidades
 
@@ -92,4 +92,3 @@ Este documento especifica unidades y procedencia de datos; no cambia las reglas 
 
 - ISO/IEC 25012: modelo de calidad de datos, aplicado a la exactitud y consistencia de unidades con respecto al contrato de origen.
 - ISO 9241-110: principios de diálogo, aplicado a la autodescriptividad de las etiquetas financieras para reducir interpretaciones ambiguas.
-
