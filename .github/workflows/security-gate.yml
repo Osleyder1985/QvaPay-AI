@@ -35,6 +35,9 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      - name: Impedir exclusiones de Prettier
+        run: npm run check:prettier-exclusions
+
       - name: Verificación de formato con diagnóstico automático
         shell: bash
         run: |
