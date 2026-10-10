@@ -8,7 +8,7 @@ Este documento aplica la secuencia obligatoria de decisión establecida en el Is
 
 **Hallazgo → evidencia objetiva → riesgo/impacto → requisito → criterio ISO aplicable → alternativas → solución seleccionada → por qué → para qué → impacto → pruebas → documentación → implementación → verificación → evidencia objetiva → certificación.**
 
-Los requisitos cubiertos están definidos en los Issues #283, #284, #285 y #286. La línea base documental se propuso en el PR #288.
+Los requisitos cubiertos están definidos en los Issues #283, #284, #285 y #286; la aplicabilidad regulatoria también queda sujeta al Issue #294. La línea base documental quedó establecida mediante el PR #288.
 
 ---
 
@@ -333,7 +333,7 @@ Seleccionada.
 
 ### Solución seleccionada
 
-Implementar el ciclo de vida del período:
+Diseñar el ciclo de vida del período:
 
 **Abierto → En cierre → Conciliado → Cerrado**
 
@@ -565,11 +565,12 @@ La evidencia de auditoría, el historial económico y la conciliación tienen pr
 
 ### Evidencia objetiva
 
-El Issue #285 establece tres contextos delimitados:
+El Issue #285 establece cuatro responsabilidades/contextos que deben mantenerse separados:
 
-1. Auditoría y Control.
-2. Contabilidad y Economía.
-3. Conciliación e Informes.
+1. Auditoría y Control: evidencia de acciones y controles.
+2. Contabilidad y Economía: registro de hechos económicos.
+3. Conciliación: comparación de registros internos con fuentes externas y resolución documentada de diferencias.
+4. Informes: presentación de información derivada, sin convertirse en fuente primaria de los hechos ni sustituir el libro mayor.
 
 ### Criterios ISO aplicables
 
@@ -605,7 +606,8 @@ QvaPay-AI
 ├── Administración
 ├── Auditoría y Control
 ├── Contabilidad y Economía
-└── Conciliación e Informes
+├── Conciliación
+└── Informes
 ```
 
 Se permite la correlación entre contextos, pero la propiedad de los datos debe seguir siendo explícita.
@@ -614,9 +616,10 @@ Una operación de VENTA, por ejemplo, puede generar:
 
 - uno o más eventos de auditoría;
 - uno o más asientos contables;
-- uno o más registros de conciliación posteriormente.
+- uno o más registros de conciliación posteriormente;
+- datos derivados que se presentan mediante informes.
 
-Ninguno de esos registros sustituye a los demás.
+El informe es una vista derivada y no sustituye a los registros de auditoría, al libro mayor ni a la evidencia de conciliación.
 
 ### ¿Por qué?
 
@@ -644,7 +647,8 @@ La dirección de diseño seleccionada es:
 
 - **Capacidad dedicada de Auditoría y Control** para evidencia operativa y de seguridad.
 - **Capacidad Contable y Económica preparada para partida doble** para representar la realidad económica, sujeta al marco contable aplicable.
-- **Capacidad dedicada de Conciliación e Informes** para comparar con evidencia externa.
+- **Capacidad dedicada de Conciliación** para comparar con evidencia externa y documentar diferencias.
+- **Capacidad de Informes** para presentar datos derivados sin sustituir los registros fuente.
 - **Registros históricos inmutables con ajustes y reversiones controlados.**
 - **Minimización estricta de datos sensibles.**
 - **Correlación explícita entre contextos sin fusionar sus modelos de datos.**
