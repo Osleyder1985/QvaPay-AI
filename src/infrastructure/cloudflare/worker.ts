@@ -352,27 +352,56 @@ export default {
     }
 
     if (url.pathname === "/api/account/password") {
-      if (request.method !== "POST") return new Response("Method not allowed", { status: 405 });
-      const access = await requireRole(request, env.DB, env.ACCOUNT_AUTH_SECRET, ["ADMINISTRATION", "AUDITOR"]);
+      if (request.method !== "POST")
+        return new Response("Method not allowed", { status: 405 });
+      const access = await requireRole(
+        request,
+        env.DB,
+        env.ACCOUNT_AUTH_SECRET,
+        ["ADMINISTRATION", "AUDITOR"],
+      );
       if (access instanceof Response) return access;
       const input = await body(request);
       const password = typeof input.password === "string" ? input.password : "";
-      const confirmation = typeof input.confirmation === "string" ? input.confirmation : "";
-      if (password !== confirmation) return jsonError("Las contraseñas no coinciden.", 400);
+      const confirmation =
+        typeof input.confirmation === "string" ? input.confirmation : "";
+      if (password !== confirmation)
+        return jsonError("Las contraseñas no coinciden.", 400);
       try {
-        const user = await changeUserPassword(env.DB, access.user, access.user.id, password);
-        return Response.json({ user }, { headers: { "cache-control": "no-store" } });
+        const user = await changeUserPassword(
+          env.DB,
+          access.user,
+          access.user.id,
+          password,
+        );
+        return Response.json(
+          { user },
+          { headers: { "cache-control": "no-store" } },
+        );
       } catch (error) {
-        return jsonError(error instanceof Error ? error.message : "No se pudo cambiar la contraseña.", 400);
+        return jsonError(
+          error instanceof Error
+            ? error.message
+            : "No se pudo cambiar la contraseña.",
+          400,
+        );
       }
     }
 
     if (url.pathname === "/api/account") {
-      if (request.method !== "GET") return new Response("Method not allowed", { status: 405 });
-      const access = await requireRole(request, env.DB, env.ACCOUNT_AUTH_SECRET, ["ADMINISTRATION", "AUDITOR"]);
+      if (request.method !== "GET")
+        return new Response("Method not allowed", { status: 405 });
+      const access = await requireRole(
+        request,
+        env.DB,
+        env.ACCOUNT_AUTH_SECRET,
+        ["ADMINISTRATION", "AUDITOR"],
+      );
       if (access instanceof Response) return access;
       const current = await getCurrentQvaPayAccountSnapshot(env.DB);
-      const lastSuccessful = await getLastSuccessfulQvaPayAccountSnapshot(env.DB);
+      const lastSuccessful = await getLastSuccessfulQvaPayAccountSnapshot(
+        env.DB,
+      );
       return Response.json(
         {
           account: current?.snapshot ?? lastSuccessful?.snapshot ?? null,
