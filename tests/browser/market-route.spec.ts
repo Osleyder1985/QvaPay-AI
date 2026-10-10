@@ -114,9 +114,7 @@ test("el mercado autenticado muestra los dos libros en modo de solo lectura", as
 
   expect(response?.status()).toBe(200);
   await expect(page.locator("body")).toHaveAttribute("data-module", "mercado");
-  await expect(
-    page.getByRole("heading", { name: "Mercado P2P" }),
-  ).toBeVisible();
+  await expect(page.locator("#page-title")).toHaveText("Mercado P2P");
   await expect(
     page.getByRole("heading", { name: /SELL.*acción Comprar/ }),
   ).toBeVisible();
@@ -170,9 +168,7 @@ test("el mercado identifica explícitamente un snapshot no disponible", async ({
   await authenticate(page);
   await page.goto("/app/mercado");
 
-  await expect(page.locator("#marketIntegrity")).toContainText(
-    "NO DISPONIBLE",
-  );
+  await expect(page.locator("#marketIntegrity")).toContainText("NO DISPONIBLE");
   await expect(page.locator("#sellTable")).toContainText("No hay ofertas");
   await expect(page.locator("#buyTable")).toContainText("No hay ofertas");
 });
