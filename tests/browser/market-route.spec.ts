@@ -511,6 +511,49 @@ test("la navegación por teclado puede alcanzar el control de cierre de sesión"
   await expect(page.locator("#logoutButton")).toBeFocused();
 });
 
+test("la acción Comprar envía una solicitud simulada y nunca contacta QvaPay desde el navegador", async ({
+  page,
+}, testInfo) => {
+  await page.route("**/api/scanner/status", (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      headers: { "cache-control": "no-store" },
+      body: JSON.stringify(scannerState()),
+    }),
+  );
+  let applyRequestCount = 0;
+  await page.route("**/api/p2p/test-sell-1/apply", async (route) => {
+    applyRequestCount += 1;
+    expect(route.request().method()).toBe("POST");
+    await route.fulfill({
+      status: 201,
+      contentType: "application/json",
+      headers: { "cache-control": "no-store" },
+      body: JSON.stringify({
+        operationId: "operation-synthetic-1",
+        applyStatus: "CONFIRMED",
+        detailStatus: "AVAILABLE",
+        offer: { uuid: "test-sell-1", status: "open" },
+      }),
+    });
+  });
+  page.on("dialog", (dialog) => dialog.accept());
+  await authenticate(page, testInfo);
+  await page.goto("/app/mercado");
+
+  const applyRequest = page.waitForRequest(
+    (request) =>
+      request.url().endsWith("/api/p2p/test-sell-1/apply") &&
+      request.method() === "POST",
+  );
+  await page.getByRole("button", { name: /Comprar oferta test-sell-1/ }).click();
+  await applyRequest;
+
+  expect(applyRequestCount).toBe(1);
+  await expect(page.locator("#sellTable")).toContainText("vendedor-prueba");
+});
+
 test("un snapshot con error operativo se marca degradado y no accionable", async ({
   page,
 }, testInfo) => {
