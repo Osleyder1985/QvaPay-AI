@@ -1,7 +1,7 @@
 /**
  * @archivo scripts/check-prettier-exclusions.mjs
  * @proposito Impide que se excluyan archivos o bloques del formato global de Prettier.
- * @responsabilidades Detectar archivos .prettierignore y directivas prettier-ignore en código.
+ * @responsabilidades Detectar archivos .prettierignore y directivas prettier-ignore en archivos de texto del repositorio.
  * @ubicacion scripts de control de calidad del repositorio QvaPay-AI.
  */
 import { readdir, readFile } from "node:fs/promises";
@@ -15,20 +15,18 @@ const ignoredDirectories = new Set([
   "coverage",
   ".wrangler",
 ]);
-const sourceExtensions = new Set([
-  ".cjs",
-  ".css",
-  ".html",
-  ".js",
-  ".jsx",
-  ".json",
-  ".mjs",
-  ".scss",
-  ".ts",
-  ".tsx",
-  ".vue",
-  ".yaml",
-  ".yml",
+const binaryExtensions = new Set([
+  ".avif",
+  ".bmp",
+  ".gif",
+  ".ico",
+  ".jpeg",
+  ".jpg",
+  ".pdf",
+  ".png",
+  ".webp",
+  ".woff",
+  ".woff2",
 ]);
 const directive =
   /^\s*(?:\/\/|\/\*|\*|<!--|#)\s*prettier-ignore(?:-start|-end)?\b/m;
@@ -53,9 +51,13 @@ async function inspectDirectory(directory) {
       continue;
     }
 
-    if (!sourceExtensions.has(extname(entry.name))) continue;
-    const content = await readFile(path, "utf8");
-    if (directive.test(content)) {
+    if (binaryExtensions.has(extname(entry.name).toLowerCase())) continue;
+
+    const content = await readFile(path);
+    // Evita decodificar archivos binarios desconocidos como si fueran texto.
+    if (content.includes(0)) continue;
+
+    if (directive.test(content.toString("utf8"))) {
       violations.push(
         relativePath + ": contiene una directiva prettier-ignore",
       );
