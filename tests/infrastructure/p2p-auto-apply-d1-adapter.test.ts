@@ -199,10 +199,15 @@ describe("createD1AutoApplyExecutionPorts", () => {
     expect(statement.run).not.toHaveBeenCalled();
   });
 
-  it("recupera un estado APPLYING tras fallo de persistencia sin repetir el POST", async () => {
+  it("recupera un fallo real de persistencia posterior al POST sin repetirlo", async () => {
     const statement = {
       bind: vi.fn().mockReturnThis(),
-      run: vi.fn(async () => ({ meta: { changes: 1 } })),
+      run: vi.fn(async (sql?: string) => {
+        if (sql?.includes("SET apply_status = ?")) {
+          throw new Error("Fallo simulado de escritura tras el POST");
+        }
+        return { meta: { changes: 1 } };
+      }),
       first: vi.fn(async () => ({
         id: "operation-crash",
         offer_uuid: "offer-crash",
@@ -218,10 +223,13 @@ describe("createD1AutoApplyExecutionPorts", () => {
       })),
     };
     const db = {
-      prepare: vi.fn(() => statement),
+      prepare: vi.fn((sql: string) => ({
+        ...statement,
+        run: () => statement.run(sql),
+      })),
       batch: vi.fn(async () => []),
     } as unknown as D1Database;
-    const applyOffer = vi.fn();
+    const applyOffer = vi.fn(async () => ({ success: true }));
     const fetchOfferDetail = vi.fn(async () => ({
       uuid: "offer-crash",
       status: "processing",
@@ -234,14 +242,19 @@ describe("createD1AutoApplyExecutionPorts", () => {
       now: () => "2026-10-10T12:01:00.000Z",
     });
 
-    // APPLYING representa un proceso interrumpido antes de guardar el resultado del POST.
+    await expect(ports.applyOnce("offer-crash")).resolves.toEqual({
+      status: "CONFIRMED",
+    });
+    await expect(
+      ports.recordOutcome("operation-crash", "CONFIRMED", 201),
+    ).rejects.toThrow("Fallo simulado de escritura tras el POST");
+
     await expect(
       ports.reconcileOnce("operation-crash", "offer-crash"),
     ).resolves.toBe("CONFIRMED");
-    expect(fetchOfferDetail).toHaveBeenCalledWith("offer-crash");
-    expect(getVerifiedAccountUuid).toHaveBeenCalledTimes(1);
-    expect(applyOffer).not.toHaveBeenCalled();
-    expect(statement.run).toHaveBeenCalledTimes(1);
+    expect(applyOffer).toHaveBeenCalledTimes(1);
+    expect(fetchOfferDetail).toHaveBeenCalledTimes(2);
+    expect(getVerifiedAccountUuid).toHaveBeenCalledTimes(2);
   });
 
   it("mantiene ambigua la operación cuando la reconciliación no confirma la identidad", async () => {
