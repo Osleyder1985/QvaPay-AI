@@ -365,6 +365,23 @@ describe("Cloudflare Worker: aplicación P2P protegida", () => {
     );
   });
 
+  it("bloquea la aplicación si falla la auditoría y no se confirma la liberación", async () => {
+    mocks.recordOperationAudit.mockRejectedValueOnce(
+      new Error("synthetic audit storage outage"),
+    );
+    mocks.releaseReservation.mockResolvedValueOnce(false);
+
+    const response = await applyRequest(createEnvironment());
+
+    expect(response.status).toBe(503);
+    await expect(response.json()).resolves.toMatchObject({
+      error: expect.stringContaining("requiere revisión operativa"),
+    });
+    expect(mocks.releaseReservation).toHaveBeenCalledOnce();
+    expect(mocks.claimOperation).not.toHaveBeenCalled();
+    expect(mocks.applyOffer).not.toHaveBeenCalled();
+  });
+
   it("no repite el POST cuando el resultado remoto es ambiguo", async () => {
     mocks.applyOffer.mockRejectedValue(
       new Error("synthetic transport failure"),
