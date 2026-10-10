@@ -39,3 +39,12 @@ Los flujos `.github/workflows/security-gate.yml` y `.github/workflows/quality-ga
 4. Permitir que la corrección se aplique y confirme en la rama del PR; después se vuelve a ejecutar toda la CI.
 
 El diff se usa como evidencia diagnóstica, no se confirma ni se publica automáticamente desde el job. La reparación permanente del código se realiza en la rama de trabajo y continúa sujeta a revisión, compilación, pruebas y controles de seguridad.
+
+## Prohibición de exclusiones
+
+No se permiten archivos `.prettierignore` ni directivas `prettier-ignore` en el repositorio. Si una plantilla o contenido literal requiere tratamiento especial, debe estructurarse de forma compatible con Prettier, sin excluir el archivo completo ni bloques del control global.
+
+## Justificación normativa
+
+- **ISO/IEC 25010:2023**: la consistencia y mantenibilidad se apoyan en reglas uniformes de formato y cambios fáciles de revisar.
+- **ISO/IEC/IEEE 12207:2017**: la verificación repetible y la evidencia registrada permiten auditar el proceso de cambio.
