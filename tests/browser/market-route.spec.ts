@@ -71,7 +71,7 @@ function scannerState(overrides: Record<string, unknown> = {}) {
 
 async function authenticate(page: Page): Promise<void> {
   await page.goto("/");
-  const username = `ci-market-${crypto.randomUUID()}`;
+  const username = `ci-smoke-${crypto.randomUUID()}`;
   const password = "BrowserMarket-Pass-2026!";
   const created = await page.request.post("/internal/auth/smoke-user", {
     headers: smokeHeaders,
@@ -131,8 +131,12 @@ test("el mercado autenticado muestra los dos libros en modo de solo lectura", as
   await expect(
     page.getByRole("button", { name: /Comprar|Vender/ }),
   ).toHaveCount(0);
-  await expect(page.locator("#sellTable table caption")).toHaveText("Ofertas SELL · Comprar");
-  await expect(page.locator("#buyTable table caption")).toHaveText("Ofertas BUY · Vender");
+  await expect(page.locator("#sellTable table caption")).toHaveText(
+    "Ofertas SELL · Comprar",
+  );
+  await expect(page.locator("#buyTable table caption")).toHaveText(
+    "Ofertas BUY · Vender",
+  );
 });
 
 test("el mercado identifica explícitamente un snapshot no disponible", async ({
@@ -166,7 +170,9 @@ test("el mercado identifica explícitamente un snapshot no disponible", async ({
   await authenticate(page);
   await page.goto("/app/mercado");
 
-  await expect(page.locator("#marketIntegrity")).toContainText("NO DISPONIBLE");
+  await expect(page.locator("#marketIntegrity")).toContainText(
+    "NO DISPONIBLE",
+  );
   await expect(page.locator("#sellTable")).toContainText("No hay ofertas");
   await expect(page.locator("#buyTable")).toContainText("No hay ofertas");
 });
