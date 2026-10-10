@@ -17,17 +17,15 @@ import {
 /** Datos mínimos de una estrategia; enabled debe resolverse como false si no hay configuración válida. */
 export interface AutoApplyStrategy {
   readonly enabled: boolean;
-  readonly decision: Omit<
-    AutoApplyDecisionInput,
-    "offer" | "enabled"
-  >;
+  readonly decision: Omit<AutoApplyDecisionInput, "offer" | "enabled">;
 }
 
 /** Reserva persistida de manera idempotente y compartida por origen manual/automático. */
 export interface AutoApplyReservation {
   readonly operationId: string;
   readonly created: boolean;
-  readonly status: "RESERVED" | "APPLYING" | "CONFIRMED" | "REJECTED" | "AMBIGUOUS";
+  readonly status:
+    "RESERVED" | "APPLYING" | "CONFIRMED" | "REJECTED" | "AMBIGUOUS";
 }
 
 /** Puertos obligatorios: la implementación concreta no puede ocultar persistencia ni llamadas remotas. */
