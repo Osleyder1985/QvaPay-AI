@@ -40,7 +40,6 @@ Los flujos `.github/workflows/security-gate.yml` y `.github/workflows/quality-ga
 
 El diff se usa como evidencia diagnóstica, no se confirma ni se publica automáticamente desde el job. La reparación permanente del código se realiza en la rama de trabajo y continúa sujeta a revisión, compilación, pruebas y controles de seguridad.
 
-
 ## Prohibición de exclusiones
 
 No se permiten archivos `.prettierignore` ni directivas `prettier-ignore` en el repositorio. Si una plantilla o contenido literal requiere tratamiento especial, debe estructurarse de forma compatible con Prettier, sin excluir el archivo completo ni bloques del control global.
