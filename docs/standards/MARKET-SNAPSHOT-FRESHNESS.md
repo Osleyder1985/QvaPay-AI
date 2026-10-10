@@ -22,5 +22,4 @@ Estimar la antigüedad de los datos sin depender de que el reloj del dispositivo
 
 La integración requiere que los controles de calidad, seguridad y navegador se ejecuten sobre el HEAD exacto del PR; los resultados de un commit anterior no sustituyen esa evidencia.
 
-
 Las pruebas deterministas cubren relojes locales adelantados y atrasados, antigüedad basada en la hora estimada del servidor, marcas ausentes o inválidas y marcas futuras. La cadencia de cinco segundos es una decisión inicial de carga/interacción, no un SLA ni una garantía de frescura del proveedor.
