@@ -16,5 +16,5 @@
     "outDir": "dist",
     "types": ["node", "@cloudflare/workers-types"]
   },
-  "include": ["src", "tests", "vitest.config.ts"]
+  "include": ["src", "tests", "vitest.config.ts", "vitest.d1.config.ts"]
 }
