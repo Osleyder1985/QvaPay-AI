@@ -236,6 +236,65 @@ test("el mercado autenticado muestra los dos libros en modo de solo lectura", as
   }
 });
 
+test("Administration puede confirmar una aplicación sintética y recibe su estado sin operar QvaPay real", async ({
+  page,
+}, testInfo) => {
+  await page.route("**/api/session", (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      headers: { "cache-control": "no-store" },
+      body: JSON.stringify({
+        user: {
+          id: "admin-ui-test",
+          username: "administration-test",
+          role: "ADMINISTRATION",
+        },
+      }),
+    }),
+  );
+  await page.route("**/api/scanner/status", (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      headers: { "cache-control": "no-store" },
+      body: JSON.stringify(scannerState()),
+    }),
+  );
+  let applyRequests = 0;
+  await page.route("**/api/p2p/test-sell-1/apply", async (route) => {
+    expect(route.request().method()).toBe("POST");
+    applyRequests += 1;
+    await route.fulfill({
+      status: 201,
+      contentType: "application/json",
+      headers: { "cache-control": "no-store" },
+      body: JSON.stringify({
+        operationId: "synthetic-operation-1",
+        applyStatus: "CONFIRMED",
+        detailStatus: "AVAILABLE",
+      }),
+    });
+  });
+  page.on("dialog", async (dialog) => {
+    await dialog.accept();
+  });
+
+  await authenticate(page, testInfo);
+  await page.goto("/app/mercado");
+
+  const buyButton = page.getByRole("button", {
+    name: "Comprar oferta test-sell-1",
+  });
+  await expect(buyButton).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Vender oferta test-buy-1" }),
+  ).toBeVisible();
+  await buyButton.click();
+
+  await expect.poll(() => applyRequests).toBe(1);
+});
+
 test("los valores monetarios ausentes de BANK_CUP no se representan como cero", async ({
   page,
 }, testInfo) => {
