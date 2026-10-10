@@ -84,11 +84,21 @@ async function hmac(secret: string, value: string): Promise<string> {
     false,
     ["sign"],
   );
-  return b64(new Uint8Array(await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(value))));
+  return b64(
+    new Uint8Array(
+      await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(value)),
+    ),
+  );
 }
 function cookieFromRequest(request: Request): string | null {
-  return request.headers.get("cookie")?.split(";").map((part) => part.trim())
-    .find((part) => part.startsWith(SESSION_COOKIE + "="))?.slice(SESSION_COOKIE.length + 1) ?? null;
+  return (
+    request.headers
+      .get("cookie")
+      ?.split(";")
+      .map((part) => part.trim())
+      .find((part) => part.startsWith(SESSION_COOKIE + "="))
+      ?.slice(SESSION_COOKIE.length + 1) ?? null
+  );
 }
 async function writeAudit(
   db: D1Database,
@@ -180,9 +190,15 @@ export async function ensureSecuritySchema(db: D1Database): Promise<void> {
         is_current INTEGER NOT NULL DEFAULT 1 CHECK (is_current IN (0,1)),
         is_last_successful INTEGER NOT NULL DEFAULT 0 CHECK (is_last_successful IN (0,1))
       )`),
-      db.prepare("CREATE INDEX IF NOT EXISTS idx_qvapay_account_snapshots_captured_at ON qvapay_account_snapshots(captured_at DESC)"),
-      db.prepare("CREATE INDEX IF NOT EXISTS idx_qvapay_account_snapshots_current ON qvapay_account_snapshots(is_current, captured_at DESC)"),
-      db.prepare("CREATE INDEX IF NOT EXISTS idx_qvapay_account_snapshots_last_successful ON qvapay_account_snapshots(is_last_successful, captured_at DESC)"),
+      db.prepare(
+        "CREATE INDEX IF NOT EXISTS idx_qvapay_account_snapshots_captured_at ON qvapay_account_snapshots(captured_at DESC)",
+      ),
+      db.prepare(
+        "CREATE INDEX IF NOT EXISTS idx_qvapay_account_snapshots_current ON qvapay_account_snapshots(is_current, captured_at DESC)",
+      ),
+      db.prepare(
+        "CREATE INDEX IF NOT EXISTS idx_qvapay_account_snapshots_last_successful ON qvapay_account_snapshots(is_last_successful, captured_at DESC)",
+      ),
     ])
     .then(() => undefined)
     .catch((error) => {
@@ -242,33 +258,71 @@ export async function listUsers(db: D1Database): Promise<AppUser[]> {
  * @responsabilidades Aplicar las validaciones y reglas de negocio definidas por el contrato del módulo.
  * @returns Resultado de la operación pública.
  */
-export async function createUser(db: D1Database, username: string, password: string, role: AppRole): Promise<AppUser> {
+export async function createUser(
+  db: D1Database,
+  username: string,
+  password: string,
+  role: AppRole,
+): Promise<AppUser> {
   const normalized = username.trim();
-  if (!/^[a-zA-Z0-9._-]{3,64}$/.test(normalized)) throw new Error("Nombre de usuario inválido.");
-  if (role !== "ADMINISTRATION" && role !== "AUDITOR") throw new Error("Rol inválido.");
+  if (!/^[a-zA-Z0-9._-]{3,64}$/.test(normalized))
+    throw new Error("Nombre de usuario inválido.");
+  if (role !== "ADMINISTRATION" && role !== "AUDITOR")
+    throw new Error("Rol inválido.");
   const verifier = await createPasswordVerifier(password);
   const now = new Date().toISOString();
   const id = crypto.randomUUID();
-  await db.prepare(
-    "INSERT INTO app_users (id, username, role, password_salt, password_hash, password_iterations, active, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, 1, ?, ?)",
-  ).bind(id, normalized, role, verifier.salt, verifier.hash, verifier.iterations, now, now).run();
+  await db
+    .prepare(
+      "INSERT INTO app_users (id, username, role, password_salt, password_hash, password_iterations, active, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, 1, ?, ?)",
+    )
+    .bind(
+      id,
+      normalized,
+      role,
+      verifier.salt,
+      verifier.hash,
+      verifier.iterations,
+      now,
+      now,
+    )
+    .run();
   const user = await findUserByUsername(db, normalized);
   if (!user) throw new Error("No se pudo crear el usuario.");
   return user;
 }
-async function sessionForUser(request: Request, db: D1Database, secret: string): Promise<AuthSession | null> {
+async function sessionForUser(
+  request: Request,
+  db: D1Database,
+  secret: string,
+): Promise<AuthSession | null> {
   if (!secret) return null;
   const token = cookieFromRequest(request);
   if (!token) return null;
   const [payload, signature] = token.split(".");
   if (!payload || !signature) return null;
   const expected = await hmac(secret, payload);
-  if (!equalBytes(new TextEncoder().encode(signature), new TextEncoder().encode(expected))) return null;
+  if (
+    !equalBytes(
+      new TextEncoder().encode(signature),
+      new TextEncoder().encode(expected),
+    )
+  )
+    return null;
   const [userId, expires] = payload.split(":");
   const expiresAt = Number(expires);
-  if (!userId || !Number.isSafeInteger(expiresAt) || expiresAt <= Math.floor(Date.now() / 1000)) return null;
-  const row = await db.prepare("SELECT id, username, role, active, created_at, updated_at, last_login_at FROM app_users WHERE id = ? LIMIT 1")
-    .bind(userId).first<Record<string, unknown>>();
+  if (
+    !userId ||
+    !Number.isSafeInteger(expiresAt) ||
+    expiresAt <= Math.floor(Date.now() / 1000)
+  )
+    return null;
+  const row = await db
+    .prepare(
+      "SELECT id, username, role, active, created_at, updated_at, last_login_at FROM app_users WHERE id = ? LIMIT 1",
+    )
+    .bind(userId)
+    .first<Record<string, unknown>>();
   if (!row) return null;
   const user = rowToUser(row);
   return user.active ? { user } : null;
@@ -372,10 +426,20 @@ export async function requireRole(
  * @responsabilidades Aplicar las validaciones y reglas de negocio definidas por el contrato del módulo.
  * @returns Resultado de la operación pública.
  */
-export async function logout(request: Request, db: D1Database, secret: string): Promise<Response> {
+export async function logout(
+  request: Request,
+  db: D1Database,
+  secret: string,
+): Promise<Response> {
   const session = await getSession(request, db, secret);
   if (session) await writeAudit(db, "logout", "SUCCESS", session.user);
-  return new Response(null, { status: 204, headers: { "cache-control": "no-store", "set-cookie": `${SESSION_COOKIE}=; Max-Age=0; Path=/; HttpOnly; Secure; SameSite=Strict` } });
+  return new Response(null, {
+    status: 204,
+    headers: {
+      "cache-control": "no-store",
+      "set-cookie": `${SESSION_COOKIE}=; Max-Age=0; Path=/; HttpOnly; Secure; SameSite=Strict`,
+    },
+  });
 }
 
 /**
