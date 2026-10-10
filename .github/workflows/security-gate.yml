@@ -24,7 +24,7 @@ jobs:
           node-version: 22
 
       - name: Instalar dependencias
-        run: npm install --no-audit --no-fund
+        run: npm install --no-audit --no-fund --legacy-peer-deps
 
       - name: Verificación de vulnerabilidades de dependencias
         run: npm audit --omit=dev --audit-level=high
