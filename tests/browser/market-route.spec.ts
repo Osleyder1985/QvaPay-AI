@@ -343,3 +343,31 @@ test("la navegación por teclado puede alcanzar el control de cierre de sesión"
   ).toBe(true);
   await expect(page.locator("#logoutButton")).toBeFocused();
 });
+
+test("BANK_MLC deriva sus etiquetas monetarias del contrato conocido", async ({
+  page,
+}, testInfo) => {
+  const payload = scannerState({ coin: "BANK_MLC" });
+  await page.route("**/api/scanner/status", (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      headers: { "cache-control": "no-store" },
+      body: JSON.stringify(payload),
+    }),
+  );
+  await authenticate(page, testInfo);
+  await page.goto("/app/mercado");
+
+  await expect(page.locator("#sellTable table caption")).toContainText(
+    "BANK_MLC",
+  );
+  await expect(page.locator("#sellTable thead")).toContainText(
+    "TASA (MLC/QUSD)",
+  );
+  await expect(page.locator("#sellTable thead")).toContainText("MLC a pagar");
+  await expect(page.locator("#buyTable thead")).toContainText(
+    "TASA (MLC/QUSD)",
+  );
+  await expect(page.locator("#buyTable thead")).toContainText("MLC a recibir");
+});
