@@ -11,7 +11,7 @@ import { DASHBOARD_CLIENT_SCRIPT } from "../src/presentation/dashboard/dashboard
 describe("sincronización adaptativa del Dashboard", () => {
   it("mantiene el contador local separado del sondeo HTTP", () => {
     expect(DASHBOARD_CLIENT_SCRIPT).toContain("setInterval(tick,1000)");
-    expect(DASHBOARD_CLIENT_SCRIPT).not.toMatch(/setInterval\\(refresh\\s*,/);
+    expect(DASHBOARD_CLIENT_SCRIPT).not.toMatch(/setInterval\(refresh\s*,/);
     expect(DASHBOARD_CLIENT_SCRIPT).toContain("scheduleRefresh()");
   });
 
