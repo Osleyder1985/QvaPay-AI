@@ -13,8 +13,18 @@ import {
 import { DASHBOARD_CLIENT_SCRIPT } from "../src/presentation/dashboard/dashboard-client.js";
 import { renderDashboardModuleView } from "../src/presentation/dashboard/dashboard-view.js";
 import { renderApplicationShellHeader } from "../src/infrastructure/cloudflare/application-shell-header.js";
+import { renderApplicationShellStart } from "../src/infrastructure/cloudflare/application-shell-layout.js";
 
 describe("rutas y navegación del Application Shell", () => {
+  it("expone un enlace funcional para saltar al contenido principal", () => {
+    const shell = renderApplicationShellStart("inicio");
+
+    expect(shell).toContain(
+      '<a class="skip-link" href="#contenido-principal">Saltar al contenido principal</a>',
+    );
+    expect(shell).toContain('<main id="contenido-principal"');
+  });
+
   it("define las rutas de los módulos", () => {
     expect(APPLICATION_SHELL_MODULES.map((module) => module.href)).toEqual([
       "/app/inicio",
