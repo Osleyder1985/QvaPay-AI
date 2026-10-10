@@ -210,9 +210,15 @@ test("el mercado autenticado habilita acciones únicamente para el rol Administr
   await expect(page.locator("#buyTable")).toContainText("comprador-prueba");
   await expect(page.locator("#sellTable")).toContainText("1,001.00");
   await expect(page.locator("#buyTable")).toContainText("1,000.00");
-  await expect(page.getByRole("button", { name: /Comprar oferta test-sell-1/ })).toBeVisible();
-  await expect(page.getByRole("button", { name: /Vender oferta test-buy-1/ })).toBeVisible();
-  await expect(page.getByRole("button", { name: /Comprar|Vender/ })).toHaveCount(2);
+  await expect(
+    page.getByRole("button", { name: /Comprar oferta test-sell-1/ }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: /Vender oferta test-buy-1/ }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: /Comprar|Vender/ }),
+  ).toHaveCount(2);
   await expect(page.locator("#sellTable table caption")).toHaveText(
     "Ofertas SELL · Comprar · Mercado BANK_CUP",
   );
