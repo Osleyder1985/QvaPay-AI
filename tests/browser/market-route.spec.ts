@@ -10,6 +10,23 @@ const smokeHeaders = {
   authorization: "Bearer local-browser-test-smoke",
 };
 
+let smokeUsername: string | undefined;
+
+test.afterEach(async ({ page }) => {
+  if (!smokeUsername) return;
+
+  const username = smokeUsername;
+  smokeUsername = undefined;
+  const deleted = await page.request.delete("/internal/auth/smoke-user", {
+    headers: {
+      ...smokeHeaders,
+      origin: "http://127.0.0.1:8787",
+    },
+    data: { username },
+  });
+  expect(deleted.status()).toBe(204);
+});
+
 function scannerState(overrides: Record<string, unknown> = {}) {
   const now = Date.now();
   const buyOffer = {
@@ -78,6 +95,7 @@ async function authenticate(page: Page): Promise<void> {
     data: { username, password },
   });
   expect(created.status()).toBe(200);
+  smokeUsername = username;
 
   const login = await page.request.post("/api/auth/login", {
     data: { username, password },
