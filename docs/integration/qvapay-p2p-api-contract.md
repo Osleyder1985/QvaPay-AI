@@ -92,3 +92,19 @@ Este documento especifica unidades y procedencia de datos; no cambia las reglas 
 
 - ISO/IEC 25012: modelo de calidad de datos, aplicado a la exactitud y consistencia de unidades con respecto al contrato de origen.
 - ISO 9241-110: principios de diálogo, aplicado a la autodescriptividad de las etiquetas financieras para reducir interpretaciones ambiguas.
+
+## Alcance de la validación monetaria por fases
+
+La fase actual valida exclusivamente el mercado configurado `BANK_CUP`. En este mercado, el contrato P2P define `ratio = receive / amount`; `amount` representa QUSD y `receive` representa la moneda seleccionada. Por ello, la tabla rotula la tasa como `CUP/QUSD`, la cantidad base como QUSD y el importe recibido/pagado como CUP.
+
+La identificación de otros mercados y la validación de sus unidades quedan expresamente fuera de esta fase y se abordarán después, mercado por mercado, usando el catálogo y la documentación oficial de QvaPay. No debe interpretarse que esos mercados sean desconocidos para QvaPay. Mientras no se haya validado su contrato, la interfaz evita atribuirles CUP u otra unidad por defecto y utiliza una etiqueta genérica segura.
+
+No se realizan conversiones ni cambios de cálculo, ordenación o fórmula de spread en esta fase.
+
+Fuentes oficiales para la fase BANK_CUP: [listado P2P y semántica de ratio](https://www.qvapay.com/docs/p2p/list) y [promedios por moneda, incluido BANK_CUP](https://www.qvapay.com/docs/p2p/averages).
+
+## Justificación normativa
+
+- ISO/IEC 25012: exactitud y consistencia de unidades frente al contrato de origen.
+- ISO 9241-110: autodescriptividad de etiquetas financieras y prevención de ambigüedad.
+- ISO/IEC/IEEE 29119: regresión automatizada de la unidad validada en esta fase.
