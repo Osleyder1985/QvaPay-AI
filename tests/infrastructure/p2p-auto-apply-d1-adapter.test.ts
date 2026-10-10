@@ -4,7 +4,12 @@ import {
   QvaPayAmbiguousOperationError,
   QvaPayProviderError,
 } from "../../src/infrastructure/qvapay/qvapay-p2p-client.js";
-import { createD1AutoApplyExecutionPorts } from "../../src/infrastructure/cloudflare/p2p-auto-apply-d1-adapter.js";
+import {
+  createD1AutoApplyExecutionPorts,
+  createQvaPayAutoApplyProvider,
+} from "../../src/infrastructure/cloudflare/p2p-auto-apply-d1-adapter.js";
+import type { QvaPayAccountClient } from "../../src/infrastructure/qvapay/qvapay-account-client.js";
+import type { QvaPayP2PClient } from "../../src/infrastructure/qvapay/qvapay-p2p-client.js";
 import { executeAutoApplyCandidate } from "../../src/application/p2p-auto-apply-executor.js";
 
 function unusedDatabase(): D1Database {
@@ -123,5 +128,63 @@ describe("createD1AutoApplyExecutionPorts", () => {
       httpStatus: 403,
     });
     expect(applyOffer).toHaveBeenCalledTimes(1);
+  });
+});
+
+
+describe("createQvaPayAutoApplyProvider", () => {
+  it("usa la identidad de /user solo con integración y correlación verificadas", async () => {
+    const fetchOfferDetail = vi.fn(async () => ({
+      uuid: "offer-1",
+      status: "processing",
+      coin: "QUSD",
+      side: "sell" as const,
+      onlyVip: false,
+      onlyKyc: false,
+      ownerUuid: "owner-1",
+      peerUuid: "account-verified",
+    }));
+    const p2pClient = {
+      applyOffer: vi.fn(async () => ({ success: true })),
+      fetchOfferDetail,
+    } as unknown as Pick<QvaPayP2PClient, "applyOffer" | "fetchOfferDetail">;
+    const accountClient = {
+      fetchAccount: vi.fn(async () => ({
+        integrationStatus: "verified",
+        identitySource: "/user",
+        identityProvenance: { status: "verified" },
+        identityOk: true,
+        ownerCorrelationOk: true,
+        identity: { uuid: "account-verified" },
+      } as unknown as Awaited<ReturnType<QvaPayAccountClient["fetchAccount"]>>)),
+    } as Pick<QvaPayAccountClient, "fetchAccount">;
+
+    const provider = createQvaPayAutoApplyProvider(p2pClient, accountClient);
+    await expect(provider.getVerifiedAccountUuid?.()).resolves.toBe("account-verified");
+    await expect(provider.fetchOfferDetail?.("offer-1")).resolves.toEqual({
+      uuid: "offer-1",
+      status: "processing",
+      peerUuid: "account-verified",
+    });
+  });
+
+  it("rechaza la identidad si el snapshot /user no está completamente verificado", async () => {
+    const accountClient = {
+      fetchAccount: vi.fn(async () => ({
+        integrationStatus: "degraded",
+        identitySource: "/user",
+        identityProvenance: { status: "verified" },
+        identityOk: true,
+        ownerCorrelationOk: false,
+        identity: { uuid: "account-unverified" },
+      } as unknown as Awaited<ReturnType<QvaPayAccountClient["fetchAccount"]>>)),
+    } as Pick<QvaPayAccountClient, "fetchAccount">;
+    const p2pClient = {
+      applyOffer: vi.fn(async () => ({ success: true })),
+      fetchOfferDetail: vi.fn(),
+    } as unknown as Pick<QvaPayP2PClient, "applyOffer" | "fetchOfferDetail">;
+
+    const provider = createQvaPayAutoApplyProvider(p2pClient, accountClient);
+    await expect(provider.getVerifiedAccountUuid?.()).resolves.toBeNull();
   });
 });
