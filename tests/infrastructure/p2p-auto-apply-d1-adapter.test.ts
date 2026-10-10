@@ -114,6 +114,72 @@ describe("createD1AutoApplyExecutionPorts", () => {
     expect(applyOffer).toHaveBeenCalledTimes(1);
   });
 
+  it("reconcilia una operación sin volver a invocar applyOffer", async () => {
+    const statement = {
+      bind: vi.fn().mockReturnThis(),
+      run: vi.fn(async () => ({ meta: { changes: 1 } })),
+    };
+    const db = {
+      prepare: vi.fn(() => statement),
+      batch: vi.fn(async () => []),
+    } as unknown as D1Database;
+    const applyOffer = vi.fn(async () => ({ success: true }));
+    const fetchOfferDetail = vi.fn(async () => ({
+      uuid: "offer-1",
+      status: "processing",
+      peerUuid: "verified-account-1",
+    }));
+    const getVerifiedAccountUuid = vi.fn(async () => "verified-account-1");
+    const ports = createD1AutoApplyExecutionPorts({
+      db,
+      provider: { applyOffer, fetchOfferDetail, getVerifiedAccountUuid },
+      now: () => "2026-10-10T12:00:00.000Z",
+    });
+
+    await expect(
+      ports.reconcileOnce("operation-1", "offer-1"),
+    ).resolves.toBe("CONFIRMED");
+    expect(fetchOfferDetail).toHaveBeenCalledWith("offer-1");
+    expect(getVerifiedAccountUuid).toHaveBeenCalledTimes(1);
+    expect(applyOffer).not.toHaveBeenCalled();
+    expect(statement.run).toHaveBeenCalledTimes(1);
+    expect(String(db.prepare.mock.calls.at(-1)?.[0])).toContain(
+      "apply_status IN ('APPLYING', 'AMBIGUOUS')",
+    );
+  });
+
+  it("mantiene ambigua la operación cuando la reconciliación no confirma la identidad", async () => {
+    const statement = {
+      bind: vi.fn().mockReturnThis(),
+      run: vi.fn(async () => ({ meta: { changes: 1 } })),
+    };
+    const db = {
+      prepare: vi.fn(() => statement),
+      batch: vi.fn(async () => []),
+    } as unknown as D1Database;
+    const applyOffer = vi.fn(async () => ({ success: true }));
+    const ports = createD1AutoApplyExecutionPorts({
+      db,
+      provider: {
+        applyOffer,
+        fetchOfferDetail: async () => ({
+          uuid: "offer-1",
+          status: "processing",
+          peerUuid: "some-other-account",
+        }),
+        getVerifiedAccountUuid: async () => "verified-account-1",
+      },
+    });
+
+    await expect(
+      ports.reconcileOnce("operation-1", "offer-1"),
+    ).resolves.toBe("AMBIGUOUS");
+    expect(applyOffer).not.toHaveBeenCalled();
+    expect(String(db.prepare.mock.calls.at(-1)?.[0])).toContain(
+      "apply_status = 'AMBIGUOUS'",
+    );
+  });
+
   it("clasifica un rechazo explícito 4xx como REJECTED sin reintentar", async () => {
     const applyOffer = vi.fn(async () => {
       throw new QvaPayProviderError(403, "No autorizado", "invalid-request");
