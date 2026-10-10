@@ -167,8 +167,7 @@ test("los valores monetarios ausentes de BANK_CUP no se representan como cero", 
   page,
 }, testInfo) => {
   const payload = scannerState();
-  payload.buyOffers[0].amount = null;
-  payload.buyOffers[0].fiatAmount = null;
+  Object.assign(payload.buyOffers[0], { amount: null, fiatAmount: null });
   await page.route("**/api/scanner/status", (route) =>
     route.fulfill({
       status: 200,
