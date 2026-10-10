@@ -190,9 +190,9 @@ describe("P2P operation idempotency store", () => {
     expect(duplicate.created).toBe(false);
     expect(duplicate.operation.id).toBe(reservation.operation.id);
     expect(duplicate.operation.applyStatus).toBe("AMBIGUOUS");
-    expect(
-      await claimP2POperation(db, duplicate.operation.id, input.now),
-    ).toBe(false);
+    expect(await claimP2POperation(db, duplicate.operation.id, input.now)).toBe(
+      false,
+    );
   });
 
   it("permite recuperar el detalle sin degradar la aplicación confirmada", async () => {
