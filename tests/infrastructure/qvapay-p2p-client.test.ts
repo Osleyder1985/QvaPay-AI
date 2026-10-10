@@ -317,4 +317,68 @@ describe("QvaPay P2P apply", () => {
     });
     expect(fetcher).toHaveBeenCalledTimes(1);
   });
+
+  it("recupera el detalle autoritativo con token de cuenta y valida participantes", async () => {
+    const fetcher = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+      expect(String(input)).toBe("https://api.qvapay.com/p2p/offer-123");
+      expect(init?.method).toBe("GET");
+      expect(new Headers(init?.headers).get("authorization")).toBe(
+        "Bearer account-token",
+      );
+      return responseFor({
+        message: "P2P",
+        p2p: {
+          uuid: "offer-123",
+          status: "processing",
+          User: { uuid: "owner-123" },
+          Peer: { uuid: "peer-456" },
+        },
+      });
+    });
+    const client = new QvaPayP2PClient({
+      baseUrl: "https://api.qvapay.com",
+      ...credentials,
+      userApiToken: "account-token",
+      fetcher,
+    });
+
+    await expect(client.fetchOfferDetail("offer-123")).resolves.toEqual({
+      uuid: "offer-123",
+      status: "processing",
+      ownerUuid: "owner-123",
+      peerUuid: "peer-456",
+    });
+    expect(fetcher).toHaveBeenCalledTimes(1);
+  });
+
+  it("no consulta detalle sin token de cuenta y no envía credenciales de aplicación", async () => {
+    const fetcher = vi.fn();
+    const client = new QvaPayP2PClient({
+      baseUrl: "https://api.qvapay.com",
+      ...credentials,
+      fetcher,
+    });
+
+    await expect(client.fetchOfferDetail("offer-123")).rejects.toBeInstanceOf(
+      QvaPayTransientError,
+    );
+    expect(fetcher).not.toHaveBeenCalled();
+  });
+
+  it("clasifica el fallo de detalle como recuperable sin convertirlo en fallo de apply", async () => {
+    const fetcher = vi.fn().mockResolvedValue(
+      new Response("unavailable", { status: 503 }),
+    );
+    const client = new QvaPayP2PClient({
+      baseUrl: "https://api.qvapay.com",
+      ...credentials,
+      userApiToken: "account-token",
+      fetcher,
+    });
+
+    await expect(client.fetchOfferDetail("offer-123")).rejects.toBeInstanceOf(
+      QvaPayTransientError,
+    );
+    expect(fetcher).toHaveBeenCalledTimes(1);
+  });
 });
