@@ -42,7 +42,7 @@ La tasa interna se calcula:
 
 `rate = receive / amount`
 
-En el mercado configurado `BANK_CUP`, `amount` representa la cantidad del activo de cuenta expresada funcionalmente en QUSD y `receive` representa el importe fiat en CUP. Por tanto, la tasa presentada se interpreta como **CUP por QUSD**. `BANK_CUP` identifica el mercado P2P; no reemplaza la denominación QUSD del balance de cuenta.
+`BANK_CUP` identifica la moneda/mercado consultado por el endpoint P2P. No es la denominación del balance de la cuenta, cuyo nombre funcional en QvaPay-AI es QUSD. La clave `coin` por sí sola no demuestra la unidad económica de `amount`, `receive` ni `rate`; esas unidades deben derivarse del contrato oficial del proveedor y de la respuesta real. Hasta contar con esa evidencia, no se debe etiquetar automáticamente la tasa como CUP por QUSD ni convertir cantidades entre el mercado P2P y el balance.
 
 ## Semántica
 
