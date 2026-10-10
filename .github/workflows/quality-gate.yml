@@ -219,6 +219,9 @@ jobs:
       - name: Validar el paquete de despliegue de Cloudflare
         run: npx wrangler deploy --dry-run
 
+      - name: Impedir exclusiones de Prettier
+        run: npm run check:prettier-exclusions
+
       - name: Comprobar formato
         run: npm run format:check
 
