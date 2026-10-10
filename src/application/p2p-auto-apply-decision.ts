@@ -28,14 +28,29 @@ export interface AutoApplyDecisionInput {
     readonly amount: string;
   } | null;
 }
+
 export type AutoApplyDecision =
-  | { readonly eligible: true; readonly action: OfferSide; readonly offerUuid: string }
-  | { readonly eligible: false; readonly reason:
-      | "DISABLED" | "INVALID_CONFIGURATION" | "ACCOUNT_NOT_VERIFIED"
-      | "MARKET_MISMATCH" | "OFFER_NOT_OPEN" | "SNAPSHOT_STALE" | "VIP_REQUIRED"
-      | "BUY_RATE_NOT_BELOW_THRESHOLD" | "BUY_CUP_LIMIT_EXCEEDED"
-      | "SELL_RATE_NOT_ABOVE_THRESHOLD" | "SELL_QUSD_LIMIT_EXCEEDED"
-      | "SELL_BALANCE_UNAVAILABLE" };
+  | {
+      readonly eligible: true;
+      readonly action: OfferSide;
+      readonly offerUuid: string;
+    }
+  | {
+      readonly eligible: false;
+      readonly reason:
+        | "DISABLED"
+        | "INVALID_CONFIGURATION"
+        | "ACCOUNT_NOT_VERIFIED"
+        | "MARKET_MISMATCH"
+        | "OFFER_NOT_OPEN"
+        | "SNAPSHOT_STALE"
+        | "VIP_REQUIRED"
+        | "BUY_RATE_NOT_BELOW_THRESHOLD"
+        | "BUY_CUP_LIMIT_EXCEEDED"
+        | "SELL_RATE_NOT_ABOVE_THRESHOLD"
+        | "SELL_QUSD_LIMIT_EXCEEDED"
+        | "SELL_BALANCE_UNAVAILABLE";
+    };
 
 /**
  * @proposito Evaluar una oferta para Auto Apply sin realizar efectos secundarios.
@@ -43,42 +58,78 @@ export type AutoApplyDecision =
  * @param input Configuración y evidencia del snapshot/cuenta usados en la decisión.
  * @returns Decisión elegible o motivo estable de exclusión para auditoría.
  */
-export function evaluateAutoApplyDecision(input: AutoApplyDecisionInput): AutoApplyDecision {
+export function evaluateAutoApplyDecision(
+  input: AutoApplyDecisionInput,
+): AutoApplyDecision {
   if (!input.enabled) return { eligible: false, reason: "DISABLED" };
+
   try {
-    if (!input.expectedCoin.trim() || !input.offer.id.trim() ||
+    if (
+      !input.expectedCoin.trim() ||
+      !input.offer.id.trim() ||
       compareDecimalStrings(input.rateThreshold, "0") <= 0 ||
       compareDecimalStrings(input.amountLimit, "0") <= 0 ||
-      !Number.isFinite(input.nowMs) || !Number.isFinite(input.maxSnapshotAgeMs) ||
-      input.maxSnapshotAgeMs <= 0) return { eligible: false, reason: "INVALID_CONFIGURATION" };
-  } catch { return { eligible: false, reason: "INVALID_CONFIGURATION" }; }
-  if (!input.accountEligible) return { eligible: false, reason: "ACCOUNT_NOT_VERIFIED" };
-  if (input.offer.market !== input.expectedCoin) return { eligible: false, reason: "MARKET_MISMATCH" };
-  if (input.offer.status !== "open" || compareDecimalStrings(input.offer.availableAmount, "0") <= 0)
+      !Number.isFinite(input.nowMs) ||
+      !Number.isFinite(input.maxSnapshotAgeMs) ||
+      input.maxSnapshotAgeMs <= 0
+    ) {
+      return { eligible: false, reason: "INVALID_CONFIGURATION" };
+    }
+  } catch {
+    return { eligible: false, reason: "INVALID_CONFIGURATION" };
+  }
+
+  if (!input.accountEligible)
+    return { eligible: false, reason: "ACCOUNT_NOT_VERIFIED" };
+  if (input.offer.market !== input.expectedCoin)
+    return { eligible: false, reason: "MARKET_MISMATCH" };
+  if (
+    input.offer.status !== "open" ||
+    compareDecimalStrings(input.offer.availableAmount, "0") <= 0
+  )
     return { eligible: false, reason: "OFFER_NOT_OPEN" };
+
   const observedAt = Date.parse(input.offer.observedAt);
-  if (!Number.isFinite(observedAt) || observedAt > input.nowMs ||
-      input.nowMs - observedAt > input.maxSnapshotAgeMs)
+  if (
+    !Number.isFinite(observedAt) ||
+    observedAt > input.nowMs ||
+    input.nowMs - observedAt > input.maxSnapshotAgeMs
+  )
     return { eligible: false, reason: "SNAPSHOT_STALE" };
   if (input.offer.onlyVip && !input.accountVipVerified)
     return { eligible: false, reason: "VIP_REQUIRED" };
+
   try {
     if (input.action === "BUY") {
-      if (input.offer.side !== "BUY" || compareDecimalStrings(input.offer.rate, input.rateThreshold) >= 0)
+      if (
+        input.offer.side !== "BUY" ||
+        compareDecimalStrings(input.offer.rate, input.rateThreshold) >= 0
+      )
         return { eligible: false, reason: "BUY_RATE_NOT_BELOW_THRESHOLD" };
-      if (input.offer.fiatAmount === undefined ||
-          compareDecimalStrings(input.offer.fiatAmount, input.amountLimit) > 0)
+      if (
+        input.offer.fiatAmount === undefined ||
+        compareDecimalStrings(input.offer.fiatAmount, input.amountLimit) > 0
+      )
         return { eligible: false, reason: "BUY_CUP_LIMIT_EXCEEDED" };
     } else {
-      if (input.offer.side !== "SELL" || compareDecimalStrings(input.offer.rate, input.rateThreshold) <= 0)
+      if (
+        input.offer.side !== "SELL" ||
+        compareDecimalStrings(input.offer.rate, input.rateThreshold) <= 0
+      )
         return { eligible: false, reason: "SELL_RATE_NOT_ABOVE_THRESHOLD" };
+
       const balance = input.accountBalanceQusd;
       if (!balance?.available || !balance.fresh)
         return { eligible: false, reason: "SELL_BALANCE_UNAVAILABLE" };
-      if (compareDecimalStrings(input.offer.amount, input.amountLimit) > 0 ||
-          compareDecimalStrings(input.offer.amount, balance.amount) > 0)
+      if (
+        compareDecimalStrings(input.offer.amount, input.amountLimit) > 0 ||
+        compareDecimalStrings(input.offer.amount, balance.amount) > 0
+      )
         return { eligible: false, reason: "SELL_QUSD_LIMIT_EXCEEDED" };
     }
-  } catch { return { eligible: false, reason: "INVALID_CONFIGURATION" }; }
+  } catch {
+    return { eligible: false, reason: "INVALID_CONFIGURATION" };
+  }
+
   return { eligible: true, action: input.action, offerUuid: input.offer.id };
 }
