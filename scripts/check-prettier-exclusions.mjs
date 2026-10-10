@@ -47,14 +47,18 @@ async function inspectDirectory(directory) {
     }
 
     if (entry.name === ".prettierignore") {
-      violations.push(relativePath + ": no se permiten listas de exclusión de Prettier");
+      violations.push(
+        relativePath + ": no se permiten listas de exclusión de Prettier",
+      );
       continue;
     }
 
     if (!sourceExtensions.has(extname(entry.name))) continue;
     const content = await readFile(path, "utf8");
     if (directive.test(content)) {
-      violations.push(relativePath + ": contiene una directiva prettier-ignore");
+      violations.push(
+        relativePath + ": contiene una directiva prettier-ignore",
+      );
     }
   }
 }
