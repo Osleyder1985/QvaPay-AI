@@ -557,13 +557,13 @@ export default {
 
       const runtimeState = await stub.getState();
       const market = runtimeState.market;
-      const offer = market?.offers.find((candidate) => candidate.id === offerUuid);
+      const offer = market?.offers.find(
+        (candidate) => candidate.id === offerUuid,
+      );
       const nowMs = Date.now();
       const observedAtMs = offer ? Date.parse(offer.observedAt) : Number.NaN;
-      const maxAgeMs = Math.max(
-        1,
-        Number(env.SCANNER_INTERVAL_SECONDS) || 10,
-      ) * 2000;
+      const maxAgeMs =
+        Math.max(1, Number(env.SCANNER_INTERVAL_SECONDS) || 10) * 2000;
       if (
         runtimeState.execution.lastError ||
         !offer ||
@@ -588,7 +588,9 @@ export default {
         userApiToken: env.QVAPAY_USER_API_TOKEN,
       });
 
-      let preflightDetail: Awaited<ReturnType<QvaPayP2PClient["fetchOfferDetail"]>>;
+      let preflightDetail: Awaited<
+        ReturnType<QvaPayP2PClient["fetchOfferDetail"]>
+      >;
       try {
         preflightDetail = await client.fetchOfferDetail(offerUuid);
       } catch (error) {
@@ -641,11 +643,9 @@ export default {
       ) {
         try {
           const detail = await client.fetchOfferDetail(offerUuid);
-          await recordP2PDetailOutcome(
-            env.DB,
-            reservation.operation.id,
-            { available: true },
-          );
+          await recordP2PDetailOutcome(env.DB, reservation.operation.id, {
+            available: true,
+          });
           return Response.json(
             {
               operationId: reservation.operation.id,
@@ -662,7 +662,8 @@ export default {
               operationId: reservation.operation.id,
               applyStatus: "CONFIRMED",
               detailStatus: reservation.operation.detailStatus,
-              message: "La aplicación está confirmada; el detalle sigue pendiente de reconciliación.",
+              message:
+                "La aplicación está confirmada; el detalle sigue pendiente de reconciliación.",
               alreadyApplied: true,
             },
             { status: 202, headers: { "cache-control": "no-store" } },
@@ -675,7 +676,8 @@ export default {
             operationId: reservation.operation.id,
             applyStatus: reservation.operation.applyStatus,
             detailStatus: reservation.operation.detailStatus,
-            message: "Esta oferta ya tiene una reserva creada por otra solicitud; no se enviará otra aplicación.",
+            message:
+              "Esta oferta ya tiene una reserva creada por otra solicitud; no se enviará otra aplicación.",
           },
           { status: 409, headers: { "cache-control": "no-store" } },
         );
@@ -700,10 +702,7 @@ export default {
         );
       }
 
-      const claimed = await claimP2POperation(
-        env.DB,
-        reservation.operation.id,
-      );
+      const claimed = await claimP2POperation(env.DB, reservation.operation.id);
       if (!claimed) {
         return jsonError(
           "La oferta ya está siendo procesada por otra solicitud.",
@@ -781,7 +780,8 @@ export default {
               operationId: reservation.operation.id,
               applyStatus: "AMBIGUOUS",
               detailStatus: "NOT_REQUESTED",
-              message: "No se pudo confirmar el resultado remoto. La oferta queda bloqueada hasta reconciliarla; no reintentes la aplicación.",
+              message:
+                "No se pudo confirmar el resultado remoto. La oferta queda bloqueada hasta reconciliarla; no reintentes la aplicación.",
             },
             { status: 202, headers: { "cache-control": "no-store" } },
           );
@@ -791,7 +791,8 @@ export default {
             operationId: reservation.operation.id,
             applyStatus: "AMBIGUOUS",
             detailStatus: "NOT_REQUESTED",
-            message: "El resultado de QvaPay es ambiguo y requiere reconciliación.",
+            message:
+              "El resultado de QvaPay es ambiguo y requiere reconciliación.",
           },
           { status: 202, headers: { "cache-control": "no-store" } },
         );
@@ -820,11 +821,9 @@ export default {
       }
       try {
         const detail = await client.fetchOfferDetail(offerUuid);
-        await recordP2PDetailOutcome(
-          env.DB,
-          reservation.operation.id,
-          { available: true },
-        );
+        await recordP2PDetailOutcome(env.DB, reservation.operation.id, {
+          available: true,
+        });
         try {
           await recordP2POperationAudit(env.DB, {
             actorUserId: access.user.id,
@@ -856,15 +855,13 @@ export default {
             ? "TIMEOUT"
             : error instanceof QvaPayTransientError
               ? "UNAVAILABLE"
-              : error instanceof QvaPayProviderError &&
-                  error.status >= 500
+              : error instanceof QvaPayProviderError && error.status >= 500
                 ? "HTTP_5XX"
                 : "CONTRACT";
-        await recordP2PDetailOutcome(
-          env.DB,
-          reservation.operation.id,
-          { available: false, errorCode },
-        );
+        await recordP2PDetailOutcome(env.DB, reservation.operation.id, {
+          available: false,
+          errorCode,
+        });
         try {
           await recordP2POperationAudit(env.DB, {
             actorUserId: access.user.id,
@@ -885,7 +882,8 @@ export default {
             applyStatus: "CONFIRMED",
             detailStatus: "FAILED",
             auditStatus,
-            message: "QvaPay confirmó la aplicación, pero el detalle no está disponible. La aplicación no se repetirá.",
+            message:
+              "QvaPay confirmó la aplicación, pero el detalle no está disponible. La aplicación no se repetirá.",
           },
           { status: 201, headers: { "cache-control": "no-store" } },
         );
