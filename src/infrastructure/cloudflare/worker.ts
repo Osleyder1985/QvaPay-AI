@@ -33,6 +33,8 @@ import {
   ensureP2POperationSchema,
   recordP2PApplyOutcome,
   recordP2PDetailOutcome,
+  recordP2POperationAudit,
+  releaseReservedP2POperation,
   reserveP2POperation,
 } from "./p2p-operation-store.js";
 import {
@@ -660,6 +662,25 @@ export default {
         );
       }
 
+      try {
+        await recordP2POperationAudit(env.DB, {
+          actorUserId: access.user.id,
+          actorUsername: access.user.username,
+          operationId: reservation.operation.id,
+          offerUuid,
+          eventType: "p2p_apply_attempt",
+          outcome: "SUCCESS",
+          applyStatus: "RESERVED",
+          detailStatus: "NOT_REQUESTED",
+        });
+      } catch {
+        await releaseReservedP2POperation(env.DB, reservation.operation.id);
+        return jsonError(
+          "No se pudo registrar la auditoría; la aplicación no se envió.",
+          503,
+        );
+      }
+
       const claimed = await claimP2POperation(
         env.DB,
         reservation.operation.id,
@@ -681,6 +702,23 @@ export default {
             "REJECTED",
             error.status,
           );
+          try {
+            await recordP2POperationAudit(env.DB, {
+              actorUserId: access.user.id,
+              actorUsername: access.user.username,
+              operationId: reservation.operation.id,
+              offerUuid,
+              eventType: "p2p_apply_result",
+              outcome: "FAILURE",
+              applyStatus: "REJECTED",
+              detailStatus: "NOT_REQUESTED",
+            });
+          } catch {
+            return jsonError(
+              "QvaPay rechazó la aplicación y el resultado quedó guardado; verifica la bitácora antes de otra operación.",
+              503,
+            );
+          }
           const status = [400, 401, 403, 404, 409, 429].includes(error.status)
             ? error.status
             : 502;
@@ -701,6 +739,20 @@ export default {
           "AMBIGUOUS",
           null,
         );
+        try {
+          await recordP2POperationAudit(env.DB, {
+            actorUserId: access.user.id,
+            actorUsername: access.user.username,
+            operationId: reservation.operation.id,
+            offerUuid,
+            eventType: "p2p_apply_result",
+            outcome: "FAILURE",
+            applyStatus: "AMBIGUOUS",
+            detailStatus: "NOT_REQUESTED",
+          });
+        } catch {
+          // La operación queda bloqueada por su estado persistente AMBIGUOUS.
+        }
         if (
           error instanceof QvaPayAmbiguousOperationError ||
           error instanceof QvaPayTransientError
@@ -732,6 +784,21 @@ export default {
         "CONFIRMED",
         null,
       );
+      let auditStatus: "RECORDED" | "FAILED" = "RECORDED";
+      try {
+        await recordP2POperationAudit(env.DB, {
+          actorUserId: access.user.id,
+          actorUsername: access.user.username,
+          operationId: reservation.operation.id,
+          offerUuid,
+          eventType: "p2p_apply_result",
+          outcome: "SUCCESS",
+          applyStatus: "CONFIRMED",
+          detailStatus: "PENDING",
+        });
+      } catch {
+        auditStatus = "FAILED";
+      }
       try {
         const detail = await client.fetchOfferDetail(offerUuid);
         await recordP2PDetailOutcome(
@@ -739,11 +806,26 @@ export default {
           reservation.operation.id,
           { available: true },
         );
+        try {
+          await recordP2POperationAudit(env.DB, {
+            actorUserId: access.user.id,
+            actorUsername: access.user.username,
+            operationId: reservation.operation.id,
+            offerUuid,
+            eventType: "p2p_apply_detail",
+            outcome: "SUCCESS",
+            applyStatus: "CONFIRMED",
+            detailStatus: "AVAILABLE",
+          });
+        } catch {
+          auditStatus = "FAILED";
+        }
         return Response.json(
           {
             operationId: reservation.operation.id,
             applyStatus: "CONFIRMED",
             detailStatus: "AVAILABLE",
+            auditStatus,
             offer: detail,
           },
           { status: 201, headers: { "cache-control": "no-store" } },
@@ -764,11 +846,26 @@ export default {
           reservation.operation.id,
           { available: false, errorCode },
         );
+        try {
+          await recordP2POperationAudit(env.DB, {
+            actorUserId: access.user.id,
+            actorUsername: access.user.username,
+            operationId: reservation.operation.id,
+            offerUuid,
+            eventType: "p2p_apply_detail",
+            outcome: "FAILURE",
+            applyStatus: "CONFIRMED",
+            detailStatus: "FAILED",
+          });
+        } catch {
+          auditStatus = "FAILED";
+        }
         return Response.json(
           {
             operationId: reservation.operation.id,
             applyStatus: "CONFIRMED",
             detailStatus: "FAILED",
+            auditStatus,
             message: "QvaPay confirmó la aplicación, pero el detalle no está disponible. La aplicación no se repetirá.",
           },
           { status: 201, headers: { "cache-control": "no-store" } },
