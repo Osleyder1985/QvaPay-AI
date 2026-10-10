@@ -49,9 +49,9 @@ describe("P2P operation store with local Cloudflare D1", () => {
     expect(manual.operation.id).toBe(automatic.operation.id);
     expect(manual.operation.offerUuid).toBe(offerUuid);
     expect(["MANUAL", "AUTO_APPLY"]).toContain(manual.operation.source);
-    expect(
-      (await getP2POperation(db, manual.operation.id))?.applyStatus,
-    ).toBe("RESERVED");
+    expect((await getP2POperation(db, manual.operation.id))?.applyStatus).toBe(
+      "RESERVED",
+    );
   });
 
   it("permite una sola transición concurrente RESERVED → APPLYING", async () => {
@@ -72,8 +72,8 @@ describe("P2P operation store with local Cloudflare D1", () => {
     ]);
 
     expect(claims.filter(Boolean)).toHaveLength(1);
-    expect(
-      (await getP2POperation(db, reservation.operation.id))?.applyStatus,
-    ).toBe("APPLYING");
+    expect((await getP2POperation(db, reservation.operation.id))?.applyStatus).toBe(
+      "APPLYING",
+    );
   });
 });
