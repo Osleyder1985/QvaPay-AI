@@ -40,11 +40,14 @@ vi.mock("../../src/infrastructure/qvapay/qvapay-account-client.js", () => ({
   },
 }));
 
-vi.mock("../../src/infrastructure/cloudflare/qvapay-account-snapshot-store.js", () => ({
-  getCurrentQvaPayAccountSnapshot: vi.fn(),
-  getLastSuccessfulQvaPayAccountSnapshot: vi.fn(),
-  persistQvaPayAccountSnapshot: mocks.persistAccount,
-}));
+vi.mock(
+  "../../src/infrastructure/cloudflare/qvapay-account-snapshot-store.js",
+  () => ({
+    getCurrentQvaPayAccountSnapshot: vi.fn(),
+    getLastSuccessfulQvaPayAccountSnapshot: vi.fn(),
+    persistQvaPayAccountSnapshot: mocks.persistAccount,
+  }),
+);
 
 vi.mock("../../src/infrastructure/qvapay/qvapay-p2p-client.js", () => ({
   QvaPayAmbiguousOperationError: class QvaPayAmbiguousOperationError extends Error {},
@@ -174,9 +177,7 @@ function reservation() {
   };
 }
 
-async function applyRequest(
-  env: ScannerWorkerEnvironment,
-): Promise<Response> {
+async function applyRequest(env: ScannerWorkerEnvironment): Promise<Response> {
   return worker.fetch(
     new Request("https://qvapay-ai.test/api/p2p/offer-123/apply", {
       method: "POST",
@@ -266,7 +267,9 @@ describe("Cloudflare Worker: aplicación P2P protegida", () => {
   });
 
   it("no repite el POST cuando el resultado remoto es ambiguo", async () => {
-    mocks.applyOffer.mockRejectedValue(new Error("synthetic transport failure"));
+    mocks.applyOffer.mockRejectedValue(
+      new Error("synthetic transport failure"),
+    );
 
     const response = await applyRequest(createEnvironment());
 
