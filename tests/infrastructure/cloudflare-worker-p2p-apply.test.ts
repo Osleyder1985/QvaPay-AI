@@ -271,11 +271,15 @@ describe("Cloudflare Worker: aplicación P2P protegida", () => {
   });
 
   it("mantiene APPLYING si falla D1 tras el POST y reconcilia sin repetirlo", async () => {
-    mocks.recordApplyOutcome.mockRejectedValueOnce(new Error("synthetic D1 outage"));
+    mocks.recordApplyOutcome.mockRejectedValueOnce(
+      new Error("synthetic D1 outage"),
+    );
     const first = await applyRequest(createEnvironment());
 
     expect(first.status).toBe(202);
-    await expect(first.json()).resolves.toMatchObject({ applyStatus: "APPLYING" });
+    await expect(first.json()).resolves.toMatchObject({
+      applyStatus: "APPLYING",
+    });
     expect(mocks.applyOffer).toHaveBeenCalledOnce();
 
     mocks.reserveOperation.mockResolvedValueOnce({
@@ -320,7 +324,9 @@ describe("Cloudflare Worker: aplicación P2P protegida", () => {
 
     const response = await applyRequest(createEnvironment());
     expect(response.status).toBe(202);
-    await expect(response.json()).resolves.toMatchObject({ applyStatus: "APPLYING" });
+    await expect(response.json()).resolves.toMatchObject({
+      applyStatus: "APPLYING",
+    });
     expect(mocks.applyOffer).not.toHaveBeenCalled();
     expect(mocks.recordApplyOutcome).not.toHaveBeenCalled();
   });
