@@ -72,8 +72,8 @@ describe("P2P operation store with local Cloudflare D1", () => {
     ]);
 
     expect(claims.filter(Boolean)).toHaveLength(1);
-    expect((await getP2POperation(db, reservation.operation.id))?.applyStatus).toBe(
-      "APPLYING",
-    );
+    expect(
+      (await getP2POperation(db, reservation.operation.id))?.applyStatus,
+    ).toBe("APPLYING");
   });
 });
