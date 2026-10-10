@@ -744,9 +744,25 @@ export default {
           detailStatus: "NOT_REQUESTED",
         });
       } catch {
-        await releaseReservedP2POperation(env.DB, reservation.operation.id);
+        try {
+          const released = await releaseReservedP2POperation(
+            env.DB,
+            reservation.operation.id,
+          );
+          if (!released) {
+            return jsonError(
+              "Falló la auditoría y no se pudo confirmar la liberación de la reserva P2P; requiere revisión operativa. La aplicación no se envió.",
+              503,
+            );
+          }
+        } catch {
+          return jsonError(
+            "Falló la auditoría y no se pudo liberar de forma segura la reserva P2P; requiere revisión operativa. La aplicación no se envió.",
+            503,
+          );
+        }
         return jsonError(
-          "No se pudo registrar la auditoría; la aplicación no se envió.",
+          "No se pudo registrar la auditoría; la reserva fue liberada y la aplicación no se envió.",
           503,
         );
       }
