@@ -33,6 +33,14 @@ import { ensureSecuritySchema } from "./auth-rbac.js";
 
 export interface AutoApplyProvider {
   applyOffer(offerUuid: string): Promise<unknown>;
+  /** Consulta autoritativa del detalle tras una respuesta de aplicación. */
+  fetchOfferDetail?(offerUuid: string): Promise<{
+    readonly uuid: string;
+    readonly status: string;
+    readonly peerUuid: string | null;
+  }>;
+  /** UUID de la cuenta autenticada, obtenido de una fuente server-side verificada. */
+  getVerifiedAccountUuid?(): Promise<string | null>;
 }
 
 export interface D1AutoApplyExecutionOptions {
@@ -116,30 +124,43 @@ export function createD1AutoApplyExecutionPorts(
 
     async applyOnce(offerUuid) {
       try {
-        // Un HTTP exitoso solo acredita que la solicitud fue aceptada por el transporte.
-        // Sin reconciliación del detalle y comparación con la identidad verificada de la
-        // cuenta, no existe evidencia suficiente para marcar la operación como CONFIRMED.
         await options.provider.applyOffer(offerUuid);
-        return { status: "AMBIGUOUS" as const, httpStatus: null };
       } catch (error) {
         if (error instanceof QvaPayAmbiguousOperationError) {
           return { status: "AMBIGUOUS" as const, httpStatus: null };
         }
         if (error instanceof QvaPayProviderError) {
           if (error.status >= 400 && error.status < 500) {
-            return {
-              status: "REJECTED" as const,
-              httpStatus: error.status,
-            };
+            return { status: "REJECTED" as const, httpStatus: error.status };
           }
-          return {
-            status: "AMBIGUOUS" as const,
-            httpStatus: error.status,
-          };
+          return { status: "AMBIGUOUS" as const, httpStatus: error.status };
         }
-        // Tras iniciar apply, una excepción desconocida no prueba que el servidor no actuó.
+        // Una excepción tras iniciar apply no prueba que QvaPay no haya actuado.
         return { status: "AMBIGUOUS" as const, httpStatus: null };
       }
+
+      // Solo se confirma con detalle autoritativo y UUID de cuenta verificado.
+      if (!options.provider.fetchOfferDetail || !options.provider.getVerifiedAccountUuid) {
+        return { status: "AMBIGUOUS" as const, httpStatus: null };
+      }
+      try {
+        const [detail, verifiedAccountUuid] = await Promise.all([
+          options.provider.fetchOfferDetail(offerUuid),
+          options.provider.getVerifiedAccountUuid(),
+        ]);
+        if (
+          detail.uuid === offerUuid &&
+          detail.status === "processing" &&
+          typeof verifiedAccountUuid === "string" &&
+          verifiedAccountUuid.trim() !== "" &&
+          detail.peerUuid === verifiedAccountUuid
+        ) {
+          return { status: "CONFIRMED" as const };
+        }
+      } catch {
+        // No se reenvía el POST ni se confirma si falla la reconciliación.
+      }
+      return { status: "AMBIGUOUS" as const, httpStatus: null };
     },
 
     async recordOutcome(operationId, status, httpStatus) {
