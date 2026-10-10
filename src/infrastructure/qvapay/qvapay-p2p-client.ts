@@ -180,7 +180,7 @@ export class QvaPayP2PClient {
           const body = await response.text();
           throw new QvaPayProviderError(
             response.status,
-            body || "QvaPay P2P apply failed with status " + response.status,
+            body || "QvaPay P2P rechazó la aplicación con estado HTTP " + response.status,
             response.status === 401
               ? "authentication"
               : response.status >= 400 && response.status < 500
