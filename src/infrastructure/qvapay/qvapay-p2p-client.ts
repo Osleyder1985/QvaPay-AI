@@ -61,6 +61,25 @@ export class QvaPayTransientError extends Error {
   }
 }
 
+/**
+ * @proposito Representar una aplicación P2P cuyo resultado remoto no puede confirmarse.
+ * @responsabilidades Evitar que un timeout o fallo de transporte se interprete como rechazo
+ * y obligar a reconciliar el estado antes de permitir un nuevo intento.
+ */
+export class QvaPayAmbiguousOperationError extends Error {
+  readonly offerUuid: string;
+
+  constructor(
+    offerUuid: string,
+    message = "No se pudo confirmar el resultado de la aplicación P2P; requiere reconciliación antes de reintentar.",
+    options?: { cause?: unknown },
+  ) {
+    super(message, options);
+    this.name = "QvaPayAmbiguousOperationError";
+    this.offerUuid = offerUuid;
+  }
+}
+
 export interface QvaPayP2PClientOptions {
   readonly baseUrl: string;
   readonly appId: string;
@@ -122,32 +141,112 @@ export class QvaPayP2PClient {
     }
   }
 
+  /**
+   * @proposito Aplicar una oferta P2P sin repetir automáticamente una operación ambigua.
+   * @responsabilidades Limitar el tiempo de la solicitud y lectura de respuesta; clasificar
+   * timeout, fallo de transporte o respuesta 5xx como resultado ambiguo para reconciliación.
+   * @param uuid Identificador de la oferta QvaPay.
+   * @returns Respuesta JSON confirmada por QvaPay.
+   * @throws QvaPayProviderError Cuando QvaPay rechaza explícitamente la solicitud.
+   * @throws QvaPayAmbiguousOperationError Cuando no se puede confirmar el resultado remoto.
+   */
   async applyOffer(uuid: string): Promise<unknown> {
-    const response = await this.fetcher(
-      new URL(`/p2p/${encodeURIComponent(uuid)}/apply`, this.options.baseUrl),
-      {
-        method: "POST",
-        headers: {
-          "app-id": this.options.appId,
-          "app-secret": this.options.appSecret,
-        },
+    return this.withTimeout(
+      async (signal) => {
+        const response = await this.fetcher(
+          new URL(
+            "/p2p/" + encodeURIComponent(uuid) + "/apply",
+            this.options.baseUrl,
+          ),
+          {
+            method: "POST",
+            headers: {
+              "app-id": this.options.appId,
+              "app-secret": this.options.appSecret,
+            },
+            signal,
+          },
+        );
+
+        if (!response.ok) {
+          if (response.status >= 500) {
+            throw new QvaPayAmbiguousOperationError(
+              uuid,
+              "QvaPay respondió HTTP " +
+                response.status +
+                " a la aplicación; el resultado requiere reconciliación.",
+            );
+          }
+          const body = await response.text();
+          throw new QvaPayProviderError(
+            response.status,
+            body ||
+              "QvaPay P2P rechazó la aplicación con estado HTTP " +
+                response.status,
+            response.status === 401
+              ? "authentication"
+              : response.status >= 400 && response.status < 500
+                ? "invalid-request"
+                : "transient",
+          );
+        }
+
+        try {
+          return await response.json();
+        } catch (error) {
+          throw new QvaPayAmbiguousOperationError(
+            uuid,
+            "QvaPay aceptó la solicitud, pero no se pudo interpretar la respuesta; requiere reconciliación.",
+            { cause: error },
+          );
+        }
       },
-    );
-
-    if (!response.ok) {
-      const body = await response.text();
-      throw new QvaPayProviderError(
-        response.status,
-        body || `QvaPay P2P apply failed with status ${response.status}`,
-        response.status === 401
-          ? "authentication"
-          : response.status >= 400 && response.status < 500
-            ? "invalid-request"
-            : "transient",
+      () =>
+        new QvaPayAmbiguousOperationError(
+          uuid,
+          "Tiempo de espera agotado al aplicar la oferta; no se debe reintentar sin reconciliar el estado.",
+        ),
+    ).catch((error: unknown) => {
+      if (
+        error instanceof QvaPayProviderError ||
+        error instanceof QvaPayAmbiguousOperationError
+      ) {
+        throw error;
+      }
+      throw new QvaPayAmbiguousOperationError(
+        uuid,
+        "Falló el transporte durante la aplicación; el resultado remoto es ambiguo y requiere reconciliación.",
+        { cause: error },
       );
-    }
+    });
+  }
 
-    return response.json();
+  /**
+   * @proposito Ejecutar una solicitud del proveedor bajo un límite temporal estricto.
+   * @responsabilidades Abortar el transporte al vencer el plazo y resolver el timeout
+   * aunque el adaptador fetcher no respete la señal de aborto.
+   * @param task Operación HTTP y lectura de respuesta bajo la señal de cancelación.
+   * @param timeoutError Error específico que describe el resultado del timeout.
+   * @returns Resultado de la tarea antes de vencer el plazo.
+   */
+  private async withTimeout<T>(
+    task: (signal: AbortSignal) => Promise<T>,
+    timeoutError: () => Error,
+  ): Promise<T> {
+    const controller = new AbortController();
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
+    const timeout = new Promise<never>((_, reject) => {
+      timeoutId = setTimeout(() => {
+        controller.abort();
+        reject(timeoutError());
+      }, this.timeoutMs);
+    });
+
+    try {
+      return await Promise.race([task(controller.signal), timeout]);
+    } finally {
+      if (timeoutId !== undefined) clearTimeout(timeoutId);
+    }
   }
 
   async fetchOffers(

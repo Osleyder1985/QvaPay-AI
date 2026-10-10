@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import {
   QvaPayP2PClient,
+  QvaPayAmbiguousOperationError,
   QvaPayProviderError,
   QvaPayRateLimitError,
   QvaPayTransientError,
@@ -270,5 +271,50 @@ describe("QvaPay P2P apply", () => {
     await expect(client.applyOffer("offer-123")).resolves.toEqual({
       message: "Aplicado a la oferta",
     });
+  });
+
+  it("clasifica un timeout de apply como ambiguo y no repite la orden", async () => {
+    const fetcher = vi.fn().mockImplementation(
+      (_input: RequestInfo | URL, init?: RequestInit) =>
+        new Promise<Response>((_, reject) => {
+          init?.signal?.addEventListener("abort", () => {
+            reject(new DOMException("Solicitud abortada", "AbortError"));
+          });
+        }),
+    );
+    const client = new QvaPayP2PClient({
+      baseUrl: "https://api.qvapay.com",
+      ...credentials,
+      fetcher,
+      timeoutMs: 10,
+      maxRetries: 3,
+    });
+
+    await expect(client.applyOffer("offer-timeout")).rejects.toMatchObject({
+      name: QvaPayAmbiguousOperationError.name,
+      offerUuid: "offer-timeout",
+      message:
+        "Tiempo de espera agotado al aplicar la oferta; no se debe reintentar sin reconciliar el estado.",
+    });
+    expect(fetcher).toHaveBeenCalledTimes(1);
+    expect(fetcher.mock.calls[0]?.[1]?.signal?.aborted).toBe(true);
+  });
+
+  it("clasifica una respuesta 5xx de apply como ambigua sin reintentar", async () => {
+    const fetcher = vi
+      .fn()
+      .mockResolvedValue(new Response("upstream failure", { status: 503 }));
+    const client = new QvaPayP2PClient({
+      baseUrl: "https://api.qvapay.com",
+      ...credentials,
+      fetcher,
+      maxRetries: 3,
+    });
+
+    await expect(client.applyOffer("offer-ambiguous")).rejects.toMatchObject({
+      name: QvaPayAmbiguousOperationError.name,
+      offerUuid: "offer-ambiguous",
+    });
+    expect(fetcher).toHaveBeenCalledTimes(1);
   });
 });
