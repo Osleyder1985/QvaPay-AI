@@ -239,9 +239,16 @@ async function verifyPassword(
  * @responsabilidades Aplicar las validaciones y reglas de negocio definidas por el contrato del módulo.
  * @returns Resultado de la operación pública.
  */
-export async function findUserByUsername(db: D1Database, username: string): Promise<AppUser | null> {
-  const row = await db.prepare("SELECT id, username, role, active, created_at, updated_at, last_login_at FROM app_users WHERE username = ? COLLATE NOCASE LIMIT 1")
-    .bind(username.trim()).first<Record<string, unknown>>();
+export async function findUserByUsername(
+  db: D1Database,
+  username: string,
+): Promise<AppUser | null> {
+  const row = await db
+    .prepare(
+      "SELECT id, username, role, active, created_at, updated_at, last_login_at FROM app_users WHERE username = ? COLLATE NOCASE LIMIT 1",
+    )
+    .bind(username.trim())
+    .first<Record<string, unknown>>();
   return row ? rowToUser(row) : null;
 }
 /**
@@ -500,9 +507,18 @@ export async function setUserActive(
  * @responsabilidades Aplicar las validaciones y reglas de negocio definidas por el contrato del módulo.
  * @returns Resultado de la operación pública.
  */
-export async function changeUserPassword(db: D1Database, actor: AppUser, userId: string, password: string): Promise<AppUser> {
-  const row = await db.prepare("SELECT id, username, role, active, created_at, updated_at, last_login_at FROM app_users WHERE id = ? LIMIT 1")
-    .bind(userId).first<Record<string, unknown>>();
+export async function changeUserPassword(
+  db: D1Database,
+  actor: AppUser,
+  userId: string,
+  password: string,
+): Promise<AppUser> {
+  const row = await db
+    .prepare(
+      "SELECT id, username, role, active, created_at, updated_at, last_login_at FROM app_users WHERE id = ? LIMIT 1",
+    )
+    .bind(userId)
+    .first<Record<string, unknown>>();
   if (!row) throw new Error("Usuario no encontrado.");
   const target = rowToUser(row);
   const verifier = await createPasswordVerifier(password);
