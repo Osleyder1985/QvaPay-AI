@@ -127,6 +127,10 @@ function createEnvironment(): ScannerWorkerEnvironment {
 const openOfferDetail = {
   uuid: "offer-123",
   status: "open",
+  coin: "BANK_CUP",
+  side: "sell" as const,
+  onlyVip: false,
+  onlyKyc: false,
   ownerUuid: "another-account",
   peerUuid: null,
 };
