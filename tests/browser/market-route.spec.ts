@@ -354,4 +354,3 @@ test("un snapshot con error operativo se marca degradado y no accionable", async
     page.locator("#buyTable [aria-label^='Acción no disponible']"),
   ).toContainText("DEGRADADO");
 });
-
