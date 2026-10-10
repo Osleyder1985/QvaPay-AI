@@ -4,16 +4,24 @@
  * @responsabilidades Implementar y proteger las reglas propias de este módulo sin mezclar responsabilidades de otras capas.
  * @ubicacion src/infrastructure/cloudflare dentro de la arquitectura de QvaPay-AI.
  */
-
-// prettier-ignore
 const HTML = `<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="QvaPay-AI · autenticación"><title>QvaPay-AI · Acceso seguro</title><style>
 :root{color-scheme:dark;--bg:#070b14;--panel:#0d1424;--line:#263552;--text:#edf3ff;--muted:#8f9dbb;--accent:#7c9cff;--gold:#ffd746}*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;background:radial-gradient(circle at 20% 10%,#16233f,transparent 35%),radial-gradient(circle at 80% 80%,#211a3e,transparent 35%),var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui}.card{width:min(430px,calc(100% - 30px));padding:32px;border:1px solid var(--line);border-radius:24px;background:rgba(13,20,36,.94);box-shadow:0 25px 80px rgba(0,0,0,.45)}.logo{width:52px;height:52px;display:grid;place-items:center;border-radius:16px;background:linear-gradient(135deg,#6f8cff,#9b6dff);font-size:25px}.eyebrow{margin-top:22px;color:var(--muted);font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}.title{font-size:34px;font-weight:850;margin:6px 0}.copy{color:var(--muted);font-size:15px;line-height:1.6}.field{display:grid;gap:7px;margin-top:20px}.field label{font-size:14px;font-weight:750}.field input{width:100%;padding:14px 15px;font-size:16px;border:1px solid var(--line);border-radius:11px;background:#090f1c;color:var(--text);outline:none}.field input:focus{border-color:var(--accent)}button{width:100%;margin-top:18px;padding:14px;border:0;border-radius:11px;background:linear-gradient(135deg,#6f8cff,#9b6dff);color:white;font-size:16px;font-weight:850;cursor:pointer}button:disabled{opacity:.6}.error{min-height:20px;margin-top:12px;color:#ff7188;font-size:11px}.security{margin-top:20px;padding:12px;border:1px solid rgba(255,215,70,.22);border-radius:11px;color:var(--muted);font-size:10px;line-height:1.5}.security b{color:var(--gold)}</style></head><body><main class="card"><div class="logo">⚡</div><div class="eyebrow">Control de acceso · ISO/IEC 27001</div><div class="title">QvaPay-AI</div><p class="copy">La aplicación operativa está protegida. Autentíquese para acceder a sus módulos y datos.</p><form id="login" aria-busy="false"><div class="field"><label for="username">Usuario</label><input id="username" autocomplete="username" required minlength="3"></div><div class="field"><label for="password">Contraseña</label><input id="password" type="password" autocomplete="current-password" required minlength="12"></div><button id="submit" type="submit" aria-disabled="false">Iniciar sesión</button><div class="error" id="error"></div><div class="status" id="loginStatus" role="status" aria-live="polite"></div></form><div class="security"><b>Acceso protegido.</b> Las operaciones y datos permanecen en el servidor; la autorización se valida por rol.</div></main><script>
 const form=document.getElementById("login"),button=document.getElementById("submit"),error=document.getElementById("error"),status=document.getElementById("loginStatus");form.addEventListener("submit",async event=>{event.preventDefault();button.disabled=true;button.setAttribute("aria-disabled","true");form.setAttribute("aria-busy","true");error.textContent="";if(status)status.textContent="Iniciando sesión…";try{const response=await fetch("/api/auth/login",{method:"POST",headers:{"content-type":"application/json","accept":"application/json"},credentials:"same-origin",body:JSON.stringify({username:document.getElementById("username").value,password:document.getElementById("password").value})});const body=await response.json().catch(()=>({}));if(!response.ok)throw new Error(body.error||"No fue posible iniciar sesión.");document.getElementById("password").value="";if(status)status.textContent="Sesión iniciada.";location.href="/";}catch(e){error.textContent="No se pudo iniciar sesión. Verifica tus credenciales e inténtalo de nuevo.";if(status)status.textContent="Autenticación fallida."}finally{button.disabled=false;button.setAttribute("aria-disabled","false");form.setAttribute("aria-busy","false")}});
 </script></body></html>`;
-// prettier-ignore
 /**
  * @proposito API pública createLoginAppResponse: implementa el comportamiento expuesto por este módulo.
  * @responsabilidades Aplicar el contrato y las validaciones correspondientes a la integración.
  * @returns Resultado de la operación pública.
  */
-export function createLoginAppResponse(): Response { return new Response(HTML,{status:200,headers:{"content-type":"text/html; charset=UTF-8","cache-control":"no-store","x-content-type-options":"nosniff","content-security-policy":"default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src 'self'; base-uri 'none'; frame-ancestors 'none'"}}); }
+export function createLoginAppResponse(): Response {
+  return new Response(HTML, {
+    status: 200,
+    headers: {
+      "content-type": "text/html; charset=UTF-8",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "content-security-policy":
+        "default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src 'self'; base-uri 'none'; frame-ancestors 'none'",
+    },
+  });
+}
