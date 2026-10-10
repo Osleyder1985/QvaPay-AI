@@ -149,9 +149,35 @@ test("el mercado autenticado muestra los dos libros en modo de solo lectura", as
   await expect(page.locator("#sellTable table caption")).toHaveText(
     "Ofertas SELL · Comprar · Mercado BANK_CUP",
   );
+  await expect(page.locator("#sellTable thead")).toContainText("TASA (CUP/QUSD)");
+  await expect(page.locator("#sellTable thead")).toContainText("CUP a pagar");
   await expect(page.locator("#buyTable table caption")).toHaveText(
     "Ofertas BUY · Vender · Mercado BANK_CUP",
   );
+  await expect(page.locator("#buyTable thead")).toContainText("TASA (CUP/QUSD)");
+  await expect(page.locator("#buyTable thead")).toContainText("CUP a recibir");
+});
+
+test("un mercado sin metadatos monetarios conocidos no hereda etiquetas CUP", async ({
+  page,
+}, testInfo) => {
+  const payload = scannerState({ coin: "BANK_EUR" });
+  await page.route("**/api/scanner/status", (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      headers: { "cache-control": "no-store" },
+      body: JSON.stringify(payload),
+    }),
+  );
+  await authenticate(page, testInfo);
+  await page.goto("/app/mercado");
+
+  await expect(page.locator("#sellTable table caption")).toContainText("BANK_EUR");
+  await expect(page.locator("#sellTable thead")).toContainText("Tasa (receive/amount)");
+  await expect(page.locator("#sellTable thead")).toContainText("Moneda de mercado a pagar");
+  await expect(page.locator("#sellTable thead")).not.toContainText("CUP");
+  await expect(page.locator("#buyTable thead")).not.toContainText("CUP");
 });
 
 test("el mercado identifica explícitamente un snapshot no disponible", async ({
