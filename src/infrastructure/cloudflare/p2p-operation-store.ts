@@ -139,7 +139,8 @@ export async function recordP2POperationAudit(
     readonly actorUsername: string;
     readonly operationId: string;
     readonly offerUuid: string;
-    readonly eventType: "p2p_apply_attempt" | "p2p_apply_result" | "p2p_apply_detail";
+    readonly eventType:
+      "p2p_apply_attempt" | "p2p_apply_result" | "p2p_apply_detail";
     readonly outcome: "SUCCESS" | "FAILURE" | "DENIED";
     readonly applyStatus: P2PApplyStatus;
     readonly detailStatus: P2PDetailStatus;
