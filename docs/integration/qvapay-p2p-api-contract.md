@@ -84,6 +84,20 @@ El cálculo de la tasa se realiza actualmente mediante representación numérica
 
 La operación `POST /p2p/:uuid/apply` existe como capacidad independiente de lectura y requiere token de acción más credenciales server-side.
 
+## Timeout y resultado ambiguo de aplicación
+
+La solicitud `POST /p2p/:uuid/apply` usa un timeout acotado compartido con la configuración del cliente P2P. El plazo cubre la solicitud y la lectura de la respuesta; al vencer, el adaptador aborta la señal HTTP y devuelve un error tipado de resultado ambiguo.
+
+Reglas de seguridad:
+
+- Un timeout, un fallo de transporte o una respuesta HTTP 5xx no prueban que QvaPay haya rechazado la aplicación.
+- El adaptador no reintenta automáticamente el POST de aplicación, aunque el cliente tenga reintentos configurados para lecturas de mercado.
+- Antes de permitir otro intento, la capa de operaciones debe reconciliar el estado con la fuente autoritativa y la protección de idempotencia compartida.
+- Una respuesta de rechazo HTTP 4xx se mantiene como rechazo explícito; el error no se interpreta como éxito.
+- Esta capa de cliente no habilita por sí sola operaciones en el dashboard. La ruta server-side permanece bloqueada hasta integrar idempotencia, reconciliación, auditoría y controles de autorización.
+
+La prueba automatizada usa un proveedor simulado que no responde y verifica el timeout, la cancelación y que solo se envía una llamada. No se envían órdenes reales durante CI.
+
 ## Aplicación de cambios
 
 Este documento especifica unidades y procedencia de datos; no cambia las reglas de negocio, el cálculo de tasa, el orden BUY/SELL ni los permisos de aplicación. Las etiquetas visuales de mercados adicionales deben implementarse a partir de metadatos contractuales validados y con pruebas de regresión.
