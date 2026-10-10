@@ -84,6 +84,7 @@ export interface QvaPayP2PClientOptions {
   readonly baseUrl: string;
   readonly appId: string;
   readonly appSecret: string;
+  readonly userApiToken?: string;
   readonly fetcher?: typeof fetch;
   readonly take?: number;
   readonly maxRetries?: number;
@@ -219,6 +220,134 @@ export class QvaPayP2PClient {
         { cause: error },
       );
     });
+  }
+
+  /**
+   * @proposito Recuperar el detalle autoritativo de una oferta para reconciliar una aplicación.
+   * @responsabilidades Consultar mediante token de cuenta server-side; nunca repetir la mutación
+   * apply cuando el detalle no esté disponible.
+   * @param uuid Identificador de la oferta P2P.
+   * @returns Detalle mínimo validado para conocer la oferta y su estado remoto.
+   * @throws QvaPayTransientError Cuando la consulta no puede completarse o el contrato no es válido.
+   */
+  async fetchOfferDetail(uuid: string): Promise<{
+    readonly uuid: string;
+    readonly status: string;
+    readonly coin: string;
+    readonly side: "buy" | "sell";
+    readonly onlyVip: boolean | null;
+    readonly onlyKyc: boolean | null;
+    readonly ownerUuid: string | null;
+    readonly peerUuid: string | null;
+  }> {
+    const token = this.options.userApiToken;
+    if (!token) {
+      throw new QvaPayTransientError(
+        "No está configurado el token de cuenta requerido para consultar el detalle P2P.",
+      );
+    }
+
+    return this.withTimeout(
+      async (signal) => {
+        const response = await this.fetcher(
+          new URL("/p2p/" + encodeURIComponent(uuid), this.options.baseUrl),
+          {
+            method: "GET",
+            headers: { authorization: "Bearer " + token },
+            signal,
+          },
+        );
+        if (!response.ok) {
+          if (response.status >= 500 || response.status === 429) {
+            throw new QvaPayTransientError(
+              "QvaPay no pudo recuperar el detalle P2P (HTTP " +
+                response.status +
+                ").",
+            );
+          }
+          throw new QvaPayProviderError(
+            response.status,
+            "QvaPay rechazó la consulta del detalle P2P (HTTP " +
+              response.status +
+              ").",
+            response.status === 401 ? "authentication" : "invalid-request",
+          );
+        }
+
+        let payload: unknown;
+        try {
+          payload = await response.json();
+        } catch (error) {
+          throw new QvaPayTransientError(
+            "QvaPay devolvió un detalle P2P que no es JSON válido.",
+            { cause: error },
+          );
+        }
+        if (
+          typeof payload !== "object" ||
+          payload === null ||
+          !("p2p" in payload) ||
+          typeof payload.p2p !== "object" ||
+          payload.p2p === null
+        ) {
+          throw new QvaPayTransientError(
+            "QvaPay devolvió un contrato de detalle P2P incompatible.",
+          );
+        }
+
+        const detail = payload.p2p as Record<string, unknown>;
+        if (
+          detail.uuid !== uuid ||
+          typeof detail.status !== "string" ||
+          detail.status.trim() === "" ||
+          typeof detail.coin !== "string" ||
+          detail.coin.trim() === "" ||
+          (detail.type !== "buy" && detail.type !== "sell")
+        ) {
+          throw new QvaPayTransientError(
+            "QvaPay devolvió un identificador, mercado, tipo o estado de oferta P2P incompatible.",
+          );
+        }
+        const readOptionalBoolean = (value: unknown): boolean | null => {
+          if (value === undefined || value === null) return null;
+          if (typeof value === "boolean") return value;
+          if (value === 0 || value === 1) return value === 1;
+          throw new QvaPayTransientError(
+            "QvaPay devolvió una regla de elegibilidad P2P incompatible.",
+          );
+        };
+        const readParticipantUuid = (value: unknown): string | null => {
+          if (value === undefined || value === null) return null;
+          if (
+            typeof value !== "object" ||
+            value === null ||
+            !("uuid" in value) ||
+            typeof value.uuid !== "string" ||
+            value.uuid.trim() === ""
+          ) {
+            throw new QvaPayTransientError(
+              "QvaPay devolvió una identidad de participante P2P incompatible.",
+            );
+          }
+          return value.uuid;
+        };
+
+        return {
+          uuid,
+          status: detail.status,
+          coin: detail.coin,
+          side: detail.type,
+          onlyVip: readOptionalBoolean(detail.only_vip),
+          onlyKyc: readOptionalBoolean(detail.only_kyc),
+          ownerUuid: readParticipantUuid(detail.User),
+          peerUuid: readParticipantUuid(detail.Peer),
+        };
+      },
+      () =>
+        new QvaPayTransientError(
+          "Tiempo de espera agotado al recuperar el detalle P2P; la aplicación no debe repetirse.",
+        ),
+    );
   }
 
   /**

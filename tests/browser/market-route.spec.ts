@@ -181,7 +181,7 @@ test("el mercado conserva un estado de carga explícito hasta recibir el snapsho
   await expect(page.locator("#sellTable")).toContainText("vendedor-prueba");
 });
 
-test("el mercado autenticado muestra los dos libros en modo de solo lectura", async ({
+test("el mercado autenticado habilita acciones únicamente para el rol Administration", async ({
   page,
 }, testInfo) => {
   const payload = scannerState();
@@ -211,8 +211,14 @@ test("el mercado autenticado muestra los dos libros en modo de solo lectura", as
   await expect(page.locator("#sellTable")).toContainText("1,001.00");
   await expect(page.locator("#buyTable")).toContainText("1,000.00");
   await expect(
+    page.getByRole("button", { name: /Comprar oferta test-sell-1/ }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: /Vender oferta test-buy-1/ }),
+  ).toBeVisible();
+  await expect(
     page.getByRole("button", { name: /Comprar|Vender/ }),
-  ).toHaveCount(0);
+  ).toHaveCount(2);
   await expect(page.locator("#sellTable table caption")).toHaveText(
     "Ofertas SELL · Comprar · Mercado BANK_CUP",
   );
@@ -234,6 +240,65 @@ test("el mercado autenticado muestra los dos libros en modo de solo lectura", as
       await expect(headers.nth(index)).toHaveAttribute("scope", "col");
     }
   }
+});
+
+test("Administration puede confirmar una aplicación sintética y recibe su estado sin operar QvaPay real", async ({
+  page,
+}, testInfo) => {
+  await page.route("**/api/session", (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      headers: { "cache-control": "no-store" },
+      body: JSON.stringify({
+        user: {
+          id: "admin-ui-test",
+          username: "administration-test",
+          role: "ADMINISTRATION",
+        },
+      }),
+    }),
+  );
+  await page.route("**/api/scanner/status", (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      headers: { "cache-control": "no-store" },
+      body: JSON.stringify(scannerState()),
+    }),
+  );
+  let applyRequests = 0;
+  await page.route("**/api/p2p/test-sell-1/apply", async (route) => {
+    expect(route.request().method()).toBe("POST");
+    applyRequests += 1;
+    await route.fulfill({
+      status: 201,
+      contentType: "application/json",
+      headers: { "cache-control": "no-store" },
+      body: JSON.stringify({
+        operationId: "synthetic-operation-1",
+        applyStatus: "CONFIRMED",
+        detailStatus: "AVAILABLE",
+      }),
+    });
+  });
+  page.on("dialog", async (dialog) => {
+    await dialog.accept();
+  });
+
+  await authenticate(page, testInfo);
+  await page.goto("/app/mercado");
+
+  const buyButton = page.getByRole("button", {
+    name: "Comprar oferta test-sell-1",
+  });
+  await expect(buyButton).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Vender oferta test-buy-1" }),
+  ).toBeVisible();
+  await buyButton.click();
+
+  await expect.poll(() => applyRequests).toBe(1);
 });
 
 test("los valores monetarios ausentes de BANK_CUP no se representan como cero", async ({
@@ -450,6 +515,51 @@ test("la navegación por teclado puede alcanzar el control de cierre de sesión"
     "El control de cierre debe ser alcanzable con Tab",
   ).toBe(true);
   await expect(page.locator("#logoutButton")).toBeFocused();
+});
+
+test("la acción Comprar envía una solicitud simulada y nunca contacta QvaPay desde el navegador", async ({
+  page,
+}, testInfo) => {
+  await page.route("**/api/scanner/status", (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      headers: { "cache-control": "no-store" },
+      body: JSON.stringify(scannerState()),
+    }),
+  );
+  let applyRequestCount = 0;
+  await page.route("**/api/p2p/test-sell-1/apply", async (route) => {
+    applyRequestCount += 1;
+    expect(route.request().method()).toBe("POST");
+    await route.fulfill({
+      status: 201,
+      contentType: "application/json",
+      headers: { "cache-control": "no-store" },
+      body: JSON.stringify({
+        operationId: "operation-synthetic-1",
+        applyStatus: "CONFIRMED",
+        detailStatus: "AVAILABLE",
+        offer: { uuid: "test-sell-1", status: "open" },
+      }),
+    });
+  });
+  page.on("dialog", (dialog) => dialog.accept());
+  await authenticate(page, testInfo);
+  await page.goto("/app/mercado");
+
+  const applyRequest = page.waitForRequest(
+    (request) =>
+      request.url().endsWith("/api/p2p/test-sell-1/apply") &&
+      request.method() === "POST",
+  );
+  await page
+    .getByRole("button", { name: /Comprar oferta test-sell-1/ })
+    .click();
+  await applyRequest;
+
+  expect(applyRequestCount).toBe(1);
+  await expect(page.locator("#sellTable")).toContainText("vendedor-prueba");
 });
 
 test("un snapshot con error operativo se marca degradado y no accionable", async ({

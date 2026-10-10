@@ -204,6 +204,38 @@ describe("Cloudflare Worker: autorización de rutas modulares", () => {
     expect(authMocks.changeUserPassword).toHaveBeenCalledOnce();
   });
 
+  it("rechaza métodos distintos de POST en la ruta de aplicación P2P", async () => {
+    const env = createEnvironment();
+    const response = await requestModule(
+      "/api/p2p/offer-123/apply",
+      env,
+      "GET",
+    );
+
+    expect(response.status).toBe(405);
+    expect(response.headers.get("allow")).toBe("POST");
+    expect(authMocks.requireRole).not.toHaveBeenCalled();
+  });
+
+  it("deniega la ruta de aplicación P2P al rol Auditor antes de consultar el proveedor", async () => {
+    const env = createEnvironment();
+    authMocks.requireRole.mockResolvedValue(
+      Response.json({ error: "Permisos insuficientes." }, { status: 403 }),
+    );
+
+    const response = await requestModule(
+      "/api/p2p/offer-123/apply",
+      env,
+      "POST",
+    );
+
+    expect(response.status).toBe(403);
+    expect(await response.json()).toEqual({
+      error: "Permisos insuficientes.",
+    });
+    expect(authMocks.requireRole).toHaveBeenCalledOnce();
+  });
+
   it("rechaza rutas desconocidas y métodos no GET", async () => {
     const env = createEnvironment();
     authMocks.getSession.mockResolvedValue(administratorSession);
