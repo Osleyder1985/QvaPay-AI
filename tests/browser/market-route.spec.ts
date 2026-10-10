@@ -160,6 +160,13 @@ test("el mercado autenticado muestra los dos libros en modo de solo lectura", as
     "TASA (CUP/QUSD)",
   );
   await expect(page.locator("#buyTable thead")).toContainText("CUP a recibir");
+  for (const selector of ["#sellTable table", "#buyTable table"]) {
+    const headers = page.locator(`${selector} thead th`);
+    await expect(headers).toHaveCount(8);
+    for (let index = 0; index < 8; index += 1) {
+      await expect(headers.nth(index)).toHaveAttribute("scope", "col");
+    }
+  }
 });
 
 test("los valores monetarios ausentes de BANK_CUP no se representan como cero", async ({
