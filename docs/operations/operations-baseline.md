@@ -70,7 +70,7 @@ Condiciones previas server-side:
 - rechazo de ofertas propias y aplicación a ofertas VIP solo si la cuenta cumple la elegibilidad;
 - reserva D1 única por UUID antes del POST remoto.
 
-Una aplicación confirmada y la recuperación del detalle son estados independientes. Un timeout, error de transporte o HTTP 5xx deja la operación ambigua y bloqueada; no se repite automáticamente el POST. Si el apply se confirma pero falla el detalle, se conserva el resultado confirmado y solo se puede reintentar la consulta de detalle.
+La confirmación de una aplicación exige que el detalle autoritativo posterior al POST coincida en UUID, estado `processing` e identidad de cuenta verificada. Un timeout, error de transporte, HTTP 5xx, detalle inaccesible o identidad/estado discordantes deja la operación `AMBIGUOUS` y bloqueada; no se repite automáticamente el POST. Solo una coincidencia completa permite persistir `CONFIRMED`.
 
 La ruta no acepta credenciales desde el navegador. La credencial de cuenta se usa exclusivamente server-side para verificar identidad/detalle y las credenciales de aplicación para el POST oficial de QvaPay. No se habilita Auto Apply mediante esta ruta.
 
