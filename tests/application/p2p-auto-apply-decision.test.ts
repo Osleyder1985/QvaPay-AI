@@ -31,6 +31,32 @@ describe("evaluateAutoApplyDecision", () => {
     expect(evaluateAutoApplyDecision(input({ action: "SELL", offer: sell, rateThreshold: "360", amountLimit: "25", accountBalanceQusd: null }))).toMatchObject({ eligible: false, reason: "SELL_BALANCE_UNAVAILABLE" });
     expect(evaluateAutoApplyDecision(input({ action: "SELL", offer: sell, rateThreshold: "360", amountLimit: "25", accountBalanceQusd: { available: true, fresh: true, amount: "10" } }))).toMatchObject({ eligible: false, reason: "SELL_QUSD_LIMIT_EXCEEDED" });
   });
+  it("rechaza configuración decimal inválida y snapshots futuros", () => {
+    expect(evaluateAutoApplyDecision(input({ rateThreshold: "no-numero" }))).toMatchObject({
+      eligible: false, reason: "INVALID_CONFIGURATION",
+    });
+    expect(evaluateAutoApplyDecision(input({ offer: offer({ observedAt: "2026-10-10T12:00:01.000Z" }) })).toMatchObject({
+      eligible: false, reason: "SNAPSHOT_STALE",
+    });
+    expect(evaluateAutoApplyDecision(input({ maxSnapshotAgeMs: 0 })).toMatchObject({
+      eligible: false, reason: "INVALID_CONFIGURATION",
+    });
+  });
+  it("aplica SELL con comparación estricta de tasa y límites QUSD", () => {
+    const sell = offer({ side: "SELL", rate: "370", amount: "20", fiatAmount: "7400" });
+    expect(evaluateAutoApplyDecision(input({
+      action: "SELL", offer: sell, rateThreshold: "360", amountLimit: "20",
+      accountBalanceQusd: { available: true, fresh: true, amount: "20" },
+    }))).toMatchObject({ eligible: true, action: "SELL" });
+    expect(evaluateAutoApplyDecision(input({
+      action: "SELL", offer: offer({ ...sell, rate: "360" }), rateThreshold: "360", amountLimit: "20",
+      accountBalanceQusd: { available: true, fresh: true, amount: "20" },
+    }))).toMatchObject({ eligible: false, reason: "SELL_RATE_NOT_ABOVE_THRESHOLD" });
+    expect(evaluateAutoApplyDecision(input({
+      action: "SELL", offer: sell, rateThreshold: "360", amountLimit: "19",
+      accountBalanceQusd: { available: true, fresh: true, amount: "20" },
+    }))).toMatchObject({ eligible: false, reason: "SELL_QUSD_LIMIT_EXCEEDED" });
+  });
   it("rechaza moneda, estado y elegibilidad VIP incompatibles", () => {
     expect(evaluateAutoApplyDecision(input({ offer: offer({ market: "OTHER" }) }))).toMatchObject({ eligible: false, reason: "MARKET_MISMATCH" });
     expect(evaluateAutoApplyDecision(input({ offer: offer({ status: "processing" }) }))).toMatchObject({ eligible: false, reason: "OFFER_NOT_OPEN" });
