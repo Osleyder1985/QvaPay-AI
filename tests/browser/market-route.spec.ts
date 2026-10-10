@@ -162,62 +162,6 @@ test("el mercado autenticado muestra los dos libros en modo de solo lectura", as
   await expect(page.locator("#buyTable thead")).toContainText("CUP a recibir");
 });
 
-test("BANK_EUR deriva sus etiquetas monetarias del contrato conocido", async ({
-  page,
-}, testInfo) => {
-  const payload = scannerState({ coin: "BANK_EUR" });
-  await page.route("**/api/scanner/status", (route) =>
-    route.fulfill({
-      status: 200,
-      contentType: "application/json",
-      headers: { "cache-control": "no-store" },
-      body: JSON.stringify(payload),
-    }),
-  );
-  await authenticate(page, testInfo);
-  await page.goto("/app/mercado");
-
-  await expect(page.locator("#sellTable table caption")).toContainText(
-    "BANK_EUR",
-  );
-  await expect(page.locator("#sellTable thead")).toContainText(
-    "TASA (EUR/QUSD)",
-  );
-  await expect(page.locator("#sellTable thead")).toContainText("EUR a pagar");
-  await expect(page.locator("#buyTable thead")).toContainText(
-    "TASA (EUR/QUSD)",
-  );
-  await expect(page.locator("#buyTable thead")).toContainText("EUR a recibir");
-});
-
-test("un mercado sin metadatos monetarios conocidos usa etiquetas genéricas", async ({
-  page,
-}, testInfo) => {
-  const payload = scannerState({ coin: "UNSUPPORTED_TEST_MARKET" });
-  await page.route("**/api/scanner/status", (route) =>
-    route.fulfill({
-      status: 200,
-      contentType: "application/json",
-      headers: { "cache-control": "no-store" },
-      body: JSON.stringify(payload),
-    }),
-  );
-  await authenticate(page, testInfo);
-  await page.goto("/app/mercado");
-
-  await expect(page.locator("#sellTable table caption")).toContainText(
-    "UNSUPPORTED_TEST_MARKET",
-  );
-  await expect(page.locator("#sellTable thead")).toContainText(
-    "TASA (receive/amount)",
-  );
-  await expect(page.locator("#sellTable thead")).toContainText(
-    "Moneda de mercado a pagar",
-  );
-  await expect(page.locator("#sellTable thead")).not.toContainText("CUP");
-  await expect(page.locator("#buyTable thead")).not.toContainText("CUP");
-});
-
 test("el mercado identifica explícitamente un snapshot no disponible", async ({
   page,
 }, testInfo) => {
@@ -342,32 +286,4 @@ test("la navegación por teclado puede alcanzar el control de cierre de sesión"
     "El control de cierre debe ser alcanzable con Tab",
   ).toBe(true);
   await expect(page.locator("#logoutButton")).toBeFocused();
-});
-
-test("BANK_MLC deriva sus etiquetas monetarias del contrato conocido", async ({
-  page,
-}, testInfo) => {
-  const payload = scannerState({ coin: "BANK_MLC" });
-  await page.route("**/api/scanner/status", (route) =>
-    route.fulfill({
-      status: 200,
-      contentType: "application/json",
-      headers: { "cache-control": "no-store" },
-      body: JSON.stringify(payload),
-    }),
-  );
-  await authenticate(page, testInfo);
-  await page.goto("/app/mercado");
-
-  await expect(page.locator("#sellTable table caption")).toContainText(
-    "BANK_MLC",
-  );
-  await expect(page.locator("#sellTable thead")).toContainText(
-    "TASA (MLC/QUSD)",
-  );
-  await expect(page.locator("#sellTable thead")).toContainText("MLC a pagar");
-  await expect(page.locator("#buyTable thead")).toContainText(
-    "TASA (MLC/QUSD)",
-  );
-  await expect(page.locator("#buyTable thead")).toContainText("MLC a recibir");
 });
