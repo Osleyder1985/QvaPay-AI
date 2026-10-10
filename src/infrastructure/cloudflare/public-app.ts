@@ -169,9 +169,7 @@ function buildMarketView(market: Market | null, completedAt: string | null) {
           .replace(/\.$/, "")
       : null;
   const spreadPercent =
-    bestBuyNumber !== null &&
-    bestBuyNumber !== 0 &&
-    bestSellNumber !== null
+    bestBuyNumber !== null && bestBuyNumber !== 0 && bestSellNumber !== null
       ? ((bestSellNumber - bestBuyNumber) / bestBuyNumber) * 100
       : null;
 
@@ -247,7 +245,7 @@ ${renderDashboardModuleView(moduleId)}
 ${renderApplicationShellModuleMountEnd()}
 ${renderApplicationShellEnd()}
 ${DASHBOARD_CLIENT_SCRIPT}
-</body></html>`
+</body></html>`;
 
 /**
  * @proposito API pública createPublicAppResponse: implementa el comportamiento expuesto por este módulo.
