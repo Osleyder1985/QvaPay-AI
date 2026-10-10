@@ -102,7 +102,10 @@ describe("public production dashboard", () => {
     expect(body).toContain("10");
     expect(body).toContain("Centro de mando");
     expect(body).toContain("performance.now()");
-    expect(body).toContain("setInterval(refresh,5000)");
+    expect(body).toContain("scheduleRefresh()");
+    expect(body).toContain('document.addEventListener("visibilitychange"');
+    expect(body).toContain("refreshDelay=Math.min(60000,Math.max(5000,refreshDelay*2))");
+    expect(body).not.toContain("setInterval(refresh,5000)");
     expect(body).not.toContain('id="auditoria"');
     expect(body).not.toContain('id="cuenta"');
     expect(body).not.toContain('id="mercado"');
