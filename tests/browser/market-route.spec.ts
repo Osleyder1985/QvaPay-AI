@@ -167,7 +167,9 @@ test("los valores monetarios ausentes de BANK_CUP no se representan como cero", 
   page,
 }, testInfo) => {
   const payload = scannerState();
-  Object.assign(payload.buyOffers[0], { amount: null, fiatAmount: null });
+  const firstBuyOffer = payload.buyOffers[0];
+  if (!firstBuyOffer) throw new Error("La fixture BANK_CUP requiere una oferta BUY.");
+  Object.assign(firstBuyOffer, { amount: null, fiatAmount: null });
   await page.route("**/api/scanner/status", (route) =>
     route.fulfill({
       status: 200,
