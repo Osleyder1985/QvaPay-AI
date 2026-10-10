@@ -114,15 +114,23 @@ test("el mercado autenticado muestra los dos libros en modo de solo lectura", as
 
   expect(response?.status()).toBe(200);
   await expect(page.locator("body")).toHaveAttribute("data-module", "mercado");
-  await expect(page.getByRole("heading", { name: "Mercado P2P" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: /SELL.*acción Comprar/ })).toBeVisible();
-  await expect(page.getByRole("heading", { name: /BUY.*acción Vender/ })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Mercado P2P" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: /SELL.*acción Comprar/ }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: /BUY.*acción Vender/ }),
+  ).toBeVisible();
   await expect(page.locator("#marketIntegrity")).toContainText("ACTUAL");
   await expect(page.locator("#sellTable")).toContainText("vendedor-prueba");
   await expect(page.locator("#buyTable")).toContainText("comprador-prueba");
   await expect(page.locator("#sellTable")).toContainText("1,001.00");
   await expect(page.locator("#buyTable")).toContainText("1,000.00");
-  await expect(page.getByRole("button", { name: /Comprar|Vender/ })).toHaveCount(0);
+  await expect(
+    page.getByRole("button", { name: /Comprar|Vender/ }),
+  ).toHaveCount(0);
   await expect(page.locator("#sellTable table caption")).toHaveText("Ofertas SELL · Comprar");
   await expect(page.locator("#buyTable table caption")).toHaveText("Ofertas BUY · Vender");
 });
