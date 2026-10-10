@@ -141,8 +141,7 @@ export function renderDashboardModuleView(moduleId: string): string {
 
   const sectionsByModule: Record<string, string> = {
     inicio: hero + footer,
-    cuenta:
-      extractSection(markup, "cuenta") + accountSecurityWithoutControls,
+    cuenta: extractSection(markup, "cuenta") + accountSecurityWithoutControls,
     mercado: hero + extractSection(markup, "mercado") + footer,
     operaciones: extractSection(markup, "operaciones"),
     usuarios: extractSection(markup, "administracion"),
