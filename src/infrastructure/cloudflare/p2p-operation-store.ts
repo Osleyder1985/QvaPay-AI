@@ -12,21 +12,11 @@ import type { D1Database } from "@cloudflare/workers-types";
 
 export type P2POperationSource = "MANUAL" | "AUTO_APPLY";
 export type P2PApplyStatus =
-  | "RESERVED"
-  | "APPLYING"
-  | "CONFIRMED"
-  | "REJECTED"
-  | "AMBIGUOUS";
+  "RESERVED" | "APPLYING" | "CONFIRMED" | "REJECTED" | "AMBIGUOUS";
 export type P2PDetailStatus =
-  | "NOT_REQUESTED"
-  | "PENDING"
-  | "AVAILABLE"
-  | "FAILED";
+  "NOT_REQUESTED" | "PENDING" | "AVAILABLE" | "FAILED";
 export type P2PDetailErrorCode =
-  | "TIMEOUT"
-  | "HTTP_5XX"
-  | "UNAVAILABLE"
-  | "CONTRACT";
+  "TIMEOUT" | "HTTP_5XX" | "UNAVAILABLE" | "CONTRACT";
 
 export interface P2POperation {
   readonly id: string;
