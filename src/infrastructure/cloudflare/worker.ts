@@ -523,12 +523,26 @@ export default {
         );
       }
 
-      const account = await getCurrentQvaPayAccountSnapshot(env.DB);
-      const identity = account?.snapshot.identity;
+      let accountSnapshot;
+      try {
+        const accountClient = new QvaPayAccountClient({
+          baseUrl: env.QVAPAY_API_BASE_URL,
+          appId: env.QVAPAY_APP_ID,
+          appSecret: env.QVAPAY_APP_SECRET,
+          userApiToken: env.QVAPAY_USER_API_TOKEN,
+        });
+        accountSnapshot = await accountClient.fetchAccount();
+        await persistQvaPayAccountSnapshot(env.DB, accountSnapshot);
+      } catch {
+        return jsonError(
+          "No se pudo verificar en tiempo real la cuenta QvaPay; no se envió ninguna aplicación.",
+          503,
+        );
+      }
+      const identity = accountSnapshot.identity;
       if (
-        !account ||
-        account.integrationStatus !== "verified" ||
-        !account.snapshot.ownerCorrelationOk ||
+        accountSnapshot.integrationStatus !== "verified" ||
+        !accountSnapshot.ownerCorrelationOk ||
         !identity ||
         !identity.p2pEnabled ||
         identity.kyc !== true ||
