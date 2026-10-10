@@ -105,6 +105,68 @@ export async function ensureP2POperationSchema(db: D1Database): Promise<void> {
 }
 
 /**
+ * @proposito Registrar una reserva que todavía no ha enviado un POST al proveedor.
+ * @responsabilidades Liberar únicamente una reserva propia que siga en RESERVED; nunca
+ * eliminar una operación reclamada o con resultado potencialmente remoto.
+ * @param db Base de datos D1.
+ * @param operationId Identificador estable de la operación.
+ * @returns true si se liberó una reserva no reclamada.
+ */
+export async function releaseReservedP2POperation(
+  db: D1Database,
+  operationId: string,
+): Promise<boolean> {
+  const result = await db
+    .prepare(
+      "DELETE FROM p2p_operations WHERE id = ? AND apply_status = 'RESERVED'",
+    )
+    .bind(operationId)
+    .run();
+  return Number(result.meta?.changes ?? 0) === 1;
+}
+
+/**
+ * @proposito Registrar eventos de la operación P2P en la bitácora de seguridad.
+ * @responsabilidades Guardar solo identificadores y estados, sin credenciales ni cuerpos
+ * remotos; vincular cada evento con la operación persistida.
+ * @param db Base de datos D1.
+ * @param input Datos mínimos del evento auditable.
+ */
+export async function recordP2POperationAudit(
+  db: D1Database,
+  input: {
+    readonly actorUserId: string;
+    readonly actorUsername: string;
+    readonly operationId: string;
+    readonly offerUuid: string;
+    readonly eventType: "p2p_apply_attempt" | "p2p_apply_result" | "p2p_apply_detail";
+    readonly outcome: "SUCCESS" | "FAILURE" | "DENIED";
+    readonly applyStatus: P2PApplyStatus;
+    readonly detailStatus: P2PDetailStatus;
+  },
+): Promise<void> {
+  await db
+    .prepare(
+      "INSERT INTO security_audit_log (id, occurred_at, actor_user_id, actor_username, event_type, outcome, target_user_id, target_username, metadata_json) VALUES (?, ?, ?, ?, ?, ?, NULL, NULL, ?)",
+    )
+    .bind(
+      crypto.randomUUID(),
+      new Date().toISOString(),
+      input.actorUserId,
+      input.actorUsername,
+      input.eventType,
+      input.outcome,
+      JSON.stringify({
+        operationId: input.operationId,
+        offerUuid: input.offerUuid,
+        applyStatus: input.applyStatus,
+        detailStatus: input.detailStatus,
+      }),
+    )
+    .run();
+}
+
+/**
  * @proposito Reservar una oferta P2P mediante una inserción idempotente.
  * @responsabilidades Usar la restricción única de D1 para que solo un origen gane
  * la carrera; las llamadas posteriores recuperan la operación existente.
