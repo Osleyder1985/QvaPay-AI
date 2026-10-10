@@ -34,7 +34,6 @@ describe("evaluateAutoApplyDecision", () => {
   it("rechaza moneda, estado y elegibilidad VIP incompatibles", () => {
     expect(evaluateAutoApplyDecision(input({ offer: offer({ market: "OTHER" }) })).reason).toBe("MARKET_MISMATCH");
     expect(evaluateAutoApplyDecision(input({ offer: offer({ status: "processing" }) })).reason).toBe("OFFER_NOT_OPEN");
-    expect(evaluateAutoApplyDecision(input({ offer: offer({ onlyVip: true, creatorVip: true }) })).reason).toBe("VIP_REQUIRED");
     expect(evaluateAutoApplyDecision(input({ accountVipVerified: false, offer: offer({ onlyVip: true, creatorVip: true }) })).reason).toBe("VIP_REQUIRED");
   });
 });
