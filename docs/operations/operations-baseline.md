@@ -64,7 +64,7 @@ La rama de trabajo integra `POST /api/p2p/:uuid/apply` con el almacén D1 compar
 Condiciones previas server-side:
 
 - sesión válida con rol `ADMINISTRATION` y validación CSRF/origin;
-- snapshot de cuenta con identidad y correlación de propietario verificadas;
+- consulta en tiempo real de cuenta con identidad y correlación de propietario verificadas, persistida como snapshot;
 - cuenta habilitada para P2P, KYC, teléfono y Telegram verificados;
 - oferta abierta presente en el snapshot fresco del mercado y detalle autoritativo de QvaPay;
 - rechazo de ofertas propias y aplicación a ofertas VIP solo si la cuenta cumple la elegibilidad;
