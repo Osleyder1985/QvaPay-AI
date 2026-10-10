@@ -70,6 +70,17 @@ El cálculo de la tasa se realiza actualmente mediante representación numérica
 
 La operación `POST /p2p/:uuid/apply` existe como capacidad independiente de lectura y requiere token de acción más credenciales server-side.
 
+## Etiquetas monetarias de la tabla
+
+La tabla utiliza el mercado activo comunicado por el snapshot del scanner. Para `BANK_CUP`, la documentación oficial del proveedor identifica la moneda seleccionada como Transferencia CUP y define `ratio = receive / amount`; por ello la presentación de tasa es `CUP/QUSD`. El encabezado de cantidad del activo se mantiene como QUSD.
+
+Cuando el identificador de mercado no tiene una unidad de moneda validada en el contrato disponible, la interfaz debe mostrar una etiqueta genérica basada en la semántica `receive / amount` y no reutilizar CUP por defecto. La identidad del mercado activo debe seguir visible. La ampliación a otros mercados requiere evidencia contractual explícita y pruebas de regresión para cada par; no se realizan conversiones ni cambios de cálculo por formato de presentación.
+
+## Justificación normativa
+
+- ISO/IEC 25012: exactitud y consistencia de unidades frente al contrato de origen.
+- ISO 9241-110: autodescriptividad de las etiquetas para evitar ambigüedad en la lectura de datos financieros.
+
 ## Fuente externa
 
 La documentación oficial de QvaPay continúa siendo la fuente normativa del proveedor. Este documento describe el contrato utilizado por QvaPay-AI.
