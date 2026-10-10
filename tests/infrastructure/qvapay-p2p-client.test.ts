@@ -319,26 +319,28 @@ describe("QvaPay P2P apply", () => {
   });
 
   it("recupera el detalle autoritativo con token de cuenta y valida participantes", async () => {
-    const fetcher = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
-      expect(String(input)).toBe("https://api.qvapay.com/p2p/offer-123");
-      expect(init?.method).toBe("GET");
-      expect(new Headers(init?.headers).get("authorization")).toBe(
-        "Bearer account-token",
-      );
-      return responseFor({
-        message: "P2P",
-        p2p: {
-          uuid: "offer-123",
-          status: "processing",
-          coin: "BANK_CUP",
-          type: "sell",
-          only_vip: false,
-          only_kyc: true,
-          User: { uuid: "owner-123" },
-          Peer: { uuid: "peer-456" },
-        },
-      });
-    });
+    const fetcher = vi.fn(
+      async (input: RequestInfo | URL, init?: RequestInit) => {
+        expect(String(input)).toBe("https://api.qvapay.com/p2p/offer-123");
+        expect(init?.method).toBe("GET");
+        expect(new Headers(init?.headers).get("authorization")).toBe(
+          "Bearer account-token",
+        );
+        return responseFor({
+          message: "P2P",
+          p2p: {
+            uuid: "offer-123",
+            status: "processing",
+            coin: "BANK_CUP",
+            type: "sell",
+            only_vip: false,
+            only_kyc: true,
+            User: { uuid: "owner-123" },
+            Peer: { uuid: "peer-456" },
+          },
+        });
+      },
+    );
     const client = new QvaPayP2PClient({
       baseUrl: "https://api.qvapay.com",
       ...credentials,
@@ -374,9 +376,9 @@ describe("QvaPay P2P apply", () => {
   });
 
   it("clasifica el fallo de detalle como recuperable sin convertirlo en fallo de apply", async () => {
-    const fetcher = vi.fn().mockResolvedValue(
-      new Response("unavailable", { status: 503 }),
-    );
+    const fetcher = vi
+      .fn()
+      .mockResolvedValue(new Response("unavailable", { status: 503 }));
     const client = new QvaPayP2PClient({
       baseUrl: "https://api.qvapay.com",
       ...credentials,
