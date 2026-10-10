@@ -110,7 +110,7 @@ Estados persistidos de aplicación:
 - `REJECTED`: el proveedor rechazó explícitamente la aplicación.
 - `AMBIGUOUS`: no se puede determinar el resultado; la reserva no se libera.
 
-El estado del detalle es independiente: `NOT_REQUESTED`, `PENDING`, `AVAILABLE` o `FAILED`. Una aplicación confirmada deja el detalle en `PENDING`; un fallo de consulta solo afecta al estado del detalle y nunca cambia la aplicación confirmada. La reserva no se elimina ni se reutiliza automáticamente después de un resultado ambiguo.
+El estado del detalle es independiente: `NOT_REQUESTED`, `PENDING`, `AVAILABLE` o `FAILED`. Para la ruta manual, un HTTP exitoso de apply no basta para declarar `CONFIRMED`: la consulta autoritativa debe devolver el mismo UUID, `status = processing` y `peerUuid` igual al UUID de cuenta verificado mediante `/user`. Si el detalle no está disponible o no coincide con la identidad, la operación permanece `AMBIGUOUS` y no se repite el POST. La reserva no se elimina ni se reutiliza automáticamente después de un resultado ambiguo.
 
 Esta etapa añade el esquema y las transiciones persistentes. No activa todavía la ruta financiera ni demuestra por sí sola que el flujo manual y Auto Apply ya estén conectados al almacén. Esa integración requiere los controles y pruebas end-to-end de #229, #231 y #235.
 
@@ -123,7 +123,7 @@ Fuentes oficiales:
 - [Detalle de Oferta P2P](https://www.qvapay.com/docs/p2p/detail).
 - [Aplicar a Oferta P2P](https://www.qvapay.com/docs/p2p/apply).
 
-Antes de aplicar, la ruta comprueba que el detalle siga en estado `open` y que se pueda identificar al propietario para rechazar una oferta propia. Después de una respuesta de apply confirmada, vuelve a consultar el detalle. Si esta segunda consulta falla, la operación permanece `CONFIRMED` y solo se marca el detalle como `FAILED`; no se repite el POST.
+Antes de aplicar, la ruta comprueba que el detalle siga en estado `open` y que se pueda identificar al propietario para rechazar una oferta propia. Después del POST, vuelve a consultar el detalle y solo confirma si UUID, estado `processing` e identidad verificada coinciden. Si la consulta falla o devuelve un contrato/identidad no coincidente, el resultado es `AMBIGUOUS`, se registra el detalle como `FAILED` y no se repite el POST.
 
 La implementación debe continuar bloqueada en producción hasta que la verificación del despliegue confirme los controles de autenticación y el flujo de operaciones.
 
