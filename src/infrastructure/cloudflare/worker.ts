@@ -628,7 +628,16 @@ export default {
         status: number,
       ): Promise<Response> => {
         try {
-          await releaseReservedP2POperation(env.DB, reservation.operation.id);
+          const released = await releaseReservedP2POperation(
+            env.DB,
+            reservation.operation.id,
+          );
+          if (!released) {
+            return jsonError(
+              "No se pudo confirmar la liberación de la reserva P2P; requiere revisión operativa.",
+              503,
+            );
+          }
         } catch {
           return jsonError(
             "No se pudo liberar de forma segura la reserva P2P; requiere revisión operativa.",
