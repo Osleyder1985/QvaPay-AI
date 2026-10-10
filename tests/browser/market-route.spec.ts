@@ -264,13 +264,18 @@ test("la navegación por teclado puede alcanzar el control de cierre de sesión"
   let reachedLogout = false;
   for (let index = 0; index < 40; index += 1) {
     await page.keyboard.press("Tab");
-    if (await page.locator("#logoutButton").evaluate(
-      (element) => element === document.activeElement,
-    )) {
+    if (
+      await page
+        .locator("#logoutButton")
+        .evaluate((element) => element === document.activeElement)
+    ) {
       reachedLogout = true;
       break;
     }
   }
-  expect(reachedLogout, "El control de cierre debe ser alcanzable con Tab").toBe(true);
+  expect(
+    reachedLogout,
+    "El control de cierre debe ser alcanzable con Tab",
+  ).toBe(true);
   await expect(page.locator("#logoutButton")).toBeFocused();
 });
