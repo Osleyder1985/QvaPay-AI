@@ -516,52 +516,6 @@ export default {
       if (!offerUuid || offerUuid.length > 200) {
         return jsonError("El identificador de oferta no es válido.", 400);
       }
-      if (!env.QVAPAY_USER_API_TOKEN) {
-        return jsonError(
-          "La reconciliación segura de la cuenta QvaPay no está configurada.",
-          503,
-        );
-      }
-
-      let accountSnapshot;
-      try {
-        const accountClient = new QvaPayAccountClient({
-          baseUrl: env.QVAPAY_API_BASE_URL,
-          appId: env.QVAPAY_APP_ID,
-          appSecret: env.QVAPAY_APP_SECRET,
-          userApiToken: env.QVAPAY_USER_API_TOKEN,
-        });
-        accountSnapshot = await accountClient.fetchAccount();
-        await persistQvaPayAccountSnapshot(env.DB, accountSnapshot);
-      } catch {
-        return jsonError(
-          "No se pudo verificar en tiempo real la cuenta QvaPay; no se envió ninguna aplicación.",
-          503,
-        );
-      }
-      const identity = accountSnapshot.identity;
-      if (
-        accountSnapshot.integrationStatus !== "verified" ||
-        !accountSnapshot.ownerCorrelationOk ||
-        !identity ||
-        !identity.p2pEnabled ||
-        identity.kyc !== true ||
-        identity.phoneVerified !== true ||
-        identity.telegramVerified !== true
-      ) {
-        return jsonError(
-          "La cuenta QvaPay no tiene una identidad y elegibilidad P2P verificadas. Sincroniza la cuenta antes de operar.",
-          403,
-        );
-      }
-
-      const client = new QvaPayP2PClient({
-        baseUrl: env.QVAPAY_API_BASE_URL,
-        appId: env.QVAPAY_APP_ID,
-        appSecret: env.QVAPAY_APP_SECRET,
-        userApiToken: env.QVAPAY_USER_API_TOKEN,
-      });
-
       let reservation;
       try {
         await ensureP2POperationSchema(env.DB);
@@ -575,14 +529,33 @@ export default {
         return jsonError("No se pudo reservar la operación P2P.", 503);
       }
 
-      // Una aplicación confirmada puede dejar la oferta remota en "processing".
-      // La recuperación del detalle debe preceder a las validaciones para nuevas aplicaciones.
+      // La recuperación de una aplicación confirmada no debe depender del snapshot de cuenta.
+      // Solo consulta el detalle remoto y nunca repite el POST financiero.
       if (
         reservation.operation.applyStatus === "CONFIRMED" &&
         ["PENDING", "FAILED"].includes(reservation.operation.detailStatus)
       ) {
+        if (!env.QVAPAY_USER_API_TOKEN) {
+          return Response.json(
+            {
+              operationId: reservation.operation.id,
+              applyStatus: "CONFIRMED",
+              detailStatus: reservation.operation.detailStatus,
+              message:
+                "La aplicación está confirmada; falta configurar la credencial para recuperar el detalle.",
+              alreadyApplied: true,
+            },
+            { status: 202, headers: { "cache-control": "no-store" } },
+          );
+        }
+        const recoveryClient = new QvaPayP2PClient({
+          baseUrl: env.QVAPAY_API_BASE_URL,
+          appId: env.QVAPAY_APP_ID,
+          appSecret: env.QVAPAY_APP_SECRET,
+          userApiToken: env.QVAPAY_USER_API_TOKEN,
+        });
         try {
-          const detail = await client.fetchOfferDetail(offerUuid);
+          const detail = await recoveryClient.fetchOfferDetail(offerUuid);
           await recordP2PDetailOutcome(env.DB, reservation.operation.id, {
             available: true,
           });
@@ -646,6 +619,52 @@ export default {
         }
         return jsonError(message, status);
       };
+
+      if (!env.QVAPAY_USER_API_TOKEN) {
+        return rejectReservedOperation(
+          "La reconciliación segura de la cuenta QvaPay no está configurada.",
+          503,
+        );
+      }
+
+      let accountSnapshot;
+      try {
+        const accountClient = new QvaPayAccountClient({
+          baseUrl: env.QVAPAY_API_BASE_URL,
+          appId: env.QVAPAY_APP_ID,
+          appSecret: env.QVAPAY_APP_SECRET,
+          userApiToken: env.QVAPAY_USER_API_TOKEN,
+        });
+        accountSnapshot = await accountClient.fetchAccount();
+        await persistQvaPayAccountSnapshot(env.DB, accountSnapshot);
+      } catch {
+        return rejectReservedOperation(
+          "No se pudo verificar en tiempo real la cuenta QvaPay; no se envió ninguna aplicación.",
+          503,
+        );
+      }
+      const identity = accountSnapshot.identity;
+      if (
+        accountSnapshot.integrationStatus !== "verified" ||
+        !accountSnapshot.ownerCorrelationOk ||
+        !identity ||
+        !identity.p2pEnabled ||
+        identity.kyc !== true ||
+        identity.phoneVerified !== true ||
+        identity.telegramVerified !== true
+      ) {
+        return rejectReservedOperation(
+          "La cuenta QvaPay no tiene una identidad y elegibilidad P2P verificadas. Sincroniza la cuenta antes de operar.",
+          403,
+        );
+      }
+
+      const client = new QvaPayP2PClient({
+        baseUrl: env.QVAPAY_API_BASE_URL,
+        appId: env.QVAPAY_APP_ID,
+        appSecret: env.QVAPAY_APP_SECRET,
+        userApiToken: env.QVAPAY_USER_API_TOKEN,
+      });
 
       const runtimeState = await stub.getState();
       const market = runtimeState.market;
