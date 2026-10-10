@@ -553,7 +553,9 @@ test("la acción Comprar envía una solicitud simulada y nunca contacta QvaPay d
       request.url().endsWith("/api/p2p/test-sell-1/apply") &&
       request.method() === "POST",
   );
-  await page.getByRole("button", { name: /Comprar oferta test-sell-1/ }).click();
+  await page
+    .getByRole("button", { name: /Comprar oferta test-sell-1/ })
+    .click();
   await applyRequest;
 
   expect(applyRequestCount).toBe(1);
