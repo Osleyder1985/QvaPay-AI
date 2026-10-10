@@ -14,6 +14,8 @@
 
 import type { D1Database } from "@cloudflare/workers-types";
 import type { Offer } from "../../domain/offer.js";
+import type { QvaPayAccountClient } from "../qvapay/qvapay-account-client.js";
+import type { QvaPayP2PClient } from "../qvapay/qvapay-p2p-client.js";
 import type {
   AutoApplyExecutionPorts,
   AutoApplyStrategy,
@@ -41,6 +43,47 @@ export interface AutoApplyProvider {
   }>;
   /** UUID de la cuenta autenticada, obtenido de una fuente server-side verificada. */
   getVerifiedAccountUuid?(): Promise<string | null>;
+}
+
+/**
+ * @proposito Crear un proveedor Auto Apply con clientes reales de QvaPay.
+ * @responsabilidades Reutilizar la API P2P y aceptar la identidad solo cuando el snapshot
+ * server-side valida /user, correlación de aplicación y estado de integración verificado.
+ * @param p2pClient Cliente P2P con aplicación única y consulta de detalle.
+ * @param accountClient Cliente que obtiene y valida el perfil de cuenta QvaPay.
+ * @returns Proveedor compatible con los puertos de ejecución de Auto Apply.
+ */
+export function createQvaPayAutoApplyProvider(
+  p2pClient: Pick<QvaPayP2PClient, "applyOffer" | "fetchOfferDetail">,
+  accountClient: Pick<QvaPayAccountClient, "fetchAccount">,
+): AutoApplyProvider {
+  return {
+    applyOffer: (offerUuid) => p2pClient.applyOffer(offerUuid),
+    fetchOfferDetail: async (offerUuid) => {
+      const detail = await p2pClient.fetchOfferDetail(offerUuid);
+      return {
+        uuid: detail.uuid,
+        status: detail.status,
+        peerUuid: detail.peerUuid,
+      };
+    },
+    getVerifiedAccountUuid: async () => {
+      const snapshot = await accountClient.fetchAccount();
+      const uuid = snapshot.identity?.uuid;
+      if (
+        snapshot.integrationStatus !== "verified" ||
+        snapshot.identitySource !== "/user" ||
+        snapshot.identityProvenance.status !== "verified" ||
+        !snapshot.identityOk ||
+        !snapshot.ownerCorrelationOk ||
+        typeof uuid !== "string" ||
+        uuid.trim() === ""
+      ) {
+        return null;
+      }
+      return uuid;
+    },
+  };
 }
 
 export interface D1AutoApplyExecutionOptions {
