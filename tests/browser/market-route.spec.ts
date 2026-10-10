@@ -345,7 +345,10 @@ test("el mercado aísla el desplazamiento de tablas sin desbordar la página", a
     ).toBeLessThanOrEqual(dimensions.viewport);
 
     for (const scroller of dimensions.scrollers) {
-      expect(scroller.left, `${scroller.id} sale por la izquierda`).toBeGreaterThanOrEqual(-1);
+      expect(
+        scroller.left,
+        `${scroller.id} sale por la izquierda`,
+      ).toBeGreaterThanOrEqual(-1);
       expect(
         scroller.right,
         `${scroller.id} sale por la derecha: ${JSON.stringify(scroller)}`,
@@ -410,7 +413,10 @@ test("la ruta de mercado supera el análisis automatizado de accesibilidad", asy
   await page.goto("/app/mercado");
   await expect(page.locator("#marketIntegrity")).toContainText("ACTUAL");
 
-  await expectNoAccessibilityViolations(page, "mercado con snapshot disponible");
+  await expectNoAccessibilityViolations(
+    page,
+    "mercado con snapshot disponible",
+  );
 });
 
 test("la navegación por teclado puede alcanzar el control de cierre de sesión", async ({
