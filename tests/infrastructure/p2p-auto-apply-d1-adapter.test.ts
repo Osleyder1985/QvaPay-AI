@@ -131,7 +131,6 @@ describe("createD1AutoApplyExecutionPorts", () => {
   });
 });
 
-
 describe("createQvaPayAutoApplyProvider", () => {
   it("usa la identidad de /user solo con integración y correlación verificadas", async () => {
     const fetchOfferDetail = vi.fn(async () => ({
@@ -149,18 +148,25 @@ describe("createQvaPayAutoApplyProvider", () => {
       fetchOfferDetail,
     } as unknown as Pick<QvaPayP2PClient, "applyOffer" | "fetchOfferDetail">;
     const accountClient = {
-      fetchAccount: vi.fn(async () => ({
-        integrationStatus: "verified",
-        identitySource: "/user",
-        identityProvenance: { status: "verified" },
-        identityOk: true,
-        ownerCorrelationOk: true,
-        identity: { uuid: "account-verified" },
-      } as unknown as Awaited<ReturnType<QvaPayAccountClient["fetchAccount"]>>)),
+      fetchAccount: vi.fn(
+        async () =>
+          ({
+            integrationStatus: "verified",
+            identitySource: "/user",
+            identityProvenance: { status: "verified" },
+            identityOk: true,
+            ownerCorrelationOk: true,
+            identity: { uuid: "account-verified" },
+          }) as unknown as Awaited<
+            ReturnType<QvaPayAccountClient["fetchAccount"]>
+          >,
+      ),
     } as Pick<QvaPayAccountClient, "fetchAccount">;
 
     const provider = createQvaPayAutoApplyProvider(p2pClient, accountClient);
-    await expect(provider.getVerifiedAccountUuid?.()).resolves.toBe("account-verified");
+    await expect(provider.getVerifiedAccountUuid?.()).resolves.toBe(
+      "account-verified",
+    );
     await expect(provider.fetchOfferDetail?.("offer-1")).resolves.toEqual({
       uuid: "offer-1",
       status: "processing",
@@ -170,14 +176,19 @@ describe("createQvaPayAutoApplyProvider", () => {
 
   it("rechaza la identidad si el snapshot /user no está completamente verificado", async () => {
     const accountClient = {
-      fetchAccount: vi.fn(async () => ({
-        integrationStatus: "degraded",
-        identitySource: "/user",
-        identityProvenance: { status: "verified" },
-        identityOk: true,
-        ownerCorrelationOk: false,
-        identity: { uuid: "account-unverified" },
-      } as unknown as Awaited<ReturnType<QvaPayAccountClient["fetchAccount"]>>)),
+      fetchAccount: vi.fn(
+        async () =>
+          ({
+            integrationStatus: "degraded",
+            identitySource: "/user",
+            identityProvenance: { status: "verified" },
+            identityOk: true,
+            ownerCorrelationOk: false,
+            identity: { uuid: "account-unverified" },
+          }) as unknown as Awaited<
+            ReturnType<QvaPayAccountClient["fetchAccount"]>
+          >,
+      ),
     } as Pick<QvaPayAccountClient, "fetchAccount">;
     const p2pClient = {
       applyOffer: vi.fn(async () => ({ success: true })),
