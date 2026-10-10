@@ -140,7 +140,10 @@ export function createD1AutoApplyExecutionPorts(
       }
 
       // Solo se confirma con detalle autoritativo y UUID de cuenta verificado.
-      if (!options.provider.fetchOfferDetail || !options.provider.getVerifiedAccountUuid) {
+      if (
+        !options.provider.fetchOfferDetail ||
+        !options.provider.getVerifiedAccountUuid
+      ) {
         return { status: "AMBIGUOUS" as const, httpStatus: null };
       }
       try {
