@@ -180,5 +180,5 @@ describe("contrato de temporización del dashboard", () => {
       "refreshDelay=Math.min(60000,Math.max(5000,refreshDelay*2))",
     );
     expect(DASHBOARD_CLIENT_SCRIPT).not.toContain("setInterval(refresh,5000)");
-  });;
+  });
 });
