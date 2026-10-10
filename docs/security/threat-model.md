@@ -24,7 +24,17 @@
 | Reintentos duplicados         | Medio      | límites de reintento y control de ejecución   |
 | Información sensible en logs  | Alto       | Sanitización                                  |
 
-## Riesgo operativo
+## Integridad de operaciones P2P
+
+| Amenaza                                                       | Impacto | Control requerido                                                                   |
+| ------------------------------------------------------------- | ------- | ----------------------------------------------------------------------------------- |
+| Aplicación manual y Auto Apply concurrentes a la misma oferta | Crítico | Reserva D1 única por `offer_uuid` y reclamación condicional                         |
+| Timeout tras enviar el POST                                   | Crítico | Estado `AMBIGUOUS`, sin reintento automático                                        |
+| Aplicación aceptada y detalle no disponible                   | Crítico | Estado de aplicación separado del estado de detalle; reconciliación de solo lectura |
+| Reinicio del Worker tras reservar una oferta                  | Alto    | Estado persistente D1; nunca confiar en memoria del proceso                         |
+| Auditor intenta ejecutar una operación                        | Alto    | RBAC server-side exclusivo para Administration                                      |
+
+El almacén persistente es la base de la protección, pero no significa que el flujo esté habilitado: el endpoint permanece en 501 hasta que las transiciones estén conectadas y verificadas end-to-end.
 
 La capacidad de aplicación P2P es una operación real y no debe confundirse con una simulación. Cualquier automatización posterior requiere controles adicionales, autorización explícita y verificación específica.
 

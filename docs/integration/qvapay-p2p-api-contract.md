@@ -98,6 +98,22 @@ Reglas de seguridad:
 
 La prueba automatizada usa un proveedor simulado que no responde y verifica el timeout, la cancelación y que solo se envía una llamada. No se envían órdenes reales durante CI.
 
+## Reserva idempotente y estado de operación
+
+La infraestructura D1 define una reserva única por `offer_uuid`, compartida por los orígenes `MANUAL` y `AUTO_APPLY`. La restricción de unicidad de la base de datos, no una comprobación en memoria ni del navegador, decide qué solicitud crea la operación.
+
+Estados persistidos de aplicación:
+
+- `RESERVED`: reserva creada antes de contactar al proveedor.
+- `APPLYING`: un único ejecutor reclamó la reserva mediante una transición condicional.
+- `CONFIRMED`: QvaPay confirmó la aplicación.
+- `REJECTED`: el proveedor rechazó explícitamente la aplicación.
+- `AMBIGUOUS`: no se puede determinar el resultado; la reserva no se libera.
+
+El estado del detalle es independiente: `NOT_REQUESTED`, `PENDING`, `AVAILABLE` o `FAILED`. Una aplicación confirmada deja el detalle en `PENDING`; un fallo de consulta solo afecta al estado del detalle y nunca cambia la aplicación confirmada. La reserva no se elimina ni se reutiliza automáticamente después de un resultado ambiguo.
+
+Esta etapa añade el esquema y las transiciones persistentes. No activa todavía la ruta financiera ni demuestra por sí sola que el flujo manual y Auto Apply ya estén conectados al almacén. Esa integración requiere los controles y pruebas end-to-end de #229, #231 y #235.
+
 ## Aplicación de cambios
 
 Este documento especifica unidades y procedencia de datos; no cambia las reglas de negocio, el cálculo de tasa, el orden BUY/SELL ni los permisos de aplicación. Las etiquetas visuales de mercados adicionales deben implementarse a partir de metadatos contractuales validados y con pruebas de regresión.

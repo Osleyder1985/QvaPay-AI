@@ -79,6 +79,10 @@ El dashboard muestra:
 
 La acción solicita confirmación y una clave de operación antes de llamar al endpoint server-side.
 
+## Seguridad e idempotencia de operaciones
+
+Antes de conectar las acciones visuales, el backend debe reservar la oferta de forma atómica en D1 y conservar estados separados para la aplicación y el detalle autoritativo. Manual y Auto Apply deben usar la misma clave única por oferta. Las operaciones ambiguas permanecen bloqueadas hasta reconciliarse; el navegador no puede liberar una reserva ni autorizar un reintento.
+
 ## Límite de alcance
 
 La aplicación HTTP de una oferta P2P permanece bloqueada (`501`) aunque el cliente de infraestructura contiene la operación técnica. Esto no autoriza creación de un motor de arbitraje ni ejecución automática de estrategias.

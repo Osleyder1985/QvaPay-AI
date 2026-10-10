@@ -59,6 +59,12 @@ Cloudflare Deploy se ejecuta después de un Quality Gate exitoso sobre `main`. E
 
 ## Aplicación P2P
 
+La ruta `POST /api/p2p/:uuid/apply` permanece bloqueada y devuelve HTTP `501` en la versión funcional actual. El cliente de infraestructura no equivale a una capacidad disponible para usuarios ni autoriza órdenes reales.
+
+Antes de habilitarla deben integrarse la reserva idempotente D1 compartida, el manejo de resultados ambiguos, la reconciliación del detalle, RBAC, CSRF/origin, auditoría y pruebas de concurrencia/fallos. Un resultado ambiguo nunca debe disparar automáticamente un segundo POST.
+
+## Aplicación P2P
+
 `POST /api/p2p/:uuid/apply` permite una aplicación real a una oferta cuando se presenta `P2P_ACTION_TOKEN`. Esta operación requiere especial cuidado operacional y no equivale a arbitraje automático.
 
 ## Certificación
