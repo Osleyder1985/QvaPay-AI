@@ -280,9 +280,12 @@ jobs:
           '
 
           echo "Synchronizing QvaPay Account through the authenticated production boundary..."
+          # Control CSRF: las mutaciones autenticadas requieren Origin igual al origen del Worker.
+          # Racional: ISO/IEC 27001:2022, control A.8.26 (requisitos de seguridad de aplicaciones).
           SYNC_RESPONSE="$(curl --fail-with-body --silent --show-error --max-time 90 \
             --request POST \
             --header "Accept: application/json" \
+            --header "Origin: $WORKER_URL" \
             --cookie /tmp/qvapay-account-smoke.cookies \
             "$WORKER_URL/api/account/sync")"
           printf '%s\n' "$SYNC_RESPONSE" | node -e '
