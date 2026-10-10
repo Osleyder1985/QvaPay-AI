@@ -30,6 +30,7 @@ import {
 } from "../qvapay/qvapay-p2p-client.js";
 import {
   claimP2POperation,
+  ensureP2POperationSchema,
   recordP2PApplyOutcome,
   recordP2PDetailOutcome,
   reserveP2POperation,
@@ -603,6 +604,7 @@ export default {
 
       let reservation;
       try {
+        await ensureP2POperationSchema(env.DB);
         reservation = await reserveP2POperation(env.DB, {
           offerUuid,
           source: "MANUAL",
