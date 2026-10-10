@@ -28,6 +28,7 @@ import {
   claimP2POperation,
   confirmP2POperationAfterReconciliation,
   ensureP2POperationSchema,
+  getP2POperation,
   markP2POperationAmbiguous,
   recordP2PApplyOutcome,
   releaseReservedP2POperation,
@@ -219,6 +220,14 @@ export function createD1AutoApplyExecutionPorts(
     async reconcileOnce(operationId, offerUuid) {
       // La reconciliación solo consulta el proveedor: nunca invoca applyOffer.
       await ensureP2POperationSchema(options.db);
+      const operation = await getP2POperation(options.db, operationId);
+      if (
+        !operation ||
+        operation.offerUuid !== offerUuid ||
+        !["APPLYING", "AMBIGUOUS"].includes(operation.applyStatus)
+      ) {
+        return "AMBIGUOUS";
+      }
       if (
         !options.provider.fetchOfferDetail ||
         !options.provider.getVerifiedAccountUuid
