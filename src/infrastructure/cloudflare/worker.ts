@@ -23,6 +23,18 @@ import {
 } from "./auth-rbac.js";
 import { QvaPayAccountClient } from "../qvapay/qvapay-account-client.js";
 import {
+  QvaPayAmbiguousOperationError,
+  QvaPayP2PClient,
+  QvaPayProviderError,
+  QvaPayTransientError,
+} from "../qvapay/qvapay-p2p-client.js";
+import {
+  claimP2POperation,
+  recordP2PApplyOutcome,
+  recordP2PDetailOutcome,
+  reserveP2POperation,
+} from "./p2p-operation-store.js";
+import {
   getCurrentQvaPayAccountSnapshot,
   getLastSuccessfulQvaPayAccountSnapshot,
   persistQvaPayAccountSnapshot,
@@ -478,6 +490,12 @@ export default {
 
     const applyMatch = url.pathname.match(/^\/api\/p2p\/([^/]+)\/apply$/);
     if (applyMatch) {
+      if (request.method !== "POST") {
+        return new Response("Method not allowed", {
+          status: 405,
+          headers: { allow: "POST", "cache-control": "no-store" },
+        });
+      }
       const access = await requireRole(
         request,
         env.DB,
@@ -485,10 +503,272 @@ export default {
         ["ADMINISTRATION"],
       );
       if (access instanceof Response) return access;
-      return jsonError(
-        "La operación P2P está protegida y su ejecución seguirá el contrato operativo existente.",
-        501,
+
+      let offerUuid = "";
+      try {
+        offerUuid = decodeURIComponent(applyMatch[1] ?? "").trim();
+      } catch {
+        return jsonError("El identificador de oferta no es válido.", 400);
+      }
+      if (!offerUuid || offerUuid.length > 200) {
+        return jsonError("El identificador de oferta no es válido.", 400);
+      }
+      if (!env.QVAPAY_USER_API_TOKEN) {
+        return jsonError(
+          "La reconciliación segura de la cuenta QvaPay no está configurada.",
+          503,
+        );
+      }
+
+      const account = await getCurrentQvaPayAccountSnapshot(env.DB);
+      const identity = account?.snapshot.identity;
+      if (
+        !account ||
+        account.integrationStatus !== "verified" ||
+        !account.snapshot.ownerCorrelationOk ||
+        !identity ||
+        !identity.p2pEnabled ||
+        identity.kyc !== true ||
+        identity.phoneVerified !== true ||
+        identity.telegramVerified !== true
+      ) {
+        return jsonError(
+          "La cuenta QvaPay no tiene una identidad y elegibilidad P2P verificadas. Sincroniza la cuenta antes de operar.",
+          403,
+        );
+      }
+
+      const runtimeState = await stub.getState();
+      const market = runtimeState.market;
+      const offer = market?.offers.find((candidate) => candidate.id === offerUuid);
+      const nowMs = Date.now();
+      const observedAtMs = offer ? Date.parse(offer.observedAt) : Number.NaN;
+      const maxAgeMs = Math.max(
+        1,
+        Number(env.SCANNER_INTERVAL_SECONDS) || 10,
+      ) * 2000;
+      if (
+        runtimeState.execution.lastError ||
+        !offer ||
+        offer.status !== "open" ||
+        !Number.isFinite(observedAtMs) ||
+        nowMs - observedAtMs > maxAgeMs ||
+        offer.market !== env.SCANNER_COIN
+      ) {
+        return jsonError(
+          "La oferta no pertenece a un snapshot fresco y accionable. Actualiza el mercado y vuelve a comprobarla.",
+          409,
+        );
+      }
+      if (offer.onlyVip && identity.vip !== true) {
+        return jsonError("La oferta requiere elegibilidad VIP.", 403);
+      }
+
+      const client = new QvaPayP2PClient({
+        baseUrl: env.QVAPAY_API_BASE_URL,
+        appId: env.QVAPAY_APP_ID,
+        appSecret: env.QVAPAY_APP_SECRET,
+        userApiToken: env.QVAPAY_USER_API_TOKEN,
+      });
+
+      let preflightDetail: Awaited<ReturnType<QvaPayP2PClient["fetchOfferDetail"]>>;
+      try {
+        preflightDetail = await client.fetchOfferDetail(offerUuid);
+      } catch (error) {
+        if (error instanceof QvaPayProviderError && error.status === 401) {
+          return jsonError(
+            "La credencial server-side de cuenta QvaPay no pudo autenticarse.",
+            503,
+          );
+        }
+        return jsonError(
+          "No se pudo verificar el detalle autoritativo de la oferta; no se envió ninguna aplicación.",
+          409,
+        );
+      }
+      if (
+        preflightDetail.status !== "open" ||
+        preflightDetail.ownerUuid === identity.uuid
+      ) {
+        return jsonError(
+          preflightDetail.ownerUuid === identity.uuid
+            ? "No se puede aplicar una oferta propia."
+            : "La oferta ya no está abierta en QvaPay.",
+          409,
+        );
+      }
+
+      let reservation;
+      try {
+        reservation = await reserveP2POperation(env.DB, {
+          offerUuid,
+          source: "MANUAL",
+          actorUserId: access.user.id,
+          actorUsername: access.user.username,
+        });
+      } catch {
+        return jsonError("No se pudo reservar la operación P2P.", 503);
+      }
+      if (
+        reservation.operation.applyStatus === "CONFIRMED" &&
+        ["PENDING", "FAILED"].includes(reservation.operation.detailStatus)
+      ) {
+        try {
+          const detail = await client.fetchOfferDetail(offerUuid);
+          await recordP2PDetailOutcome(
+            env.DB,
+            reservation.operation.id,
+            { available: true },
+          );
+          return Response.json(
+            {
+              operationId: reservation.operation.id,
+              applyStatus: "CONFIRMED",
+              detailStatus: "AVAILABLE",
+              offer: detail,
+              alreadyApplied: true,
+            },
+            { status: 200, headers: { "cache-control": "no-store" } },
+          );
+        } catch {
+          return Response.json(
+            {
+              operationId: reservation.operation.id,
+              applyStatus: "CONFIRMED",
+              detailStatus: reservation.operation.detailStatus,
+              message: "La aplicación está confirmada; el detalle sigue pendiente de reconciliación.",
+              alreadyApplied: true,
+            },
+            { status: 202, headers: { "cache-control": "no-store" } },
+          );
+        }
+      }
+      if (!reservation.created && reservation.operation.applyStatus !== "RESERVED") {
+        return Response.json(
+          {
+            operationId: reservation.operation.id,
+            applyStatus: reservation.operation.applyStatus,
+            detailStatus: reservation.operation.detailStatus,
+            message: "Esta oferta ya tiene una operación registrada; no se enviará otra aplicación.",
+          },
+          { status: 409, headers: { "cache-control": "no-store" } },
+        );
+      }
+
+      const claimed = await claimP2POperation(
+        env.DB,
+        reservation.operation.id,
       );
+      if (!claimed) {
+        return jsonError(
+          "La oferta ya está siendo procesada por otra solicitud.",
+          409,
+        );
+      }
+
+      try {
+        await client.applyOffer(offerUuid);
+      } catch (error) {
+        if (error instanceof QvaPayProviderError) {
+          await recordP2PApplyOutcome(
+            env.DB,
+            reservation.operation.id,
+            "REJECTED",
+            error.status,
+          );
+          const status = [400, 401, 403, 404, 409, 429].includes(error.status)
+            ? error.status
+            : 502;
+          return jsonError(
+            status === 409
+              ? "QvaPay ya no permite aplicar esta oferta."
+              : status === 429
+                ? "QvaPay limitó temporalmente las aplicaciones. No se repetirá la solicitud."
+                : status === 401 || status === 403
+                  ? "QvaPay rechazó la autorización de la operación."
+                  : "QvaPay rechazó la aplicación de la oferta.",
+            status,
+          );
+        }
+        await recordP2PApplyOutcome(
+          env.DB,
+          reservation.operation.id,
+          "AMBIGUOUS",
+          null,
+        );
+        if (
+          error instanceof QvaPayAmbiguousOperationError ||
+          error instanceof QvaPayTransientError
+        ) {
+          return Response.json(
+            {
+              operationId: reservation.operation.id,
+              applyStatus: "AMBIGUOUS",
+              detailStatus: "NOT_REQUESTED",
+              message: "No se pudo confirmar el resultado remoto. La oferta queda bloqueada hasta reconciliarla; no reintentes la aplicación.",
+            },
+            { status: 202, headers: { "cache-control": "no-store" } },
+          );
+        }
+        return Response.json(
+          {
+            operationId: reservation.operation.id,
+            applyStatus: "AMBIGUOUS",
+            detailStatus: "NOT_REQUESTED",
+            message: "El resultado de QvaPay es ambiguo y requiere reconciliación.",
+          },
+          { status: 202, headers: { "cache-control": "no-store" } },
+        );
+      }
+
+      await recordP2PApplyOutcome(
+        env.DB,
+        reservation.operation.id,
+        "CONFIRMED",
+        null,
+      );
+      try {
+        const detail = await client.fetchOfferDetail(offerUuid);
+        await recordP2PDetailOutcome(
+          env.DB,
+          reservation.operation.id,
+          { available: true },
+        );
+        return Response.json(
+          {
+            operationId: reservation.operation.id,
+            applyStatus: "CONFIRMED",
+            detailStatus: "AVAILABLE",
+            offer: detail,
+          },
+          { status: 201, headers: { "cache-control": "no-store" } },
+        );
+      } catch (error) {
+        const errorCode =
+          error instanceof QvaPayTransientError &&
+          /tiempo de espera/i.test(error.message)
+            ? "TIMEOUT"
+            : error instanceof QvaPayTransientError
+              ? "UNAVAILABLE"
+              : error instanceof QvaPayProviderError &&
+                  error.status >= 500
+                ? "HTTP_5XX"
+                : "CONTRACT";
+        await recordP2PDetailOutcome(
+          env.DB,
+          reservation.operation.id,
+          { available: false, errorCode },
+        );
+        return Response.json(
+          {
+            operationId: reservation.operation.id,
+            applyStatus: "CONFIRMED",
+            detailStatus: "FAILED",
+            message: "QvaPay confirmó la aplicación, pero el detalle no está disponible. La aplicación no se repetirá.",
+          },
+          { status: 201, headers: { "cache-control": "no-store" } },
+        );
+      }
     }
 
     if (url.pathname.startsWith("/api/admin/")) {
