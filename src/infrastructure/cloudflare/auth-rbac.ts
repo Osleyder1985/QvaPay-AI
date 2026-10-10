@@ -32,10 +32,15 @@ const SALT_BYTES = 16;
 function b64(bytes: Uint8Array): string {
   let binary = "";
   for (const byte of bytes) binary += String.fromCharCode(byte);
-  return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+  return btoa(binary)
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/g, "");
 }
 function unb64(value: string): Uint8Array {
-  const normalized = value.replace(/-/g, "+").replace(/_/g, "/") + "===".slice((value.length + 3) % 4);
+  const normalized =
+    value.replace(/-/g, "+").replace(/_/g, "/") +
+    "===".slice((value.length + 3) % 4);
   const binary = atob(normalized);
   return Uint8Array.from(binary, (c) => c.charCodeAt(0));
 }
@@ -93,18 +98,32 @@ async function writeAudit(
   target?: Pick<AppUser, "id" | "username">,
   metadata: Record<string, unknown> = {},
 ): Promise<void> {
-  await db.prepare(
-    "INSERT INTO security_audit_log (id, occurred_at, actor_user_id, actor_username, event_type, outcome, target_user_id, target_username, metadata_json) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-  ).bind(
-    crypto.randomUUID(), new Date().toISOString(), actor?.id ?? null, actor?.username ?? null,
-    eventType, outcome, target?.id ?? null, target?.username ?? null, JSON.stringify(metadata),
-  ).run();
+  await db
+    .prepare(
+      "INSERT INTO security_audit_log (id, occurred_at, actor_user_id, actor_username, event_type, outcome, target_user_id, target_username, metadata_json) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+    )
+    .bind(
+      crypto.randomUUID(),
+      new Date().toISOString(),
+      actor?.id ?? null,
+      actor?.username ?? null,
+      eventType,
+      outcome,
+      target?.id ?? null,
+      target?.username ?? null,
+      JSON.stringify(metadata),
+    )
+    .run();
 }
 function rowToUser(row: Record<string, unknown>): AppUser {
   return {
-    id: String(row.id), username: String(row.username), role: String(row.role) as AppRole,
-    active: Number(row.active) === 1, createdAt: String(row.created_at),
-    updatedAt: String(row.updated_at), lastLoginAt: row.last_login_at ? String(row.last_login_at) : null,
+    id: String(row.id),
+    username: String(row.username),
+    role: String(row.role) as AppRole,
+    active: Number(row.active) === 1,
+    createdAt: String(row.created_at),
+    updatedAt: String(row.updated_at),
+    lastLoginAt: row.last_login_at ? String(row.last_login_at) : null,
   };
 }
 // El arranque del runtime es idempotente y mantiene el inicio de producción independiente de
@@ -145,8 +164,12 @@ export async function ensureSecuritySchema(db: D1Database): Promise<void> {
         target_username TEXT,
         metadata_json TEXT NOT NULL DEFAULT '{}'
       )`),
-      db.prepare("CREATE INDEX IF NOT EXISTS idx_security_audit_log_occurred_at ON security_audit_log(occurred_at DESC)"),
-      db.prepare("CREATE INDEX IF NOT EXISTS idx_security_audit_log_actor ON security_audit_log(actor_user_id)"),
+      db.prepare(
+        "CREATE INDEX IF NOT EXISTS idx_security_audit_log_occurred_at ON security_audit_log(occurred_at DESC)",
+      ),
+      db.prepare(
+        "CREATE INDEX IF NOT EXISTS idx_security_audit_log_actor ON security_audit_log(actor_user_id)",
+      ),
       db.prepare(`CREATE TABLE IF NOT EXISTS qvapay_account_snapshots (
         id TEXT PRIMARY KEY,
         schema_version INTEGER NOT NULL,
@@ -173,13 +196,21 @@ export async function ensureSecuritySchema(db: D1Database): Promise<void> {
  * @responsabilidades Aplicar las validaciones y reglas de negocio definidas por el contrato del módulo.
  * @returns Resultado de la operación pública.
  */
-export async function createPasswordVerifier(password: string): Promise<{ salt: string; hash: string; iterations: number }> {
-  if (password.length < 12) throw new Error("La contraseña debe tener al menos 12 caracteres.");
+export async function createPasswordVerifier(
+  password: string,
+): Promise<{ salt: string; hash: string; iterations: number }> {
+  if (password.length < 12)
+    throw new Error("La contraseña debe tener al menos 12 caracteres.");
   const salt = crypto.getRandomValues(new Uint8Array(SALT_BYTES));
   const hash = await derivePasswordHash(password, salt);
   return { salt: b64(salt), hash: b64(hash), iterations: PBKDF2_ITERATIONS };
 }
-async function verifyPassword(password: string, salt: string, expected: string, iterations: number): Promise<boolean> {
+async function verifyPassword(
+  password: string,
+  salt: string,
+  expected: string,
+  iterations: number,
+): Promise<boolean> {
   const actual = await derivePasswordHash(password, unb64(salt), iterations);
   return equalBytes(actual, unb64(expected));
 }
@@ -199,7 +230,11 @@ export async function findUserByUsername(db: D1Database, username: string): Prom
  * @returns Resultado de la operación pública.
  */
 export async function listUsers(db: D1Database): Promise<AppUser[]> {
-  const result = await db.prepare("SELECT id, username, role, active, created_at, updated_at, last_login_at FROM app_users ORDER BY username COLLATE NOCASE").all<Record<string, unknown>>();
+  const result = await db
+    .prepare(
+      "SELECT id, username, role, active, created_at, updated_at, last_login_at FROM app_users ORDER BY username COLLATE NOCASE",
+    )
+    .all<Record<string, unknown>>();
   return result.results.map(rowToUser);
 }
 /**
@@ -252,17 +287,39 @@ export async function authenticate(
 ): Promise<{ sessionCookie: string; user: AppUser } | null> {
   const user = await findUserByUsername(db, username);
   if (!user) {
-    await writeAudit(db, "login", "FAILURE", undefined, undefined, { username: username.trim() });
+    await writeAudit(db, "login", "FAILURE", undefined, undefined, {
+      username: username.trim(),
+    });
     return null;
   }
-  const row = await db.prepare("SELECT password_salt, password_hash, password_iterations, active FROM app_users WHERE id = ? LIMIT 1")
-    .bind(user.id).first<Record<string, unknown>>();
-  if (!row || Number(row.active) !== 1 || !(await verifyPassword(password, String(row.password_salt), String(row.password_hash), Number(row.password_iterations)))) {
-    await writeAudit(db, "login", "FAILURE", undefined, user, { username: user.username });
+  const row = await db
+    .prepare(
+      "SELECT password_salt, password_hash, password_iterations, active FROM app_users WHERE id = ? LIMIT 1",
+    )
+    .bind(user.id)
+    .first<Record<string, unknown>>();
+  if (
+    !row ||
+    Number(row.active) !== 1 ||
+    !(await verifyPassword(
+      password,
+      String(row.password_salt),
+      String(row.password_hash),
+      Number(row.password_iterations),
+    ))
+  ) {
+    await writeAudit(db, "login", "FAILURE", undefined, user, {
+      username: user.username,
+    });
     return null;
   }
   const now = new Date().toISOString();
-  await db.prepare("UPDATE app_users SET last_login_at = ?, updated_at = ? WHERE id = ?").bind(now, now, user.id).run();
+  await db
+    .prepare(
+      "UPDATE app_users SET last_login_at = ?, updated_at = ? WHERE id = ?",
+    )
+    .bind(now, now, user.id)
+    .run();
   const refreshed = { ...user, lastLoginAt: now };
   const payload = `${user.id}:${Math.floor(Date.now() / 1000) + SESSION_TTL_SECONDS}`;
   const signature = await hmac(secret, payload);
@@ -289,12 +346,24 @@ export async function getSession(request: Request, db: D1Database, secret: strin
  * @responsabilidades Aplicar las validaciones y reglas de negocio definidas por el contrato del módulo.
  * @returns Resultado de la operación pública.
  */
-export async function requireRole(request: Request, db: D1Database, secret: string, roles: readonly AppRole[]): Promise<AuthSession | Response> {
+export async function requireRole(
+  request: Request,
+  db: D1Database,
+  secret: string,
+  roles: readonly AppRole[],
+): Promise<AuthSession | Response> {
   const session = await getSession(request, db, secret);
-  if (!session) return Response.json({ error: "Autenticación requerida." }, { status: 401, headers: { "cache-control": "no-store" } });
+  if (!session)
+    return Response.json(
+      { error: "Autenticación requerida." },
+      { status: 401, headers: { "cache-control": "no-store" } },
+    );
   if (!roles.includes(session.user.role)) {
     await writeAudit(db, "authorization_denied", "DENIED", session.user);
-    return Response.json({ error: "Permisos insuficientes." }, { status: 403, headers: { "cache-control": "no-store" } });
+    return Response.json(
+      { error: "Permisos insuficientes." },
+      { status: 403, headers: { "cache-control": "no-store" } },
+    );
   }
   return session;
 }
@@ -322,16 +391,35 @@ export function clearSessionCookie(): string {
  * @responsabilidades Aplicar las validaciones y reglas de negocio definidas por el contrato del módulo.
  * @returns Resultado de la operación pública.
  */
-export async function setUserActive(db: D1Database, actor: AppUser, userId: string, active: boolean): Promise<AppUser> {
-  const row = await db.prepare("SELECT id, username, role, active, created_at, updated_at, last_login_at FROM app_users WHERE id = ? LIMIT 1")
-    .bind(userId).first<Record<string, unknown>>();
+export async function setUserActive(
+  db: D1Database,
+  actor: AppUser,
+  userId: string,
+  active: boolean,
+): Promise<AppUser> {
+  const row = await db
+    .prepare(
+      "SELECT id, username, role, active, created_at, updated_at, last_login_at FROM app_users WHERE id = ? LIMIT 1",
+    )
+    .bind(userId)
+    .first<Record<string, unknown>>();
   if (!row) throw new Error("Usuario no encontrado.");
   const target = rowToUser(row);
-  if (target.id === actor.id && !active) throw new Error("La Administración no puede desactivarse a sí misma.");
+  if (target.id === actor.id && !active)
+    throw new Error("La Administración no puede desactivarse a sí misma.");
   const now = new Date().toISOString();
-  await db.prepare("UPDATE app_users SET active = ?, updated_at = ? WHERE id = ?").bind(active ? 1 : 0, now, userId).run();
+  await db
+    .prepare("UPDATE app_users SET active = ?, updated_at = ? WHERE id = ?")
+    .bind(active ? 1 : 0, now, userId)
+    .run();
   const updated = { ...target, active, updatedAt: now };
-  await writeAudit(db, active ? "user_enabled" : "user_disabled", "SUCCESS", actor, updated);
+  await writeAudit(
+    db,
+    active ? "user_enabled" : "user_disabled",
+    "SUCCESS",
+    actor,
+    updated,
+  );
   return updated;
 }
 /**
@@ -369,9 +457,6 @@ export async function deleteUserByUsername(
   }
   const user = await findUserByUsername(db, normalized);
   if (!user) return;
-  await db
-    .prepare("DELETE FROM app_users WHERE id = ?")
-    .bind(user.id)
-    .run();
+  await db.prepare("DELETE FROM app_users WHERE id = ?").bind(user.id).run();
   await writeAudit(db, "smoke_user_deleted", "SUCCESS", undefined, user);
 }
