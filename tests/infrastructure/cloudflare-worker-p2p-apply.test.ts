@@ -192,7 +192,7 @@ async function applyRequest(env: ScannerWorkerEnvironment): Promise<Response> {
 
 describe("Cloudflare Worker: aplicación P2P protegida", () => {
   beforeEach(() => {
-    vi.clearAllMocks();
+    vi.resetAllMocks();
     mocks.ensureSecuritySchema.mockResolvedValue(undefined);
     mocks.requireRole.mockResolvedValue(administrator);
     mocks.accountFetch.mockResolvedValue(accountSnapshot);
