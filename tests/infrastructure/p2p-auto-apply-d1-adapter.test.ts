@@ -65,7 +65,9 @@ describe("createD1AutoApplyExecutionPorts", () => {
       provider: { applyOffer, fetchOfferDetail, getVerifiedAccountUuid },
     });
 
-    await expect(ports.applyOnce("offer-1")).resolves.toEqual({ status: "CONFIRMED" });
+    await expect(ports.applyOnce("offer-1")).resolves.toEqual({
+      status: "CONFIRMED",
+    });
     expect(fetchOfferDetail).toHaveBeenCalledWith("offer-1");
     expect(getVerifiedAccountUuid).toHaveBeenCalledTimes(1);
     expect(applyOffer).toHaveBeenCalledTimes(1);
