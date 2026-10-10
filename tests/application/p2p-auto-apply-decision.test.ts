@@ -38,7 +38,7 @@ describe("evaluateAutoApplyDecision", () => {
     expect(evaluateAutoApplyDecision(input({ offer: offer({ observedAt: "2026-10-10T12:00:01.000Z" }) }))).toMatchObject({
       eligible: false, reason: "SNAPSHOT_STALE",
     });
-    expect(evaluateAutoApplyDecision(input({ maxSnapshotAgeMs: 0 })).toMatchObject({
+    expect(evaluateAutoApplyDecision(input({ maxSnapshotAgeMs: 0 }))).toMatchObject({
       eligible: false, reason: "INVALID_CONFIGURATION",
     });
   });
