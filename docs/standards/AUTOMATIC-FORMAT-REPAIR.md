@@ -15,6 +15,8 @@ Evitar correcciones manuales repetitivas cuando Prettier detecta diferencias de 
 
 ## Alcance y límites
 
+- No se permiten archivos ni bloques excluidos mediante `.prettierignore` o `prettier-ignore`; los archivos del proyecto deben estar cubiertos por la comprobación y la reparación globales.
+- Si un formato generado o una plantilla necesita conservar contenido literal, debe estructurarse de forma compatible con Prettier, sin desactivar el control para el archivo completo.
 - `format:fix` aplica Prettier a los archivos cubiertos por la configuración del repositorio.
 - `format:check` sigue siendo el control de integración obligatorio; no se sustituye por una ejecución de escritura que oculte diferencias.
 - Prettier solo corrige formato. No repara errores de TypeScript, pruebas, lógica, seguridad ni documentación semántica.
@@ -29,6 +31,10 @@ Evitar correcciones manuales repetitivas cuando Prettier detecta diferencias de 
 
 La CI debe mostrar que `npm run format:check` pasa después de la reparación y que los controles de compilación/pruebas afectados también pasan. La existencia del comando, por sí sola, no certifica una ejecución correcta.
 
+## Prohibición verificable de exclusiones
+
+Los workflows de calidad y seguridad ejecutan `npm run check:prettier-exclusions`. El control recorre los archivos de texto del repositorio, detecta cualquier archivo `.prettierignore` y busca directivas de comentario `prettier-ignore`, incluidas las variantes de inicio y fin de bloque. Omite únicamente directorios generados o de dependencias y archivos binarios. El control complementa `format:check`: el primero impide exclusiones deliberadas y el segundo exige que el formato sea correcto en el alcance configurado.
+
 ## Diagnóstico permanente en CI
 
 El flujo `.github/workflows/security-gate.yml` debe conservar un paso permanente de diagnóstico de Prettier. Si `npm run format:check` falla, el mismo paso debe:
@@ -36,6 +42,6 @@ El flujo `.github/workflows/security-gate.yml` debe conservar un paso permanente
 1. Ejecutar `npm run format:fix` en el entorno temporal de CI.
 2. Mostrar los archivos afectados y el diff exacto generado por Prettier.
 3. Terminar en estado fallido aunque la reparación temporal haya dejado el directorio formateado. Así, el diagnóstico no convierte una rama incorrecta en una verificación aprobada ni oculta el cambio requerido.
-4. Permitir que la corrección se aplique y confirme en la rama del PR; después se vuelve a ejecutar toda la CI.
+4. Permitir que la corrección se aplique y confirme en la rama de trabajo; después se vuelve a ejecutar toda la CI.
 
 El diff se usa como evidencia diagnóstica, no se confirma ni se publica automáticamente desde el job. La reparación permanente del código se realiza en la rama de trabajo y continúa sujeta a revisión, compilación, pruebas y controles de seguridad.
