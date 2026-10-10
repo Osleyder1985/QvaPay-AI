@@ -270,6 +270,61 @@ describe("Cloudflare Worker: aplicación P2P protegida", () => {
     );
   });
 
+  it("mantiene APPLYING si falla D1 tras el POST y reconcilia sin repetirlo", async () => {
+    mocks.recordApplyOutcome.mockRejectedValueOnce(new Error("synthetic D1 outage"));
+    const first = await applyRequest(createEnvironment());
+
+    expect(first.status).toBe(202);
+    await expect(first.json()).resolves.toMatchObject({ applyStatus: "APPLYING" });
+    expect(mocks.applyOffer).toHaveBeenCalledOnce();
+
+    mocks.reserveOperation.mockResolvedValueOnce({
+      created: false,
+      operation: { ...reservation().operation, applyStatus: "APPLYING" },
+    });
+    mocks.recordApplyOutcome.mockResolvedValueOnce(true);
+    mocks.fetchOfferDetail.mockReset().mockResolvedValue({
+      ...confirmedOfferDetail,
+      coin: "BANK_CUP",
+      side: "sell",
+      status: "processing",
+      onlyVip: false,
+      onlyKyc: false,
+    });
+
+    const second = await applyRequest(createEnvironment());
+    expect(second.status).toBe(200);
+    await expect(second.json()).resolves.toMatchObject({
+      applyStatus: "CONFIRMED",
+      detailStatus: "AVAILABLE",
+      reconciled: true,
+    });
+    expect(mocks.applyOffer).toHaveBeenCalledOnce();
+    expect(mocks.fetchOfferDetail).toHaveBeenCalledOnce();
+  });
+
+  it("no confirma APPLYING cuando Peer.uuid no coincide con la cuenta verificada", async () => {
+    mocks.reserveOperation.mockResolvedValue({
+      created: false,
+      operation: { ...reservation().operation, applyStatus: "APPLYING" },
+    });
+    mocks.fetchOfferDetail.mockReset().mockResolvedValue({
+      ...confirmedOfferDetail,
+      coin: "BANK_CUP",
+      side: "sell",
+      status: "processing",
+      peerUuid: "different-account",
+      onlyVip: false,
+      onlyKyc: false,
+    });
+
+    const response = await applyRequest(createEnvironment());
+    expect(response.status).toBe(202);
+    await expect(response.json()).resolves.toMatchObject({ applyStatus: "APPLYING" });
+    expect(mocks.applyOffer).not.toHaveBeenCalled();
+    expect(mocks.recordApplyOutcome).not.toHaveBeenCalled();
+  });
+
   it("recupera el detalle de una aplicación confirmada aunque la oferta esté en processing", async () => {
     const existing = reservation().operation;
     mocks.reserveOperation.mockResolvedValue({

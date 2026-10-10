@@ -22,6 +22,14 @@ Documentar el contrato que utiliza el adaptador de QvaPay-AI para consultar el m
 | `orderBy`   | `updated_at`                                |
 | `orderType` | `desc`                                      |
 
+## Reconciliación de una operación en estado `APPLYING`
+
+Si el POST de aplicación puede haber sido aceptado por QvaPay pero falla la persistencia D1 del resultado, la operación permanece en `APPLYING`. La recuperación no vuelve a ejecutar el POST. Consulta `GET /p2p/:uuid` con el token de cuenta y solo puede confirmar el resultado si el estado remoto es `processing` y `Peer.uuid` coincide exactamente con el UUID de la identidad de cuenta verificada por el endpoint de cuenta. Un estado remoto sin esa coincidencia no es evidencia suficiente y conserva el bloqueo para revisión.
+
+Contrato de referencia: [Aplicar una oferta P2P](https://www.qvapay.com/docs/p2p/apply) documenta que la aplicación cambia la oferta a `processing`; [Detalle de oferta P2P](https://www.qvapay.com/docs/p2p/detail) expone `Peer` para identificar a la contraparte. La implementación debe probar explícitamente la falta de coincidencia, la indisponibilidad de ambos GET y el fallo de D1. Estos datos no sustituyen una respuesta de aplicación persistida ni autorizan repetir la mutación.
+
+Justificación normativa previa al cambio: ISO/IEC 25010:2023 (fiabilidad y recuperabilidad), ISO/IEC/IEEE 29119-2:2021 (pruebas de fallos y regresión) e ISO/IEC/IEEE 12207:2017 (trazabilidad de requisito, código y pruebas). Referencias de diseño; no constituyen certificación.
+
 ## Modelo interno y unidades
 
 El adaptador valida:
