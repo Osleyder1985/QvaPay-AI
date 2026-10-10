@@ -86,97 +86,178 @@ function validateSameOriginMutation(
   return null;
 }
 async function body(request: Request): Promise<Record<string, unknown>> {
-  return (await request.json().catch(() => null)) as Record<string, unknown> | null ?? {};
+  return (
+    ((await request.json().catch(() => null)) as Record<
+      string,
+      unknown
+    > | null) ?? {}
+  );
 }
 export default {
-  async fetch(request: Request, env: ScannerWorkerEnvironment): Promise<Response> {
+  async fetch(
+    request: Request,
+    env: ScannerWorkerEnvironment,
+  ): Promise<Response> {
     const url = new URL(request.url);
     const csrfResponse = validateSameOriginMutation(request, url);
     if (csrfResponse) return csrfResponse;
     const stub = env.SCANNER_SCHEDULER.getByName(OBJECT_NAME);
 
-    if (url.pathname === "/" || url.pathname.startsWith("/app/") || url.pathname.startsWith("/api/")) {
+    if (
+      url.pathname === "/" ||
+      url.pathname.startsWith("/app/") ||
+      url.pathname.startsWith("/api/")
+    ) {
       await ensureSecuritySchema(env.DB);
     }
 
     if (url.pathname === "/setup") {
-      if (request.method !== "GET") return new Response("Method not allowed", { status: 405 });
-      const count = await env.DB.prepare("SELECT COUNT(*) AS count FROM app_users").first<{ count: number }>();
-      const nonSmokeCount = await env.DB.prepare("SELECT COUNT(*) AS count FROM app_users WHERE username NOT LIKE 'ci-smoke-%'").first<{ count: number }>();
-      if (Number(nonSmokeCount?.count ?? 0) === 0 && Number(count?.count ?? 0) !== 0) {
-        await env.DB.prepare("DELETE FROM app_users WHERE username LIKE 'ci-smoke-%'").run();
+      if (request.method !== "GET")
+        return new Response("Method not allowed", { status: 405 });
+      const count = await env.DB.prepare(
+        "SELECT COUNT(*) AS count FROM app_users",
+      ).first<{ count: number }>();
+      const nonSmokeCount = await env.DB.prepare(
+        "SELECT COUNT(*) AS count FROM app_users WHERE username NOT LIKE 'ci-smoke-%'",
+      ).first<{ count: number }>();
+      if (
+        Number(nonSmokeCount?.count ?? 0) === 0 &&
+        Number(count?.count ?? 0) !== 0
+      ) {
+        await env.DB.prepare(
+          "DELETE FROM app_users WHERE username LIKE 'ci-smoke-%'",
+        ).run();
       }
-      const remaining = await env.DB.prepare("SELECT COUNT(*) AS count FROM app_users").first<{ count: number }>();
-      if (Number(remaining?.count ?? 0) !== 0) return createInitialAdminSetupCompletedResponse();
+      const remaining = await env.DB.prepare(
+        "SELECT COUNT(*) AS count FROM app_users",
+      ).first<{ count: number }>();
+      if (Number(remaining?.count ?? 0) !== 0)
+        return createInitialAdminSetupCompletedResponse();
       return createInitialAdminSetupResponse();
     }
 
     if (url.pathname === "/api/auth/bootstrap") {
-      if (request.method !== "POST") return new Response("Method not allowed", { status: 405 });
+      if (request.method !== "POST")
+        return new Response("Method not allowed", { status: 405 });
       const input = await body(request);
       const username = typeof input.username === "string" ? input.username : "";
       const password = typeof input.password === "string" ? input.password : "";
       try {
-        const user = await bootstrapInitialAdmin(
-          env.DB,
-          username,
-          password,
-        );
+        const user = await bootstrapInitialAdmin(env.DB, username, password);
         return Response.json(
           { created: true, user },
           { status: 201, headers: { "cache-control": "no-store" } },
         );
       } catch (error) {
-        const message = error instanceof Error ? error.message : "No fue posible completar la configuración inicial.";
-        const status = message === "La configuración inicial ya fue completada." ? 409 : 400;
+        const message =
+          error instanceof Error
+            ? error.message
+            : "No fue posible completar la configuración inicial.";
+        const status =
+          message === "La configuración inicial ya fue completada." ? 409 : 400;
         return jsonError(message, status);
       }
     }
 
     if (url.pathname === "/api/auth/login") {
-      if (request.method !== "POST") return new Response("Method not allowed", { status: 405 });
+      if (request.method !== "POST")
+        return new Response("Method not allowed", { status: 405 });
       const input = await body(request);
       const username = typeof input.username === "string" ? input.username : "";
       const password = typeof input.password === "string" ? input.password : "";
-      if (!username || !password) return jsonError("Usuario y contraseña son obligatorios.", 400);
+      if (!username || !password)
+        return jsonError("Usuario y contraseña son obligatorios.", 400);
       try {
-        const result = await authenticate(request, env.DB, env.ACCOUNT_AUTH_SECRET, username, password);
+        const result = await authenticate(
+          request,
+          env.DB,
+          env.ACCOUNT_AUTH_SECRET,
+          username,
+          password,
+        );
         if (!result) return jsonError("Credenciales inválidas.", 401);
         return Response.json(
           { authenticated: true, user: result.user, expiresInSeconds: 28800 },
-          { headers: { "cache-control": "no-store", "set-cookie": result.sessionCookie } },
+          {
+            headers: {
+              "cache-control": "no-store",
+              "set-cookie": result.sessionCookie,
+            },
+          },
         );
       } catch (error) {
-        return jsonError(error instanceof Error ? error.message : "No fue posible iniciar sesión.", 400);
+        return jsonError(
+          error instanceof Error
+            ? error.message
+            : "No fue posible iniciar sesión.",
+          400,
+        );
       }
     }
 
     if (url.pathname === "/internal/auth/smoke-user") {
       const authorization = request.headers.get("authorization");
-      if (authorization !== `Bearer ${env.PRODUCTION_SMOKE_TOKEN}`) return new Response("Unauthorized", { status: 401 });
+      if (authorization !== `Bearer ${env.PRODUCTION_SMOKE_TOKEN}`)
+        return new Response("Unauthorized", { status: 401 });
       const input = await body(request);
-      const username = typeof input.username === "string" ? input.username.trim() : "";
-      if (!/^ci-smoke-[a-zA-Z0-9-]{3,64}$/.test(username)) return jsonError("Smoke username inválido.", 400);
+      const username =
+        typeof input.username === "string" ? input.username.trim() : "";
+      if (!/^ci-smoke-[a-zA-Z0-9-]{3,64}$/.test(username))
+        return jsonError("Smoke username inválido.", 400);
 
       if (request.method === "POST") {
-        const password = typeof input.password === "string" ? input.password : "";
+        const password =
+          typeof input.password === "string" ? input.password : "";
         try {
-          const user = await createUser(env.DB, username, password, "ADMINISTRATION");
+          const user = await createUser(
+            env.DB,
+            username,
+            password,
+            "ADMINISTRATION",
+          );
           await env.DB.prepare(
             "INSERT INTO security_audit_log (id, occurred_at, actor_user_id, actor_username, event_type, outcome, target_user_id, target_username, metadata_json) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-          ).bind(crypto.randomUUID(), new Date().toISOString(), null, null, "smoke_user_created", "SUCCESS", user.id, user.username, JSON.stringify({ purpose: "production_auth_smoke" })).run();
-          return Response.json({ user }, { headers: { "cache-control": "no-store" } });
+          )
+            .bind(
+              crypto.randomUUID(),
+              new Date().toISOString(),
+              null,
+              null,
+              "smoke_user_created",
+              "SUCCESS",
+              user.id,
+              user.username,
+              JSON.stringify({ purpose: "production_auth_smoke" }),
+            )
+            .run();
+          return Response.json(
+            { user },
+            { headers: { "cache-control": "no-store" } },
+          );
         } catch (error) {
-          return jsonError(error instanceof Error ? error.message : "No se pudo crear la cuenta de smoke.", 400);
+          return jsonError(
+            error instanceof Error
+              ? error.message
+              : "No se pudo crear la cuenta de smoke.",
+            400,
+          );
         }
       }
 
       if (request.method === "DELETE") {
         try {
           await deleteUserByUsername(env.DB, username);
-          return new Response(null, { status: 204, headers: { "cache-control": "no-store" } });
+          return new Response(null, {
+            status: 204,
+            headers: { "cache-control": "no-store" },
+          });
         } catch (error) {
-          return jsonError(error instanceof Error ? error.message : "No se pudo eliminar la cuenta de smoke.", 400);
+          return jsonError(
+            error instanceof Error
+              ? error.message
+              : "No se pudo eliminar la cuenta de smoke.",
+            400,
+          );
         }
       }
 
