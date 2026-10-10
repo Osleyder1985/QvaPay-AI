@@ -50,7 +50,8 @@ describe("reloj del servidor", () => {
  * aisladas para verificar concurrencia y recuperación ante fallos de red.
  */
 function createRefreshHarness(fetchImplementation: typeof fetch) {
-  const marker = "let refreshInFlight=false;async function refresh(){";
+  const marker =
+    "let refreshInFlight=false;let refreshDelay=5000;async function refresh(){";
   const start = DASHBOARD_CLIENT_SCRIPT.indexOf(marker);
   const end = DASHBOARD_CLIENT_SCRIPT.indexOf("\nfunction tick(){", start);
 
@@ -75,7 +76,7 @@ function createRefreshHarness(fetchImplementation: typeof fetch) {
     selector: (id: string) => { className: string; textContent: string },
     performance: { now: () => number },
   ) => {
-    refresh: () => Promise<void>;
+    refresh: () => Promise<boolean>;
     getState: () => Record<string, unknown> | null;
   };
 
@@ -171,8 +172,14 @@ describe("contrato de temporización del dashboard", () => {
     expect(DASHBOARD_CLIENT_SCRIPT).toContain("estimateServerNow(");
   });
 
-  it("programa el sondeo cada cinco segundos y evita solapamientos", () => {
-    expect(DASHBOARD_CLIENT_SCRIPT).toContain("setInterval(refresh,5000)");
-    expect(DASHBOARD_CLIENT_SCRIPT).toContain("if(refreshInFlight)return");
+  it("programa el sondeo adaptativo y mantiene la exclusión de solicitudes concurrentes", () => {
+    expect(DASHBOARD_CLIENT_SCRIPT).toContain("scheduleRefresh()");
+    expect(DASHBOARD_CLIENT_SCRIPT).toContain(
+      "if(refreshInFlight)return false",
+    );
+    expect(DASHBOARD_CLIENT_SCRIPT).toContain(
+      "refreshDelay=Math.min(60000,Math.max(5000,refreshDelay*2))",
+    );
+    expect(DASHBOARD_CLIENT_SCRIPT).not.toContain("setInterval(refresh,5000)");
   });
 });
