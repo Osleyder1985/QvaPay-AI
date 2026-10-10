@@ -247,3 +247,6 @@ jobs:
 
       - name: Pruebas unitarias
         run: npm test
+
+      - name: Pruebas de integración D1 local
+        run: npm run test:d1
