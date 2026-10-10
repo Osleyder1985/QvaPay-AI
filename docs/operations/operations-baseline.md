@@ -86,6 +86,7 @@ Una operación con estado de aplicación `CONFIRMED` y detalle `PENDING` o `FAIL
 - La recuperación nunca vuelve a invocar el POST de aplicación.
 - Una caída temporal de `fetchAccount()` no bloquea la recuperación de detalle de una operación ya confirmada.
 - Para operaciones nuevas, un fallo de configuración o verificación de cuenta debe liberar de forma comprobada la reserva antes de responder.
+- Si falla el registro de auditoría antes del POST, la aplicación se bloquea; si la liberación de la reserva no se confirma, se devuelve un error operativo explícito y se exige revisión.
 - Las validaciones de snapshot fresco, oferta abierta y elegibilidad siguen siendo obligatorias para operaciones nuevas.
 - Si la validación previa de una operación nueva falla, se intenta liberar la reserva `RESERVED`; si no puede liberarse, se devuelve un error operativo y la operación requiere revisión.
 
