@@ -863,6 +863,98 @@ export default {
         );
       }
 
+      // Un HTTP exitoso de apply no confirma por sí solo la operación financiera.
+      // La confirmación requiere detalle autoritativo, estado processing e identidad coincidente.
+      let detail: Awaited<ReturnType<QvaPayP2PClient["fetchOfferDetail"]>>;
+      try {
+        detail = await client.fetchOfferDetail(offerUuid);
+      } catch (error) {
+        const errorCode =
+          error instanceof QvaPayTransientError &&
+          /tiempo de espera/i.test(error.message)
+            ? "TIMEOUT"
+            : error instanceof QvaPayTransientError
+              ? "UNAVAILABLE"
+              : error instanceof QvaPayProviderError && error.status >= 500
+                ? "HTTP_5XX"
+                : "CONTRACT";
+        await recordP2PApplyOutcome(
+          env.DB,
+          reservation.operation.id,
+          "AMBIGUOUS",
+          null,
+        );
+        await recordP2PDetailOutcome(env.DB, reservation.operation.id, {
+          available: false,
+          errorCode,
+        });
+        try {
+          await recordP2POperationAudit(env.DB, {
+            actorUserId: access.user.id,
+            actorUsername: access.user.username,
+            operationId: reservation.operation.id,
+            offerUuid,
+            eventType: "p2p_apply_result",
+            outcome: "FAILURE",
+            applyStatus: "AMBIGUOUS",
+            detailStatus: "FAILED",
+          });
+        } catch {
+          // La operación permanece bloqueada en estado ambiguo aunque falle la auditoría secundaria.
+        }
+        return Response.json(
+          {
+            operationId: reservation.operation.id,
+            applyStatus: "AMBIGUOUS",
+            detailStatus: "FAILED",
+            message:
+              "QvaPay recibió la aplicación, pero no se pudo verificar el detalle y la identidad. La operación queda bloqueada hasta reconciliarla; no reintentes.",
+          },
+          { status: 202, headers: { "cache-control": "no-store" } },
+        );
+      }
+
+      if (
+        detail.uuid !== offerUuid ||
+        detail.status !== "processing" ||
+        detail.peerUuid !== identity.uuid
+      ) {
+        await recordP2PApplyOutcome(
+          env.DB,
+          reservation.operation.id,
+          "AMBIGUOUS",
+          null,
+        );
+        await recordP2PDetailOutcome(env.DB, reservation.operation.id, {
+          available: false,
+          errorCode: "CONTRACT",
+        });
+        try {
+          await recordP2POperationAudit(env.DB, {
+            actorUserId: access.user.id,
+            actorUsername: access.user.username,
+            operationId: reservation.operation.id,
+            offerUuid,
+            eventType: "p2p_apply_result",
+            outcome: "FAILURE",
+            applyStatus: "AMBIGUOUS",
+            detailStatus: "FAILED",
+          });
+        } catch {
+          // No se confirma una operación cuyo detalle no satisface el contrato autoritativo.
+        }
+        return Response.json(
+          {
+            operationId: reservation.operation.id,
+            applyStatus: "AMBIGUOUS",
+            detailStatus: "FAILED",
+            message:
+              "El detalle autoritativo no confirma el estado processing ni la identidad de la cuenta. La operación requiere reconciliación; no reintentes.",
+          },
+          { status: 202, headers: { "cache-control": "no-store" } },
+        );
+      }
+
       await recordP2PApplyOutcome(
         env.DB,
         reservation.operation.id,
@@ -885,7 +977,6 @@ export default {
         auditStatus = "FAILED";
       }
       try {
-        const detail = await client.fetchOfferDetail(offerUuid);
         await recordP2PDetailOutcome(env.DB, reservation.operation.id, {
           available: true,
         });
@@ -913,42 +1004,16 @@ export default {
           },
           { status: 201, headers: { "cache-control": "no-store" } },
         );
-      } catch (error) {
-        const errorCode =
-          error instanceof QvaPayTransientError &&
-          /tiempo de espera/i.test(error.message)
-            ? "TIMEOUT"
-            : error instanceof QvaPayTransientError
-              ? "UNAVAILABLE"
-              : error instanceof QvaPayProviderError && error.status >= 500
-                ? "HTTP_5XX"
-                : "CONTRACT";
-        await recordP2PDetailOutcome(env.DB, reservation.operation.id, {
-          available: false,
-          errorCode,
-        });
-        try {
-          await recordP2POperationAudit(env.DB, {
-            actorUserId: access.user.id,
-            actorUsername: access.user.username,
-            operationId: reservation.operation.id,
-            offerUuid,
-            eventType: "p2p_apply_detail",
-            outcome: "FAILURE",
-            applyStatus: "CONFIRMED",
-            detailStatus: "FAILED",
-          });
-        } catch {
-          auditStatus = "FAILED";
-        }
+      } catch {
+        // La aplicación se confirmó por el detalle autoritativo, pero no se pudo guardar el estado de detalle.
         return Response.json(
           {
             operationId: reservation.operation.id,
             applyStatus: "CONFIRMED",
             detailStatus: "FAILED",
-            auditStatus,
+            auditStatus: "FAILED",
             message:
-              "QvaPay confirmó la aplicación, pero el detalle no está disponible. La aplicación no se repetirá.",
+              "QvaPay confirmó la aplicación con detalle autoritativo, pero no se pudo persistir su resultado de detalle. La aplicación no se repetirá.",
           },
           { status: 201, headers: { "cache-control": "no-store" } },
         );
