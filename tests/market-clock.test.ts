@@ -50,7 +50,8 @@ describe("reloj del servidor", () => {
  * aisladas para verificar concurrencia y recuperación ante fallos de red.
  */
 function createRefreshHarness(fetchImplementation: typeof fetch) {
-  const marker = "let refreshInFlight=false;let refreshDelay=5000;async function refresh(){";
+  const marker =
+    "let refreshInFlight=false;let refreshDelay=5000;async function refresh(){";
   const start = DASHBOARD_CLIENT_SCRIPT.indexOf(marker);
   const end = DASHBOARD_CLIENT_SCRIPT.indexOf("\nfunction tick(){", start);
 
