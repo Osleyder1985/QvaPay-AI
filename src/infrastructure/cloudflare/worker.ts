@@ -588,12 +588,15 @@ export default {
       }
       if (
         preflightDetail.status !== "open" ||
+        preflightDetail.ownerUuid === null ||
         preflightDetail.ownerUuid === identity.uuid
       ) {
         return jsonError(
           preflightDetail.ownerUuid === identity.uuid
             ? "No se puede aplicar una oferta propia."
-            : "La oferta ya no está abierta en QvaPay.",
+            : preflightDetail.ownerUuid === null
+              ? "QvaPay no permitió verificar el propietario de la oferta."
+              : "La oferta ya no está abierta en QvaPay.",
           409,
         );
       }
@@ -643,13 +646,13 @@ export default {
           );
         }
       }
-      if (!reservation.created && reservation.operation.applyStatus !== "RESERVED") {
+      if (!reservation.created) {
         return Response.json(
           {
             operationId: reservation.operation.id,
             applyStatus: reservation.operation.applyStatus,
             detailStatus: reservation.operation.detailStatus,
-            message: "Esta oferta ya tiene una operación registrada; no se enviará otra aplicación.",
+            message: "Esta oferta ya tiene una reserva creada por otra solicitud; no se enviará otra aplicación.",
           },
           { status: 409, headers: { "cache-control": "no-store" } },
         );
