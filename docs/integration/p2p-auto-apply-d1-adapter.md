@@ -13,7 +13,8 @@
 - Persistencia de resultado mediante `recordP2PApplyOutcome`; si no se confirma la escritura, se propaga el error y no se intenta reenviar el POST.
 - Ausencia de estrategia u ofertas inyectadas implica valores vacíos/deshabilitados; no se activa Auto Apply por defecto.
 - Un timeout o error desconocido durante la aplicación se trata como `AMBIGUOUS`; un rechazo explícito 4xx se conserva como `REJECTED`.
-- Incluso si el POST devuelve una respuesta exitosa, el resultado permanece `AMBIGUOUS` hasta que una reconciliación consulte el detalle autoritativo y compare `status === processing` y `peerUuid` con la identidad de cuenta verificada. Esa verificación todavía no está conectada; por tanto, este adaptador no puede confirmar operaciones.
+- Una respuesta exitosa del POST solo se marca `CONFIRMED` cuando el proveedor inyectado consulta el detalle autoritativo y se cumplen simultáneamente `detail.uuid === offerUuid`, `detail.status === processing` y `detail.peerUuid === verifiedAccountUuid` obtenido de una fuente server-side verificada. Si falta cualquiera de los puertos, la consulta falla o la identidad no coincide, el resultado queda `AMBIGUOUS` y no se reenvía el POST.
+- Los puertos de detalle e identidad ya están definidos y cubiertos por pruebas unitarias; la implementación concreta que los conecte a QvaPay y a la identidad `/user` verificada sigue pendiente de integración runtime.
 
 ## Límites pendientes
 
