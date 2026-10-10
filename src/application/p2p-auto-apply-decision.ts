@@ -21,6 +21,7 @@ export interface AutoApplyDecisionInput {
   readonly nowMs: number;
   readonly maxSnapshotAgeMs: number;
   readonly accountEligible: boolean;
+  readonly accountVipVerified: boolean;
   readonly accountBalanceQusd?: {
     readonly available: boolean;
     readonly fresh: boolean;
@@ -59,7 +60,7 @@ export function evaluateAutoApplyDecision(input: AutoApplyDecisionInput): AutoAp
   if (!Number.isFinite(observedAt) || observedAt > input.nowMs ||
       input.nowMs - observedAt > input.maxSnapshotAgeMs)
     return { eligible: false, reason: "SNAPSHOT_STALE" };
-  if (input.offer.onlyVip && input.offer.creatorVip !== true)
+  if (input.offer.onlyVip && !input.accountVipVerified)
     return { eligible: false, reason: "VIP_REQUIRED" };
   try {
     if (input.action === "BUY") {
