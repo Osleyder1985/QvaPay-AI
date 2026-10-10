@@ -4,7 +4,42 @@
  * @responsabilidades Cubrir regresiones visibles de mercado con respuestas sintéticas, sin operar cuentas ni ofertas reales.
  * @ubicacion tests/browser dentro de la verificación de integración de QvaPay-AI.
  */
+import * as AxeBuilderModule from "@axe-core/playwright";
 import { expect, test, type Page, type TestInfo } from "@playwright/test";
+
+type AxeAudit = {
+  violations: Array<{
+    id: string;
+    impact?: string | null;
+    help: string;
+    nodes: Array<{ target: string[] }>;
+  }>;
+};
+
+type AxeBuilderInstance = {
+  withTags(tags: string[]): AxeBuilderInstance;
+  analyze(): Promise<AxeAudit>;
+};
+
+const AxeBuilder = AxeBuilderModule.default as unknown as new (options: {
+  page: unknown;
+}) => AxeBuilderInstance;
+
+async function expectNoAccessibilityViolations(
+  page: unknown,
+  context: string,
+): Promise<void> {
+  const audit = await new AxeBuilder({ page })
+    .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
+    .analyze();
+  const violations = audit.violations.map((violation) => ({
+    id: violation.id,
+    impact: violation.impact,
+    help: violation.help,
+    targets: violation.nodes.map((node) => node.target),
+  }));
+  expect(violations, `Violaciones Axe: ${context}`).toEqual([]);
+}
 
 const smokeHeaders = {
   authorization: "Bearer local-browser-test-smoke",
@@ -113,6 +148,38 @@ async function authenticate(page: Page, testInfo: TestInfo): Promise<void> {
     },
   ]);
 }
+
+test("el mercado conserva un estado de carga explícito hasta recibir el snapshot", async ({
+  page,
+}, testInfo) => {
+  let releaseResponse!: () => void;
+  const responseGate = new Promise<void>((resolve) => {
+    releaseResponse = resolve;
+  });
+  let intercepted = false;
+  await page.route("**/api/scanner/status", async (route) => {
+    intercepted = true;
+    await responseGate;
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      headers: { "cache-control": "no-store" },
+      body: JSON.stringify(scannerState()),
+    });
+  });
+  await authenticate(page, testInfo);
+  await page.goto("/app/mercado");
+
+  await expect(page.locator("#marketIntegrity")).toBeVisible();
+  await expect(page.locator("#marketIntegrity")).toHaveText(
+    "Esperando validación de integridad del snapshot.",
+  );
+  expect(intercepted).toBe(true);
+
+  releaseResponse();
+  await expect(page.locator("#marketIntegrity")).toContainText("ACTUAL");
+  await expect(page.locator("#sellTable")).toContainText("vendedor-prueba");
+});
 
 test("el mercado autenticado muestra los dos libros en modo de solo lectura", async ({
   page,
@@ -232,7 +299,7 @@ test("el mercado identifica explícitamente un snapshot no disponible", async ({
   await expect(page.locator("#buyTable")).toContainText("No hay ofertas");
 });
 
-test("el módulo de mercado no desborda los viewports definidos", async ({
+test("el mercado aísla el desplazamiento de tablas sin desbordar la página", async ({
   page,
 }, testInfo) => {
   await page.route("**/api/scanner/status", (route) =>
@@ -248,14 +315,53 @@ test("el módulo de mercado no desborda los viewports definidos", async ({
 
   for (const width of [320, 360, 768, 1440]) {
     await page.setViewportSize({ width, height: 900 });
-    const dimensions = await page.evaluate(() => ({
-      viewport: document.documentElement.clientWidth,
-      document: document.documentElement.scrollWidth,
-    }));
+    const dimensions = await page.evaluate(() => {
+      const viewport = document.documentElement.clientWidth;
+      const scrollers = Array.from(
+        document.querySelectorAll<HTMLElement>("#sellTable, #buyTable"),
+      ).map((element) => {
+        const rect = element.getBoundingClientRect();
+        const panel = element.closest(".tablepanel");
+        const panelRect = panel?.getBoundingClientRect();
+        return {
+          id: element.id,
+          left: Math.round(rect.left),
+          right: Math.round(rect.right),
+          clientWidth: element.clientWidth,
+          scrollWidth: element.scrollWidth,
+          overflowX: getComputedStyle(element).overflowX,
+          panelRight: panelRect ? Math.round(panelRect.right) : null,
+        };
+      });
+      return {
+        viewport,
+        document: document.documentElement.scrollWidth,
+        scrollers,
+      };
+    });
     expect(
       dimensions.document,
-      `Desbordamiento a ${width}px: ${JSON.stringify(dimensions)}`,
+      `Desbordamiento de página a ${width}px: ${JSON.stringify(dimensions)}`,
     ).toBeLessThanOrEqual(dimensions.viewport);
+
+    for (const scroller of dimensions.scrollers) {
+      expect(scroller.left, `${scroller.id} sale por la izquierda`).toBeGreaterThanOrEqual(-1);
+      expect(
+        scroller.right,
+        `${scroller.id} sale por la derecha: ${JSON.stringify(scroller)}`,
+      ).toBeLessThanOrEqual(dimensions.viewport + 1);
+      expect(
+        scroller.panelRight,
+        `El panel de ${scroller.id} sale del viewport`,
+      ).toBeLessThanOrEqual(dimensions.viewport + 1);
+      expect(["auto", "scroll"]).toContain(scroller.overflowX);
+      if (width < 960) {
+        expect(
+          scroller.scrollWidth,
+          `${scroller.id} debe permitir desplazamiento horizontal interno`,
+        ).toBeGreaterThan(scroller.clientWidth);
+      }
+    }
   }
 });
 
@@ -287,6 +393,24 @@ test("el estado del mercado se recupera después de un error de transporte", asy
   await expect(page.locator("#marketIntegrity")).toContainText("ACTUAL");
   await expect(page.locator("#sellTable")).toContainText("vendedor-prueba");
   expect(attempts).toBeGreaterThanOrEqual(2);
+});
+
+test("la ruta de mercado supera el análisis automatizado de accesibilidad", async ({
+  page,
+}, testInfo) => {
+  await page.route("**/api/scanner/status", (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      headers: { "cache-control": "no-store" },
+      body: JSON.stringify(scannerState()),
+    }),
+  );
+  await authenticate(page, testInfo);
+  await page.goto("/app/mercado");
+  await expect(page.locator("#marketIntegrity")).toContainText("ACTUAL");
+
+  await expectNoAccessibilityViolations(page, "mercado con snapshot disponible");
 });
 
 test("la navegación por teclado puede alcanzar el control de cierre de sesión", async ({
