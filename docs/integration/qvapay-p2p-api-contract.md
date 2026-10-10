@@ -119,7 +119,8 @@ Esta etapa añade el esquema y las transiciones persistentes. No activa todavía
 El proveedor documenta `GET /p2p/:uuid` para obtener el detalle completo de una oferta. Esta consulta usa `Authorization: Bearer <token>`; el adaptador la ejecuta solo desde el Worker mediante `QVAPAY_USER_API_TOKEN`, nunca desde el navegador. El payload esperado contiene `p2p.uuid`, `p2p.status`, `p2p.User` y `p2p.Peer`.
 
 Fuentes oficiales:
-- [Detalle de Oferta P2P](https://www.qvapay.com/docs/p2p/detail).
+
+- [Detalle de Oferta P2P(https://www.qvapay.com/docs/p2p/detail).
 - [Aplicar a Oferta P2P](https://www.qvapay.com/docs/p2p/apply).
 
 Antes de aplicar, la ruta comprueba que el detalle siga en estado `open` y que se pueda identificar al propietario para rechazar una oferta propia. Después de una respuesta de apply confirmada, vuelve a consultar el detalle. Si esta segunda consulta falla, la operación permanece `CONFIRMED` y solo se marca el detalle como `FAILED`; no se repite el POST.
