@@ -606,16 +606,21 @@ export default {
       if (
         preflightDetail.status !== "open" ||
         preflightDetail.ownerUuid === null ||
-        preflightDetail.ownerUuid === identity.uuid
+        preflightDetail.ownerUuid === identity.uuid ||
+        preflightDetail.coin !== env.SCANNER_COIN ||
+        (preflightDetail.side === "sell" ? "SELL" : "BUY") !== offer.side ||
+        (preflightDetail.onlyVip === true && identity.vip !== true) ||
+        (preflightDetail.onlyKyc === true && identity.kyc !== true)
       ) {
-        return jsonError(
+        const reason =
           preflightDetail.ownerUuid === identity.uuid
             ? "No se puede aplicar una oferta propia."
-            : preflightDetail.ownerUuid === null
-              ? "QvaPay no permitió verificar el propietario de la oferta."
-              : "La oferta ya no está abierta en QvaPay.",
-          409,
-        );
+            : preflightDetail.status !== "open"
+              ? "La oferta ya no está abierta en QvaPay."
+              : preflightDetail.ownerUuid === null
+                ? "QvaPay no permitió verificar el propietario de la oferta."
+                : "El mercado, tipo o requisito de elegibilidad cambió en QvaPay.";
+        return jsonError(reason, 409);
       }
 
       let reservation;
