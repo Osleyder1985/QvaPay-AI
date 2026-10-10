@@ -39,7 +39,7 @@ El endpoint público `GET /api/account` devuelve `403` mientras no exista una se
 
 La implementación de la ruta `POST /api/p2p/:uuid/apply` se mantiene en una rama de trabajo hasta que los controles pasen y se verifique el despliegue. En producción no debe considerarse habilitada por la mera existencia del cliente de infraestructura.
 
-Antes de invocar QvaPay, la ruta exige rol `ADMINISTRATION`, origen válido para la sesión, identidad de cuenta y correlación de propietario verificadas, elegibilidad P2P/KYC/teléfono/Telegram, oferta abierta y fresca, detalle autoritativo y rechazo de ofertas propias. El token de cuenta y los secretos de aplicación permanecen server-side.
+Antes de invocar QvaPay, la ruta exige rol `ADMINISTRATION`, origen válido para la sesión, consulta en tiempo real de cuenta con identidad y correlación de propietario verificadas, elegibilidad P2P/KYC/teléfono/Telegram, oferta abierta y fresca, detalle autoritativo y rechazo de ofertas propias. El token de cuenta y los secretos de aplicación permanecen server-side.
 
 D1 mantiene una reserva única por `offer_uuid` compartida por `MANUAL` y `AUTO_APPLY`. Una operación ambigua no libera la reserva ni permite un segundo POST automático. La aplicación confirmada y la recuperación del detalle se registran por separado; un fallo del detalle no revierte el éxito de apply.
 
