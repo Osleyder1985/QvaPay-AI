@@ -162,6 +162,28 @@ test("el mercado autenticado muestra los dos libros en modo de solo lectura", as
   await expect(page.locator("#buyTable thead")).toContainText("CUP a recibir");
 });
 
+
+test("los valores monetarios ausentes de BANK_CUP no se representan como cero", async ({
+  page,
+}, testInfo) => {
+  const payload = scannerState();
+  payload.buyOffers[0].amount = null;
+  payload.buyOffers[0].fiatAmount = null;
+  await page.route("**/api/scanner/status", (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      headers: { "cache-control": "no-store" },
+      body: JSON.stringify(payload),
+    }),
+  );
+  await authenticate(page, testInfo);
+  await page.goto("/app/mercado");
+
+  await expect(page.locator("#buyTable tbody tr td:nth-child(3)")).toHaveText("—");
+  await expect(page.locator("#buyTable tbody tr td:nth-child(5)")).toHaveText("—");
+});
+
 test("el mercado identifica explícitamente un snapshot no disponible", async ({
   page,
 }, testInfo) => {
