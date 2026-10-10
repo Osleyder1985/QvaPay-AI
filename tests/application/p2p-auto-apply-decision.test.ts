@@ -54,9 +54,7 @@ describe("evaluateAutoApplyDecision", () => {
   });
 
   it("rechaza cuando está desactivado, la cuenta no está verificada o el snapshot venció", () => {
-    expect(
-      evaluateAutoApplyDecision(input({ enabled: false })),
-    ).toMatchObject({
+    expect(evaluateAutoApplyDecision(input({ enabled: false }))).toMatchObject({
       eligible: false,
       reason: "DISABLED",
     });
