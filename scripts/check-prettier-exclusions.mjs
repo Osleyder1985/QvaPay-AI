@@ -8,12 +8,30 @@ import { readdir, readFile } from "node:fs/promises";
 import { extname, join, relative } from "node:path";
 
 const root = process.cwd();
-const ignoredDirectories = new Set([".git", "node_modules", "dist", "coverage", ".wrangler"]);
-const sourceExtensions = new Set([
-  ".cjs", ".css", ".html", ".js", ".jsx", ".json", ".mjs", ".scss",
-  ".ts", ".tsx", ".vue", ".yaml", ".yml",
+const ignoredDirectories = new Set([
+  ".git",
+  "node_modules",
+  "dist",
+  "coverage",
+  ".wrangler",
 ]);
-const directive = /^\s*(?:\/\/|\/\*|\*|<!--|#)\s*prettier-ignore(?:-start|-end)?\b/m;
+const sourceExtensions = new Set([
+  ".cjs",
+  ".css",
+  ".html",
+  ".js",
+  ".jsx",
+  ".json",
+  ".mjs",
+  ".scss",
+  ".ts",
+  ".tsx",
+  ".vue",
+  ".yaml",
+  ".yml",
+]);
+const directive =
+  /^\s*(?:\/\/|\/\*|\*|<!--|#)\s*prettier-ignore(?:-start|-end)?\b/m;
 const violations = [];
 
 async function inspectDirectory(directory) {
@@ -47,5 +65,7 @@ if (violations.length > 0) {
   for (const violation of violations) console.error("- " + violation);
   process.exitCode = 1;
 } else {
-  console.log("Control de exclusiones de Prettier aprobado: no hay archivos ni bloques excluidos.");
+  console.log(
+    "Control de exclusiones de Prettier aprobado: no hay archivos ni bloques excluidos.",
+  );
 }
