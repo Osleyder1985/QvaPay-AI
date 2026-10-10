@@ -208,7 +208,9 @@ jobs:
           node-version: 22
 
       - name: Instalar dependencias
-        run: npm install --no-audit --no-fund
+        run: |
+          npm install -g npm@11.19.0
+          npm install --no-audit --no-fund
 
       - name: Comprobar tipos
         run: npm run build
@@ -245,3 +247,6 @@ jobs:
 
       - name: Pruebas unitarias
         run: npm test
+
+      - name: Pruebas de integración D1 local
+        run: npm run test:d1

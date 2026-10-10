@@ -272,6 +272,52 @@ export async function recordP2PApplyOutcome(
 }
 
 /**
+ * @proposito Marcar como ambiguo un intento cuyo resultado no pudo persistirse con certeza.
+ * @responsabilidades Conservar la reserva única y permitir que una reconciliación futura
+ * consulte el proveedor sin volver a enviar la solicitud de aplicación.
+ * @param db Base de datos D1.
+ * @param operationId Identificador persistido de la operación.
+ * @param now Marca temporal ISO 8601.
+ * @returns true si el estado APPLYING pasó a AMBIGUOUS.
+ */
+export async function markP2POperationAmbiguous(
+  db: D1Database,
+  operationId: string,
+  now = new Date().toISOString(),
+): Promise<boolean> {
+  const result = await db
+    .prepare(
+      "UPDATE p2p_operations SET apply_status = 'AMBIGUOUS', updated_at = ? WHERE id = ? AND apply_status = 'APPLYING'",
+    )
+    .bind(now, operationId)
+    .run();
+  return Number(result.meta?.changes ?? 0) === 1;
+}
+
+/**
+ * @proposito Confirmar una operación ambigua tras una reconciliación positiva con QvaPay.
+ * @responsabilidades Permitir la transición únicamente desde APPLYING/AMBIGUOUS y solo
+ * invocarse después de validar el UUID de oferta, estado remoto e identidad de cuenta.
+ * @param db Base de datos D1.
+ * @param operationId Identificador persistido de la operación.
+ * @param now Marca temporal ISO 8601.
+ * @returns true si se confirmó la transición condicional.
+ */
+export async function confirmP2POperationAfterReconciliation(
+  db: D1Database,
+  operationId: string,
+  now = new Date().toISOString(),
+): Promise<boolean> {
+  const result = await db
+    .prepare(
+      "UPDATE p2p_operations SET apply_status = 'CONFIRMED', detail_status = 'PENDING', detail_error_code = NULL, updated_at = ? WHERE id = ? AND apply_status IN ('APPLYING', 'AMBIGUOUS')",
+    )
+    .bind(now, operationId)
+    .run();
+  return Number(result.meta?.changes ?? 0) === 1;
+}
+
+/**
  * @proposito Registrar por separado el resultado de recuperación del detalle.
  * @responsabilidades No cambiar el resultado de aplicación; permitir reintentar solo
  * la consulta de detalle cuando su estado anterior sea PENDING o FAILED.
