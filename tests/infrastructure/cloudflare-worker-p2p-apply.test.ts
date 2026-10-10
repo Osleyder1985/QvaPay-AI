@@ -243,7 +243,7 @@ describe("Cloudflare Worker: aplicación P2P protegida", () => {
     expect(mocks.recordOperationAudit).toHaveBeenCalledTimes(3);
   });
 
-  it("conserva la aplicación confirmada si la consulta posterior del detalle falla", async () => {
+  it("mantiene AMBIGUOUS si no puede verificar el detalle después del POST", async () => {
     mocks.fetchOfferDetail
       .mockReset()
       .mockResolvedValueOnce(openOfferDetail)
@@ -251,16 +251,46 @@ describe("Cloudflare Worker: aplicación P2P protegida", () => {
 
     const response = await applyRequest(createEnvironment());
 
-    expect(response.status).toBe(201);
+    expect(response.status).toBe(202);
     await expect(response.json()).resolves.toMatchObject({
-      applyStatus: "CONFIRMED",
+      applyStatus: "AMBIGUOUS",
       detailStatus: "FAILED",
     });
     expect(mocks.applyOffer).toHaveBeenCalledOnce();
     expect(mocks.recordApplyOutcome).toHaveBeenCalledWith(
       expect.anything(),
       "operation-123",
-      "CONFIRMED",
+      "AMBIGUOUS",
+      null,
+    );
+    expect(mocks.recordDetailOutcome).toHaveBeenCalledWith(
+      expect.anything(),
+      "operation-123",
+      { available: false, errorCode: "CONTRACT" },
+    );
+  });
+
+  it("no confirma si el detalle no coincide con la oferta y la identidad verificadas", async () => {
+    mocks.fetchOfferDetail
+      .mockReset()
+      .mockResolvedValueOnce(openOfferDetail)
+      .mockResolvedValueOnce({
+        ...confirmedOfferDetail,
+        peerUuid: "different-account",
+      });
+
+    const response = await applyRequest(createEnvironment());
+
+    expect(response.status).toBe(202);
+    await expect(response.json()).resolves.toMatchObject({
+      applyStatus: "AMBIGUOUS",
+      detailStatus: "FAILED",
+    });
+    expect(mocks.applyOffer).toHaveBeenCalledOnce();
+    expect(mocks.recordApplyOutcome).toHaveBeenCalledWith(
+      expect.anything(),
+      "operation-123",
+      "AMBIGUOUS",
       null,
     );
     expect(mocks.recordDetailOutcome).toHaveBeenCalledWith(
