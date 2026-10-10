@@ -1,0 +1,47 @@
+name: Reparación temporal de formato Prettier
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pull-requests: read
+
+jobs:
+  repair:
+    if: github.event.pull_request.head.ref == 'chore/remove-prettier-ignore-all-files' && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - name: Obtener la rama del PR
+        uses: actions/checkout@v4
+        with:
+          ref: chore/remove-prettier-ignore-all-files
+          fetch-depth: 0
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Instalar dependencias
+        run: npm install --no-audit --no-fund
+
+      - name: Aplicar formato canónico en todos los archivos
+        run: npm run format:fix
+
+      - name: Registrar la reparación si hay cambios
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git diff --quiet; then
+            echo "No hay cambios de formato que registrar."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -u
+          git add scripts/check-prettier-exclusions.mjs
+          git commit -m "style: apply canonical Prettier formatting repository-wide"
+          git push origin HEAD:chore/remove-prettier-ignore-all-files
