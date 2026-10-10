@@ -37,7 +37,6 @@
 
 El almacén persistente es la base de la protección, pero no significa que el flujo esté habilitado: el endpoint permanece en 501 hasta que las transiciones estén conectadas y verificadas end-to-end.
 
-
 La capacidad de aplicación P2P es una operación real y no debe confundirse con una simulación. Cualquier automatización posterior requiere controles adicionales, autorización explícita y verificación específica.
 
 ## Feed futuro
