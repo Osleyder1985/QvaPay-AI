@@ -69,6 +69,42 @@ function rowToOperation(row: Record<string, unknown>): P2POperation {
 }
 
 /**
+ * @proposito Inicializar el esquema exclusivo de operaciones P2P.
+ * @responsabilidades Mantener la persistencia financiera aislada del esquema de autenticación,
+ * para que una migración o un error del módulo P2P no interrumpa el inicio de sesión.
+ * @param db Base de datos D1.
+ */
+export async function ensureP2POperationSchema(db: D1Database): Promise<void> {
+  await db.batch([
+    db.prepare(`CREATE TABLE IF NOT EXISTS p2p_operations (
+      id TEXT PRIMARY KEY,
+      offer_uuid TEXT NOT NULL UNIQUE,
+      source TEXT NOT NULL CHECK (source IN ('MANUAL', 'AUTO_APPLY')),
+      actor_user_id TEXT,
+      actor_username TEXT,
+      apply_status TEXT NOT NULL CHECK (
+        apply_status IN ('RESERVED', 'APPLYING', 'CONFIRMED', 'REJECTED', 'AMBIGUOUS')
+      ),
+      detail_status TEXT NOT NULL CHECK (
+        detail_status IN ('NOT_REQUESTED', 'PENDING', 'AVAILABLE', 'FAILED')
+      ),
+      provider_http_status INTEGER,
+      detail_error_code TEXT CHECK (
+        detail_error_code IS NULL OR detail_error_code IN ('TIMEOUT', 'HTTP_5XX', 'UNAVAILABLE', 'CONTRACT')
+      ),
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    )`),
+    db.prepare(
+      "CREATE INDEX IF NOT EXISTS idx_p2p_operations_status_updated ON p2p_operations(apply_status, updated_at DESC)",
+    ),
+    db.prepare(
+      "CREATE INDEX IF NOT EXISTS idx_p2p_operations_source_created ON p2p_operations(source, created_at DESC)",
+    ),
+  ]);
+}
+
+/**
  * @proposito Reservar una oferta P2P mediante una inserción idempotente.
  * @responsabilidades Usar la restricción única de D1 para que solo un origen gane
  * la carrera; las llamadas posteriores recuperan la operación existente.
