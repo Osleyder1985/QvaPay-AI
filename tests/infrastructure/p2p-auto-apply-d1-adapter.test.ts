@@ -52,6 +52,45 @@ describe("createD1AutoApplyExecutionPorts", () => {
     expect(applyOffer).toHaveBeenCalledTimes(1);
   });
 
+  it("confirma solo con detalle processing e identidad verificada coincidente", async () => {
+    const applyOffer = vi.fn(async () => ({ success: true }));
+    const fetchOfferDetail = vi.fn(async () => ({
+      uuid: "offer-1",
+      status: "processing",
+      peerUuid: "verified-account-1",
+    }));
+    const getVerifiedAccountUuid = vi.fn(async () => "verified-account-1");
+    const ports = createD1AutoApplyExecutionPorts({
+      db: unusedDatabase(),
+      provider: { applyOffer, fetchOfferDetail, getVerifiedAccountUuid },
+    });
+
+    await expect(ports.applyOnce("offer-1")).resolves.toEqual({ status: "CONFIRMED" });
+    expect(fetchOfferDetail).toHaveBeenCalledWith("offer-1");
+    expect(getVerifiedAccountUuid).toHaveBeenCalledTimes(1);
+    expect(applyOffer).toHaveBeenCalledTimes(1);
+  });
+
+  it("mantiene AMBIGUOUS si el detalle no coincide con la identidad verificada", async () => {
+    const applyOffer = vi.fn(async () => ({ success: true }));
+    const fetchOfferDetail = vi.fn(async () => ({
+      uuid: "offer-1",
+      status: "processing",
+      peerUuid: "different-account",
+    }));
+    const getVerifiedAccountUuid = vi.fn(async () => "verified-account-1");
+    const ports = createD1AutoApplyExecutionPorts({
+      db: unusedDatabase(),
+      provider: { applyOffer, fetchOfferDetail, getVerifiedAccountUuid },
+    });
+
+    await expect(ports.applyOnce("offer-1")).resolves.toEqual({
+      status: "AMBIGUOUS",
+      httpStatus: null,
+    });
+    expect(applyOffer).toHaveBeenCalledTimes(1);
+  });
+
   it("clasifica un timeout ambiguo sin reintentar el proveedor", async () => {
     const applyOffer = vi.fn(async () => {
       throw new QvaPayAmbiguousOperationError("offer-1");
