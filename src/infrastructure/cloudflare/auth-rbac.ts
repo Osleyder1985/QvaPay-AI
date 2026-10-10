@@ -161,8 +161,12 @@ export async function ensureSecuritySchema(db: D1Database): Promise<void> {
         updated_at TEXT NOT NULL,
         last_login_at TEXT
       )`),
-      db.prepare("CREATE INDEX IF NOT EXISTS idx_app_users_username ON app_users(username)"),
-      db.prepare("CREATE INDEX IF NOT EXISTS idx_app_users_active ON app_users(active)"),
+      db.prepare(
+        "CREATE INDEX IF NOT EXISTS idx_app_users_username ON app_users(username)",
+      ),
+      db.prepare(
+        "CREATE INDEX IF NOT EXISTS idx_app_users_active ON app_users(active)",
+      ),
       db.prepare(`CREATE TABLE IF NOT EXISTS security_audit_log (
         id TEXT PRIMARY KEY,
         occurred_at TEXT NOT NULL,
@@ -388,10 +392,15 @@ export async function authenticate(
  * @responsabilidades Aplicar las validaciones y reglas de negocio definidas por el contrato del módulo.
  * @returns Resultado de la operación pública.
  */
-export async function getSession(request: Request, db: D1Database, secret: string): Promise<AuthSession | null> {
+export async function getSession(
+  request: Request,
+  db: D1Database,
+  secret: string,
+): Promise<AuthSession | null> {
   const session = await sessionForUser(request, db, secret);
   if (!session) {
-    if (request.headers.get("cookie")) await writeAudit(db, "session_rejected", "DENIED");
+    if (request.headers.get("cookie"))
+      await writeAudit(db, "session_rejected", "DENIED");
   }
   return session;
 }
