@@ -171,8 +171,10 @@ describe("contrato de temporización del dashboard", () => {
     expect(DASHBOARD_CLIENT_SCRIPT).toContain("estimateServerNow(");
   });
 
-  it("programa el sondeo adaptativo y mantiene la exclusión de solicitudes concurrentes", () => {
-    expect(DASHBOARD_CLIENT_SCRIPT).toContain("scheduleRefresh()");
+  it(
+    "programa el sondeo adaptativo y mantiene la exclusión de solicitudes concurrentes",
+    () => {
+      expect(DASHBOARD_CLIENT_SCRIPT).toContain("scheduleRefresh()");
     expect(DASHBOARD_CLIENT_SCRIPT).toContain("if(refreshInFlight)return false");
     expect(DASHBOARD_CLIENT_SCRIPT).toContain("refreshDelay=Math.min(60000,Math.max(5000,refreshDelay*2))");
     expect(DASHBOARD_CLIENT_SCRIPT).not.toContain("setInterval(refresh,5000)");
