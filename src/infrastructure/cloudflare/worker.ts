@@ -667,9 +667,32 @@ export default {
               { status: 202, headers: { "cache-control": "no-store" } },
             );
           }
-          await recordP2PDetailOutcome(env.DB, reservation.operation.id, {
-            available: true,
-          });
+          // La aplicación ya está confirmada en D1. Un fallo separado al guardar
+          // el detalle no debe degradarla ni presentarla como APPLYING.
+          let detailPersisted = false;
+          try {
+            detailPersisted = await recordP2PDetailOutcome(
+              env.DB,
+              reservation.operation.id,
+              { available: true },
+            );
+          } catch {
+            // Mantener CONFIRMED; el detalle se puede recuperar sin repetir el POST.
+          }
+          if (!detailPersisted) {
+            return Response.json(
+              {
+                operationId: reservation.operation.id,
+                applyStatus: "CONFIRMED",
+                detailStatus: "PENDING",
+                message:
+                  "La aplicación está confirmada, pero no se pudo persistir el detalle. Puede recuperarse sin repetir la aplicación.",
+                alreadyApplied: true,
+                reconciled: true,
+              },
+              { status: 202, headers: { "cache-control": "no-store" } },
+            );
+          }
           return Response.json(
             {
               operationId: reservation.operation.id,
