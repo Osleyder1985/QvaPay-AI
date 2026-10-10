@@ -321,3 +321,36 @@ test("la navegación por teclado puede alcanzar el control de cierre de sesión"
   ).toBe(true);
   await expect(page.locator("#logoutButton")).toBeFocused();
 });
+
+test("un snapshot con error operativo se marca degradado y no accionable", async ({
+  page,
+}, testInfo) => {
+  const payload = scannerState({
+    lastError: "fallo sintético de lectura",
+  });
+  await page.route("**/api/scanner/status", (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      headers: { "cache-control": "no-store" },
+      body: JSON.stringify(payload),
+    }),
+  );
+  await authenticate(page, testInfo);
+  await page.goto("/app/mercado");
+
+  await expect(page.locator("#marketIntegrity")).toContainText("DEGRADADO");
+  await expect(page.locator("#liveText")).toHaveText("DEGRADADO");
+  await expect(
+    page.locator("#sellTable [aria-label^='Acción no disponible']"),
+  ).toBeVisible();
+  await expect(
+    page.locator("#buyTable [aria-label^='Acción no disponible']"),
+  ).toBeVisible();
+  await expect(
+    page.locator("#sellTable [aria-label^='Acción no disponible']"),
+  ).toContainText("DEGRADADO");
+  await expect(
+    page.locator("#buyTable [aria-label^='Acción no disponible']"),
+  ).toContainText("DEGRADADO");
+});
