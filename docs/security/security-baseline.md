@@ -36,6 +36,12 @@ La identidad del propietario se obtiene exclusivamente mediante `GET /user` con 
 El endpoint público `GET /api/account` devuelve `403` mientras no exista una sesión de usuario autenticada independiente. No solicita ni acepta el token de infraestructura desde el navegador.
 
 ### Operaciones P2P
+### Operaciones P2P
+
+La ruta `POST /api/p2p/:uuid/apply` continúa bloqueada hasta completar la ejecución autenticada, idempotencia, reconciliación y verificación. El token de acción no sustituye la sesión, RBAC, CSRF/origin ni el registro persistente de la operación.
+
+La tabla D1 `p2p_operations` reserva cada `offer_uuid` de forma única para compartir la barrera entre ejecución manual y Auto Apply. Un resultado `AMBIGUOUS` conserva la reserva y no permite un segundo POST automático. El resultado de aplicación y la disponibilidad del detalle se registran por separado.
+
 
 `/api/p2p/:uuid/apply` permanece bloqueado para el dashboard público. La ejecución de operaciones reales requiere una frontera de operación autenticada independiente de los secretos server-side.
 
