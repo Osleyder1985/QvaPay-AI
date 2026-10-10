@@ -137,9 +137,9 @@ describe("createD1AutoApplyExecutionPorts", () => {
       now: () => "2026-10-10T12:00:00.000Z",
     });
 
-    await expect(
-      ports.reconcileOnce("operation-1", "offer-1"),
-    ).resolves.toBe("CONFIRMED");
+    await expect(ports.reconcileOnce("operation-1", "offer-1")).resolves.toBe(
+      "CONFIRMED",
+    );
     expect(fetchOfferDetail).toHaveBeenCalledWith("offer-1");
     expect(getVerifiedAccountUuid).toHaveBeenCalledTimes(1);
     expect(applyOffer).not.toHaveBeenCalled();
@@ -172,9 +172,9 @@ describe("createD1AutoApplyExecutionPorts", () => {
       },
     });
 
-    await expect(
-      ports.reconcileOnce("operation-1", "offer-1"),
-    ).resolves.toBe("AMBIGUOUS");
+    await expect(ports.reconcileOnce("operation-1", "offer-1")).resolves.toBe(
+      "AMBIGUOUS",
+    );
     expect(applyOffer).not.toHaveBeenCalled();
     expect(prepare).toHaveBeenCalled();
   });
