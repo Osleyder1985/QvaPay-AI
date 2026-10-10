@@ -233,6 +233,10 @@ export class QvaPayP2PClient {
   async fetchOfferDetail(uuid: string): Promise<{
     readonly uuid: string;
     readonly status: string;
+    readonly coin: string;
+    readonly side: "buy" | "sell";
+    readonly onlyVip: boolean | null;
+    readonly onlyKyc: boolean | null;
     readonly ownerUuid: string | null;
     readonly peerUuid: string | null;
   }> {
@@ -295,12 +299,23 @@ export class QvaPayP2PClient {
         if (
           detail.uuid !== uuid ||
           typeof detail.status !== "string" ||
-          detail.status.trim() === ""
+          detail.status.trim() === "" ||
+          typeof detail.coin !== "string" ||
+          detail.coin.trim() === "" ||
+          (detail.type !== "buy" && detail.type !== "sell")
         ) {
           throw new QvaPayTransientError(
-            "QvaPay devolvió un identificador o estado de oferta P2P incompatible.",
+            "QvaPay devolvió un identificador, mercado, tipo o estado de oferta P2P incompatible.",
           );
         }
+        const readOptionalBoolean = (value: unknown): boolean | null => {
+          if (value === undefined || value === null) return null;
+          if (typeof value === "boolean") return value;
+          if (value === 0 || value === 1) return value === 1;
+          throw new QvaPayTransientError(
+            "QvaPay devolvió una regla de elegibilidad P2P incompatible.",
+          );
+        };
         const readParticipantUuid = (value: unknown): string | null => {
           if (value === undefined || value === null) return null;
           if (
@@ -320,6 +335,10 @@ export class QvaPayP2PClient {
         return {
           uuid,
           status: detail.status,
+          coin: detail.coin,
+          side: detail.type,
+          onlyVip: readOptionalBoolean(detail.only_vip),
+          onlyKyc: readOptionalBoolean(detail.only_kyc),
           ownerUuid: readParticipantUuid(detail.User),
           peerUuid: readParticipantUuid(detail.Peer),
         };
