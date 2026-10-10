@@ -38,6 +38,20 @@ describe("createD1AutoApplyExecutionPorts", () => {
     expect(db.batch).not.toHaveBeenCalled();
   });
 
+  it("no confirma una respuesta exitosa sin reconciliar detalle e identidad", async () => {
+    const applyOffer = vi.fn(async () => ({ success: true }));
+    const ports = createD1AutoApplyExecutionPorts({
+      db: unusedDatabase(),
+      provider: { applyOffer },
+    });
+
+    await expect(ports.applyOnce("offer-1")).resolves.toEqual({
+      status: "AMBIGUOUS",
+      httpStatus: null,
+    });
+    expect(applyOffer).toHaveBeenCalledTimes(1);
+  });
+
   it("clasifica un timeout ambiguo sin reintentar el proveedor", async () => {
     const applyOffer = vi.fn(async () => {
       throw new QvaPayAmbiguousOperationError("offer-1");
