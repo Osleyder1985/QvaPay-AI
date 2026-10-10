@@ -23,3 +23,9 @@ Estimar la antigüedad de los datos sin depender de que el reloj del dispositivo
 La integración requiere que los controles de calidad, seguridad y navegador se ejecuten sobre el HEAD exacto del PR; los resultados de un commit anterior no sustituyen esa evidencia.
 
 Las pruebas deterministas cubren relojes locales adelantados y atrasados, antigüedad basada en la hora estimada del servidor, marcas ausentes o inválidas y marcas futuras. La cadencia de cinco segundos es una decisión inicial de carga/interacción, no un SLA ni una garantía de frescura del proveedor.
+
+## Regresión de la ruta de mercado
+
+La suite `tests/browser/market-route.spec.ts` valida la ruta autenticada `/app/mercado` con un contrato de scanner sintético: ambos libros, tasas formateadas, solo lectura, estado explícito cuando no existe snapshot y ausencia de desbordamiento horizontal a 320 px. Las respuestas sintéticas evitan depender de cuentas, credenciales o datos financieros reales.
+
+Esta cobertura comprueba la interfaz y el contrato observado; no demuestra disponibilidad del proveedor, ejecución de operaciones, certificación WCAG ni frescura real de producción. La accesibilidad manual y la verificación del Worker desplegado siguen siendo controles independientes.
