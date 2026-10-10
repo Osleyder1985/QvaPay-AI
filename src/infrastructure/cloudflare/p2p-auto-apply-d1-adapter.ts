@@ -26,7 +26,9 @@ import {
 } from "../qvapay/qvapay-p2p-client.js";
 import {
   claimP2POperation,
+  confirmP2POperationAfterReconciliation,
   ensureP2POperationSchema,
+  markP2POperationAmbiguous,
   recordP2PApplyOutcome,
   releaseReservedP2POperation,
   reserveP2POperation,
@@ -112,7 +114,12 @@ export interface D1AutoApplyExecutionOptions {
  */
 export function createD1AutoApplyExecutionPorts(
   options: D1AutoApplyExecutionOptions,
-): AutoApplyExecutionPorts {
+): AutoApplyExecutionPorts & {
+  reconcileOnce(
+    operationId: string,
+    offerUuid: string,
+  ): Promise<"CONFIRMED" | "AMBIGUOUS">;
+} {
   const now = options.now ?? (() => new Date().toISOString());
   const actorUserId = options.actor?.userId ?? null;
   const actorUsername = options.actor?.username ?? null;
@@ -207,6 +214,44 @@ export function createD1AutoApplyExecutionPorts(
         // No se reenvía el POST ni se confirma si falla la reconciliación.
       }
       return { status: "AMBIGUOUS" as const, httpStatus: null };
+    },
+
+    async reconcileOnce(operationId, offerUuid) {
+      // La reconciliación solo consulta el proveedor: nunca invoca applyOffer.
+      await ensureP2POperationSchema(options.db);
+      if (
+        !options.provider.fetchOfferDetail ||
+        !options.provider.getVerifiedAccountUuid
+      ) {
+        await markP2POperationAmbiguous(options.db, operationId, now());
+        return "AMBIGUOUS";
+      }
+
+      try {
+        const [detail, verifiedAccountUuid] = await Promise.all([
+          options.provider.fetchOfferDetail(offerUuid),
+          options.provider.getVerifiedAccountUuid(),
+        ]);
+        if (
+          detail.uuid === offerUuid &&
+          detail.status === "processing" &&
+          typeof verifiedAccountUuid === "string" &&
+          verifiedAccountUuid.trim() !== "" &&
+          detail.peerUuid === verifiedAccountUuid
+        ) {
+          const confirmed = await confirmP2POperationAfterReconciliation(
+            options.db,
+            operationId,
+            now(),
+          );
+          return confirmed ? "CONFIRMED" : "AMBIGUOUS";
+        }
+      } catch {
+        // Una consulta fallida no prueba que la operación remota no exista.
+      }
+
+      await markP2POperationAmbiguous(options.db, operationId, now());
+      return "AMBIGUOUS";
     },
 
     async recordOutcome(operationId, status, httpStatus) {
