@@ -220,10 +220,7 @@ describe("Cloudflare Worker: autorización de rutas modulares", () => {
   it("deniega la ruta de aplicación P2P al rol Auditor antes de consultar el proveedor", async () => {
     const env = createEnvironment();
     authMocks.requireRole.mockResolvedValue(
-      Response.json(
-        { error: "Permisos insuficientes." },
-        { status: 403 },
-      ),
+      Response.json({ error: "Permisos insuficientes." }, { status: 403 }),
     );
 
     const response = await requestModule(
