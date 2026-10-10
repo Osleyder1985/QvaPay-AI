@@ -72,9 +72,11 @@ La operación `POST /p2p/:uuid/apply` existe como capacidad independiente de lec
 
 ## Etiquetas monetarias de la tabla
 
-La tabla utiliza el mercado activo comunicado por el snapshot del scanner. Para `BANK_CUP`, la documentación oficial del proveedor identifica la moneda seleccionada como Transferencia CUP y define `ratio = receive / amount`; por ello la presentación de tasa es `CUP/QUSD`. El encabezado de cantidad del activo se mantiene como QUSD.
+La tabla utiliza el mercado activo comunicado por el snapshot del scanner. La tasa del contrato P2P es `ratio = receive / amount`, es decir, unidades de la moneda seleccionada por QUSD. Los ticks `BANK_CUP`, `BANK_MLC` y `BANK_EUR` tienen respaldo en la documentación pública del proveedor y se presentan respectivamente como `CUP/QUSD`, `MLC/QUSD` y `EUR/QUSD`. El encabezado de cantidad del activo se mantiene como QUSD.
 
-Cuando el identificador de mercado no tiene una unidad de moneda validada en el contrato disponible, la interfaz debe mostrar una etiqueta genérica basada en la semántica `receive / amount` y no reutilizar CUP por defecto. La identidad del mercado activo debe seguir visible. La ampliación a otros mercados requiere evidencia contractual explícita y pruebas de regresión para cada par; no se realizan conversiones ni cambios de cálculo por formato de presentación.
+El mapeo de etiquetas debe limitarse a ticks documentados explícitamente. Cuando el identificador de mercado no tenga una unidad validada en el contrato disponible, la interfaz debe mostrar una etiqueta genérica basada en la semántica `receive / amount`, conservar visible el mercado activo y no reutilizar CUP por defecto. No se realizan conversiones ni cambios de cálculo por formato de presentación.
+
+Fuentes contractuales consultadas: [listado P2P y semántica de ratio](https://www.qvapay.com/docs/p2p/list), [promedios por moneda, incluidos BANK_MLC](https://www.qvapay.com/docs/p2p/averages) y [ficha pública BANK_EUR](https://www.qvapay.com/coins/BANK_EUR).
 
 ## Justificación normativa
 
