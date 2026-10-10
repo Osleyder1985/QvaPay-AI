@@ -42,9 +42,6 @@ La ruta `POST /api/p2p/:uuid/apply` continúa bloqueada hasta completar la ejecu
 
 La tabla D1 `p2p_operations` reserva cada `offer_uuid` de forma única para compartir la barrera entre ejecución manual y Auto Apply. Un resultado `AMBIGUOUS` conserva la reserva y no permite un segundo POST automático. El resultado de aplicación y la disponibilidad del detalle se registran por separado.
 
-
-`/api/p2p/:uuid/apply` permanece bloqueado para el dashboard público. La ejecución de operaciones reales requiere una frontera de operación autenticada independiente de los secretos server-side.
-
 ### Dashboard
 
 `GET /api/scanner/status` expone únicamente estado sanitizado y datos de mercado persistidos.
