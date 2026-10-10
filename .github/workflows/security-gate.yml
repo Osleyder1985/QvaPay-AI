@@ -108,3 +108,6 @@ jobs:
 
       - name: Pruebas centradas en seguridad
         run: npm test
+
+      - name: Pruebas de integración con D1 local
+        run: npm run test:d1
