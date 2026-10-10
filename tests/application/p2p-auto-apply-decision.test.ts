@@ -11,7 +11,7 @@ const offer = (overrides: Partial<Offer> = {}): Offer => ({
 const input = (overrides: Partial<Parameters<typeof evaluateAutoApplyDecision>[0]> = {}) => ({
   enabled: true, action: "BUY" as const, offer: offer(), expectedCoin: "QUSD",
   rateThreshold: "360", amountLimit: "4000", nowMs, maxSnapshotAgeMs: 120_000,
-  accountEligible: true, accountBalanceQusd: { available: true, fresh: true, amount: "100" },
+  accountEligible: true, accountVipVerified: true, accountBalanceQusd: { available: true, fresh: true, amount: "100" },
   ...overrides,
 });
 
@@ -34,6 +34,7 @@ describe("evaluateAutoApplyDecision", () => {
   it("rechaza moneda, estado y elegibilidad VIP incompatibles", () => {
     expect(evaluateAutoApplyDecision(input({ offer: offer({ market: "OTHER" }) })).reason).toBe("MARKET_MISMATCH");
     expect(evaluateAutoApplyDecision(input({ offer: offer({ status: "processing" }) })).reason).toBe("OFFER_NOT_OPEN");
-    expect(evaluateAutoApplyDecision(input({ offer: offer({ onlyVip: true, creatorVip: false }) })).reason).toBe("VIP_REQUIRED");
+    expect(evaluateAutoApplyDecision(input({ offer: offer({ onlyVip: true, creatorVip: true }) })).reason).toBe("VIP_REQUIRED");
+    expect(evaluateAutoApplyDecision(input({ accountVipVerified: false, offer: offer({ onlyVip: true, creatorVip: true }) })).reason).toBe("VIP_REQUIRED");
   });
 });
