@@ -209,7 +209,7 @@ test("un mercado sin metadatos monetarios conocidos usa etiquetas genéricas", a
     "UNSUPPORTED_TEST_MARKET",
   );
   await expect(page.locator("#sellTable thead")).toContainText(
-    "Tasa (receive/amount)",
+    "TASA (receive/amount)",
   );
   await expect(page.locator("#sellTable thead")).toContainText(
     "Moneda de mercado a pagar",
