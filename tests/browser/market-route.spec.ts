@@ -4,19 +4,18 @@
  * @responsabilidades Cubrir regresiones visibles de mercado con respuestas sintéticas, sin operar cuentas ni ofertas reales.
  * @ubicacion tests/browser dentro de la verificación de integración de QvaPay-AI.
  */
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Page, type TestInfo } from "@playwright/test";
 
 const smokeHeaders = {
   authorization: "Bearer local-browser-test-smoke",
 };
 
-let smokeUsername: string | undefined;
+const smokeUsers = new Map<string, string>();
 
-test.afterEach(async ({ page }) => {
-  if (!smokeUsername) return;
-
-  const username = smokeUsername;
-  smokeUsername = undefined;
+test.afterEach(async ({ page }, testInfo) => {
+  const username = smokeUsers.get(testInfo.testId);
+  if (!username) return;
+  smokeUsers.delete(testInfo.testId);
   const deleted = await page.request.delete("/internal/auth/smoke-user", {
     headers: {
       ...smokeHeaders,
@@ -86,7 +85,7 @@ function scannerState(overrides: Record<string, unknown> = {}) {
   };
 }
 
-async function authenticate(page: Page): Promise<void> {
+async function authenticate(page: Page, testInfo: TestInfo): Promise<void> {
   await page.goto("/");
   const username = `ci-smoke-${crypto.randomUUID()}`;
   const password = "BrowserMarket-Pass-2026!";
@@ -95,7 +94,7 @@ async function authenticate(page: Page): Promise<void> {
     data: { username, password },
   });
   expect(created.status()).toBe(200);
-  smokeUsername = username;
+  smokeUsers.set(testInfo.testId, username);
 
   const login = await page.request.post("/api/auth/login", {
     data: { username, password },
@@ -117,7 +116,7 @@ async function authenticate(page: Page): Promise<void> {
 
 test("el mercado autenticado muestra los dos libros en modo de solo lectura", async ({
   page,
-}) => {
+}, testInfo) => {
   const payload = scannerState();
   await page.route("**/api/scanner/status", (route) =>
     route.fulfill({
@@ -127,7 +126,7 @@ test("el mercado autenticado muestra los dos libros en modo de solo lectura", as
       body: JSON.stringify(payload),
     }),
   );
-  await authenticate(page);
+  await authenticate(page, testInfo);
   const response = await page.goto("/app/mercado");
 
   expect(response?.status()).toBe(200);
@@ -157,7 +156,7 @@ test("el mercado autenticado muestra los dos libros en modo de solo lectura", as
 
 test("el mercado identifica explícitamente un snapshot no disponible", async ({
   page,
-}) => {
+}, testInfo) => {
   const payload = scannerState({
     snapshotStatus: "UNAVAILABLE",
     metrics: {
@@ -183,7 +182,7 @@ test("el mercado identifica explícitamente un snapshot no disponible", async ({
       body: JSON.stringify(payload),
     }),
   );
-  await authenticate(page);
+  await authenticate(page, testInfo);
   await page.goto("/app/mercado");
 
   await expect(page.locator("#marketIntegrity")).toContainText("NO DISPONIBLE");
@@ -191,18 +190,87 @@ test("el mercado identifica explícitamente un snapshot no disponible", async ({
   await expect(page.locator("#buyTable")).toContainText("No hay ofertas");
 });
 
-test("el módulo de mercado no desborda el viewport móvil estrecho", async ({
+test("el módulo de mercado no desborda los viewports definidos", async ({
   page,
-}) => {
-  await page.setViewportSize({ width: 320, height: 800 });
-  await authenticate(page);
-  await page.goto("/app/mercado");
-  const dimensions = await page.evaluate(() => ({
-    viewport: document.documentElement.clientWidth,
-    document: document.documentElement.scrollWidth,
-  }));
-
-  expect(dimensions.document, JSON.stringify(dimensions)).toBeLessThanOrEqual(
-    dimensions.viewport,
+}, testInfo) => {
+  await page.route("**/api/scanner/status", (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      headers: { "cache-control": "no-store" },
+      body: JSON.stringify(scannerState()),
+    }),
   );
+  await authenticate(page, testInfo);
+  await page.goto("/app/mercado");
+
+  for (const width of [320, 360, 768, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    const dimensions = await page.evaluate(() => ({
+      viewport: document.documentElement.clientWidth,
+      document: document.documentElement.scrollWidth,
+    }));
+    expect(
+      dimensions.document,
+      `Desbordamiento a ${width}px: ${JSON.stringify(dimensions)}`,
+    ).toBeLessThanOrEqual(dimensions.viewport);
+  }
+});
+
+test("el estado del mercado se recupera después de un error de transporte", async ({
+  page,
+}, testInfo) => {
+  let attempts = 0;
+  await page.route("**/api/scanner/status", (route) => {
+    attempts += 1;
+    if (attempts === 1) {
+      return route.fulfill({
+        status: 503,
+        contentType: "application/json",
+        body: JSON.stringify({ error: "fallo sintético de prueba" }),
+      });
+    }
+    return route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      headers: { "cache-control": "no-store" },
+      body: JSON.stringify(scannerState()),
+    });
+  });
+  await authenticate(page, testInfo);
+  await page.goto("/app/mercado");
+  await expect(page.locator("#liveText")).toHaveText("SIN CONEXIÓN");
+
+  await page.reload();
+  await expect(page.locator("#marketIntegrity")).toContainText("ACTUAL");
+  await expect(page.locator("#sellTable")).toContainText("vendedor-prueba");
+  expect(attempts).toBeGreaterThanOrEqual(2);
+});
+
+test("la navegación por teclado puede alcanzar el control de cierre de sesión", async ({
+  page,
+}, testInfo) => {
+  await page.route("**/api/scanner/status", (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      headers: { "cache-control": "no-store" },
+      body: JSON.stringify(scannerState()),
+    }),
+  );
+  await authenticate(page, testInfo);
+  await page.goto("/app/mercado");
+
+  let reachedLogout = false;
+  for (let index = 0; index < 40; index += 1) {
+    await page.keyboard.press("Tab");
+    if (await page.locator("#logoutButton").evaluate(
+      (element) => element === document.activeElement,
+    )) {
+      reachedLogout = true;
+      break;
+    }
+  }
+  expect(reachedLogout, "El control de cierre debe ser alcanzable con Tab").toBe(true);
+  await expect(page.locator("#logoutButton")).toBeFocused();
 });
