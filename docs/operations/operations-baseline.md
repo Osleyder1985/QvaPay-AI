@@ -77,3 +77,21 @@ La ruta no acepta credenciales desde el navegador. La credencial de cuenta se us
 ## Certificación
 
 El estado del código no sustituye la evidencia de producción. La certificación requiere evidencia reproducible del deployment y de una ejecución real.
+
+
+## Recuperación de aplicaciones P2P confirmadas
+
+Una operación con estado de aplicación `CONFIRMED` y detalle `PENDING` o `FAILED` debe recuperar el detalle remoto antes de ejecutar las validaciones destinadas a una aplicación nueva. El estado remoto puede haber pasado de `open` a `processing` después de que QvaPay confirmara la aplicación.
+
+- La recuperación consulta el detalle y actualiza únicamente el estado de detalle persistido.
+- La recuperación nunca vuelve a invocar el POST de aplicación.
+- Las validaciones de snapshot fresco, oferta abierta y elegibilidad siguen siendo obligatorias para operaciones nuevas.
+- Si la validación previa de una operación nueva falla, se intenta liberar la reserva `RESERVED`; si no puede liberarse, se devuelve un error operativo y la operación requiere revisión.
+
+### Justificación normativa y verificación
+
+- **ISO/IEC 25010:2023:** fiabilidad y capacidad de recuperación ante fallos parciales.
+- **ISO/IEC/IEEE 29119-2:2021:** pruebas de regresión de estados y recuperación.
+- **ISO/IEC/IEEE 12207:2017:** trazabilidad entre requisito, implementación, pruebas y documentación.
+
+La prueba de regresión debe simular una aplicación ya confirmada, detalle fallido y oferta remota en `processing`, y demostrar que se recupera el detalle sin repetir la mutación financiera.
