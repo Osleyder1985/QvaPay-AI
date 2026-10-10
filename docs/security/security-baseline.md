@@ -37,7 +37,6 @@ El endpoint público `GET /api/account` devuelve `403` mientras no exista una se
 
 ### Operaciones P2P
 
-
 La ruta `POST /api/p2p/:uuid/apply` continúa bloqueada hasta completar la ejecución autenticada, idempotencia, reconciliación y verificación. El token de acción no sustituye la sesión, RBAC, CSRF/origin ni el registro persistente de la operación.
 
 La tabla D1 `p2p_operations` reserva cada `offer_uuid` de forma única para compartir la barrera entre ejecución manual y Auto Apply. Un resultado `AMBIGUOUS` conserva la reserva y no permite un segundo POST automático. El resultado de aplicación y la disponibilidad del detalle se registran por separado.
