@@ -114,6 +114,18 @@ El estado del detalle es independiente: `NOT_REQUESTED`, `PENDING`, `AVAILABLE` 
 
 Esta etapa añade el esquema y las transiciones persistentes. No activa todavía la ruta financiera ni demuestra por sí sola que el flujo manual y Auto Apply ya estén conectados al almacén. Esa integración requiere los controles y pruebas end-to-end de #229, #231 y #235.
 
+## Consulta autoritativa del detalle P2P
+
+El proveedor documenta `GET /p2p/:uuid` para obtener el detalle completo de una oferta. Esta consulta usa `Authorization: Bearer <token>`; el adaptador la ejecuta solo desde el Worker mediante `QVAPAY_USER_API_TOKEN`, nunca desde el navegador. El payload esperado contiene `p2p.uuid`, `p2p.status`, `p2p.User` y `p2p.Peer`.
+
+Fuentes oficiales:
+- [Detalle de Oferta P2P](https://www.qvapay.com/docs/p2p/detail).
+- [Aplicar a Oferta P2P](https://www.qvapay.com/docs/p2p/apply).
+
+Antes de aplicar, la ruta comprueba que el detalle siga en estado `open` y que se pueda identificar al propietario para rechazar una oferta propia. Después de una respuesta de apply confirmada, vuelve a consultar el detalle. Si esta segunda consulta falla, la operación permanece `CONFIRMED` y solo se marca el detalle como `FAILED`; no se repite el POST.
+
+La implementación debe continuar bloqueada en producción hasta que la verificación del despliegue confirme los controles de autenticación y el flujo de operaciones.
+
 ## Aplicación de cambios
 
 Este documento especifica unidades y procedencia de datos; no cambia las reglas de negocio, el cálculo de tasa, el orden BUY/SELL ni los permisos de aplicación. Las etiquetas visuales de mercados adicionales deben implementarse a partir de metadatos contractuales validados y con pruebas de regresión.
