@@ -20,12 +20,12 @@
     "check:prettier-exclusions": "node scripts/check-prettier-exclusions.mjs"
   },
   "devDependencies": {
-    "@cloudflare/vitest-plugin": "^1.0.0",
+    "@cloudflare/vitest-pool-workers": "0.16.8",
     "@cloudflare/workers-types": "5.20261003.1",
     "@types/node": "^22.15.0",
     "eslint": "^9.39.0",
     "prettier": "3.9.9",
-    "vitest": "^4.1.11",
+    "vitest": "^3.2.4",
     "typescript-eslint": "^8.44.0",
     "wrangler": "4.146.0",
     "@axe-core/playwright": "^4.10.2",
