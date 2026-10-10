@@ -10,13 +10,13 @@ Este requisito amplía `SYS-FR-005` y no modifica requisitos previamente certifi
 
 ## Fuentes de verdad
 
-| Área                        | Fuente                                                 | Uso                                                                                                |
-| --------------------------- | ------------------------------------------------------ | -------------------------------------------------------------------------------------------------- |
-| Identidad propietaria       | `GET /user` con API Token QvaPay                       | Identidad de la cuenta conectada                                                                   |
-| Relación usuario-aplicación | `GET /app/{uuid}` con el mismo Bearer Token de usuario | Demostrar que la aplicación configurada pertenece al usuario autenticado                           |
-| Balance                     | `POST /v2/balance`                                     | Balance de la aplicación propietaria, en USD                                                       |
-| Aplicación                  | `POST /v2/info`                                        | Identidad y estado de la aplicación QvaPay; su `uuid` debe coincidir con la aplicación configurada |
-| Ofertas propias             | `GET /p2p?my=1`                                        | Datos operativos propios de P2P; nunca identidad                                                   |
+| Área                        | Fuente                                                 | Uso                                                                                                    |
+| --------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ |
+| Identidad propietaria       | `GET /user` con API Token QvaPay                       | Identidad de la cuenta conectada                                                                       |
+| Relación usuario-aplicación | `GET /app/{uuid}` con el mismo Bearer Token de usuario | Demostrar que la aplicación configurada pertenece al usuario autenticado                               |
+| Balance                     | `POST /v2/balance`                                     | Balance de la cuenta propietaria, con denominación funcional QUSD; conservar la proveniencia de la API |
+| Aplicación                  | `POST /v2/info`                                        | Identidad y estado de la aplicación QvaPay; su `uuid` debe coincidir con la aplicación configurada     |
+| Ofertas propias             | `GET /p2p?my=1`                                        | Datos operativos propios de P2P; nunca identidad                                                       |
 
 ## Correlación de propietario
 
@@ -66,7 +66,7 @@ El modelo admite los campos documentados por `GET /user` que son seguros para el
 
 ### Balance
 
-El modelo registra `balanceUsd` y su proveniencia, estado HTTP, estado de normalización, error y timestamp. La unidad es **USD**, conforme al contrato de `/v2/balance`; no se debe inferir QUSD desde P2P.
+El modelo registra `balanceUsd` y su proveniencia, estado HTTP, estado de normalización, error y timestamp. La denominación funcional del balance de la cuenta en QvaPay-AI es **QUSD**. La fuente autorizada es `POST /v2/balance`; no se debe deducir ni convertir el balance a partir de importes P2P (`BANK_CUP`). Debe conservarse la proveniencia del valor entregado por el proveedor y cualquier diferencia de unidad/escala debe resolverse contra su contrato, nunca mediante una conversión implícita.
 
 La ausencia o incompatibilidad del balance debe permanecer diferenciada de un balance cero.
 
