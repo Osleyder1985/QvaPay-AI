@@ -221,7 +221,8 @@ describe("Cloudflare Worker: aplicación P2P protegida", () => {
     expect(mocks.ensureOperationSchema).toHaveBeenCalledOnce();
     expect(mocks.reserveOperation).toHaveBeenCalledOnce();
     expect(mocks.claimOperation).toHaveBeenCalledOnce();
-    expect(mocks.applyOffer).toHaveBeenCalledOnceWith("offer-123");
+    expect(mocks.applyOffer).toHaveBeenCalledOnce();
+    expect(mocks.applyOffer).toHaveBeenCalledWith("offer-123");
     expect(mocks.fetchOfferDetail).toHaveBeenCalledTimes(2);
     expect(mocks.recordApplyOutcome).toHaveBeenCalledWith(
       expect.anything(),
