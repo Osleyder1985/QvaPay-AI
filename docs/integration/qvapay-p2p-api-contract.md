@@ -120,7 +120,7 @@ El proveedor documenta `GET /p2p/:uuid` para obtener el detalle completo de una 
 
 Fuentes oficiales:
 
-- [Detalle de Oferta P2P(https://www.qvapay.com/docs/p2p/detail).
+- [Detalle de Oferta P2P](https://www.qvapay.com/docs/p2p/detail).
 - [Aplicar a Oferta P2P](https://www.qvapay.com/docs/p2p/apply).
 
 Antes de aplicar, la ruta comprueba que el detalle siga en estado `open` y que se pueda identificar al propietario para rechazar una oferta propia. Después de una respuesta de apply confirmada, vuelve a consultar el detalle. Si esta segunda consulta falla, la operación permanece `CONFIRMED` y solo se marca el detalle como `FAILED`; no se repite el POST.
