@@ -586,14 +586,18 @@ export default {
       // Una escritura D1 fallida después del POST puede dejar APPLYING. Reconciliar
       // únicamente con identidad de cuenta verificada + Peer.uuid y estado remoto processing;
       // nunca volver a enviar el POST desde esta ruta.
-      if (!reservation.created && reservation.operation.applyStatus === "APPLYING") {
+      if (
+        !reservation.created &&
+        reservation.operation.applyStatus === "APPLYING"
+      ) {
         if (!env.QVAPAY_USER_API_TOKEN) {
           return Response.json(
             {
               operationId: reservation.operation.id,
               applyStatus: "APPLYING",
               detailStatus: reservation.operation.detailStatus,
-              message: "La operación requiere reconciliación; falta la credencial de cuenta. No repitas la aplicación.",
+              message:
+                "La operación requiere reconciliación; falta la credencial de cuenta. No repitas la aplicación.",
             },
             { status: 202, headers: { "cache-control": "no-store" } },
           );
@@ -617,7 +621,8 @@ export default {
                 operationId: reservation.operation.id,
                 applyStatus: "APPLYING",
                 detailStatus: reservation.operation.detailStatus,
-                message: "No se pudo verificar la identidad para reconciliar la operación. No repitas la aplicación.",
+                message:
+                  "No se pudo verificar la identidad para reconciliar la operación. No repitas la aplicación.",
               },
               { status: 202, headers: { "cache-control": "no-store" } },
             );
@@ -629,13 +634,17 @@ export default {
             userApiToken: env.QVAPAY_USER_API_TOKEN,
           });
           const detail = await recoveryClient.fetchOfferDetail(offerUuid);
-          if (detail.status !== "processing" || detail.peerUuid !== identity.uuid) {
+          if (
+            detail.status !== "processing" ||
+            detail.peerUuid !== identity.uuid
+          ) {
             return Response.json(
               {
                 operationId: reservation.operation.id,
                 applyStatus: "APPLYING",
                 detailStatus: reservation.operation.detailStatus,
-                message: "QvaPay no aporta evidencia suficiente para confirmar la aplicación. La operación sigue bloqueada; no repitas el POST.",
+                message:
+                  "QvaPay no aporta evidencia suficiente para confirmar la aplicación. La operación sigue bloqueada; no repitas el POST.",
               },
               { status: 202, headers: { "cache-control": "no-store" } },
             );
@@ -652,7 +661,8 @@ export default {
                 operationId: reservation.operation.id,
                 applyStatus: "APPLYING",
                 detailStatus: reservation.operation.detailStatus,
-                message: "La evidencia remota coincide, pero no se pudo persistir la reconciliación. No repitas la aplicación.",
+                message:
+                  "La evidencia remota coincide, pero no se pudo persistir la reconciliación. No repitas la aplicación.",
               },
               { status: 202, headers: { "cache-control": "no-store" } },
             );
@@ -677,7 +687,8 @@ export default {
               operationId: reservation.operation.id,
               applyStatus: "APPLYING",
               detailStatus: reservation.operation.detailStatus,
-              message: "No se pudo completar la reconciliación remota. La operación permanece bloqueada; no repitas la aplicación.",
+              message:
+                "No se pudo completar la reconciliación remota. La operación permanece bloqueada; no repitas la aplicación.",
             },
             { status: 202, headers: { "cache-control": "no-store" } },
           );
