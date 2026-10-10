@@ -24,12 +24,7 @@ export interface AutoApplyStrategy {
 export interface AutoApplyReservation {
   readonly operationId: string;
   readonly created: boolean;
-  readonly status:
-    | "RESERVED"
-    | "APPLYING"
-    | "CONFIRMED"
-    | "REJECTED"
-    | "AMBIGUOUS";
+  readonly status: "RESERVED" | "APPLYING" | "CONFIRMED" | "REJECTED" | "AMBIGUOUS";
 }
 
 /** Puertos obligatorios: la implementación concreta no puede ocultar persistencia ni llamadas remotas. */
