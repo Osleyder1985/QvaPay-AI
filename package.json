@@ -15,7 +15,8 @@
     "cf:deploy": "wrangler deploy",
     "check:code-docs": "node scripts/check-code-documentation.mjs",
     "test:browser": "playwright test",
-    "format:fix": "prettier --write ."
+    "format:fix": "prettier --write .",
+    "check:prettier-exclusions": "node scripts/check-prettier-exclusions.mjs"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "5.20261003.1",
