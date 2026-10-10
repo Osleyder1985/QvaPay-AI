@@ -29,8 +29,15 @@ import {
 } from "./qvapay-account-snapshot-store.js";
 import { createLoginAppResponse } from "./login-app.js";
 import { bootstrapInitialAdmin } from "./initial-admin-setup.js";
-import { createInitialAdminSetupCompletedResponse, createInitialAdminSetupResponse } from "./initial-admin-setup-app.js";
-import { createPublicAppResponse, createPublicScannerStateResponse, toPublicScannerState } from "./public-app.js";
+import {
+  createInitialAdminSetupCompletedResponse,
+  createInitialAdminSetupResponse,
+} from "./initial-admin-setup-app.js";
+import {
+  createPublicAppResponse,
+  createPublicScannerStateResponse,
+  toPublicScannerState,
+} from "./public-app.js";
 export interface ScannerWorkerEnvironment {
   readonly SCANNER_SCHEDULER: DurableObjectNamespace<ScannerSchedulerDurableObject>;
   readonly DB: D1Database;
@@ -208,10 +215,7 @@ export default {
         env.ACCOUNT_AUTH_SECRET,
       );
       if (!session) return createLoginAppResponse();
-      if (
-        moduleId === "usuarios" &&
-        session.user.role !== "ADMINISTRATION"
-      ) {
+      if (moduleId === "usuarios" && session.user.role !== "ADMINISTRATION") {
         return new Response("Acceso denegado.", {
           status: 403,
           headers: { "cache-control": "no-store" },
@@ -318,63 +322,111 @@ export default {
         const persisted = await persistQvaPayAccountSnapshot(env.DB, account);
         await env.DB.prepare(
           "INSERT INTO security_audit_log (id, occurred_at, actor_user_id, actor_username, event_type, outcome, target_user_id, target_username, metadata_json) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-        ).bind(
-          crypto.randomUUID(),
-          new Date().toISOString(),
-          access.user.id,
-          access.user.username,
-          "qvapay_account_sync",
-          "SUCCESS",
-          null,
-          null,
-          JSON.stringify({ snapshotId: persisted.id, integrationStatus: persisted.integrationStatus }),
-        ).run();
+        )
+          .bind(
+            crypto.randomUUID(),
+            new Date().toISOString(),
+            access.user.id,
+            access.user.username,
+            "qvapay_account_sync",
+            "SUCCESS",
+            null,
+            null,
+            JSON.stringify({
+              snapshotId: persisted.id,
+              integrationStatus: persisted.integrationStatus,
+            }),
+          )
+          .run();
         return Response.json(
           { account, snapshot: persisted },
           { headers: { "cache-control": "no-store" } },
         );
       } catch (error) {
-        const message = error instanceof Error ? error.message : "QvaPay account synchronization failed.";
+        const message =
+          error instanceof Error
+            ? error.message
+            : "QvaPay account synchronization failed.";
         return jsonError(message, 502);
       }
     }
 
     if (url.pathname === "/api/scanner/status") {
-      if (request.method !== "GET") return new Response("Method not allowed", { status: 405 });
-      const access = await requireRole(request, env.DB, env.ACCOUNT_AUTH_SECRET, ["ADMINISTRATION", "AUDITOR"]);
+      if (request.method !== "GET")
+        return new Response("Method not allowed", { status: 405 });
+      const access = await requireRole(
+        request,
+        env.DB,
+        env.ACCOUNT_AUTH_SECRET,
+        ["ADMINISTRATION", "AUDITOR"],
+      );
       if (access instanceof Response) return access;
-      return createPublicScannerStateResponse(toPublicScannerState(await stub.getState()));
+      return createPublicScannerStateResponse(
+        toPublicScannerState(await stub.getState()),
+      );
     }
 
     const applyMatch = url.pathname.match(/^\/api\/p2p\/([^/]+)\/apply$/);
     if (applyMatch) {
-      const access = await requireRole(request, env.DB, env.ACCOUNT_AUTH_SECRET, ["ADMINISTRATION"]);
+      const access = await requireRole(
+        request,
+        env.DB,
+        env.ACCOUNT_AUTH_SECRET,
+        ["ADMINISTRATION"],
+      );
       if (access instanceof Response) return access;
-      return jsonError("La operación P2P está protegida y su ejecución seguirá el contrato operativo existente.", 501);
+      return jsonError(
+        "La operación P2P está protegida y su ejecución seguirá el contrato operativo existente.",
+        501,
+      );
     }
 
     if (url.pathname.startsWith("/api/admin/")) {
-      const access = await requireRole(request, env.DB, env.ACCOUNT_AUTH_SECRET, ["ADMINISTRATION"]);
+      const access = await requireRole(
+        request,
+        env.DB,
+        env.ACCOUNT_AUTH_SECRET,
+        ["ADMINISTRATION"],
+      );
       if (access instanceof Response) return access;
       if (url.pathname === "/api/admin/users" && request.method === "GET") {
-        return Response.json({ users: await listUsers(env.DB) }, { headers: { "cache-control": "no-store" } });
+        return Response.json(
+          { users: await listUsers(env.DB) },
+          { headers: { "cache-control": "no-store" } },
+        );
       }
       if (url.pathname === "/api/admin/users" && request.method === "POST") {
         const input = await body(request);
-        const username = typeof input.username === "string" ? input.username : "";
-        const password = typeof input.password === "string" ? input.password : "";
-        const requestedRole = typeof input.role === "string" ? input.role : "AUDITOR";
+        const username =
+          typeof input.username === "string" ? input.username : "";
+        const password =
+          typeof input.password === "string" ? input.password : "";
+        const requestedRole =
+          typeof input.role === "string" ? input.role : "AUDITOR";
         if (requestedRole !== "AUDITOR") {
-          return jsonError("Solo se pueden crear usuarios con rol Observador.", 400);
+          return jsonError(
+            "Solo se pueden crear usuarios con rol Observador.",
+            400,
+          );
         }
         try {
           const user = await createUser(env.DB, username, password, "AUDITOR");
-          return Response.json({ user }, { status: 201, headers: { "cache-control": "no-store" } });
+          return Response.json(
+            { user },
+            { status: 201, headers: { "cache-control": "no-store" } },
+          );
         } catch (error) {
-          return jsonError(error instanceof Error ? error.message : "No se pudo crear el usuario.", 400);
+          return jsonError(
+            error instanceof Error
+              ? error.message
+              : "No se pudo crear el usuario.",
+            400,
+          );
         }
       }
-      const userMatch = url.pathname.match(/^\/api\/admin\/users\/([^/]+)\/(enable|disable|password)$/);
+      const userMatch = url.pathname.match(
+        /^\/api\/admin\/users\/([^/]+)\/(enable|disable|password)$/,
+      );
       if (userMatch) {
         const userId = userMatch[1];
         if (!userId) return jsonError("Usuario no encontrado.", 404);
