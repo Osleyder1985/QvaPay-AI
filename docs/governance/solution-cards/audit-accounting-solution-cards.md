@@ -56,9 +56,9 @@ ISO/IEC 27002:2022 proporciona orientación sobre controles para apoyar la imple
 
 El modelo de calidad del producto es aplicable a la especificación y evaluación de requisitos de software. Sus conceptos de calidad de seguridad incluyen propiedades como integridad, no repudio, responsabilidad y autenticidad, que respaldan directamente la necesidad de evidencia atribuible y resistente a manipulaciones.
 
-**ISO 9001**
+**ISO 9001:2026**
 
-El marco de gestión de la calidad resulta pertinente para la información documentada controlada, la operación de procesos, el seguimiento, la medición y la evidencia de resultados. La orientación ISO relaciona la información documentada con los procesos controlados y la conservación de evidencia.
+La edición publicada en septiembre de 2026 es la referencia vigente para el sistema de gestión de la calidad. Resulta pertinente para la información documentada controlada, la operación de procesos, el seguimiento, la medición y la evidencia de resultados. Su uso aquí es una correspondencia de diseño; no declara que QvaPay-AI tenga un sistema de gestión certificado.
 
 **ISO 19011:2026**
 
@@ -198,7 +198,7 @@ ISO/IEC 27001:2022 e ISO/IEC 27002:2022 son aplicables a la protección, el cont
 
 ISO/IEC 25010:2023 respalda la evaluación de integridad, responsabilidad, autenticidad y propiedades relacionadas de calidad del software que implemente el libro mayor.
 
-ISO 9001 respalda la operación de procesos controlados, la información documentada, el seguimiento y la evidencia de resultados.
+ISO 9001:2026 respalda, en el alcance pertinente, la operación de procesos controlados, la información documentada, el seguimiento y la evidencia de resultados. La correspondencia detallada de cláusulas debe validarse contra el texto oficial de la edición vigente.
 
 El modelo contable efectivo seguirá sujeto al marco contable aplicable que se identifique en el Issue #286.
 
@@ -313,7 +313,7 @@ La modificación histórica sin control puede causar:
 
 Los controles de ISO/IEC 27002:2022 sobre registros, derechos de acceso y registro de eventos son pertinentes para proteger la información de períodos cerrados y controlar cambios privilegiados.
 
-Los principios de ISO 9001 sobre información documentada y control de procesos respaldan procedimientos controlados y conservación de evidencia de resultados.
+ISO 9001:2026 respalda, en el alcance pertinente, los procesos controlados y la conservación de información documentada y evidencia de resultados. La correspondencia detallada de cláusulas debe validarse contra el texto oficial de la edición vigente.
 
 La definición efectiva de un cierre legal o contable sigue sujeta al Issue #286.
 
@@ -384,7 +384,7 @@ SYS-ACC-004, SYS-ACC-009 y SYS-ACC-012 requieren procedencia externa, conciliaci
 
 ### Criterios ISO aplicables
 
-ISO/IEC 27002:2022 resulta aplicable a la protección de evidencia externa y al control de acceso a los datos de conciliación. ISO 9001 respalda los procesos supervisados, la información documentada y la evaluación basada en evidencia.
+ISO/IEC 27002:2022 resulta aplicable a la protección de evidencia externa y al control de acceso a los datos de conciliación. ISO 9001:2026 respalda, en el alcance pertinente, los procesos supervisados, la información documentada y la evaluación basada en evidencia; la correspondencia detallada de cláusulas debe validarse contra el texto oficial.
 
 ISO 19011:2026 es pertinente como orientación de auditoría para evidencia verificable y evaluación estructurada, no como regla contable.
 
@@ -404,7 +404,7 @@ Seleccionada.
 
 ### Solución seleccionada
 
-Crear un contexto delimitado de Conciliación e Informes que almacene:
+Crear contextos delimitados separados de Conciliación e Informes, con propiedad de datos explícita. La conciliación conservará los registros de comparación y resolución; Informes presentará vistas derivadas sin convertirse en fuente primaria. La capacidad de Conciliación almacenará:
 
 - identidad de la ejecución de conciliación;
 - origen y marca temporal del origen;
@@ -520,7 +520,7 @@ El Issue #286 exige identificar la jurisdicción, el marco contable, los requisi
 
 ### Criterios ISO aplicables
 
-ISO 9001 respalda la determinación del contexto de la organización, los requisitos pertinentes, los procesos controlados y la evaluación del desempeño, pero no sustituye la legislación contable o fiscal.
+ISO 9001:2026 respalda, en el alcance pertinente, la determinación del contexto de la organización, los requisitos pertinentes, los procesos controlados y la evaluación del desempeño, pero no sustituye la legislación contable o fiscal.
 
 ISO/IEC 27001 e ISO/IEC 27002 respaldan los requisitos de riesgo y control de seguridad de la información, pero no son normas contables.
 
@@ -578,7 +578,7 @@ ISO/IEC 25010:2023 es pertinente para la calidad de la arquitectura mediante car
 
 ISO/IEC 27002:2022 respalda el control de acceso, la segregación y la protección de activos de información.
 
-ISO 9001 respalda los procesos controlados, las interfaces definidas, la información documentada y la medición.
+ISO 9001:2026 respalda, en el alcance pertinente, los procesos controlados, las interfaces definidas, la información documentada y la medición.
 
 ### Alternativas consideradas
 
@@ -681,7 +681,7 @@ Solo una cadena completa de evidencia puede incorporarse a la Línea Base Funcio
 
 ## 11. Matriz de aplicabilidad ISO
 
-Las correspondencias siguientes son específicas de cada control o criterio y deben tratarse como restricciones de diseño, no como declaraciones genéricas de certificación:
+Las correspondencias siguientes son específicas de cada control o criterio y deben tratarse como restricciones de diseño, no como declaraciones genéricas de certificación. ISO publicó ISO 9001:2026 el 16 de septiembre de 2026, sustituyendo la edición 2015; por ello, esta matriz no asigna números de cláusula de la nueva edición sin validarlos contra su texto oficial.
 
 | Capacidad                         | Alcance de requisitos            | Referencia ISO                                       | Aplicación                                                                                                                                                               |
 | --------------------------------- | -------------------------------- | ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -689,7 +689,7 @@ Las correspondencias siguientes son específicas de cada control o criterio y de
 | Acceso a auditoría                | SYS-AUD-005..006                 | ISO/IEC 27002:2022 5.15, 5.18                        | Restringir y gobernar los derechos de acceso a la información de auditoría, incluido el registro de accesos a la propia auditoría.                                       |
 | Evidencia de auditoría            | SYS-AUD-007                      | Enfoque basado en evidencia de ISO 19011:2026        | Definir evidencia pertinente, verificable y conservada para auditoría; es orientación de auditoría, no un control del sistema de gestión de seguridad de la información. |
 | Calidad de seguridad del software | SYS-AUD-001..008                 | Modelo de calidad de seguridad de ISO/IEC 25010:2023 | Evaluar integridad, responsabilidad, autenticidad y propiedades relacionadas de calidad de seguridad.                                                                    |
-| Procesos controlados              | SYS-AUD / SYS-ACC / SYS-COMP-ACC | ISO 9001:2015 7.5, 8, 9                              | Controlar la información documentada, las operaciones y la evidencia de desempeño cuando corresponda al alcance del sistema de gestión de calidad.                       |
+| Procesos controlados              | SYS-AUD / SYS-ACC / SYS-COMP-ACC | ISO 9001:2026                                        | Controlar la información documentada, las operaciones y la evidencia de desempeño cuando corresponda al alcance del sistema de gestión de calidad; la correspondencia de cláusulas requiere validación contra el texto oficial. |
 | Protección de datos contables     | SYS-ACC-001..012                 | ISO/IEC 27002:2022 5.33, 5.15, 5.18, 8.15            | Proteger los registros del libro mayor y restringir el acceso privilegiado y los cambios.                                                                                |
 | Calidad del software contable     | SYS-ACC-001..012                 | ISO/IEC 25010:2023                                   | Evaluar la integridad, autenticidad, responsabilidad y mantenibilidad de la implementación.                                                                              |
 | Evidencia de conciliación         | SYS-ACC-004, 009, 012            | Enfoque basado en evidencia de ISO 19011:2026        | Estructurar la evidencia y los registros de evaluación; no define reglas contables.                                                                                      |
