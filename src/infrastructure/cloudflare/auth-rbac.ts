@@ -523,8 +523,12 @@ export async function changeUserPassword(
   const target = rowToUser(row);
   const verifier = await createPasswordVerifier(password);
   const now = new Date().toISOString();
-  await db.prepare("UPDATE app_users SET password_salt = ?, password_hash = ?, password_iterations = ?, updated_at = ? WHERE id = ?")
-    .bind(verifier.salt, verifier.hash, verifier.iterations, now, userId).run();
+  await db
+    .prepare(
+      "UPDATE app_users SET password_salt = ?, password_hash = ?, password_iterations = ?, updated_at = ? WHERE id = ?",
+    )
+    .bind(verifier.salt, verifier.hash, verifier.iterations, now, userId)
+    .run();
   const updated = { ...target, updatedAt: now };
   await writeAudit(db, "password_changed", "SUCCESS", actor, updated);
   return updated;
