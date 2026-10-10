@@ -323,6 +323,48 @@ describe("Cloudflare Worker: aplicación P2P protegida", () => {
     );
   });
 
+  it("recupera una aplicación confirmada aunque falle la consulta del snapshot de cuenta", async () => {
+    const existing = reservation().operation;
+    mocks.reserveOperation.mockResolvedValue({
+      created: false,
+      operation: {
+        ...existing,
+        applyStatus: "CONFIRMED",
+        detailStatus: "FAILED",
+      },
+    });
+    mocks.accountFetch.mockRejectedValue(
+      new Error("synthetic account snapshot outage"),
+    );
+    mocks.fetchOfferDetail.mockReset().mockResolvedValue({
+      ...confirmedOfferDetail,
+      coin: "BANK_CUP",
+      side: "sell",
+      status: "processing",
+      onlyVip: false,
+      onlyKyc: false,
+    });
+
+    const response = await applyRequest(createEnvironment());
+
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toMatchObject({
+      operationId: "operation-123",
+      applyStatus: "CONFIRMED",
+      detailStatus: "AVAILABLE",
+      alreadyApplied: true,
+    });
+    expect(mocks.accountFetch).not.toHaveBeenCalled();
+    expect(mocks.persistAccount).not.toHaveBeenCalled();
+    expect(mocks.fetchOfferDetail).toHaveBeenCalledOnce();
+    expect(mocks.applyOffer).not.toHaveBeenCalled();
+    expect(mocks.recordDetailOutcome).toHaveBeenCalledWith(
+      expect.anything(),
+      "operation-123",
+      { available: true },
+    );
+  });
+
   it("no repite el POST cuando el resultado remoto es ambiguo", async () => {
     mocks.applyOffer.mockRejectedValue(
       new Error("synthetic transport failure"),
