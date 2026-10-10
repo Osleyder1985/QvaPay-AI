@@ -32,8 +32,8 @@ describe("evaluateAutoApplyDecision", () => {
     expect(evaluateAutoApplyDecision(input({ action: "SELL", offer: sell, rateThreshold: "360", amountLimit: "25", accountBalanceQusd: { available: true, fresh: true, amount: "10" } }))).toMatchObject({ eligible: false, reason: "SELL_QUSD_LIMIT_EXCEEDED" });
   });
   it("rechaza moneda, estado y elegibilidad VIP incompatibles", () => {
-    expect(evaluateAutoApplyDecision(input({ offer: offer({ market: "OTHER" }) })).reason).toBe("MARKET_MISMATCH");
-    expect(evaluateAutoApplyDecision(input({ offer: offer({ status: "processing" }) })).reason).toBe("OFFER_NOT_OPEN");
-    expect(evaluateAutoApplyDecision(input({ accountVipVerified: false, offer: offer({ onlyVip: true, creatorVip: true }) })).reason).toBe("VIP_REQUIRED");
+    expect(evaluateAutoApplyDecision(input({ offer: offer({ market: "OTHER" }) }))).toMatchObject({ eligible: false, reason: "MARKET_MISMATCH" });
+    expect(evaluateAutoApplyDecision(input({ offer: offer({ status: "processing" }) }))).toMatchObject({ eligible: false, reason: "OFFER_NOT_OPEN" });
+    expect(evaluateAutoApplyDecision(input({ accountVipVerified: false, offer: offer({ onlyVip: true, creatorVip: true }) })).toMatchObject({ eligible: false, reason: "VIP_REQUIRED" });
   });
 });
