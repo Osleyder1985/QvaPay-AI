@@ -555,75 +555,12 @@ export default {
         );
       }
 
-      const runtimeState = await stub.getState();
-      const market = runtimeState.market;
-      const offer = market?.offers.find(
-        (candidate) => candidate.id === offerUuid,
-      );
-      const nowMs = Date.now();
-      const observedAtMs = offer ? Date.parse(offer.observedAt) : Number.NaN;
-      const maxAgeMs =
-        Math.max(1, Number(env.SCANNER_INTERVAL_SECONDS) || 10) * 2000;
-      if (
-        runtimeState.execution.lastError ||
-        !offer ||
-        offer.status !== "open" ||
-        !Number.isFinite(observedAtMs) ||
-        nowMs - observedAtMs > maxAgeMs ||
-        offer.market !== env.SCANNER_COIN
-      ) {
-        return jsonError(
-          "La oferta no pertenece a un snapshot fresco y accionable. Actualiza el mercado y vuelve a comprobarla.",
-          409,
-        );
-      }
-      if (offer.onlyVip && identity.vip !== true) {
-        return jsonError("La oferta requiere elegibilidad VIP.", 403);
-      }
-
       const client = new QvaPayP2PClient({
         baseUrl: env.QVAPAY_API_BASE_URL,
         appId: env.QVAPAY_APP_ID,
         appSecret: env.QVAPAY_APP_SECRET,
         userApiToken: env.QVAPAY_USER_API_TOKEN,
       });
-
-      let preflightDetail: Awaited<
-        ReturnType<QvaPayP2PClient["fetchOfferDetail"]>
-      >;
-      try {
-        preflightDetail = await client.fetchOfferDetail(offerUuid);
-      } catch (error) {
-        if (error instanceof QvaPayProviderError && error.status === 401) {
-          return jsonError(
-            "La credencial server-side de cuenta QvaPay no pudo autenticarse.",
-            503,
-          );
-        }
-        return jsonError(
-          "No se pudo verificar el detalle autoritativo de la oferta; no se envió ninguna aplicación.",
-          409,
-        );
-      }
-      if (
-        preflightDetail.status !== "open" ||
-        preflightDetail.ownerUuid === null ||
-        preflightDetail.ownerUuid === identity.uuid ||
-        preflightDetail.coin !== env.SCANNER_COIN ||
-        (preflightDetail.side === "sell" ? "SELL" : "BUY") !== offer.side ||
-        (preflightDetail.onlyVip === true && identity.vip !== true) ||
-        (preflightDetail.onlyKyc === true && identity.kyc !== true)
-      ) {
-        const reason =
-          preflightDetail.ownerUuid === identity.uuid
-            ? "No se puede aplicar una oferta propia."
-            : preflightDetail.status !== "open"
-              ? "La oferta ya no está abierta en QvaPay."
-              : preflightDetail.ownerUuid === null
-                ? "QvaPay no permitió verificar el propietario de la oferta."
-                : "El mercado, tipo o requisito de elegibilidad cambió en QvaPay.";
-        return jsonError(reason, 409);
-      }
 
       let reservation;
       try {
@@ -637,6 +574,9 @@ export default {
       } catch {
         return jsonError("No se pudo reservar la operación P2P.", 503);
       }
+
+      // Una aplicación confirmada puede dejar la oferta remota en "processing".
+      // La recuperación del detalle debe preceder a las validaciones para nuevas aplicaciones.
       if (
         reservation.operation.applyStatus === "CONFIRMED" &&
         ["PENDING", "FAILED"].includes(reservation.operation.detailStatus)
@@ -681,6 +621,87 @@ export default {
           },
           { status: 409, headers: { "cache-control": "no-store" } },
         );
+      }
+
+      const rejectReservedOperation = async (
+        message: string,
+        status: number,
+      ): Promise<Response> => {
+        try {
+          await releaseReservedP2POperation(env.DB, reservation.operation.id);
+        } catch {
+          return jsonError(
+            "No se pudo liberar de forma segura la reserva P2P; requiere revisión operativa.",
+            503,
+          );
+        }
+        return jsonError(message, status);
+      };
+
+      const runtimeState = await stub.getState();
+      const market = runtimeState.market;
+      const offer = market?.offers.find(
+        (candidate) => candidate.id === offerUuid,
+      );
+      const nowMs = Date.now();
+      const observedAtMs = offer ? Date.parse(offer.observedAt) : Number.NaN;
+      const maxAgeMs =
+        Math.max(1, Number(env.SCANNER_INTERVAL_SECONDS) || 10) * 2000;
+      if (
+        runtimeState.execution.lastError ||
+        !offer ||
+        offer.status !== "open" ||
+        !Number.isFinite(observedAtMs) ||
+        nowMs - observedAtMs > maxAgeMs ||
+        offer.market !== env.SCANNER_COIN
+      ) {
+        return rejectReservedOperation(
+          "La oferta no pertenece a un snapshot fresco y accionable. Actualiza el mercado y vuelve a comprobarla.",
+          409,
+        );
+      }
+      if (offer.onlyVip && identity.vip !== true) {
+        return rejectReservedOperation(
+          "La oferta requiere elegibilidad VIP.",
+          403,
+        );
+      }
+
+      let preflightDetail: Awaited<
+        ReturnType<QvaPayP2PClient["fetchOfferDetail"]>
+      >;
+      try {
+        preflightDetail = await client.fetchOfferDetail(offerUuid);
+      } catch (error) {
+        if (error instanceof QvaPayProviderError && error.status === 401) {
+          return rejectReservedOperation(
+            "La credencial server-side de cuenta QvaPay no pudo autenticarse.",
+            503,
+          );
+        }
+        return rejectReservedOperation(
+          "No se pudo verificar el detalle autoritativo de la oferta; no se envió ninguna aplicación.",
+          409,
+        );
+      }
+      if (
+        preflightDetail.status !== "open" ||
+        preflightDetail.ownerUuid === null ||
+        preflightDetail.ownerUuid === identity.uuid ||
+        preflightDetail.coin !== env.SCANNER_COIN ||
+        (preflightDetail.side === "sell" ? "SELL" : "BUY") !== offer.side ||
+        (preflightDetail.onlyVip === true && identity.vip !== true) ||
+        (preflightDetail.onlyKyc === true && identity.kyc !== true)
+      ) {
+        const reason =
+          preflightDetail.ownerUuid === identity.uuid
+            ? "No se puede aplicar una oferta propia."
+            : preflightDetail.status !== "open"
+              ? "La oferta ya no está abierta en QvaPay."
+              : preflightDetail.ownerUuid === null
+                ? "QvaPay no permitió verificar el propietario de la oferta."
+                : "El mercado, tipo o requisito de elegibilidad cambió en QvaPay.";
+        return rejectReservedOperation(reason, 409);
       }
 
       try {
