@@ -118,19 +118,19 @@ describe("createD1AutoApplyExecutionPorts", () => {
     const statement = {
       bind: vi.fn().mockReturnThis(),
       run: vi.fn(async () => ({ meta: { changes: 1 } })),
-    first: vi.fn(async () => ({
-      id: "operation-1",
-      offer_uuid: "offer-1",
-      source: "AUTO_APPLY",
-      actor_user_id: null,
-      actor_username: null,
-      apply_status: "AMBIGUOUS",
-      detail_status: "NOT_REQUESTED",
-      provider_http_status: null,
-      detail_error_code: null,
-      created_at: "2026-10-10T12:00:00.000Z",
-      updated_at: "2026-10-10T12:00:00.000Z",
-    })),
+      first: vi.fn(async () => ({
+        id: "operation-1",
+        offer_uuid: "offer-1",
+        source: "AUTO_APPLY",
+        actor_user_id: null,
+        actor_username: null,
+        apply_status: "AMBIGUOUS",
+        detail_status: "NOT_REQUESTED",
+        provider_http_status: null,
+        detail_error_code: null,
+        created_at: "2026-10-10T12:00:00.000Z",
+        updated_at: "2026-10-10T12:00:00.000Z",
+      })),
     };
     const prepare = vi.fn(() => statement);
     const db = {
@@ -158,26 +158,25 @@ describe("createD1AutoApplyExecutionPorts", () => {
     expect(applyOffer).not.toHaveBeenCalled();
     expect(statement.run).toHaveBeenCalledTimes(1);
     expect(prepare).toHaveBeenCalled();
-
   });
 
   it("mantiene ambigua la operación cuando la reconciliación no confirma la identidad", async () => {
     const statement = {
       bind: vi.fn().mockReturnThis(),
       run: vi.fn(async () => ({ meta: { changes: 1 } })),
-    first: vi.fn(async () => ({
-      id: "operation-1",
-      offer_uuid: "offer-1",
-      source: "AUTO_APPLY",
-      actor_user_id: null,
-      actor_username: null,
-      apply_status: "AMBIGUOUS",
-      detail_status: "NOT_REQUESTED",
-      provider_http_status: null,
-      detail_error_code: null,
-      created_at: "2026-10-10T12:00:00.000Z",
-      updated_at: "2026-10-10T12:00:00.000Z",
-    })),
+      first: vi.fn(async () => ({
+        id: "operation-1",
+        offer_uuid: "offer-1",
+        source: "AUTO_APPLY",
+        actor_user_id: null,
+        actor_username: null,
+        apply_status: "AMBIGUOUS",
+        detail_status: "NOT_REQUESTED",
+        provider_http_status: null,
+        detail_error_code: null,
+        created_at: "2026-10-10T12:00:00.000Z",
+        updated_at: "2026-10-10T12:00:00.000Z",
+      })),
     };
     const prepare = vi.fn(() => statement);
     const db = {
