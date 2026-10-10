@@ -42,6 +42,8 @@ La tasa interna se calcula:
 
 `rate = receive / amount`
 
+En el mercado configurado `BANK_CUP`, `amount` representa la cantidad del activo de cuenta expresada funcionalmente en QUSD y `receive` representa el importe fiat en CUP. Por tanto, la tasa presentada se interpreta como **CUP por QUSD**. `BANK_CUP` identifica el mercado P2P; no reemplaza la denominación QUSD del balance de cuenta.
+
 ## Semántica
 
 - `buy` externo se mapea a `BUY`.
