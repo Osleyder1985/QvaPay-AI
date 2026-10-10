@@ -13,6 +13,7 @@
 - Persistencia de resultado mediante `recordP2PApplyOutcome`; si no se confirma la escritura, se propaga el error y no se intenta reenviar el POST.
 - Ausencia de estrategia u ofertas inyectadas implica valores vacíos/deshabilitados; no se activa Auto Apply por defecto.
 - Un timeout o error desconocido durante la aplicación se trata como `AMBIGUOUS`; un rechazo explícito 4xx se conserva como `REJECTED`.
+- Incluso si el POST devuelve una respuesta exitosa, el resultado permanece `AMBIGUOUS` hasta que una reconciliación consulte el detalle autoritativo y compare `status === processing` y `peerUuid` con la identidad de cuenta verificada. Esa verificación todavía no está conectada; por tanto, este adaptador no puede confirmar operaciones.
 
 ## Límites pendientes
 
