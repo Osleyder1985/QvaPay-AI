@@ -8,7 +8,7 @@ on:
       - governance/spanish-language-control
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   security:
@@ -55,19 +55,6 @@ jobs:
 
           echo "===== Diff exacto propuesto por Prettier ====="
           git diff -- .
-
-          if [[ "${GITHUB_HEAD_REF:-}" == "chore/remove-prettier-ignore-all-files" && "${GITHUB_REPOSITORY}" == "${GITHUB_REPOSITORY_OWNER}/QvaPay-AI" ]]; then
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add -u
-            git add scripts/check-prettier-exclusions.mjs
-            if ! git diff --cached --quiet; then
-              git commit -m "style: apply canonical Prettier formatting repository-wide"
-              git push origin "HEAD:${GITHUB_HEAD_REF}"
-              echo "Se registró la reparación canónica en la rama del PR; CI volverá a ejecutarse sobre el nuevo commit."
-              exit 0
-            fi
-          fi
 
           echo "::error::El formato original no cumplía. Revisa el diff, aplica la reparación en la rama de trabajo y vuelve a ejecutar los controles."
           exit 1
