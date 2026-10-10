@@ -311,11 +311,10 @@ describe("QvaPay P2P apply", () => {
       maxRetries: 3,
     });
 
-    await expect(client.applyOffer("offer-ambiguous")).rejects.toMatchObject({
+    await expect(client.applyOffer("offer-ambiguous")).rejects.toMatchObject(
       name: QvaPayAmbiguousOperationError.name,
       offerUuid: "offer-ambiguous",
     });
     expect(fetcher).toHaveBeenCalledTimes(1);
   });
-
 });
