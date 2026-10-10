@@ -221,9 +221,7 @@ test("el mercado identifica explícitamente un snapshot no disponible", async ({
   await authenticate(page, testInfo);
   await page.goto("/app/mercado");
 
-  await expect(page.locator("#marketIntegrity")).toContainText(
-    "NO DISPONIBLE",
-  );
+  await expect(page.locator("#marketIntegrity")).toContainText("NO DISPONIBLE");
   await expect(page.locator("#sellTable")).toContainText("No hay ofertas");
   await expect(page.locator("#buyTable")).toContainText("No hay ofertas");
 });
